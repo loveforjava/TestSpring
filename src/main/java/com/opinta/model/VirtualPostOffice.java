@@ -1,10 +1,20 @@
 package com.opinta.model;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import java.util.List;
 
+
+/**
+ * VirtualPostOffice is the group of clients with the same postcode
+ */
 @Entity
 @Data
 @NoArgsConstructor
@@ -12,10 +22,12 @@ public class VirtualPostOffice {
     @Id
     @GeneratedValue
     private long id;
-    // 5 digits
-    private String virtualPostcode;
-    @ManyToOne
-    @JoinColumn(name = "tenant_id")
-    private Tenant tenant;
-    private boolean blocked;
+    private String name;
+    @OneToOne
+    @NotNull
+    private PostcodePool activePostcodePool;
+    // TODO add field private List<PostcodePool> closedPostcodePools (unidirectional)
+    private String description;
+    @OneToMany(mappedBy = "virtualPostOffice")
+    private List<Client> clients;
 }

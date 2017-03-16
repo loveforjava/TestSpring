@@ -1,10 +1,24 @@
 package com.opinta.model;
 
+import java.util.ArrayList;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import java.util.List;
 
+/**
+ * PostcodePool holds all postcodes ("00000"-"99999") and pool of the inner numbers for each postcode
+ * It shouldn't have field like Client or PostOffice.
+ * Client and PostOffice should have reference to it instead
+ */
 @Entity
 @Data
 @NoArgsConstructor
@@ -12,9 +26,16 @@ public class PostcodePool {
     @Id
     @GeneratedValue
     private long id;
-    // 7 digits
-    private String number;
-    @ManyToOne
-    @JoinColumn(name = "virtual_post_office_id")
-    private VirtualPostOffice virtualPostOffice;
+    @NotNull
+    @Size(min = 5, max = 5)
+    private String postcode;
+//    @OneToMany(mappedBy = "postcodePool", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "postcodePool")
+    private List<BarcodeInnerNumber> barcodeInnerNumbers = new ArrayList<>();
+    private boolean closed;
+
+    public PostcodePool(String postcode, boolean closed) {
+        this.postcode = postcode;
+        this.closed = closed;
+    }
 }

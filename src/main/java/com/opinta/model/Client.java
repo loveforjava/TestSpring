@@ -1,9 +1,12 @@
 package com.opinta.model;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
 
 @Entity
 @Data
@@ -13,12 +16,12 @@ public class Client {
     @GeneratedValue
     private long id;
     private String name;
-    private String usreou;
-    private String tin;
+    private String uniqueRegistrationNumber;
+    private String taxpayerIdNumber;
     @ManyToOne
-    @JoinColumn(name = "group_id")
+    @JoinColumn(name = "address_id")
     private Address address;
     @ManyToOne
-    @JoinColumn(name = "tenant_id")
-    private Tenant tenant;
+    @JoinColumn(name = "virtual_post_office_id")
+    private VirtualPostOffice virtualPostOffice;
 }
