@@ -8,6 +8,6 @@ public interface BarcodeInnerNumberService {
     List<BarcodeInnerNumber> getAll();
     BarcodeInnerNumber getById(Long id);
     void save(BarcodeInnerNumber barcodeInnerNumber);
-    BarcodeInnerNumber update(Long id, BarcodeInnerNumber barcodeInnerNumber);
+    BarcodeInnerNumber update(Long id, BarcodeInnerNumber source);
     boolean delete(Long id);
 }

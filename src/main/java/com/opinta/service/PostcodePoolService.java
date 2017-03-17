@@ -8,6 +8,6 @@ public interface PostcodePoolService {
     List<PostcodePool> getAll();
     PostcodePool getById(Long id);
     void save(PostcodePool postcodePool);
-    PostcodePool update(Long id, PostcodePool postcodePool);
+    PostcodePool update(Long id, PostcodePool source);
     boolean delete(Long id);
 }

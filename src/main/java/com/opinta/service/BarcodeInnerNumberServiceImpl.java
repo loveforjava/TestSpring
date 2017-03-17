@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.List;
 
+import static org.apache.commons.beanutils.BeanUtils.copyProperties;
+
 @Service
 @Slf4j
 public class BarcodeInnerNumberServiceImpl implements BarcodeInnerNumberService {
@@ -22,47 +24,52 @@ public class BarcodeInnerNumberServiceImpl implements BarcodeInnerNumberService 
     @Override
     @Transactional
     public List<BarcodeInnerNumber> getAll() {
-        log.info("Getting all Customers");
+        log.info("Getting all barcodeInnerNumbers");
         return barcodeInnerNumberDao.getAll();
     }
 
     @Override
     @Transactional
     public BarcodeInnerNumber getById(Long id) {
-        log.info("Getting Customer by id " + id);
+        log.info("Getting barcodeInnerNumber by id " + id);
         return barcodeInnerNumberDao.getById(id);
     }
 
     @Override
     @Transactional
     public void save(BarcodeInnerNumber barcodeInnerNumber) {
-        log.info("Saving customer " + barcodeInnerNumber);
+        log.info("Saving barcodeInnerNumber " + barcodeInnerNumber);
         barcodeInnerNumberDao.save(barcodeInnerNumber);
     }
 
     @Override
     @Transactional
-    public BarcodeInnerNumber update(Long id, BarcodeInnerNumber barcodeInnerNumber) {
-        if (getById(id) == null) {
-            log.info("Can't update barcode inner number. Inner number doesn't exist " + id);
+    public BarcodeInnerNumber update(Long id, BarcodeInnerNumber source) {
+        BarcodeInnerNumber target = getById(id);
+        if (target == null) {
+            log.info("Can't update barcodeInnerNumber. BarcodeInnerNumber doesn't exist " + id);
             return null;
         }
-        barcodeInnerNumber.setId(id);
-        log.info("Updating customer " + barcodeInnerNumber);
-        barcodeInnerNumberDao.update(barcodeInnerNumber);
-        return barcodeInnerNumber;
+        try {
+            copyProperties(target, source);
+        } catch (Exception e) {
+            log.error("Can't get properties from object to updatable object for barcodeInnerNumber", e);
+        }
+        target.setId(id);
+        log.info("Updating barcodeInnerNumber " + target);
+        barcodeInnerNumberDao.update(target);
+        return target;
     }
 
     @Override
     @Transactional
     public boolean delete(Long id) {
-        if (getById(id) == null) {
-            log.debug("Can't delete customer. Customer doesn't exist " + id);
+        BarcodeInnerNumber barcodeInnerNumber = getById(id);
+        if (barcodeInnerNumber == null) {
+            log.debug("Can't delete barcodeInnerNumber. BarcodeInnerNumber doesn't exist " + id);
             return false;
         }
-        BarcodeInnerNumber barcodeInnerNumber = new BarcodeInnerNumber();
-        barcodeInnerNumber.setId(id);
-        log.info("Deleting customer " + barcodeInnerNumber);
+        log.info("Deleting barcodeInnerNumber " + barcodeInnerNumber);
         barcodeInnerNumberDao.delete(barcodeInnerNumber);
         return true;
     }

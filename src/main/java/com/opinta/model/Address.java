@@ -24,4 +24,13 @@ public class Address {
     private String description;
     private BigDecimal latitude;
     private BigDecimal longitude;
+
+    public Address(String postcode, String region, String district, String city, String street, String houseNumber) {
+        this.postcode = postcode;
+        this.region = region;
+        this.district = district;
+        this.city = city;
+        this.street = street;
+        this.houseNumber = houseNumber;
+    }
 }

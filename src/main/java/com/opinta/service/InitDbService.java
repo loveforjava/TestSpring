@@ -38,15 +38,12 @@ public class InitDbService {
         customers.stream().forEach(customerService::save);
 
         PostcodePool postcodePool = new PostcodePool("00001", false);
+        postcodePool.getBarcodeInnerNumbers().add(new BarcodeInnerNumber("0000001", BarcodeInnerNumber.Status.USED));
+        postcodePool.getBarcodeInnerNumbers().add(new BarcodeInnerNumber("0000002", BarcodeInnerNumber.Status.RESERVED));
+        postcodePool.getBarcodeInnerNumbers().add(new BarcodeInnerNumber("0000003", BarcodeInnerNumber.Status.RESERVED));
+        postcodePoolService.save(postcodePool);
 
-        List<BarcodeInnerNumber> barcodeInnerNumbers = new ArrayList<>();
-        barcodeInnerNumbers.add(new BarcodeInnerNumber("0000001", postcodePool, BarcodeInnerNumber.Status.USED));
-        barcodeInnerNumbers.add(new BarcodeInnerNumber("0000002", postcodePool, BarcodeInnerNumber.Status.RESERVED));
-        barcodeInnerNumbers.add(new BarcodeInnerNumber("0000003", postcodePool, BarcodeInnerNumber.Status.RESERVED));
-        barcodeInnerNumbers.stream().forEach(barcodeInnerNumberService::save);
-
-        // TODO why this code throws StackOverflowError???
-//        postcodePool.setBarcodeInnerNumbers(barcodeInnerNumbers);
-//        postcodePoolService.save(postcodePool);
+        BarcodeInnerNumber barcodeInnerNumber = new BarcodeInnerNumber("0000004", BarcodeInnerNumber.Status.RESERVED);
+        barcodeInnerNumberService.update(postcodePool.getBarcodeInnerNumbers().get(2).getId(), barcodeInnerNumber);
     }
 }

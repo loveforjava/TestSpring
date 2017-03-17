@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -29,8 +30,8 @@ public class PostcodePool {
     @NotNull
     @Size(min = 5, max = 5)
     private String postcode;
-//    @OneToMany(mappedBy = "postcodePool", cascade = CascadeType.ALL)
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "postcodePool")
+    @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY)
+    @JoinColumn(name="postcode_pool_id")
     private List<BarcodeInnerNumber> barcodeInnerNumbers = new ArrayList<>();
     private boolean closed;
 

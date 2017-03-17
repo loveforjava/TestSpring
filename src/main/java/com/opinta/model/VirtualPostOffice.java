@@ -1,5 +1,6 @@
 package com.opinta.model;
 
+import java.util.ArrayList;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -28,6 +29,9 @@ public class VirtualPostOffice {
     private PostcodePool activePostcodePool;
     // TODO add field private List<PostcodePool> closedPostcodePools (unidirectional)
     private String description;
-    @OneToMany(mappedBy = "virtualPostOffice")
-    private List<Client> clients;
+
+    public VirtualPostOffice(String name, PostcodePool activePostcodePool) {
+        this.name = name;
+        this.activePostcodePool = activePostcodePool;
+    }
 }
