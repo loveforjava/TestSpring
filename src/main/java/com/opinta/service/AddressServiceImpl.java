@@ -1,6 +1,8 @@
 package com.opinta.service;
 
 import com.opinta.dao.AddressDao;
+import com.opinta.dto.AddressDto;
+import com.opinta.mapper.AddressMapper;
 import com.opinta.model.Address;
 import java.util.List;
 import javax.transaction.Transactional;
@@ -14,17 +16,19 @@ import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 @Slf4j
 public class AddressServiceImpl implements AddressService {
     private AddressDao addressDao;
+    private AddressMapper addressMapper;
 
     @Autowired
-    public AddressServiceImpl(AddressDao addressDao) {
+    public AddressServiceImpl(AddressDao addressDao, AddressMapper addressMapper) {
         this.addressDao = addressDao;
+        this.addressMapper = addressMapper;
     }
 
     @Override
     @Transactional
-    public List<Address> getAll() {
-        log.info("Getting all addresss");
-        return addressDao.getAll();
+    public List<AddressDto> getAll() {
+        log.info("Getting all addresses");
+        return addressMapper.toDto(addressDao.getAll());
     }
 
     @Override

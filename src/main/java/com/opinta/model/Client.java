@@ -1,5 +1,6 @@
 package com.opinta.model;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -20,7 +21,7 @@ public class Client {
     @ManyToOne
     @JoinColumn(name = "address_id")
     private Address address;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "virtual_post_office_id")
     private VirtualPostOffice virtualPostOffice;
 

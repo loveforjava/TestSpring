@@ -1,5 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ua.test.spring</groupId>
 	<artifactId>TestSpring</artifactId>
@@ -13,19 +14,25 @@
 		<jackson.version>2.7.5</jackson.version>
         <hibernate.version>4.3.5.Final</hibernate.version>
         <hibernate-validator.version>4.3.1.Final</hibernate-validator.version>
+        <!--<org.mapstruct.version>1.1.0.Final</org.mapstruct.version>-->
+        <org.mapstruct.version>1.2.0.Beta1</org.mapstruct.version>
+        <org.projectlombok.version>1.16.14</org.projectlombok.version>
         <hsqldb.version>2.3.2</hsqldb.version>
 	</properties>
 	<dependencies>
+        <!-- spring-webmvc -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc</artifactId>
 			<version>${springframework.version}</version>
 		</dependency>
+        <!-- jackson-databind -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 			<version>${jackson.version}</version>
 		</dependency>
+        <!-- javax.servlet-api -->
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
@@ -54,17 +61,50 @@
             <artifactId>hibernate-validator</artifactId>
             <version>${hibernate-validator.version}</version>
         </dependency>
+        <!-- mapstruct -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${org.mapstruct.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-processor</artifactId>
+            <version>${org.mapstruct.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${org.projectlombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
         <!-- slf4j-api -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.7.21</version>
         </dependency>
-        <!-- lombok -->
+        <!-- junit -->
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.16.6</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- mockito-all -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.10.19</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- spring-test -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${springframework.version}</version>
         </dependency>
         <!-- commons-beanutils -->
         <dependency>
@@ -86,15 +126,20 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>2.5.1</version>
+                    <version>3.6.0</version>
                     <configuration>
                         <source>${jdk.version}</source>
                         <target>${jdk.version}</target>
-                        <compilerArgument>-Xlint:all</compilerArgument>
-                        <showWarnings>true</showWarnings>
-                        <showDeprecation>true</showDeprecation>
+                        <!--<annotationProcessors>-->
+                            <!--<annotationProcessor>lombok.launch.AnnotationProcessorHider$AnnotationProcessor</annotationProcessor>-->
+                            <!--<annotationProcessor>org.mapstruct.ap.MappingProcessor</annotationProcessor>-->
+                        <!--</annotationProcessors>-->
+                        <!--<compilerArgs>-->
+                            <!--<arg>-Amapstruct.defaultComponentModel=spring</arg>-->
+                        <!--</compilerArgs>-->
                     </configuration>
                 </plugin>
+
                 <!-- embedded Jetty server, for testing -->
                 <plugin>
                     <groupId>org.eclipse.jetty</groupId>

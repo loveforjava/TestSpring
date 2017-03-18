@@ -1,6 +1,7 @@
 package com.opinta.model;
 
 import java.util.ArrayList;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -24,7 +25,7 @@ public class VirtualPostOffice {
     @GeneratedValue
     private long id;
     private String name;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @NotNull
     private PostcodePool activePostcodePool;
     // TODO add field private List<PostcodePool> closedPostcodePools (unidirectional)
