@@ -1,11 +1,7 @@
 package com.opinta.controller;
 
 import com.opinta.dto.AddressDto;
-import com.opinta.model.Address;
-import com.opinta.model.Client;
-import com.opinta.model.Customer;
 import com.opinta.service.AddressService;
-import com.opinta.service.CustomerService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,8 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static java.lang.String.format;
 
 @RestController
 @RequestMapping("/addresses")
@@ -29,50 +24,41 @@ public class AddressController {
     @Autowired
     private AddressService addressService;
 
-    @RequestMapping(method = GET, produces = APPLICATION_JSON_VALUE)
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<AddressDto> getAddresses() {
         return addressService.getAll();
     }
 
-//	@GetMapping("/customers/{id}")
-//	public ResponseEntity<?> getCustomer(@PathVariable("id") Long id) {
-//
-//		Customer customer = customerService.getById(id);
-//		if (customer == null) {
-//			return new ResponseEntity<>("No Customer found for ID " + id, HttpStatus.NOT_FOUND);
-//		}
-//
-//		return new ResponseEntity<>(customer, HttpStatus.OK);
-//	}
-//
-//	@PostMapping(value = "/customers")
-//	public ResponseEntity<?> createCustomer(@RequestBody Customer customer) {
-//
-//		customerService.save(customer);
-//
-//		return new ResponseEntity<>(customer, HttpStatus.OK);
-//	}
-//
-//	@PutMapping("/customers/{id}")
-//	public ResponseEntity<?> updateCustomer(@PathVariable Long id, @RequestBody Customer customer) {
-//
-//		customer = customerService.update(id, customer);
-//
-//		if (null == customer) {
-//			return new ResponseEntity<>("No Customer found for ID " + id, HttpStatus.NOT_FOUND);
-//		}
-//
-//		return new ResponseEntity<>(customer, HttpStatus.OK);
-//	}
-//
-//    @DeleteMapping("/customers/{id}")
-//    public ResponseEntity<?> deleteCustomer(@PathVariable Long id) {
-//
-//        if (!customerService.delete(id)) {
-//            return new ResponseEntity("No Customer found for ID " + id, HttpStatus.NOT_FOUND);
-//        }
-//
-//        return new ResponseEntity(id, HttpStatus.OK);
-//    }
+	@GetMapping("{id}")
+	public ResponseEntity<?> getAddress(@PathVariable("id") Long id) {
+		AddressDto addressDto = addressService.getById(id);
+		if (addressDto == null) {
+			return new ResponseEntity<>(format("No Address found for ID %d", id), HttpStatus.NOT_FOUND);
+		}
+		return new ResponseEntity<>(addressDto, HttpStatus.OK);
+	}
+
+	@PostMapping
+    @ResponseStatus(HttpStatus.OK)
+	public void createAddress(@RequestBody AddressDto addressDto) {
+		addressService.save(addressDto);
+	}
+
+	@PutMapping("{id}")
+	public ResponseEntity<?> updateAddress(@PathVariable Long id, @RequestBody AddressDto addressDto) {
+		addressDto = addressService.update(id, addressDto);
+		if (addressDto == null) {
+			return new ResponseEntity<>(format("No Address found for ID %d", id), HttpStatus.NOT_FOUND);
+		}
+		return new ResponseEntity<>(addressDto, HttpStatus.OK);
+	}
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<?> deleteAddress(@PathVariable Long id) {
+        if (!addressService.delete(id)) {
+            return new ResponseEntity<>(format("No Customer found for ID %d", id), HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(id, HttpStatus.OK);
+    }
 }

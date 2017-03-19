@@ -14,7 +14,6 @@
 		<jackson.version>2.7.5</jackson.version>
         <hibernate.version>4.3.5.Final</hibernate.version>
         <hibernate-validator.version>4.3.1.Final</hibernate-validator.version>
-        <!--<org.mapstruct.version>1.1.0.Final</org.mapstruct.version>-->
         <org.mapstruct.version>1.2.0.Beta1</org.mapstruct.version>
         <org.projectlombok.version>1.16.14</org.projectlombok.version>
         <hsqldb.version>2.3.2</hsqldb.version>
@@ -130,16 +129,8 @@
                     <configuration>
                         <source>${jdk.version}</source>
                         <target>${jdk.version}</target>
-                        <!--<annotationProcessors>-->
-                            <!--<annotationProcessor>lombok.launch.AnnotationProcessorHider$AnnotationProcessor</annotationProcessor>-->
-                            <!--<annotationProcessor>org.mapstruct.ap.MappingProcessor</annotationProcessor>-->
-                        <!--</annotationProcessors>-->
-                        <!--<compilerArgs>-->
-                            <!--<arg>-Amapstruct.defaultComponentModel=spring</arg>-->
-                        <!--</compilerArgs>-->
                     </configuration>
                 </plugin>
-
                 <!-- embedded Jetty server, for testing -->
                 <plugin>
                     <groupId>org.eclipse.jetty</groupId>

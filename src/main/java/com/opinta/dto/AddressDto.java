@@ -5,11 +5,11 @@ import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
+import static com.opinta.constraint.RegexPattern.POSTCODE_REGEX;
+
 @Getter
 @Setter
 public class AddressDto {
-    public static final String POSTCODE_REGEX = "^$|\\d{5}";
-
     private long id;
     @Pattern(regexp = POSTCODE_REGEX)
     private String postcode;
