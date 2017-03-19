@@ -1,7 +1,11 @@
 package com.opinta.service;
 
 import com.opinta.dto.AddressDto;
+import com.opinta.dto.BarcodeInnerNumberDto;
+import com.opinta.dto.PostcodePoolDto;
 import com.opinta.mapper.AddressMapper;
+import com.opinta.mapper.BarcodeInnerNumberMapper;
+import com.opinta.mapper.PostcodePoolMapper;
 import com.opinta.model.Address;
 import com.opinta.model.BarcodeInnerNumber;
 import com.opinta.model.BarcodeStatus;
@@ -27,17 +31,22 @@ public class InitDbService {
     private ClientService clientService;
     private AddressService addressService;
     private AddressMapper addressMapper;
+    private PostcodePoolMapper postcodePoolMapper;
+    private BarcodeInnerNumberMapper barcodeInnerNumberMapper;
 
     @Autowired
     public InitDbService(CustomerService customerService, BarcodeInnerNumberService barcodeInnerNumberService,
                          PostcodePoolService postcodePoolService, ClientService clientService,
-                         AddressService addressService, AddressMapper addressMapper) {
+                         AddressService addressService, AddressMapper addressMapper,
+                         PostcodePoolMapper postcodePoolMapper, BarcodeInnerNumberMapper barcodeInnerNumberMapper) {
         this.customerService = customerService;
         this.barcodeInnerNumberService = barcodeInnerNumberService;
         this.postcodePoolService = postcodePoolService;
         this.clientService = clientService;
         this.addressService = addressService;
         this.addressMapper = addressMapper;
+        this.postcodePoolMapper = postcodePoolMapper;
+        this.barcodeInnerNumberMapper = barcodeInnerNumberMapper;
     }
 
     @PostConstruct
@@ -54,11 +63,15 @@ public class InitDbService {
 //        customers.stream().forEach(customerService::save);
 
         // create PostcodePool with BarcodeInnerNumber
-        PostcodePool postcodePool = new PostcodePool("00001", false);
-        postcodePool.getBarcodeInnerNumbers().add(new BarcodeInnerNumber("0000001", USED));
-        postcodePool.getBarcodeInnerNumbers().add(new BarcodeInnerNumber("0000002", RESERVED));
-        postcodePool.getBarcodeInnerNumbers().add(new BarcodeInnerNumber("0000003", RESERVED));
-        postcodePoolService.save(postcodePool);
+        PostcodePoolDto postcodePoolDto = postcodePoolMapper.toDto(new PostcodePool("00001", false));
+        final long postcodePoolId = postcodePoolService.save(postcodePoolDto).getId();
+
+        List<BarcodeInnerNumberDto> barcodeInnerNumbers = new ArrayList<>();
+        barcodeInnerNumbers.add(barcodeInnerNumberMapper.toDto(new BarcodeInnerNumber("0000001", USED)));
+        barcodeInnerNumbers.add(barcodeInnerNumberMapper.toDto(new BarcodeInnerNumber("0000002", RESERVED)));
+        barcodeInnerNumbers.add(barcodeInnerNumberMapper.toDto(new BarcodeInnerNumber("0000003", RESERVED)));
+
+        postcodePoolService.addBarcodeInnerNumbers(postcodePoolId, barcodeInnerNumbers);
 
         // create Address
         List<AddressDto> addresses = new ArrayList<>();

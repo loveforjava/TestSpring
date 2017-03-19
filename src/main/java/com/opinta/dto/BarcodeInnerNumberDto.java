@@ -15,5 +15,5 @@ public class BarcodeInnerNumberDto {
     @Pattern(regexp = BARCODE_INNER_NUMBER_REGEX)
     private String number;
     @EnumString(source = BarcodeStatus.class)
-    private String status;
+    private BarcodeStatus barcodeStatus;
 }

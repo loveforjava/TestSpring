@@ -30,9 +30,9 @@ public class PostcodePoolDaoImpl implements PostcodePoolDao {
     }
 
     @Override
-    public void save(PostcodePool postcodePool) {
+    public PostcodePool save(PostcodePool postcodePool) {
         Session session = sessionFactory.getCurrentSession();
-        session.saveOrUpdate(postcodePool);
+        return (PostcodePool) session.merge(postcodePool);
     }
 
     @Override

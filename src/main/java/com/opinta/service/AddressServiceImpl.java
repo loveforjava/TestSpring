@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static java.lang.String.format;
 import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 
 @Service
@@ -35,14 +34,14 @@ public class AddressServiceImpl implements AddressService {
     @Override
     @Transactional
     public AddressDto getById(Long id) {
-        log.info(format("Getting address by id %d", id));
+        log.info("Getting address by id {}", id);
         return addressMapper.toDto(addressDao.getById(id));
     }
 
     @Override
     @Transactional
     public void save(AddressDto addressDto) {
-        log.info(format("Saving address %s", addressDto));
+        log.info("Saving address {}", addressDto);
         addressDao.save(addressMapper.toEntity(addressDto));
     }
 
@@ -52,7 +51,7 @@ public class AddressServiceImpl implements AddressService {
         Address source = addressMapper.toEntity(addressDto);
         Address target = addressDao.getById(id);
         if (target == null) {
-            log.info(format("Can't update address. Address doesn't exist %d", id));
+            log.info("Can't update address. Address doesn't exist {}", id);
             return null;
         }
         try {
@@ -61,7 +60,7 @@ public class AddressServiceImpl implements AddressService {
             log.error("Can't get properties from object to updatable object for address", e);
         }
         target.setId(id);
-        log.info(format("Updating client %s", target));
+        log.info("Updating address {}", target);
         addressDao.update(target);
         return addressMapper.toDto(target);
     }
@@ -71,10 +70,10 @@ public class AddressServiceImpl implements AddressService {
     public boolean delete(Long id) {
         Address address = addressDao.getById(id);
         if (address == null) {
-            log.debug("Can't delete address. Address doesn't exist " + id);
+            log.debug("Can't delete address. Address doesn't exist {}", id);
             return false;
         }
-        log.info("Deleting address " + address);
+        log.info("Deleting address {}", address);
         addressDao.delete(address);
         return true;
     }

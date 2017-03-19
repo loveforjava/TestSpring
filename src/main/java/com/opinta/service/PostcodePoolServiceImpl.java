@@ -1,13 +1,16 @@
 package com.opinta.service;
 
-import com.opinta.dao.CustomerDao;
+import com.opinta.dao.BarcodeInnerNumberDao;
 import com.opinta.dao.PostcodePoolDao;
-import com.opinta.model.Customer;
+import com.opinta.dto.BarcodeInnerNumberDto;
+import com.opinta.dto.PostcodePoolDto;
+import com.opinta.mapper.BarcodeInnerNumberMapper;
+import com.opinta.mapper.PostcodePoolMapper;
+import com.opinta.model.BarcodeInnerNumber;
 import com.opinta.model.PostcodePool;
 import java.util.List;
 import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,36 +19,47 @@ import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 @Service
 @Slf4j
 public class PostcodePoolServiceImpl implements PostcodePoolService {
-    @Autowired
     private PostcodePoolDao postcodePoolDao;
+    private BarcodeInnerNumberDao barcodeInnerNumberDao;
+    private PostcodePoolMapper postcodePoolMapper;
+    private BarcodeInnerNumberMapper barcodeInnerNumberMapper;
+
+    @Autowired
+    public PostcodePoolServiceImpl(PostcodePoolDao postcodePoolDao, PostcodePoolMapper postcodePoolMapper,
+                                   BarcodeInnerNumberMapper barcodeInnerNumberMapper) {
+        this.postcodePoolDao = postcodePoolDao;
+        this.postcodePoolMapper = postcodePoolMapper;
+        this.barcodeInnerNumberMapper = barcodeInnerNumberMapper;
+    }
 
     @Override
     @Transactional
-    public List<PostcodePool> getAll() {
+    public List<PostcodePoolDto> getAll() {
         log.info("Getting all postcodePools");
-        return postcodePoolDao.getAll();
+        return postcodePoolMapper.toDto(postcodePoolDao.getAll());
     }
 
     @Override
     @Transactional
-    public PostcodePool getById(Long id) {
-        log.info("Getting postcodePool by id " + id);
-        return postcodePoolDao.getById(id);
+    public PostcodePoolDto getById(Long id) {
+        log.info("Getting postcodePool by id {}", id);
+        return postcodePoolMapper.toDto(postcodePoolDao.getById(id));
     }
 
     @Override
     @Transactional
-    public void save(PostcodePool postcodePool) {
-        log.info("Saving postcodePool " + postcodePool);
-        postcodePoolDao.save(postcodePool);
+    public PostcodePoolDto save(PostcodePoolDto postcodePoolDto) {
+        log.info("Saving postcodePool {}", postcodePoolDto);
+        return postcodePoolMapper.toDto(postcodePoolDao.save(postcodePoolMapper.toEntity(postcodePoolDto)));
     }
 
     @Override
     @Transactional
-    public PostcodePool update(Long id, PostcodePool source) {
-        PostcodePool target = getById(id);
+    public PostcodePoolDto update(Long id, PostcodePoolDto postcodePoolDto) {
+        PostcodePool source = postcodePoolMapper.toEntity(postcodePoolDto);
+        PostcodePool target = postcodePoolDao.getById(id);
         if (target == null) {
-            log.info("Can't update postcodePool. PostCodePool doesn't exist " + id);
+            log.debug("Can't update postcodePool. PostCodePool doesn't exist {}", id);
             return null;
         }
         try {
@@ -54,22 +68,36 @@ public class PostcodePoolServiceImpl implements PostcodePoolService {
             log.error("Can't get properties from object to updatable object for postcodePool", e);
         }
         target.setId(id);
-        log.info("Updating postcodePool " + target);
+        log.info("Updating postcodePool {}", target);
         postcodePoolDao.update(target);
-        return source;
+        return postcodePoolMapper.toDto(target);
     }
 
     @Override
     @Transactional
     public boolean delete(Long id) {
-        PostcodePool postcodePool = getById(id);
+        PostcodePool postcodePool = postcodePoolDao.getById(id);
         if (postcodePool == null) {
-            log.debug("Can't delete postcodePool. PostCodePool doesn't exist " + id);
+            log.debug("Can't delete postcodePool. PostCodePool doesn't exist {}", id);
             return false;
         }
         postcodePool.setId(id);
-        log.info("Deleting postcodePool " + postcodePool);
+        log.info("Deleting postcodePool {}", postcodePool);
         postcodePoolDao.delete(postcodePool);
+        return true;
+    }
+
+    @Override
+    @Transactional
+    public boolean addBarcodeInnerNumbers(long postcodeId, List<BarcodeInnerNumberDto> barcodeInnerNumberDtos) {
+        PostcodePool postcodePool = postcodePoolDao.getById(postcodeId);
+        if (postcodePool == null) {
+            log.debug("Can't add barcodeInnerNumberDto list to postcodePool. PostCodePool doesn't exist {}", postcodeId);
+            return false;
+        }
+        postcodePool.setBarcodeInnerNumbers(barcodeInnerNumberMapper.toEntity(barcodeInnerNumberDtos));
+        log.info("Adding barcodeInnerNumberDto list to postcodePool {}", postcodePool);
+        postcodePoolDao.update(postcodePool);
         return true;
     }
 }

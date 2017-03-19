@@ -19,10 +19,10 @@ public class BarcodeInnerNumber {
     @Size(min = 7, max = 7)
     private String number;
     @Enumerated(EnumType.STRING)
-    private BarcodeStatus status;
+    private BarcodeStatus barcodeStatus;
 
-    public BarcodeInnerNumber(String number, BarcodeStatus status) {
+    public BarcodeInnerNumber(String number, BarcodeStatus barcodeStatus) {
         this.number = number;
-        this.status = status;
+        this.barcodeStatus = barcodeStatus;
     }
 }
