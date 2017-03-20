@@ -1,6 +1,5 @@
 package com.opinta.dao;
 
-import com.opinta.model.Customer;
 import com.opinta.model.PostcodePool;
 import java.util.List;
 import org.hibernate.Criteria;

@@ -2,8 +2,6 @@ package com.opinta.service;
 
 import com.opinta.dto.BarcodeInnerNumberDto;
 import com.opinta.dto.PostcodePoolDto;
-import com.opinta.model.Customer;
-import com.opinta.model.PostcodePool;
 import java.util.List;
 
 public interface PostcodePoolService {
