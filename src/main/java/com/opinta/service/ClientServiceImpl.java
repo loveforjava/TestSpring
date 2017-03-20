@@ -36,9 +36,9 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public void save(Client client) {
+    public Client save(Client client) {
         log.info("Saving client " + client);
-        clientDao.save(client);
+        return clientDao.save(client);
     }
 
     @Override
