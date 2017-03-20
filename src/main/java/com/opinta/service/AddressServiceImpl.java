@@ -1,11 +1,13 @@
 package com.opinta.service;
 
+import java.util.List;
+
+import javax.transaction.Transactional;
+
 import com.opinta.dao.AddressDao;
 import com.opinta.dto.AddressDto;
 import com.opinta.mapper.AddressMapper;
 import com.opinta.model.Address;
-import java.util.List;
-import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,7 @@ import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 @Service
 @Slf4j
 public class AddressServiceImpl implements AddressService {
+    
     private AddressDao addressDao;
     private AddressMapper addressMapper;
 
