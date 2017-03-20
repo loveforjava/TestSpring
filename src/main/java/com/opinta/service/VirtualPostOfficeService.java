@@ -1,12 +1,18 @@
 package com.opinta.service;
 
-import com.opinta.model.VirtualPostOffice;
 import java.util.List;
 
+import com.opinta.dto.VirtualPostOfficeDto;
+
 public interface VirtualPostOfficeService {
-    List<VirtualPostOffice> getAll();
-    VirtualPostOffice getById(Long id);
-    void save(VirtualPostOffice virtualPostOffice);
-    VirtualPostOffice update(Long id, VirtualPostOffice source);
-    boolean delete(Long id);
+    
+    List<VirtualPostOfficeDto> getAll();
+    
+    VirtualPostOfficeDto getById(long id);
+    
+    VirtualPostOfficeDto update(long id, VirtualPostOfficeDto source);
+    
+    boolean save(VirtualPostOfficeDto virtualPostOffice);
+    
+    boolean delete(long id);
 }

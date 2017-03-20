@@ -1,6 +1,8 @@
 package com.opinta.service;
 
 import com.opinta.dao.VirtualPostOfficeDao;
+import com.opinta.dto.VirtualPostOfficeDto;
+import com.opinta.mapper.VirtualPostOfficeMapper;
 import com.opinta.model.VirtualPostOffice;
 import java.util.List;
 import javax.transaction.Transactional;
@@ -13,32 +15,39 @@ import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 @Service
 @Slf4j
 public class VirtualPostOfficeServiceImpl implements VirtualPostOfficeService {
-    private VirtualPostOfficeDao virtualPostOfficeDao;
+    
+    private final VirtualPostOfficeDao virtualPostOfficeDao;
+    private final VirtualPostOfficeMapper virtualPostOfficeMapper;
 
     @Autowired
-    public VirtualPostOfficeServiceImpl(VirtualPostOfficeDao virtualPostOfficeDao) {
+    public VirtualPostOfficeServiceImpl(
+            VirtualPostOfficeDao virtualPostOfficeDao,
+            VirtualPostOfficeMapper virtualPostOfficeMapper) {
         this.virtualPostOfficeDao = virtualPostOfficeDao;
+        this.virtualPostOfficeMapper = virtualPostOfficeMapper;
     }
 
     @Override
     @Transactional
-    public List<VirtualPostOffice> getAll() {
+    public List<VirtualPostOfficeDto> getAll() {
         log.info("Getting all virtualPostOffices");
-        return virtualPostOfficeDao.getAll();
+        List<VirtualPostOffice> all =  virtualPostOfficeDao.getAll();
+        return this.virtualPostOfficeMapper.toDto(all);
     }
 
     @Override
     @Transactional
-    public VirtualPostOffice getById(Long id) {
+    public VirtualPostOfficeDto getById(long id) {
         log.info("Getting virtualPostOffice by id " + id);
-        return virtualPostOfficeDao.getById(id);
+        VirtualPostOffice office = this.virtualPostOfficeDao.getById(id);
+        return this.virtualPostOfficeMapper.toDto(office);
     }
 
     @Override
     @Transactional
-    public void save(VirtualPostOffice virtualPostOffice) {
-        log.info("Saving virtualPostOffices " + virtualPostOffice);
-        virtualPostOfficeDao.save(virtualPostOffice);
+    public boolean save(VirtualPostOfficeDto virtualPostOfficeDto) {
+        log.info("Saving virtualPostOffices " + virtualPostOfficeDto);
+        virtualPostOfficeDao.save(virtualPostOfficeDto);
     }
 
     @Override
