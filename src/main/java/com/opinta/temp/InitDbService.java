@@ -9,6 +9,7 @@ import com.opinta.mapper.PostcodePoolMapper;
 import com.opinta.model.Address;
 import com.opinta.model.BarcodeInnerNumber;
 import com.opinta.model.PostcodePool;
+import com.opinta.model.Shipment;
 import com.opinta.service.AddressService;
 import com.opinta.service.BarcodeInnerNumberService;
 import com.opinta.service.ClientService;
