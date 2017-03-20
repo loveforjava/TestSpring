@@ -29,9 +29,9 @@ public class AddressDaoImpl implements AddressDao {
     }
 
     @Override
-    public void save(Address address) {
+    public Address save(Address address) {
         Session session = sessionFactory.getCurrentSession();
-        session.saveOrUpdate(address);
+        return (Address) session.merge(address);
     }
 
     @Override

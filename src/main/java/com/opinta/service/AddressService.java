@@ -6,7 +6,7 @@ import java.util.List;
 public interface AddressService {
     List<AddressDto> getAll();
     AddressDto getById(Long id);
-    void save(AddressDto addressDto);
+    AddressDto save(AddressDto addressDto);
     AddressDto update(Long id, AddressDto addressDto);
     boolean delete(Long id);
 }

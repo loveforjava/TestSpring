@@ -7,7 +7,7 @@ import java.util.List;
 public interface ClientService {
     List<Client> getAll();
     Client getById(Long id);
-    void save(Client client);
+    Client save(Client client);
     Client update(Long id, Client source);
     boolean delete(Long id);
 }
