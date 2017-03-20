@@ -1,7 +1,8 @@
 package com.opinta.dao;
 
-import com.opinta.model.PostcodePool;
 import java.util.List;
+
+import com.opinta.model.PostcodePool;
 
 public interface PostcodePoolDao {
     List<PostcodePool> getAll();

@@ -1,14 +1,22 @@
 package com.opinta.temp;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+
 import com.opinta.dto.AddressDto;
 import com.opinta.dto.BarcodeInnerNumberDto;
 import com.opinta.dto.PostcodePoolDto;
 import com.opinta.mapper.AddressMapper;
 import com.opinta.mapper.BarcodeInnerNumberMapper;
+import com.opinta.mapper.ClientMapper;
 import com.opinta.mapper.PostcodePoolMapper;
 import com.opinta.model.Address;
 import com.opinta.model.BarcodeInnerNumber;
+import com.opinta.model.Client;
 import com.opinta.model.PostcodePool;
+import com.opinta.model.VirtualPostOffice;
 import com.opinta.service.AddressService;
 import com.opinta.service.BarcodeInnerNumberService;
 import com.opinta.service.ClientService;
@@ -16,28 +24,33 @@ import com.opinta.service.PostcodePoolService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.List;
-
 import static com.opinta.model.BarcodeStatus.RESERVED;
 import static com.opinta.model.BarcodeStatus.USED;
 
 @Service
 public class InitDbService {
-    private BarcodeInnerNumberService barcodeInnerNumberService;
-    private PostcodePoolService postcodePoolService;
-    private ClientService clientService;
-    private AddressService addressService;
-    private AddressMapper addressMapper;
-    private PostcodePoolMapper postcodePoolMapper;
-    private BarcodeInnerNumberMapper barcodeInnerNumberMapper;
+    
+    private final BarcodeInnerNumberService barcodeInnerNumberService;
+    private final PostcodePoolService postcodePoolService;
+    private final ClientService clientService;
+    private final AddressService addressService;
+    
+    private final AddressMapper addressMapper;
+    private final PostcodePoolMapper postcodePoolMapper;
+    private final BarcodeInnerNumberMapper barcodeInnerNumberMapper;
+    private final ClientMapper clientMapper;
+    
 
     @Autowired
-    public InitDbService(BarcodeInnerNumberService barcodeInnerNumberService,
-                         PostcodePoolService postcodePoolService, ClientService clientService,
-                         AddressService addressService, AddressMapper addressMapper,
-                         PostcodePoolMapper postcodePoolMapper, BarcodeInnerNumberMapper barcodeInnerNumberMapper) {
+    public InitDbService(
+            BarcodeInnerNumberService barcodeInnerNumberService,
+            PostcodePoolService postcodePoolService,
+            ClientService clientService,
+            AddressService addressService,
+            AddressMapper addressMapper,
+            PostcodePoolMapper postcodePoolMapper,
+            BarcodeInnerNumberMapper barcodeInnerNumberMapper,
+            ClientMapper clientMapper) {
         this.barcodeInnerNumberService = barcodeInnerNumberService;
         this.postcodePoolService = postcodePoolService;
         this.clientService = clientService;
@@ -45,6 +58,7 @@ public class InitDbService {
         this.addressMapper = addressMapper;
         this.postcodePoolMapper = postcodePoolMapper;
         this.barcodeInnerNumberMapper = barcodeInnerNumberMapper;
+        this.clientMapper = clientMapper;
     }
 
     @PostConstruct
@@ -71,10 +85,10 @@ public class InitDbService {
         addresses.forEach(addressService::save);
 
 //        // create Client with VirtualPostOffice
-//        VirtualPostOffice virtualPostOffice = new VirtualPostOffice("Modna kasta", postcodePool);
-//        Client client = new Client("FOP Ivanov", "001", addressMapper.toEntity(addresses.get(0)), virtualPostOffice);
-//        clientService.save(client);
-//        client = new Client("Petrov PP", "002", addressMapper.toEntity(addresses.get(1)), virtualPostOffice);
-//        clientService.save(client);
+        VirtualPostOffice virtualPostOffice = new VirtualPostOffice("Modna kasta", postcodePoolMapper.toEntity(postcodePoolDto));
+        Client client1 = new Client("FOP Ivanov", "001", addressMapper.toEntity(addresses.get(0)), virtualPostOffice);
+        clientService.save(this.clientMapper.toDto(client1));
+        Client client2  = new Client("Petrov PP", "002", addressMapper.toEntity(addresses.get(1)), virtualPostOffice);
+        clientService.save(this.clientMapper.toDto(client2));
     }
 }
