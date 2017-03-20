@@ -5,18 +5,21 @@ import com.opinta.dto.BarcodeInnerNumberDto;
 import com.opinta.dto.PostcodePoolDto;
 import com.opinta.mapper.AddressMapper;
 import com.opinta.mapper.BarcodeInnerNumberMapper;
+import com.opinta.mapper.PostOfficeMapper;
 import com.opinta.mapper.PostcodePoolMapper;
 import com.opinta.mapper.ShipmentMapper;
 import com.opinta.model.Address;
 import com.opinta.model.BarcodeInnerNumber;
 import com.opinta.model.Client;
 import com.opinta.model.DeliveryType;
+import com.opinta.model.PostOffice;
 import com.opinta.model.PostcodePool;
 import com.opinta.model.Shipment;
 import com.opinta.model.VirtualPostOffice;
 import com.opinta.service.AddressService;
 import com.opinta.service.BarcodeInnerNumberService;
 import com.opinta.service.ClientService;
+import com.opinta.service.PostOfficeService;
 import com.opinta.service.PostcodePoolService;
 import com.opinta.service.ShipmentService;
 import com.opinta.service.VirtualPostOfficeService;
@@ -39,28 +42,33 @@ public class InitDbService {
     private AddressService addressService;
     private ShipmentService shipmentService;
     private VirtualPostOfficeService virtualPostOfficeService;
+    private PostOfficeService postOfficeService;
     private AddressMapper addressMapper;
     private PostcodePoolMapper postcodePoolMapper;
     private BarcodeInnerNumberMapper barcodeInnerNumberMapper;
     private ShipmentMapper shipmentMapper;
+    private PostOfficeMapper postOfficeMapper;
 
     @Autowired
     public InitDbService(BarcodeInnerNumberService barcodeInnerNumberService,
                          PostcodePoolService postcodePoolService, ClientService clientService,
                          AddressService addressService, ShipmentService shipmentService,
-                         VirtualPostOfficeService virtualPostOfficeService, AddressMapper addressMapper,
+                         VirtualPostOfficeService virtualPostOfficeService, PostOfficeService postOfficeService,
+                         AddressMapper addressMapper,
                          PostcodePoolMapper postcodePoolMapper, BarcodeInnerNumberMapper barcodeInnerNumberMapper,
-                         ShipmentMapper shipmentMapper) {
+                         ShipmentMapper shipmentMapper, PostOfficeMapper postOfficeMapper) {
         this.barcodeInnerNumberService = barcodeInnerNumberService;
         this.postcodePoolService = postcodePoolService;
         this.clientService = clientService;
         this.addressService = addressService;
         this.shipmentService = shipmentService;
         this.virtualPostOfficeService = virtualPostOfficeService;
+        this.postOfficeService = postOfficeService;
         this.addressMapper = addressMapper;
         this.postcodePoolMapper = postcodePoolMapper;
         this.barcodeInnerNumberMapper = barcodeInnerNumberMapper;
         this.shipmentMapper = shipmentMapper;
+        this.postOfficeMapper = postOfficeMapper;
     }
 
     @PostConstruct
@@ -98,8 +106,16 @@ public class InitDbService {
                 addressMapper.toEntity(addressesSaved.get(1)), virtualPostOffice));
         clients.forEach((Client client) -> clientsSaved.add(clientService.save(client)));
 
+        // create Shipment
         Shipment shipment = new Shipment(clientsSaved.get(0), clientsSaved.get(1), DeliveryType.W2W, 1, 1,
                 new BigDecimal("12.5"), new BigDecimal("2.5"), new BigDecimal("15"));
         shipmentService.save(shipmentMapper.toDto(shipment));
+
+        // create PostOffice
+        PostcodePoolDto postcodePoolDto2 = postcodePoolMapper.toDto(new PostcodePool("00002", false));
+        PostcodePoolDto postcodePoolDtoSaved = postcodePoolService.save(postcodePoolDto2);
+        PostOffice postOffice = new PostOffice("Lviv post office", addressMapper.toEntity(addressesSaved.get(0)),
+                postcodePoolMapper.toEntity(postcodePoolDtoSaved));
+        postOfficeService.save(postOfficeMapper.toDto(postOffice));
     }
 }
