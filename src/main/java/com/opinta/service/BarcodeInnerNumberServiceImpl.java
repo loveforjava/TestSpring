@@ -33,9 +33,14 @@ public class BarcodeInnerNumberServiceImpl implements BarcodeInnerNumberService 
 
     @Override
     @Transactional
-    public List<BarcodeInnerNumberDto> getAll() {
-        log.info("Getting all barcodeInnerNumbers");
-        return barcodeInnerNumberMapper.toDto(barcodeInnerNumberDao.getAll());
+    public List<BarcodeInnerNumberDto> getAll(long postcodeId) {
+        PostcodePool postcodePool = postcodePoolDao.getById(postcodeId);
+        if (postcodePool == null) {
+            log.debug("Can't get barcodeInnerNumberDto list by postcodePool. PostCodePool {} doesn't exist", postcodeId);
+            return null;
+        }
+        log.info("Getting all barcodeInnerNumbers by postcodeId {}", postcodeId);
+        return barcodeInnerNumberMapper.toDto(barcodeInnerNumberDao.getAll(postcodeId));
     }
 
     @Override
@@ -47,19 +52,21 @@ public class BarcodeInnerNumberServiceImpl implements BarcodeInnerNumberService 
 
     @Override
     @Transactional
-    public boolean save(long postcodeId, BarcodeInnerNumberDto barcodeInnerNumberDto) {
-//        log.info("Saving barcodeInnerNumber {}", barcodeInnerNumberDto);
-//        barcodeInnerNumberDao.save(barcodeInnerNumberMapper.toEntity(barcodeInnerNumberDto));
+    public BarcodeInnerNumberDto save(long postcodeId, BarcodeInnerNumberDto barcodeInnerNumberDto) {
         PostcodePool postcodePool = postcodePoolDao.getById(postcodeId);
         if (postcodePool == null) {
             log.debug("Can't add barcodeInnerNumberDto to postcodePool. PostCodePool {} doesn't exist", postcodeId);
-            return false;
+            return null;
         }
         BarcodeInnerNumber barcodeInnerNumber = barcodeInnerNumberMapper.toEntity(barcodeInnerNumberDto);
-        postcodePool.getBarcodeInnerNumbers().add(barcodeInnerNumber);
+        BarcodeInnerNumber barcodeInnerNumberSaved = barcodeInnerNumberDao.save(barcodeInnerNumber);
+        // TODO not to get, but set previously created list and check in db if previous values not erased
+        postcodePool.getBarcodeInnerNumbers().add(barcodeInnerNumberSaved);
         log.info("Adding barcodeInnerNumberDto {} to postcodePool {}", barcodeInnerNumber, postcodePool);
         postcodePoolDao.update(postcodePool);
-        return true;
+
+        // TODO think about how to save one barcode. Hardcoding above
+        return barcodeInnerNumberMapper.toDto(barcodeInnerNumberSaved);
     }
 
     @Override

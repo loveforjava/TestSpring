@@ -1,7 +1,7 @@
 package com.opinta.dao;
 
 import com.opinta.model.BarcodeInnerNumber;
-import org.hibernate.Criteria;
+import com.opinta.model.PostcodePool;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +16,14 @@ public class BarcodeInnerNumberDaoImpl implements BarcodeInnerNumberDao {
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<BarcodeInnerNumber> getAll() {
+    public List<BarcodeInnerNumber> getAll(long postcodeId) {
+        // TODO think about getting directly table BarcodeInnerNumber
         Session session = sessionFactory.getCurrentSession();
-        return session.createCriteria(BarcodeInnerNumber.class)
-                .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
-                .list();
+        PostcodePool postcodePool = (PostcodePool) session.get(PostcodePool.class, postcodeId);
+        if (postcodePool == null) {
+            return null;
+        }
+        return postcodePool.getBarcodeInnerNumbers();
     }
 
     @Override
@@ -30,9 +33,9 @@ public class BarcodeInnerNumberDaoImpl implements BarcodeInnerNumberDao {
     }
 
     @Override
-    public void save(BarcodeInnerNumber barcodeInnerNumber) {
+    public BarcodeInnerNumber save(BarcodeInnerNumber barcodeInnerNumber) {
         Session session = sessionFactory.getCurrentSession();
-        session.saveOrUpdate(barcodeInnerNumber);
+        return (BarcodeInnerNumber) session.merge(barcodeInnerNumber);
     }
 
     @Override

@@ -5,9 +5,9 @@ import com.opinta.model.BarcodeInnerNumber;
 import java.util.List;
 
 public interface BarcodeInnerNumberDao {
-    List<BarcodeInnerNumber> getAll();
+    List<BarcodeInnerNumber> getAll(long postcodeId);
     BarcodeInnerNumber getById(Long id);
-    void save(BarcodeInnerNumber barcodeInnerNumber);
+    BarcodeInnerNumber save(BarcodeInnerNumber barcodeInnerNumber);
     void update(BarcodeInnerNumber barcodeInnerNumber);
     void delete(BarcodeInnerNumber barcodeInnerNumber);
 }

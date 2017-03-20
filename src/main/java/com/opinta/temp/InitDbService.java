@@ -1,4 +1,4 @@
-package com.opinta.service;
+package com.opinta.temp;
 
 import com.opinta.dto.AddressDto;
 import com.opinta.dto.BarcodeInnerNumberDto;
@@ -8,11 +8,11 @@ import com.opinta.mapper.BarcodeInnerNumberMapper;
 import com.opinta.mapper.PostcodePoolMapper;
 import com.opinta.model.Address;
 import com.opinta.model.BarcodeInnerNumber;
-import com.opinta.model.BarcodeStatus;
-import com.opinta.model.Client;
-import com.opinta.model.Customer;
 import com.opinta.model.PostcodePool;
-import com.opinta.model.VirtualPostOffice;
+import com.opinta.service.AddressService;
+import com.opinta.service.BarcodeInnerNumberService;
+import com.opinta.service.ClientService;
+import com.opinta.service.PostcodePoolService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +25,6 @@ import static com.opinta.model.BarcodeStatus.USED;
 
 @Service
 public class InitDbService {
-    private CustomerService customerService;
     private BarcodeInnerNumberService barcodeInnerNumberService;
     private PostcodePoolService postcodePoolService;
     private ClientService clientService;
@@ -35,11 +34,10 @@ public class InitDbService {
     private BarcodeInnerNumberMapper barcodeInnerNumberMapper;
 
     @Autowired
-    public InitDbService(CustomerService customerService, BarcodeInnerNumberService barcodeInnerNumberService,
+    public InitDbService(BarcodeInnerNumberService barcodeInnerNumberService,
                          PostcodePoolService postcodePoolService, ClientService clientService,
                          AddressService addressService, AddressMapper addressMapper,
                          PostcodePoolMapper postcodePoolMapper, BarcodeInnerNumberMapper barcodeInnerNumberMapper) {
-        this.customerService = customerService;
         this.barcodeInnerNumberService = barcodeInnerNumberService;
         this.postcodePoolService = postcodePoolService;
         this.clientService = clientService;
@@ -55,13 +53,6 @@ public class InitDbService {
     }
 
     public void populateClients() {
-//        List<Customer> customers = new ArrayList<>();
-//        customers.add(new Customer("John", "Doe", "djohn@gmail.com", "121-232-3435"));
-//        customers.add(new Customer("Russ", "Smith", "sruss@gmail.com", "343-545-2345"));
-//        customers.add(new Customer("Kate", "Williams", "kwilliams@gmail.com", "876-237-2987"));
-//        customers.add(new Customer("Viral", "Patel", "vpatel@gmail.com", "356-758-8736"));
-//        customers.stream().forEach(customerService::save);
-
         // create PostcodePool with BarcodeInnerNumber
         PostcodePoolDto postcodePoolDto = postcodePoolMapper.toDto(new PostcodePool("00001", false));
         final long postcodePoolId = postcodePoolService.save(postcodePoolDto).getId();

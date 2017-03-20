@@ -1,4 +1,4 @@
-package com.opinta.service;
+package com.opinta.temp;
 
 import org.hsqldb.util.DatabaseManagerSwing;
 import org.springframework.stereotype.Service;
