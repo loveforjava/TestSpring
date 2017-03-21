@@ -1,48 +1,49 @@
 package com.opinta.dao;
 
-import com.opinta.model.Address;
-import java.util.List;
+import com.opinta.model.Shipment;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
-public class AddressDaoImpl implements AddressDao {
+public class ShipmentDaoImpl implements ShipmentDao {
     @Autowired
     SessionFactory sessionFactory;
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Address> getAll() {
+    public List<Shipment> getAll() {
         Session session = sessionFactory.getCurrentSession();
-        return session.createCriteria(Address.class)
+        return session.createCriteria(Shipment.class)
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                 .list();
     }
 
     @Override
-    public Address getById(Long id) {
+    public Shipment getById(Long id) {
         Session session = sessionFactory.getCurrentSession();
-        return (Address) session.get(Address.class, id);
+        return (Shipment) session.get(Shipment.class, id);
     }
 
     @Override
-    public Address save(Address address) {
+    public Shipment save(Shipment shipment) {
         Session session = sessionFactory.getCurrentSession();
-        return (Address) session.merge(address);
+        return (Shipment) session.merge(shipment);
     }
 
     @Override
-    public void update(Address address) {
+    public void update(Shipment shipment) {
         Session session = sessionFactory.getCurrentSession();
-        session.update(address);
+        session.update(shipment);
     }
 
     @Override
-    public void delete(Address address) {
+    public void delete(Shipment shipment) {
         Session session = sessionFactory.getCurrentSession();
-        session.delete(address);
+        session.delete(shipment);
     }
 }
