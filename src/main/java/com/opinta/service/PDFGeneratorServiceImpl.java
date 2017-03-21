@@ -36,13 +36,16 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             field = (PDTextField) acroForm.getField("senderAddress");
             field.setValue(processAddress(client.getAddress()));
         }
-        PDStream stream = new PDStream(template);
-        stream.toByteArray();
+//        PDStream stream = new PDStream(template);
+//        stream.toByteArray();
+        template.save("testpdf.pdf");
+        template.close();
         return null;
     }
 
     public String processAddress(Address address) {
         return address.getStreet() + " st., " +
+                address.getHouseNumber() + "," +
                 address.getAppartmentNumber() + ", " +
                 address.getCity() + "\n" +
                 address.getPostcode();
