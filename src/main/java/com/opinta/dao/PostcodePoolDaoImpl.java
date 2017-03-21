@@ -1,7 +1,8 @@
 package com.opinta.dao;
 
-import com.opinta.model.PostcodePool;
 import java.util.List;
+
+import com.opinta.model.PostcodePool;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -23,7 +24,7 @@ public class PostcodePoolDaoImpl implements PostcodePoolDao {
     }
 
     @Override
-    public PostcodePool getById(Long id) {
+    public PostcodePool getById(long id) {
         Session session = sessionFactory.getCurrentSession();
         return (PostcodePool) session.get(PostcodePool.class, id);
     }

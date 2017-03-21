@@ -1,9 +1,13 @@
 package com.opinta.service;
 
-import com.opinta.dao.ClientDao;
-import com.opinta.model.Client;
 import java.util.List;
+
 import javax.transaction.Transactional;
+
+import com.opinta.dao.ClientDao;
+import com.opinta.dto.ClientDto;
+import com.opinta.mapper.ClientMapper;
+import com.opinta.model.Client;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,63 +17,70 @@ import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 @Service
 @Slf4j
 public class ClientServiceImpl implements ClientService {
-    private ClientDao clientDao;
+    
+    private final ClientDao clientDao;
+    private final ClientMapper clientMapper;
 
     @Autowired
-    public ClientServiceImpl(ClientDao clientDao) {
+    public ClientServiceImpl(ClientDao clientDao, ClientMapper clientMapper) {
         this.clientDao = clientDao;
+        this.clientMapper = clientMapper;
     }
 
     @Override
     @Transactional
-    public List<Client> getAll() {
+    public List<ClientDto> getAll() {
         log.info("Getting all clients");
-        return clientDao.getAll();
+        List<Client> allClients = clientDao.getAll();
+        return this.clientMapper.toDto(allClients);
     }
 
     @Override
     @Transactional
-    public Client getById(Long id) {
+    public ClientDto getById(long id) {
         log.info("Getting client by id " + id);
-        return clientDao.getById(id);
+        Client client = this.clientDao.getById(id);
+        return this.clientMapper.toDto(client);
     }
 
     @Override
     @Transactional
-    public Client save(Client client) {
-        log.info("Saving client " + client);
-        return clientDao.save(client);
+    public ClientDto save(ClientDto clientDto) {
+        log.info("Saving client " + clientDto);
+        Client client = this.clientMapper.toEntity(clientDto);
+        client = this.clientDao.save(client);
+        return this.clientMapper.toDto(client);
     }
 
     @Override
     @Transactional
-    public Client update(Long id, Client source) {
-        Client target = getById(id);
-        if (target == null) {
+    public ClientDto update(long id, ClientDto dtoClient) {
+        Client storedClient = this.clientDao.getById(id);
+        if (storedClient == null) {
             log.info("Can't update client. Client doesn't exist " + id);
             return null;
         }
         try {
-            copyProperties(target, source);
+            copyProperties(storedClient, dtoClient);
         } catch (Exception e) {
             log.error("Can't get properties from object to updatable object for client", e);
         }
-        target.setId(id);
-        log.info("Updating client " + target);
-        clientDao.update(target);
-        return target;
+        storedClient.setId(id);
+        log.info("Updating client " + storedClient);
+        clientDao.update(storedClient);
+        return this.clientMapper.toDto(storedClient);
     }
 
     @Override
     @Transactional
-    public boolean delete(Long id) {
-        Client client = getById(id);
-        if (client == null) {
+    public boolean delete(long id) {
+        Client storedClient = this.clientDao.getById(id);
+        if (storedClient == null) {
             log.debug("Can't delete client. Client doesn't exist " + id);
             return false;
         }
-        log.info("Deleting client " + client);
-        clientDao.delete(client);
+        log.info("Deleting client " + storedClient);
+        clientDao.delete(storedClient);
         return true;
     }
 }

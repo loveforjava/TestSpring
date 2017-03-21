@@ -1,13 +1,13 @@
 package com.opinta.dao;
 
+import java.util.List;
+
 import com.opinta.model.BarcodeInnerNumber;
 import com.opinta.model.PostcodePool;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Repository
 public class BarcodeInnerNumberDaoImpl implements BarcodeInnerNumberDao {
@@ -27,7 +27,7 @@ public class BarcodeInnerNumberDaoImpl implements BarcodeInnerNumberDao {
     }
 
     @Override
-    public BarcodeInnerNumber getById(Long id) {
+    public BarcodeInnerNumber getById(long id) {
         Session session = sessionFactory.getCurrentSession();
         return (BarcodeInnerNumber) session.get(BarcodeInnerNumber.class, id);
     }

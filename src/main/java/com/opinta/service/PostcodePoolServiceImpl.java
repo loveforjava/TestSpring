@@ -41,7 +41,7 @@ public class PostcodePoolServiceImpl implements PostcodePoolService {
 
     @Override
     @Transactional
-    public PostcodePoolDto getById(Long id) {
+    public PostcodePoolDto getById(long id) {
         log.info("Getting postcodePool by id {}", id);
         return postcodePoolMapper.toDto(postcodePoolDao.getById(id));
     }
@@ -55,7 +55,7 @@ public class PostcodePoolServiceImpl implements PostcodePoolService {
 
     @Override
     @Transactional
-    public PostcodePoolDto update(Long id, PostcodePoolDto postcodePoolDto) {
+    public PostcodePoolDto update(long id, PostcodePoolDto postcodePoolDto) {
         PostcodePool source = postcodePoolMapper.toEntity(postcodePoolDto);
         PostcodePool target = postcodePoolDao.getById(id);
         if (target == null) {
@@ -75,7 +75,7 @@ public class PostcodePoolServiceImpl implements PostcodePoolService {
 
     @Override
     @Transactional
-    public boolean delete(Long id) {
+    public boolean delete(long id) {
         PostcodePool postcodePool = postcodePoolDao.getById(id);
         if (postcodePool == null) {
             log.debug("Can't delete postcodePool. PostCodePool doesn't exist {}", id);

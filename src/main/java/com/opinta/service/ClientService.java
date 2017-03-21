@@ -1,13 +1,18 @@
 package com.opinta.service;
 
-import com.opinta.model.BarcodeInnerNumber;
-import com.opinta.model.Client;
 import java.util.List;
 
+import com.opinta.dto.ClientDto;
+
 public interface ClientService {
-    List<Client> getAll();
-    Client getById(Long id);
-    Client save(Client client);
-    Client update(Long id, Client source);
-    boolean delete(Long id);
+    
+    List<ClientDto> getAll();
+    
+    ClientDto getById(long id);
+    
+    ClientDto update(long id, ClientDto source);
+    
+    boolean delete(long id);
+    
+    ClientDto save(ClientDto client);
 }

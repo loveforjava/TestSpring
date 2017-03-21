@@ -1,7 +1,8 @@
 package com.opinta.dao;
 
-import com.opinta.model.Client;
 import java.util.List;
+
+import com.opinta.model.Client;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -23,7 +24,7 @@ public class ClientDaoImpl implements ClientDao {
     }
 
     @Override
-    public Client getById(Long id) {
+    public Client getById(long id) {
         Session session = sessionFactory.getCurrentSession();
         return (Client) session.get(Client.class, id);
     }

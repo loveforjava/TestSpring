@@ -1,11 +1,11 @@
 package com.opinta.dto;
 
+import java.math.BigDecimal;
+
 import com.opinta.constraint.EnumString;
 import com.opinta.model.DeliveryType;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.math.BigDecimal;
 
 @Getter
 @Setter

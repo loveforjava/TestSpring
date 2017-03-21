@@ -33,7 +33,7 @@ public class PostOfficeServiceImpl implements PostOfficeService {
 
     @Override
     @Transactional
-    public PostOfficeDto getById(Long id) {
+    public PostOfficeDto getById(long id) {
         log.info("Getting postOffice by id {}", id);
         return postOfficeMapper.toDto(postOfficeDao.getById(id));
     }
@@ -47,7 +47,7 @@ public class PostOfficeServiceImpl implements PostOfficeService {
 
     @Override
     @Transactional
-    public PostOfficeDto update(Long id, PostOfficeDto postOfficeDto) {
+    public PostOfficeDto update(long id, PostOfficeDto postOfficeDto) {
         PostOffice source = postOfficeMapper.toEntity(postOfficeDto);
         PostOffice target = postOfficeDao.getById(id);
         if (target == null) {
@@ -67,7 +67,7 @@ public class PostOfficeServiceImpl implements PostOfficeService {
 
     @Override
     @Transactional
-    public boolean delete(Long id) {
+    public boolean delete(long id) {
         PostOffice postOffice = postOfficeDao.getById(id);
         if (postOffice == null) {
             log.debug("Can't delete postOffice. PostOffice doesn't exist {}", id);

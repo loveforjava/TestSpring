@@ -1,11 +1,13 @@
 package com.opinta.service;
 
+import java.util.List;
+
+import javax.transaction.Transactional;
+
 import com.opinta.dao.AddressDao;
 import com.opinta.dto.AddressDto;
 import com.opinta.mapper.AddressMapper;
 import com.opinta.model.Address;
-import java.util.List;
-import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,7 @@ import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 @Service
 @Slf4j
 public class AddressServiceImpl implements AddressService {
+    
     private AddressDao addressDao;
     private AddressMapper addressMapper;
 
@@ -33,7 +36,7 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     @Transactional
-    public AddressDto getById(Long id) {
+    public AddressDto getById(long id) {
         log.info("Getting address by id {}", id);
         return addressMapper.toDto(addressDao.getById(id));
     }
@@ -47,7 +50,7 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     @Transactional
-    public AddressDto update(Long id, AddressDto addressDto) {
+    public AddressDto update(long id, AddressDto addressDto) {
         Address source = addressMapper.toEntity(addressDto);
         Address target = addressDao.getById(id);
         if (target == null) {
@@ -67,7 +70,7 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     @Transactional
-    public boolean delete(Long id) {
+    public boolean delete(long id) {
         Address address = addressDao.getById(id);
         if (address == null) {
             log.debug("Can't delete address. Address doesn't exist {}", id);
