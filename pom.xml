@@ -9,6 +9,8 @@
 	<name>Test Spring</name>
 	<url>http://maven.apache.org</url>
 	<properties>
+        <maven-compiler-plugin.version>3.6.0</maven-compiler-plugin.version>
+        <maven-war-plugin.version>3.0.0</maven-war-plugin.version>
 		<jdk.version>1.8</jdk.version>
 		<springframework.version>4.3.0.RELEASE</springframework.version>
 		<jackson.version>2.7.5</jackson.version>
@@ -125,10 +127,18 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.6.0</version>
+                    <version>${maven-compiler-plugin.version}</version>
                     <configuration>
                         <source>${jdk.version}</source>
                         <target>${jdk.version}</target>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <version>${maven-war-plugin.version}</version>
+                    <configuration>
+                        <failOnMissingWebXml>false</failOnMissingWebXml>
                     </configuration>
                 </plugin>
                 <!-- embedded Jetty server, for testing -->
