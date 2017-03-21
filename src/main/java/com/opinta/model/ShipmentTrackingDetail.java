@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Data
 @NoArgsConstructor
-public class ShipmentTrackingDetails {
+public class ShipmentTrackingDetail {
     @Id
     @GeneratedValue
     private long id;
@@ -31,8 +31,8 @@ public class ShipmentTrackingDetails {
     @Temporal(TemporalType.TIMESTAMP)
     private Date date;
 
-    public ShipmentTrackingDetails(Shipment shipment, PostOffice postOffice, ShipmentStatus shipmentStatus,
-                                   Date date) {
+    public ShipmentTrackingDetail(Shipment shipment, PostOffice postOffice, ShipmentStatus shipmentStatus,
+                                  Date date) {
         this.shipment = shipment;
         this.postOffice = postOffice;
         this.shipmentStatus = shipmentStatus;

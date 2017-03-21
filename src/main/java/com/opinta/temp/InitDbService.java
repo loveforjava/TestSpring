@@ -1,7 +1,14 @@
 package com.opinta.temp;
 
+import com.opinta.dto.PostOfficeDto;
+import com.opinta.dto.ShipmentDto;
+import com.opinta.mapper.ShipmentTrackingDetailMapper;
+import com.opinta.model.ShipmentStatus;
+import com.opinta.model.ShipmentTrackingDetail;
+import com.opinta.service.ShipmentTrackingDetailService;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -48,6 +55,7 @@ public class InitDbService {
     private ShipmentService shipmentService;
     private VirtualPostOfficeService virtualPostOfficeService;
     private PostOfficeService postOfficeService;
+    private ShipmentTrackingDetailService shipmentTrackingDetailService;
     
     private ClientMapper clientMapper;
     private AddressMapper addressMapper;
@@ -56,23 +64,18 @@ public class InitDbService {
     private ShipmentMapper shipmentMapper;
     private PostOfficeMapper postOfficeMapper;
     private VirtualPostOfficeMapper virtualPostOfficeMapper;
+    private ShipmentTrackingDetailMapper shipmentTrackingDetailMapper;
 
     @Autowired
     public InitDbService(
-            BarcodeInnerNumberService barcodeInnerNumberService,
-            PostcodePoolService postcodePoolService,
-            ClientService clientService,
-            AddressService addressService,
-            ShipmentService shipmentService,
-            VirtualPostOfficeService virtualPostOfficeService,
-            PostOfficeService postOfficeService,
-            ClientMapper clientMapper,
-            AddressMapper addressMapper,
-            PostcodePoolMapper postcodePoolMapper,
-            BarcodeInnerNumberMapper barcodeInnerNumberMapper,
-            ShipmentMapper shipmentMapper,
-            PostOfficeMapper postOfficeMapper,
-            VirtualPostOfficeMapper virtualPostOfficeMapper) {
+            BarcodeInnerNumberService barcodeInnerNumberService, PostcodePoolService postcodePoolService,
+            ClientService clientService, AddressService addressService, ShipmentService shipmentService,
+            VirtualPostOfficeService virtualPostOfficeService, PostOfficeService postOfficeService,
+            ShipmentTrackingDetailService shipmentTrackingDetailService,
+            ClientMapper clientMapper, AddressMapper addressMapper, PostcodePoolMapper postcodePoolMapper,
+            BarcodeInnerNumberMapper barcodeInnerNumberMapper, ShipmentMapper shipmentMapper,
+            PostOfficeMapper postOfficeMapper, VirtualPostOfficeMapper virtualPostOfficeMapper,
+            ShipmentTrackingDetailMapper shipmentTrackingDetailMapper) {
         this.barcodeInnerNumberService = barcodeInnerNumberService;
         this.postcodePoolService = postcodePoolService;
         this.clientService = clientService;
@@ -80,6 +83,7 @@ public class InitDbService {
         this.shipmentService = shipmentService;
         this.virtualPostOfficeService = virtualPostOfficeService;
         this.postOfficeService = postOfficeService;
+        this.shipmentTrackingDetailService = shipmentTrackingDetailService;
         this.clientMapper = clientMapper;
         this.addressMapper = addressMapper;
         this.postcodePoolMapper = postcodePoolMapper;
@@ -87,6 +91,7 @@ public class InitDbService {
         this.shipmentMapper = shipmentMapper;
         this.postOfficeMapper = postOfficeMapper;
         this.virtualPostOfficeMapper = virtualPostOfficeMapper;
+        this.shipmentTrackingDetailMapper = shipmentTrackingDetailMapper;
     }
 
     @PostConstruct
@@ -137,13 +142,18 @@ public class InitDbService {
         // create Shipment
         Shipment shipment = new Shipment(clientsSaved.get(0), clientsSaved.get(1), DeliveryType.W2W, 1, 1,
                 new BigDecimal("12.5"), new BigDecimal("2.5"), new BigDecimal("15"));
-        shipmentService.save(shipmentMapper.toDto(shipment));
+        ShipmentDto shipmentSaved = shipmentService.save(shipmentMapper.toDto(shipment));
 
         // create PostOffice
         PostcodePoolDto postcodePoolDto2 = postcodePoolMapper.toDto(new PostcodePool("00002", false));
         PostcodePoolDto postcodePoolDtoSaved = postcodePoolService.save(postcodePoolDto2);
         PostOffice postOffice = new PostOffice("Lviv post office", addressMapper.toEntity(addressesSaved.get(0)),
                 postcodePoolMapper.toEntity(postcodePoolDtoSaved));
-        postOfficeService.save(postOfficeMapper.toDto(postOffice));
+        PostOfficeDto postOfficeSaved = postOfficeService.save(postOfficeMapper.toDto(postOffice));
+
+        // create ShipmentTrackingDetail
+        ShipmentTrackingDetail shipmentTrackingDetail = new ShipmentTrackingDetail(shipmentMapper.toEntity(shipmentSaved),
+                postOfficeMapper.toEntity(postOfficeSaved), ShipmentStatus.PREPARED, new Date());
+        shipmentTrackingDetailService.save(shipmentTrackingDetailMapper.toDto(shipmentTrackingDetail));
     }
 }

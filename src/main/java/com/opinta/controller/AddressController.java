@@ -34,29 +34,29 @@ public class AddressController {
         return addressService.getAll();
     }
 
-	@GetMapping("{id}")
-	public ResponseEntity<?> getAddress(@PathVariable("id") long id) {
-		AddressDto addressDto = addressService.getById(id);
-		if (addressDto == null) {
-			return new ResponseEntity<>(format("No Address found for ID %d", id), HttpStatus.NOT_FOUND);
-		}
-		return new ResponseEntity<>(addressDto, HttpStatus.OK);
-	}
+    @GetMapping("{id}")
+    public ResponseEntity<?> getAddress(@PathVariable("id") long id) {
+        AddressDto addressDto = addressService.getById(id);
+        if (addressDto == null) {
+            return new ResponseEntity<>(format("No Address found for ID %d", id), HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(addressDto, HttpStatus.OK);
+    }
 
-	@PostMapping
+    @PostMapping
     @ResponseStatus(HttpStatus.OK)
-	public void createAddress(@RequestBody AddressDto addressDto) {
-		addressService.save(addressDto);
-	}
+    public void createAddress(@RequestBody AddressDto addressDto) {
+        addressService.save(addressDto);
+    }
 
-	@PutMapping("{id}")
-	public ResponseEntity<?> updateAddress(@PathVariable long id, @RequestBody AddressDto addressDto) {
-		addressDto = addressService.update(id, addressDto);
-		if (addressDto == null) {
-			return new ResponseEntity<>(format("No Address found for ID %d", id), HttpStatus.NOT_FOUND);
-		}
-		return new ResponseEntity<>(addressDto, HttpStatus.OK);
-	}
+    @PutMapping("{id}")
+    public ResponseEntity<?> updateAddress(@PathVariable long id, @RequestBody AddressDto addressDto) {
+        addressDto = addressService.update(id, addressDto);
+        if (addressDto == null) {
+            return new ResponseEntity<>(format("No Address found for ID %d", id), HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(addressDto, HttpStatus.OK);
+    }
 
     @DeleteMapping("{id}")
     public ResponseEntity<?> deleteAddress(@PathVariable long id) {
