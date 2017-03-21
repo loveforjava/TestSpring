@@ -2,6 +2,9 @@
 *.idea
 *.iml
 target
+gitbash*
+dev_private
+desktop.ini
 
 # Package Files #
 *.jar

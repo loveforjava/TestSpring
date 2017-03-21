@@ -1,7 +1,8 @@
 package com.opinta.dao;
 
-import com.opinta.model.Client;
 import java.util.List;
+
+import com.opinta.model.Client;
 
 public interface ClientDao {
     List<Client> getAll();

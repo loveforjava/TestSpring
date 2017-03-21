@@ -1,8 +1,8 @@
 package com.opinta.service;
 
-import com.opinta.dto.ShipmentDto;
-
 import java.util.List;
+
+import com.opinta.dto.ShipmentDto;
 
 public interface ShipmentService {
     List<ShipmentDto> getAll();

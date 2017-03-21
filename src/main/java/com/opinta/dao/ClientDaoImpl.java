@@ -1,7 +1,8 @@
 package com.opinta.dao;
 
-import com.opinta.model.Client;
 import java.util.List;
+
+import com.opinta.model.Client;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;

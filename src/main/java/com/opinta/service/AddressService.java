@@ -1,7 +1,8 @@
 package com.opinta.service;
 
-import com.opinta.dto.AddressDto;
 import java.util.List;
+
+import com.opinta.dto.AddressDto;
 
 public interface AddressService {
     List<AddressDto> getAll();
