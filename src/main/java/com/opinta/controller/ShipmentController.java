@@ -1,8 +1,8 @@
 package com.opinta.controller;
 
+import java.util.List;
+
 import com.opinta.dto.ShipmentDto;
-import com.opinta.mapper.ShipmentMapper;
-import com.opinta.model.Shipment;
 import com.opinta.service.PDFGeneratorService;
 import com.opinta.service.ShipmentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +19,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 import static java.lang.String.format;
 
@@ -52,7 +50,7 @@ public class ShipmentController {
     }
 
     @GetMapping("{id}/label-form")
-    public ResponseEntity<byte[]> getShipmentLabel(@PathVariable("id") Long id) {
+    public ResponseEntity<byte[]> getShipmentLabel(@PathVariable("id") long id) {
         byte[] data = pdfGeneratorService.generateLabel(id);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType("application/pdf"));
@@ -70,7 +68,7 @@ public class ShipmentController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<?> updateShipment(@PathVariable Long id, @RequestBody ShipmentDto shipmentDto) {
+    public ResponseEntity<?> updateShipment(@PathVariable long id, @RequestBody ShipmentDto shipmentDto) {
         shipmentDto = shipmentService.update(id, shipmentDto);
         if (shipmentDto == null) {
             return new ResponseEntity<>(format("No Shipment found for ID %d", id), HttpStatus.NOT_FOUND);
@@ -79,7 +77,7 @@ public class ShipmentController {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<?> deleteShipment(@PathVariable Long id) {
+    public ResponseEntity<?> deleteShipment(@PathVariable long id) {
         if (!shipmentService.delete(id)) {
             return new ResponseEntity<>(format("No Shipment found for ID %d", id), HttpStatus.NOT_FOUND);
         }

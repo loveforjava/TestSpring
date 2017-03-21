@@ -10,6 +10,7 @@ import static com.opinta.constraint.RegexPattern.POSTCODE_REGEX;
 @Getter
 @Setter
 public class AddressDto {
+    
     private long id;
     @Pattern(regexp = POSTCODE_REGEX)
     private String postcode;
@@ -27,4 +28,5 @@ public class AddressDto {
     private String appartmentNumber;
     @Size(max = 255)
     private String description;
+    
 }

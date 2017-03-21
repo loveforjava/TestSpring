@@ -1,15 +1,22 @@
 package com.opinta.service;
 
+import java.util.List;
+
 import com.opinta.dto.ShipmentDto;
 import com.opinta.model.Shipment;
 
-import java.util.List;
-
 public interface ShipmentService {
+    
     List<ShipmentDto> getAll();
-    ShipmentDto getById(Long id);
+    
+    ShipmentDto getById(long id);
+    
     ShipmentDto save(ShipmentDto shipmentDto);
-    ShipmentDto update(Long id, ShipmentDto shipmentDto);
-    boolean delete(Long id);
-    Shipment getEntityById(Long id);
+    
+    ShipmentDto update(long id, ShipmentDto shipmentDto);
+    
+    boolean delete(long id);
+    
+    Shipment getEntityById(long id);
+    
 }

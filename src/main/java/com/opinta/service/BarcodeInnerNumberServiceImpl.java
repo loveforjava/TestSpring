@@ -45,7 +45,7 @@ public class BarcodeInnerNumberServiceImpl implements BarcodeInnerNumberService 
 
     @Override
     @Transactional
-    public BarcodeInnerNumberDto getById(Long id) {
+    public BarcodeInnerNumberDto getById(long id) {
         log.info("Getting barcodeInnerNumber by id {}", id);
         return barcodeInnerNumberMapper.toDto(barcodeInnerNumberDao.getById(id));
     }
@@ -71,7 +71,7 @@ public class BarcodeInnerNumberServiceImpl implements BarcodeInnerNumberService 
 
     @Override
     @Transactional
-    public BarcodeInnerNumberDto update(Long id, BarcodeInnerNumberDto barcodeInnerNumberDto) {
+    public BarcodeInnerNumberDto update(long id, BarcodeInnerNumberDto barcodeInnerNumberDto) {
         BarcodeInnerNumber source = barcodeInnerNumberMapper.toEntity(barcodeInnerNumberDto);
         BarcodeInnerNumber target = barcodeInnerNumberDao.getById(id);
         if (target == null) {
@@ -91,7 +91,7 @@ public class BarcodeInnerNumberServiceImpl implements BarcodeInnerNumberService 
 
     @Override
     @Transactional
-    public boolean delete(Long id) {
+    public boolean delete(long id) {
         BarcodeInnerNumber barcodeInnerNumber = barcodeInnerNumberDao.getById(id);
         if (barcodeInnerNumber == null) {
             log.debug("Can't delete barcodeInnerNumber. BarcodeInnerNumber doesn't exist {}", id);

@@ -24,7 +24,7 @@ public class ShipmentDaoImpl implements ShipmentDao {
     }
 
     @Override
-    public Shipment getById(Long id) {
+    public Shipment getById(long id) {
         Session session = sessionFactory.getCurrentSession();
         return (Shipment) session.get(Shipment.class, id);
     }

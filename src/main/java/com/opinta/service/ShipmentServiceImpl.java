@@ -1,5 +1,9 @@
 package com.opinta.service;
 
+import java.util.List;
+
+import javax.transaction.Transactional;
+
 import com.opinta.dao.ShipmentDao;
 import com.opinta.dto.ShipmentDto;
 import com.opinta.mapper.ShipmentMapper;
@@ -7,9 +11,6 @@ import com.opinta.model.Shipment;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import javax.transaction.Transactional;
-import java.util.List;
 
 import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 
@@ -34,7 +35,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public ShipmentDto getById(Long id) {
+    public ShipmentDto getById(long id) {
         log.info("Getting postcodePool by id {}", id);
         return shipmentMapper.toDto(shipmentDao.getById(id));
     }
@@ -48,7 +49,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public ShipmentDto update(Long id, ShipmentDto shipmentDto) {
+    public ShipmentDto update(long id, ShipmentDto shipmentDto) {
         Shipment source = shipmentMapper.toEntity(shipmentDto);
         Shipment target = shipmentDao.getById(id);
         if (target == null) {
@@ -68,7 +69,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public boolean delete(Long id) {
+    public boolean delete(long id) {
         Shipment shipment = shipmentDao.getById(id);
         if (shipment == null) {
             log.debug("Can't delete shipment. Shipment doesn't exist {}", id);
@@ -82,7 +83,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public Shipment getEntityById(Long id) {
+    public Shipment getEntityById(long id) {
         log.info("Getting postcodePool by id {}", id);
         return shipmentDao.getById(id);
     }

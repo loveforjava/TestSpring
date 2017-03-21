@@ -1,7 +1,8 @@
 package com.opinta.dao;
 
-import com.opinta.model.Address;
 import java.util.List;
+
+import com.opinta.model.Address;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -23,7 +24,7 @@ public class AddressDaoImpl implements AddressDao {
     }
 
     @Override
-    public Address getById(Long id) {
+    public Address getById(long id) {
         Session session = sessionFactory.getCurrentSession();
         return (Address) session.get(Address.class, id);
     }
