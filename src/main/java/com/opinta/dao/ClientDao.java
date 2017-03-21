@@ -6,7 +6,7 @@ import com.opinta.model.Client;
 
 public interface ClientDao {
     List<Client> getAll();
-    Client getById(Long id);
+    Client getById(long id);
     Client save(Client client);
     void update(Client client);
     void delete(Client client);

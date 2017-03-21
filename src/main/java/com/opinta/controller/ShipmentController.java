@@ -36,7 +36,7 @@ public class ShipmentController {
     }
 
 	@GetMapping("{id}")
-	public ResponseEntity<?> getShipment(@PathVariable("id") Long id) {
+	public ResponseEntity<?> getShipment(@PathVariable("id") long id) {
 		ShipmentDto shipmentDto = shipmentService.getById(id);
 		if (shipmentDto == null) {
 			return new ResponseEntity<>(format("No Shipment found for ID %d", id), HttpStatus.NOT_FOUND);
@@ -51,7 +51,7 @@ public class ShipmentController {
 	}
 
 	@PutMapping("{id}")
-	public ResponseEntity<?> updateShipment(@PathVariable Long id, @RequestBody ShipmentDto shipmentDto) {
+	public ResponseEntity<?> updateShipment(@PathVariable long id, @RequestBody ShipmentDto shipmentDto) {
 		shipmentDto = shipmentService.update(id, shipmentDto);
 		if (shipmentDto == null) {
 			return new ResponseEntity<>(format("No Shipment found for ID %d", id), HttpStatus.NOT_FOUND);
@@ -60,7 +60,7 @@ public class ShipmentController {
 	}
 
     @DeleteMapping("{id}")
-    public ResponseEntity<?> deleteShipment(@PathVariable Long id) {
+    public ResponseEntity<?> deleteShipment(@PathVariable long id) {
         if (!shipmentService.delete(id)) {
             return new ResponseEntity<>(format("No Shipment found for ID %d", id), HttpStatus.NOT_FOUND);
         }

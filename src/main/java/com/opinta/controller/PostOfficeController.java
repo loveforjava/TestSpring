@@ -1,8 +1,9 @@
 package com.opinta.controller;
 
+import java.util.List;
+
 import com.opinta.dto.PostOfficeDto;
 import com.opinta.service.PostOfficeService;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +36,7 @@ public class PostOfficeController {
     }
 
 	@GetMapping("{id}")
-	public ResponseEntity<?> getPostOffice(@PathVariable("id") Long id) {
+	public ResponseEntity<?> getPostOffice(@PathVariable("id") long id) {
         PostOfficeDto postOfficeDto = postOfficeService.getById(id);
 		if (postOfficeDto == null) {
 			return new ResponseEntity<>(format("No PostOffice found for ID %d", id), HttpStatus.NOT_FOUND);
@@ -50,7 +51,7 @@ public class PostOfficeController {
 	}
 
 	@PutMapping("{id}")
-	public ResponseEntity<?> updatePostOffice(@PathVariable Long id, @RequestBody PostOfficeDto postOfficeDto) {
+	public ResponseEntity<?> updatePostOffice(@PathVariable long id, @RequestBody PostOfficeDto postOfficeDto) {
 		postOfficeDto = postOfficeService.update(id, postOfficeDto);
 		if (postOfficeDto== null) {
 			return new ResponseEntity<>(format("No PostOfficeDto found for ID %d", id), HttpStatus.NOT_FOUND);
@@ -59,7 +60,7 @@ public class PostOfficeController {
 	}
 
     @DeleteMapping("{id}")
-    public ResponseEntity<?> deletePostOffice(@PathVariable Long id) {
+    public ResponseEntity<?> deletePostOffice(@PathVariable long id) {
         if (!postOfficeService.delete(id)) {
             return new ResponseEntity<>(format("No PostOfficeDto found for ID %d", id), HttpStatus.NOT_FOUND);
         }

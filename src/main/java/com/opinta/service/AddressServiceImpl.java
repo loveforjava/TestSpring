@@ -36,7 +36,7 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     @Transactional
-    public AddressDto getById(Long id) {
+    public AddressDto getById(long id) {
         log.info("Getting address by id {}", id);
         return addressMapper.toDto(addressDao.getById(id));
     }
@@ -50,7 +50,7 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     @Transactional
-    public AddressDto update(Long id, AddressDto addressDto) {
+    public AddressDto update(long id, AddressDto addressDto) {
         Address source = addressMapper.toEntity(addressDto);
         Address target = addressDao.getById(id);
         if (target == null) {
@@ -70,7 +70,7 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     @Transactional
-    public boolean delete(Long id) {
+    public boolean delete(long id) {
         Address address = addressDao.getById(id);
         if (address == null) {
             log.debug("Can't delete address. Address doesn't exist {}", id);

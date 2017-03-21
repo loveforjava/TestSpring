@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface PostOfficeDao {
     List<PostOffice> getAll();
-    PostOffice getById(Long id);
+    PostOffice getById(long id);
     PostOffice save(PostOffice postOffice);
     void update(PostOffice postOffice);
     void delete(PostOffice postOffice);

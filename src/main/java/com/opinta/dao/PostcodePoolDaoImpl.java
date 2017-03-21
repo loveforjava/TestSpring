@@ -24,7 +24,7 @@ public class PostcodePoolDaoImpl implements PostcodePoolDao {
     }
 
     @Override
-    public PostcodePool getById(Long id) {
+    public PostcodePool getById(long id) {
         Session session = sessionFactory.getCurrentSession();
         return (PostcodePool) session.get(PostcodePool.class, id);
     }

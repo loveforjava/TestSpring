@@ -24,7 +24,7 @@ public class AddressDaoImpl implements AddressDao {
     }
 
     @Override
-    public Address getById(Long id) {
+    public Address getById(long id) {
         Session session = sessionFactory.getCurrentSession();
         return (Address) session.get(Address.class, id);
     }

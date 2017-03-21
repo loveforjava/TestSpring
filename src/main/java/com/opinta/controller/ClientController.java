@@ -22,9 +22,6 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
-/**
- * Created by Diarsid on 20.03.2017.
- */
 
 @RestController
 @RequestMapping("/clients")
@@ -44,10 +41,9 @@ public class ClientController {
     }
     
     @GetMapping("{id}")
-    public ResponseEntity getClientById(
-            @PathVariable("id") long id) {
+    public ResponseEntity getClientById(@PathVariable("id") long id) {
         ClientDto client = this.clientService.getById(id);
-        if ( client != null ) {
+        if (client != null) {
             return new ResponseEntity(client, OK);
         } else {
             return new ResponseEntity(NOT_FOUND);
@@ -55,10 +51,9 @@ public class ClientController {
     }
     
     @PostMapping
-    public ResponseEntity createClient(
-            @RequestBody ClientDto client) {
+    public ResponseEntity createClient(@RequestBody ClientDto client) {
         ClientDto saved = this.clientService.save(client);
-        if ( saved != null ) {
+        if (saved != null) {
             return new ResponseEntity(saved, OK);
         } else {
             return new ResponseEntity("client not saved.", BAD_REQUEST);
@@ -70,7 +65,7 @@ public class ClientController {
             @PathVariable long id,
             @RequestBody ClientDto client) {
         ClientDto updatedClient = this.clientService.update(id, client);
-        if ( updatedClient != null ) {
+        if (updatedClient != null) {
             return new ResponseEntity(updatedClient, OK);
         } else {
             return new ResponseEntity(format("No Client found for ID %d", id), NOT_FOUND);
@@ -78,10 +73,9 @@ public class ClientController {
     }
     
     @DeleteMapping("{id}")
-    public ResponseEntity deleteClient(
-            @PathVariable long id) {
+    public ResponseEntity deleteClient(@PathVariable long id) {
         boolean removed = this.clientService.delete(id);
-        if ( removed ) {
+        if (removed) {
             return new ResponseEntity(id, OK);
         } else {
             return new ResponseEntity(format("No Client found for ID %d", id), NOT_FOUND);

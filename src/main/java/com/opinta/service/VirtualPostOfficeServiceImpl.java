@@ -76,7 +76,7 @@ public class VirtualPostOfficeServiceImpl implements VirtualPostOfficeService {
     @Transactional
     public boolean delete(long id) {
         VirtualPostOffice virtualPostOffice = this.virtualPostOfficeDao.getById(id);
-        if ( virtualPostOffice == null ) {
+        if (virtualPostOffice == null) {
             log.debug("Can't delete virtualPostOffices. VirtualPostOffices doesn't exist " + id);
             return false;
         } else {

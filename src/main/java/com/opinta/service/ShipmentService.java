@@ -6,8 +6,8 @@ import com.opinta.dto.ShipmentDto;
 
 public interface ShipmentService {
     List<ShipmentDto> getAll();
-    ShipmentDto getById(Long id);
+    ShipmentDto getById(long id);
     ShipmentDto save(ShipmentDto shipmentDto);
-    ShipmentDto update(Long id, ShipmentDto shipmentDto);
-    boolean delete(Long id);
+    ShipmentDto update(long id, ShipmentDto shipmentDto);
+    boolean delete(long id);
 }

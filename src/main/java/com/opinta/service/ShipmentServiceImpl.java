@@ -34,7 +34,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public ShipmentDto getById(Long id) {
+    public ShipmentDto getById(long id) {
         log.info("Getting postcodePool by id {}", id);
         return shipmentMapper.toDto(shipmentDao.getById(id));
     }
@@ -48,7 +48,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public ShipmentDto update(Long id, ShipmentDto shipmentDto) {
+    public ShipmentDto update(long id, ShipmentDto shipmentDto) {
         Shipment source = shipmentMapper.toEntity(shipmentDto);
         Shipment target = shipmentDao.getById(id);
         if (target == null) {
@@ -68,7 +68,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public boolean delete(Long id) {
+    public boolean delete(long id) {
         Shipment shipment = shipmentDao.getById(id);
         if (shipment == null) {
             log.debug("Can't delete shipment. Shipment doesn't exist {}", id);

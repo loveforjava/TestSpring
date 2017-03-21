@@ -24,7 +24,7 @@ public class ClientDaoImpl implements ClientDao {
     }
 
     @Override
-    public Client getById(Long id) {
+    public Client getById(long id) {
         Session session = sessionFactory.getCurrentSession();
         return (Client) session.get(Client.class, id);
     }

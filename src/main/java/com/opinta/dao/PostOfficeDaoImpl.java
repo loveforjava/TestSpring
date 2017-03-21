@@ -23,7 +23,7 @@ public class PostOfficeDaoImpl implements PostOfficeDao {
     }
 
     @Override
-    public PostOffice getById(Long id) {
+    public PostOffice getById(long id) {
         Session session = sessionFactory.getCurrentSession();
         return (PostOffice) session.get(PostOffice.class, id);
     }

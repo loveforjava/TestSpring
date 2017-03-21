@@ -6,9 +6,6 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 
-/**
- * Created by Diarsid on 20.03.2017.
- */
 
 @Mapper(componentModel = "spring")
 public interface ClientMapper

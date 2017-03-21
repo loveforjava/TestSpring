@@ -5,9 +5,6 @@ import com.opinta.model.VirtualPostOffice;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-/**
- * Created by Diarsid on 20.03.2017.
- */
 
 @Mapper(componentModel = "spring")
 public interface VirtualPostOfficeMapper
