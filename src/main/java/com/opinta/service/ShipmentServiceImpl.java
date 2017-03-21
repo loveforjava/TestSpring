@@ -1,5 +1,9 @@
 package com.opinta.service;
 
+import java.util.List;
+
+import javax.transaction.Transactional;
+
 import com.opinta.dao.ShipmentDao;
 import com.opinta.dto.ShipmentDto;
 import com.opinta.mapper.ShipmentMapper;
@@ -7,9 +11,6 @@ import com.opinta.model.Shipment;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import javax.transaction.Transactional;
-import java.util.List;
 
 import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 
@@ -78,5 +79,12 @@ public class ShipmentServiceImpl implements ShipmentService {
         log.info("Deleting shipment {}", shipment);
         shipmentDao.delete(shipment);
         return true;
+    }
+
+    @Override
+    @Transactional
+    public Shipment getEntityById(long id) {
+        log.info("Getting postcodePool by id {}", id);
+        return shipmentDao.getById(id);
     }
 }
