@@ -26,7 +26,7 @@ public class Client {
     @JoinColumn(name = "address_id")
     private Address address;
     
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "virtual_post_office_id")
     private VirtualPostOffice virtualPostOffice;
 

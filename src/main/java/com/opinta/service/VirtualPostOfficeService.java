@@ -12,7 +12,7 @@ public interface VirtualPostOfficeService {
     
     VirtualPostOfficeDto update(long id, VirtualPostOfficeDto source);
     
-    boolean save(VirtualPostOfficeDto virtualPostOffice);
+    VirtualPostOfficeDto save(VirtualPostOfficeDto virtualPostOffice);
     
     boolean delete(long id);
 }

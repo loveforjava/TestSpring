@@ -1,7 +1,8 @@
 package com.opinta.dao;
 
-import com.opinta.model.Address;
 import java.util.List;
+
+import com.opinta.model.Address;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -29,9 +30,9 @@ public class AddressDaoImpl implements AddressDao {
     }
 
     @Override
-    public void save(Address address) {
+    public Address save(Address address) {
         Session session = sessionFactory.getCurrentSession();
-        session.saveOrUpdate(address);
+        return (Address) session.merge(address);
     }
 
     @Override

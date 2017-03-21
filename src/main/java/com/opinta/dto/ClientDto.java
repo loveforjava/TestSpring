@@ -27,4 +27,8 @@ public class ClientDto {
     @Size(max = 255)
     private String uniqueRegistrationNumber;
     
+    private long virtualPostOfficeId;
+    
+    private long addressId;
+    
 }

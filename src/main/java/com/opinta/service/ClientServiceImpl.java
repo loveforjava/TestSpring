@@ -45,11 +45,11 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public boolean save(ClientDto clientDto) {
+    public ClientDto save(ClientDto clientDto) {
         log.info("Saving client " + clientDto);
         Client client = this.clientMapper.toEntity(clientDto);
-        this.clientDao.save(client);
-        return true;
+        client = this.clientDao.save(client);
+        return this.clientMapper.toDto(client);
     }
 
     @Override

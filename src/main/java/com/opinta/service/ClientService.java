@@ -14,5 +14,5 @@ public interface ClientService {
     
     boolean delete(long id);
     
-    boolean save(ClientDto client);
+    ClientDto save(ClientDto client);
 }

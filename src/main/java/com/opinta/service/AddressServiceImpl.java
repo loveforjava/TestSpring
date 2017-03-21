@@ -43,9 +43,9 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     @Transactional
-    public void save(AddressDto addressDto) {
+    public AddressDto save(AddressDto addressDto) {
         log.info("Saving address {}", addressDto);
-        addressDao.save(addressMapper.toEntity(addressDto));
+        return addressMapper.toDto(addressDao.save(addressMapper.toEntity(addressDto)));
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.pinta.util;
+package com.opinta.util;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

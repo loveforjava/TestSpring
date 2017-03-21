@@ -27,4 +27,6 @@ public class VirtualPostOfficeDto {
     @Size(max = 255)
     private String description;
     
+    private long activePostcodePoolId;
+    
 }
