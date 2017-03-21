@@ -17,10 +17,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * Created by dponomarenko on 20.03.2017.
- */
-
 @Service
 @Slf4j
 public class PDFGeneratorServiceImpl implements PDFGeneratorService {
@@ -33,7 +29,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
     }
 
     @Override
-    public byte[] generateLabel(Long shipmentId) {
+    public byte[] generateLabel(long shipmentId) {
         Shipment shipment = shipmentService.getEntityById(shipmentId);
 
         PDDocument template;
@@ -43,8 +39,6 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         try {
             template = PDDocument.load(file);
             PDAcroForm acroForm = template.getDocumentCatalog().getAcroForm();
-            List<PDField> fields = acroForm.getFields();
-            logFieldsList(fields);
             if (acroForm != null) {
                 Client sender = shipment.getSender();
 
@@ -71,19 +65,19 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
                 field.setValue(processAddress(recipient.getAddress()));
 
                 field = (PDTextField) acroForm.getField("mass");
-                field.setValue("" + shipment.getWeight());
+                field.setValue(String.valueOf(shipment.getWeight()));
 
                 field = (PDTextField) acroForm.getField("value");
-                field.setValue("" + shipment.getDeclaredPrice());
+                field.setValue(String.valueOf(shipment.getDeclaredPrice()));
 
                 field = (PDTextField) acroForm.getField("sendingCost");
-                field.setValue("" + shipment.getPrice());
+                field.setValue(String.valueOf(shipment.getPrice()));
 
                 field = (PDTextField) acroForm.getField("postPrice");
-                field.setValue("" + shipment.getPostPay());
+                field.setValue(String.valueOf(shipment.getPostPay()));
 
                 field = (PDTextField) acroForm.getField("totalCost");
-                field.setValue("" + shipment.getPostPay());
+                field.setValue(String.valueOf(shipment.getPostPay()));
             }
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             template.save(outputStream);
@@ -94,30 +88,12 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         return data;
     }
 
-    @Override
-    public byte[] generateForm(Shipment shipment) throws IOException {
-        return new byte[0];
-    }
-
     public String processAddress(Address address) {
         return address.getStreet() + " st., " +
                 address.getHouseNumber() + "," +
                 address.getAppartmentNumber() + ", " +
                 address.getCity() + "\n" +
                 address.getPostcode();
-    }
-
-    private void logFieldsList(List<PDField> fields) {
-        StringBuilder sb = new StringBuilder();
-        for (PDField field : fields) {
-            sb.append(field.getFullyQualifiedName()).append(" ");
-            if (field instanceof PDNonTerminalField) {
-                PDNonTerminalField nonTerminalField = (PDNonTerminalField) field;
-                logFieldsList(nonTerminalField.getChildren());
-            }
-        }
-        System.out.println("Received PDF template with fields: " + sb.toString());
-        log.info("Received PDF template with fields: {}", sb);
     }
 
 }

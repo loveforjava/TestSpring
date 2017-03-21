@@ -43,7 +43,7 @@ public class ShipmentController {
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<?> getShipment(@PathVariable("id") Long id) {
+    public ResponseEntity<?> getShipment(@PathVariable("id") long id) {
         ShipmentDto shipmentDto = shipmentService.getById(id);
         if (shipmentDto == null) {
             return new ResponseEntity<>(format("No Shipment found for ID %d", id), HttpStatus.NOT_FOUND);
