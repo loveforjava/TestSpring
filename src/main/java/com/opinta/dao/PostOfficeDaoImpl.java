@@ -1,6 +1,6 @@
 package com.opinta.dao;
 
-import com.opinta.model.Address;
+import com.opinta.model.PostOffice;
 import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -9,40 +9,40 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class AddressDaoImpl implements AddressDao {
+public class PostOfficeDaoImpl implements PostOfficeDao {
     @Autowired
     SessionFactory sessionFactory;
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Address> getAll() {
+    public List<PostOffice> getAll() {
         Session session = sessionFactory.getCurrentSession();
-        return session.createCriteria(Address.class)
+        return session.createCriteria(PostOffice.class)
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                 .list();
     }
 
     @Override
-    public Address getById(Long id) {
+    public PostOffice getById(Long id) {
         Session session = sessionFactory.getCurrentSession();
-        return (Address) session.get(Address.class, id);
+        return (PostOffice) session.get(PostOffice.class, id);
     }
 
     @Override
-    public Address save(Address address) {
+    public PostOffice save(PostOffice postOffice) {
         Session session = sessionFactory.getCurrentSession();
-        return (Address) session.merge(address);
+        return (PostOffice) session.merge(postOffice);
     }
 
     @Override
-    public void update(Address address) {
+    public void update(PostOffice postOffice) {
         Session session = sessionFactory.getCurrentSession();
-        session.update(address);
+        session.update(postOffice);
     }
 
     @Override
-    public void delete(Address address) {
+    public void delete(PostOffice postOffice) {
         Session session = sessionFactory.getCurrentSession();
-        session.delete(address);
+        session.delete(postOffice);
     }
 }

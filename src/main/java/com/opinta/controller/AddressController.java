@@ -21,8 +21,12 @@ import static java.lang.String.format;
 @RestController
 @RequestMapping("/addresses")
 public class AddressController {
-    @Autowired
     private AddressService addressService;
+
+    @Autowired
+    public AddressController(AddressService addressService) {
+        this.addressService = addressService;
+    }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)

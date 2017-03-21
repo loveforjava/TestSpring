@@ -29,9 +29,9 @@ public class ClientDaoImpl implements ClientDao {
     }
 
     @Override
-    public void save(Client client) {
+    public Client save(Client client) {
         Session session = sessionFactory.getCurrentSession();
-        session.saveOrUpdate(client);
+        return (Client) session.merge(client);
     }
 
     @Override
