@@ -50,11 +50,23 @@ public class ShipmentController {
     }
 
     @GetMapping("{id}/label-form")
-    public ResponseEntity<byte[]> getShipmentLabel(@PathVariable("id") long id) {
+    public ResponseEntity<?> getShipmentLabelForm(@PathVariable("id") long id) {
         byte[] data = pdfGeneratorService.generateLabel(id);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType("application/pdf"));
-        String filename = "form" + id + ".pdf";
+        String filename = "labelform" + id + ".pdf";
+        headers.setContentDispositionFormData(filename, filename);
+        headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+        ResponseEntity<byte[]> response = new ResponseEntity<>(data, headers, HttpStatus.OK);
+        return response;
+    }
+
+    @GetMapping("{id}/postpay-form")
+    public ResponseEntity<?> getShipmentPostpayForm(@PathVariable("id") long id) {
+        byte[] data = pdfGeneratorService.generatePostpay(id);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("application/pdf"));
+        String filename = "postpayform" + id + ".pdf";
         headers.setContentDispositionFormData(filename, filename);
         headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
         ResponseEntity<byte[]> response = new ResponseEntity<>(data, headers, HttpStatus.OK);
