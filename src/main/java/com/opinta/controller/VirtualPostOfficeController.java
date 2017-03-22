@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import static java.lang.String.format;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
 
@@ -53,7 +54,7 @@ public class VirtualPostOfficeController {
         if (postOfficeDto != null) {
             return new ResponseEntity(postOfficeDto, OK);
         } else {
-            return new ResponseEntity(format("VirtualPostOffice not found by id %d", id), BAD_REQUEST);
+            return new ResponseEntity(format("VirtualPostOffice not found by id %d", id), NOT_FOUND);
         }
     }
     
