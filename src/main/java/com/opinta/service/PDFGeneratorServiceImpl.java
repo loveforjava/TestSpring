@@ -6,8 +6,6 @@ import com.opinta.model.Shipment;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
-import org.apache.pdfbox.pdmodel.interactive.form.PDField;
-import org.apache.pdfbox.pdmodel.interactive.form.PDNonTerminalField;
 import org.apache.pdfbox.pdmodel.interactive.form.PDTextField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,13 +13,17 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
+import java.math.BigDecimal;
 
 @Service
 @Slf4j
 public class PDFGeneratorServiceImpl implements PDFGeneratorService {
+    private static final String PDF_LABEL_TEMPLATE = "pdfTemplate/label-template.pdf";
+    private static final String PDF_POSTPAY_TEMPLATE = "pdfTemplate/postpay-template.pdf";
+
     private ShipmentService shipmentService;
-    private static final String PDF_TEMPLATE = "pdfTemplate/post-template.pdf";
+    private PDDocument template;
+    private PDTextField field;
 
     @Autowired
     public PDFGeneratorServiceImpl(ShipmentService shipmentService) {
@@ -29,40 +31,49 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
     }
 
     @Override
-    public byte[] generateLabel(long shipmentId) {
+    public byte[] generatePostpay(long shipmentId) {
         Shipment shipment = shipmentService.getEntityById(shipmentId);
-
-        PDDocument template;
-
-        File file = new File(getClass().getClassLoader().getResource(PDF_TEMPLATE).getFile());
+        File file = new File(getClass()
+                .getClassLoader()
+                .getResource(PDF_POSTPAY_TEMPLATE)
+                .getFile());
         byte[] data = null;
         try {
             template = PDDocument.load(file);
             PDAcroForm acroForm = template.getDocumentCatalog().getAcroForm();
             if (acroForm != null) {
-                Client sender = shipment.getSender();
+                generateClientsData(shipment, acroForm);
 
-                PDTextField field = (PDTextField) acroForm.getField("senderName");
-                field.setValue(sender.getName());
+                String[] priceParts = String.valueOf(shipment.getPostPay()).split("\\.");
 
-                field = (PDTextField) acroForm.getField("senderPhone");
-                //TODO: Temporary value! Change later to the phone from the shipment
-                field.setValue("+380673245212");
+                field = (PDTextField) acroForm.getField("priceHryvnas");
+                field.setValue(priceParts[0]);
 
-                field = (PDTextField) acroForm.getField("senderAddress");
-                field.setValue(processAddress(sender.getAddress()));
+                field = (PDTextField) acroForm.getField("priceKopiyky");
+                field.setValue(priceParts[1]);
+            }
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            template.save(outputStream);
+            data = outputStream.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return data;
+    }
 
-                Client recipient = shipment.getRecipient();
-
-                field = (PDTextField) acroForm.getField("recipientName");
-                field.setValue(recipient.getName());
-
-                field = (PDTextField) acroForm.getField("recipientPhone");
-                //TODO: Temporary value! Change later to the phone from the shipment.
-                field.setValue("+380984122345");
-
-                field = (PDTextField) acroForm.getField("recipientAddress");
-                field.setValue(processAddress(recipient.getAddress()));
+    @Override
+    public byte[] generateLabel(long shipmentId) {
+        Shipment shipment = shipmentService.getEntityById(shipmentId);
+        File file = new File(getClass()
+                .getClassLoader()
+                .getResource(PDF_LABEL_TEMPLATE)
+                .getFile());
+        byte[] data = null;
+        try {
+            template = PDDocument.load(file);
+            PDAcroForm acroForm = template.getDocumentCatalog().getAcroForm();
+            if (acroForm != null) {
+                generateClientsData(shipment, acroForm);
 
                 field = (PDTextField) acroForm.getField("mass");
                 field.setValue(String.valueOf(shipment.getWeight()));
@@ -86,6 +97,32 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             e.printStackTrace();
         }
         return data;
+    }
+
+    private void generateClientsData(Shipment shipment, PDAcroForm acroForm) throws IOException {
+        Client sender = shipment.getSender();
+
+        field = (PDTextField) acroForm.getField("senderName");
+        field.setValue(sender.getName());
+
+        field = (PDTextField) acroForm.getField("senderPhone");
+        //TODO: Temporary value! Change later to the phone from the shipment
+        field.setValue("+380673245212");
+
+        field = (PDTextField) acroForm.getField("senderAddress");
+        field.setValue(processAddress(sender.getAddress()));
+
+        Client recipient = shipment.getRecipient();
+
+        field = (PDTextField) acroForm.getField("recipientName");
+        field.setValue(recipient.getName());
+
+        field = (PDTextField) acroForm.getField("recipientPhone");
+        //TODO: Temporary value! Change later to the phone from the shipment.
+        field.setValue("+380984122345");
+
+        field = (PDTextField) acroForm.getField("recipientAddress");
+        field.setValue(processAddress(recipient.getAddress()));
     }
 
     public String processAddress(Address address) {
