@@ -49,7 +49,7 @@ public class AddressController {
     public ResponseEntity<?> createAddress(@RequestBody AddressDto addressDto) {
         addressDto = addressService.save(addressDto);
         if (addressDto == null) {
-            return new ResponseEntity<>("Failed to create new Address using given data.", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Failed to create new Address using given data.", HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(addressDto, HttpStatus.OK);
     }
