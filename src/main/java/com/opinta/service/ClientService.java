@@ -7,7 +7,9 @@ import com.opinta.dto.ClientDto;
 public interface ClientService {
     
     List<ClientDto> getAll();
-    
+
+    List<ClientDto> getAllByVirtualPostOfficeId(long virtualPostOfficeId);
+
     ClientDto getById(long id);
     
     ClientDto update(long id, ClientDto source);
@@ -15,4 +17,5 @@ public interface ClientService {
     boolean delete(long id);
     
     ClientDto save(ClientDto client);
+
 }
