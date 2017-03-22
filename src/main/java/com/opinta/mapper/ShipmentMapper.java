@@ -1,6 +1,7 @@
 package com.opinta.mapper;
 
 import com.opinta.dto.ShipmentDto;
+import com.opinta.model.Client;
 import com.opinta.model.Shipment;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,8 +18,14 @@ public interface ShipmentMapper extends BaseMapper<ShipmentDto, Shipment> {
 
     @Override
     @Mappings({
-            @Mapping(source = "senderId", target = "sender.id"),
-            @Mapping(source = "recipientId", target = "recipient.id")
+            @Mapping(target = "sender", expression = "java(createClientById(shipmentDto.getSenderId()))"),
+            @Mapping(target = "recipient", expression = "java(createClientById(shipmentDto.getRecipientId()))")
     })
     Shipment toEntity(ShipmentDto shipmentDto);
+
+    default Client createClientById(long id) {
+        Client client = new Client();
+        client.setId(id);
+        return client;
+    }
 }
