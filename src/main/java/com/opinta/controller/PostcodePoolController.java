@@ -72,7 +72,6 @@ public class PostcodePoolController {
     }
 
     @GetMapping("{postcodeId}/inner-numbers")
-    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<?> getBarcodeInnerNumbers(@PathVariable long postcodeId) {
 		List<BarcodeInnerNumberDto> barcodeInnerNumberDtos = barcodeInnerNumberService.getAll(postcodeId);
 		if (barcodeInnerNumberDtos == null) {

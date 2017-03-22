@@ -1,9 +1,11 @@
 package com.opinta.dao;
 
+import com.opinta.model.Client;
 import com.opinta.model.Shipment;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -19,6 +21,16 @@ public class ShipmentDaoImpl implements ShipmentDao {
     public List<Shipment> getAll() {
         Session session = sessionFactory.getCurrentSession();
         return session.createCriteria(Shipment.class)
+                .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
+                .list();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Shipment> getAllByClient(Client client) {
+        Session session = sessionFactory.getCurrentSession();
+        return session.createCriteria(Shipment.class)
+                .add(Restrictions.eq("sender", client))
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                 .list();
     }
