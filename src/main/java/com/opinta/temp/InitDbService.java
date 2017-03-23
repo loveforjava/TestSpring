@@ -5,7 +5,10 @@ import com.opinta.dto.ShipmentDto;
 import com.opinta.mapper.ShipmentTrackingDetailMapper;
 import com.opinta.model.ShipmentStatus;
 import com.opinta.model.ShipmentTrackingDetail;
+import com.opinta.model.TariffGrid;
+import com.opinta.model.W2wVariation;
 import com.opinta.service.ShipmentTrackingDetailService;
+import com.opinta.service.TariffGridService;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -55,6 +58,7 @@ public class InitDbService {
     private VirtualPostOfficeService virtualPostOfficeService;
     private PostOfficeService postOfficeService;
     private ShipmentTrackingDetailService shipmentTrackingDetailService;
+    private TariffGridService tariffGridService;
     
     private ClientMapper clientMapper;
     private AddressMapper addressMapper;
@@ -70,7 +74,7 @@ public class InitDbService {
             BarcodeInnerNumberService barcodeInnerNumberService, PostcodePoolService postcodePoolService,
             ClientService clientService, AddressService addressService, ShipmentService shipmentService,
             VirtualPostOfficeService virtualPostOfficeService, PostOfficeService postOfficeService,
-            ShipmentTrackingDetailService shipmentTrackingDetailService,
+            ShipmentTrackingDetailService shipmentTrackingDetailService, TariffGridService tariffGridService,
             ClientMapper clientMapper, AddressMapper addressMapper, PostcodePoolMapper postcodePoolMapper,
             BarcodeInnerNumberMapper barcodeInnerNumberMapper, ShipmentMapper shipmentMapper,
             PostOfficeMapper postOfficeMapper, VirtualPostOfficeMapper virtualPostOfficeMapper,
@@ -83,6 +87,7 @@ public class InitDbService {
         this.virtualPostOfficeService = virtualPostOfficeService;
         this.postOfficeService = postOfficeService;
         this.shipmentTrackingDetailService = shipmentTrackingDetailService;
+        this.tariffGridService = tariffGridService;
         this.clientMapper = clientMapper;
         this.addressMapper = addressMapper;
         this.postcodePoolMapper = postcodePoolMapper;
@@ -95,10 +100,13 @@ public class InitDbService {
 
     @PostConstruct
     public void init() {
-        populateClients();
+        populateDb();
     }
 
-    public void populateClients() {
+    private void populateDb() {
+        // populate TariffGrid
+        populateTariffGrid();
+
         // create PostcodePool with BarcodeInnerNumber
         PostcodePoolDto postcodePoolDto = postcodePoolMapper.toDto(new PostcodePool("00001", false));
         final long postcodePoolId = postcodePoolService.save(postcodePoolDto).getId();
@@ -159,5 +167,47 @@ public class InitDbService {
                 new ShipmentTrackingDetail(shipmentMapper.toEntity(shipmentsSaved.get(0)),
                         postOfficeMapper.toEntity(postOfficeSaved), ShipmentStatus.PREPARED, new Date());
         shipmentTrackingDetailService.save(shipmentTrackingDetailMapper.toDto(shipmentTrackingDetail));
+    }
+
+    private void populateTariffGrid() {
+        List<TariffGrid> tariffGrids = new ArrayList<>();
+
+        tariffGrids.add(new TariffGrid(0.25f, 30f, W2wVariation.TOWN, 12f));
+        tariffGrids.add(new TariffGrid(0.25f, 30f, W2wVariation.REGION, 15f));
+        tariffGrids.add(new TariffGrid(0.25f, 30f, W2wVariation.COUNTRY, 21f));
+
+        tariffGrids.add(new TariffGrid(0.5f, 30f, W2wVariation.TOWN, 15f));
+        tariffGrids.add(new TariffGrid(0.5f, 30f, W2wVariation.REGION, 18f));
+        tariffGrids.add(new TariffGrid(0.5f, 30f, W2wVariation.COUNTRY, 24f));
+
+        tariffGrids.add(new TariffGrid(1f, 30f, W2wVariation.TOWN, 18f));
+        tariffGrids.add(new TariffGrid(1f, 30f, W2wVariation.REGION, 21f));
+        tariffGrids.add(new TariffGrid(1f, 30f, W2wVariation.COUNTRY, 27f));
+
+        tariffGrids.add(new TariffGrid(2f, 30f, W2wVariation.TOWN, 21f));
+        tariffGrids.add(new TariffGrid(2f, 30f, W2wVariation.REGION, 24f));
+        tariffGrids.add(new TariffGrid(2f, 30f, W2wVariation.COUNTRY, 30f));
+
+        tariffGrids.add(new TariffGrid(5f, 70f, W2wVariation.TOWN, 24f));
+        tariffGrids.add(new TariffGrid(5f, 70f, W2wVariation.REGION, 27f));
+        tariffGrids.add(new TariffGrid(5f, 70f, W2wVariation.COUNTRY, 36f));
+
+        tariffGrids.add(new TariffGrid(10f, 70f, W2wVariation.TOWN, 27f));
+        tariffGrids.add(new TariffGrid(10f, 70f, W2wVariation.REGION, 30f));
+        tariffGrids.add(new TariffGrid(10f, 70f, W2wVariation.COUNTRY, 42f));
+
+        tariffGrids.add(new TariffGrid(15f, 70f, W2wVariation.TOWN, 30f));
+        tariffGrids.add(new TariffGrid(15f, 70f, W2wVariation.REGION, 36f));
+        tariffGrids.add(new TariffGrid(15f, 70f, W2wVariation.COUNTRY, 48f));
+
+        tariffGrids.add(new TariffGrid(20f, 70f, W2wVariation.TOWN, 36f));
+        tariffGrids.add(new TariffGrid(20f, 70f, W2wVariation.REGION, 42f));
+        tariffGrids.add(new TariffGrid(20f, 70f, W2wVariation.COUNTRY, 54f));
+
+        tariffGrids.add(new TariffGrid(30f, 70f, W2wVariation.TOWN, 42f));
+        tariffGrids.add(new TariffGrid(30f, 70f, W2wVariation.REGION, 48f));
+        tariffGrids.add(new TariffGrid(30f, 70f, W2wVariation.COUNTRY, 60f));
+
+        tariffGrids.forEach(tariffGridService::save);
     }
 }
