@@ -9,10 +9,19 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import static com.opinta.model.BarcodeStatus.USED;
+
 @Repository
 public class BarcodeInnerNumberDaoImpl implements BarcodeInnerNumberDao {
+    private final SessionFactory sessionFactory;
+    private final BarcodeNextIndexGenerationStrategy barcodeGeneration;
+    
     @Autowired
-    SessionFactory sessionFactory;
+    public BarcodeInnerNumberDaoImpl(
+            SessionFactory sessionFactory, BarcodeNextIndexGenerationStrategy barcodeNextIndexGenerationStrategy) {
+        this.sessionFactory = sessionFactory;
+        this.barcodeGeneration = barcodeNextIndexGenerationStrategy;
+    }
 
     @Override
     @SuppressWarnings("unchecked")
@@ -31,12 +40,23 @@ public class BarcodeInnerNumberDaoImpl implements BarcodeInnerNumberDao {
         Session session = sessionFactory.getCurrentSession();
         return (BarcodeInnerNumber) session.get(BarcodeInnerNumber.class, id);
     }
-
+    
     @Override
-    public BarcodeInnerNumber save(BarcodeInnerNumber barcodeInnerNumber) {
-        Session session = sessionFactory.getCurrentSession();
-        return (BarcodeInnerNumber) session.merge(barcodeInnerNumber);
+    public BarcodeInnerNumber generateForPostcodePool(PostcodePool postcodePool) {
+        BarcodeInnerNumber barcodeInnerNumber = new BarcodeInnerNumber();
+        barcodeInnerNumber.setStatus(USED);
+        barcodeInnerNumber.setNumber(barcodeGeneration.newInnerNumberFor(postcodePool.getPostcode()));
+        //barcodeInnerNumber.setPostcode(postcodePool);
+        BarcodeInnerNumber saved = (BarcodeInnerNumber) sessionFactory.getCurrentSession().save(barcodeInnerNumber);
+        return saved;
     }
+
+
+//    @Override
+//    public BarcodeInnerNumber save(BarcodeInnerNumber barcodeInnerNumber) {
+//        Session session = sessionFactory.getCurrentSession();
+//        return (BarcodeInnerNumber) session.merge(barcodeInnerNumber);
+//    }
 
     @Override
     public void update(BarcodeInnerNumber barcodeInnerNumber) {

@@ -1,10 +1,11 @@
 package com.opinta.controller;
 
+import java.util.List;
+
 import com.opinta.dto.BarcodeInnerNumberDto;
 import com.opinta.dto.PostcodePoolDto;
 import com.opinta.service.BarcodeInnerNumberService;
 import com.opinta.service.PostcodePoolService;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -88,17 +89,17 @@ public class PostcodePoolController {
 		}
 		return new ResponseEntity<>(barcodeInnerNumberDto, HttpStatus.OK);
 	}
-
-	@PostMapping("{postcodeId}/inner-numbers")
-	@ResponseStatus(HttpStatus.OK)
-	public ResponseEntity<?> createBarcodeInnerNumber(
-			@PathVariable("postcodeId") long postcodeId, @RequestBody BarcodeInnerNumberDto barcodeInnerNumberDto) {
-		BarcodeInnerNumberDto barcodeInnerNumberDtoSaved = barcodeInnerNumberService.save(postcodeId, barcodeInnerNumberDto);
-		if (barcodeInnerNumberDtoSaved == null) {
-			return new ResponseEntity<>(format("PostcodePool %d doesn't exist", postcodeId), HttpStatus.NOT_FOUND);
-		}
-		return new ResponseEntity<>(barcodeInnerNumberDtoSaved, HttpStatus.OK);
-	}
+//
+//	@PostMapping("{postcodeId}/inner-numbers")
+//	@ResponseStatus(HttpStatus.OK)
+//	public ResponseEntity<?> createBarcodeInnerNumber(
+//			@PathVariable("postcodeId") long postcodeId, @RequestBody BarcodeInnerNumberDto barcodeInnerNumberDto) {
+//		BarcodeInnerNumberDto barcodeInnerNumberDtoSaved = barcodeInnerNumberService.save(postcodeId, barcodeInnerNumberDto);
+//		if (barcodeInnerNumberDtoSaved == null) {
+//			return new ResponseEntity<>(format("PostcodePool %d doesn't exist", postcodeId), HttpStatus.NOT_FOUND);
+//		}
+//		return new ResponseEntity<>(barcodeInnerNumberDtoSaved, HttpStatus.OK);
+//	}
 
 	@DeleteMapping("inner-numbers/{id}")
 	public ResponseEntity<?> deleteBarcodeInnerNumber(@PathVariable long id) {

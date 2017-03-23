@@ -10,7 +10,7 @@ public interface BarcodeInnerNumberService {
     
     BarcodeInnerNumberDto getById(long id);
     
-    BarcodeInnerNumberDto save(long postcodeId, BarcodeInnerNumberDto barcodeInnerNumberDto);
+//    BarcodeInnerNumberDto save(long postcodeId, BarcodeInnerNumberDto barcodeInnerNumberDto);
     
     BarcodeInnerNumberDto update(long id, BarcodeInnerNumberDto barcodeInnerNumberDto);
     

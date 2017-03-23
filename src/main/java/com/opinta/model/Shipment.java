@@ -1,30 +1,39 @@
 package com.opinta.model;
 
+import java.math.BigDecimal;
+
+import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.Entity;
-import java.math.BigDecimal;
 
 @Entity
 @Data
 @NoArgsConstructor
 public class Shipment {
+    
     @Id
     @GeneratedValue
     private long id;
+    
     @ManyToOne
     @JoinColumn(name = "sender_id")
     private Client sender;
+    
     @ManyToOne
     @JoinColumn(name = "recipient_id")
     private Client recipient;
+    
+    @OneToOne
+    private BarcodeInnerNumber barcode;
+    
     @Enumerated(EnumType.STRING)
     private DeliveryType deliveryType;
     private float weight;
