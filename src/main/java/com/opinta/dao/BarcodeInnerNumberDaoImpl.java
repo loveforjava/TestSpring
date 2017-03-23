@@ -47,8 +47,8 @@ public class BarcodeInnerNumberDaoImpl implements BarcodeInnerNumberDao {
         barcodeInnerNumber.setStatus(USED);
         barcodeInnerNumber.setNumber(barcodeGeneration.newInnerNumberFor(postcodePool.getPostcode()));
         //barcodeInnerNumber.setPostcode(postcodePool);
-        BarcodeInnerNumber saved = (BarcodeInnerNumber) sessionFactory.getCurrentSession().save(barcodeInnerNumber);
-        return saved;
+        sessionFactory.getCurrentSession().save(barcodeInnerNumber);
+        return barcodeInnerNumber;
     }
 
 
