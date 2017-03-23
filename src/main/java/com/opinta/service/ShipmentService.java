@@ -8,6 +8,8 @@ import com.opinta.model.Shipment;
 public interface ShipmentService {
     
     List<ShipmentDto> getAll();
+
+    List<ShipmentDto> getAllByClientId(long clientId);
     
     ShipmentDto getById(long id);
     
