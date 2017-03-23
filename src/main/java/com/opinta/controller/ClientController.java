@@ -3,7 +3,9 @@ package com.opinta.controller;
 import java.util.List;
 
 import com.opinta.dto.ClientDto;
+import com.opinta.dto.ShipmentDto;
 import com.opinta.service.ClientService;
+import com.opinta.service.ShipmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,16 +24,16 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
-
 @RestController
 @RequestMapping("/clients")
 public class ClientController {
-    
     private final ClientService clientService;
+    private final ShipmentService shipmentService;
     
     @Autowired
-    public ClientController(ClientService clientService) {
+    public ClientController(ClientService clientService, ShipmentService shipmentService) {
         this.clientService = clientService;
+        this.shipmentService = shipmentService;
     }
     
     @GetMapping
@@ -41,45 +43,47 @@ public class ClientController {
     }
     
     @GetMapping("{id}")
-    public ResponseEntity getClientById(@PathVariable("id") long id) {
-        ClientDto client = this.clientService.getById(id);
-        if (client != null) {
-            return new ResponseEntity(client, OK);
-        } else {
-            return new ResponseEntity(NOT_FOUND);
+    public ResponseEntity<?> getClient(@PathVariable("id") long id) {
+        ClientDto clientDto = clientService.getById(id);
+        if (clientDto == null) {
+            return new ResponseEntity<>(format("No Client found for ID %d", id), NOT_FOUND);
         }
+        return new ResponseEntity<>(clientDto, OK);
+    }
+
+    @GetMapping("{clientId}/shipments")
+    public ResponseEntity<?> getShipmentsByClientId(@PathVariable long clientId) {
+        List<ShipmentDto> shipmentDtos = shipmentService.getAllByClientId(clientId);
+        if (shipmentDtos == null) {
+            return new ResponseEntity<>(format("Client %d doesn't exist", clientId), NOT_FOUND);
+        }
+        return new ResponseEntity<>(shipmentDtos, OK);
     }
     
     @PostMapping
-    public ResponseEntity createClient(@RequestBody ClientDto client) {
-        ClientDto saved = this.clientService.save(client);
-        if (saved != null) {
-            return new ResponseEntity(saved, OK);
-        } else {
-            return new ResponseEntity("client not saved.", BAD_REQUEST);
+    public ResponseEntity<?> createClient(@RequestBody ClientDto client) {
+        ClientDto saved = clientService.save(client);
+        if (saved == null) {
+            return new ResponseEntity<>("New Client has not been saved", BAD_REQUEST);
         }
+        return new ResponseEntity<>(saved, OK);
     }
     
     @PutMapping("{id}")
-    public ResponseEntity updateClient(
-            @PathVariable long id,
-            @RequestBody ClientDto client) {
-        ClientDto updatedClient = this.clientService.update(id, client);
+    public ResponseEntity<?> updateClient(@PathVariable long id, @RequestBody ClientDto client) {
+        ClientDto updatedClient = clientService.update(id, client);
         if (updatedClient != null) {
-            return new ResponseEntity(updatedClient, OK);
+            return new ResponseEntity<>(updatedClient, OK);
         } else {
-            return new ResponseEntity(format("No Client found for ID %d", id), NOT_FOUND);
+            return new ResponseEntity<>(format("No Client found for ID %d", id), NOT_FOUND);
         }
     }
     
     @DeleteMapping("{id}")
-    public ResponseEntity deleteClient(@PathVariable long id) {
-        boolean removed = this.clientService.delete(id);
-        if (removed) {
-            return new ResponseEntity(id, OK);
-        } else {
-            return new ResponseEntity(format("No Client found for ID %d", id), NOT_FOUND);
+    public ResponseEntity<?> deleteClient(@PathVariable long id) {
+        if (!clientService.delete(id)) {
+            return new ResponseEntity<>(format("No Client found for ID %d", id), NOT_FOUND);
         }
+        return new ResponseEntity<>(id, OK);
     }
-    
 }
