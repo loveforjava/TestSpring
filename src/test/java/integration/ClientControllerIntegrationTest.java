@@ -37,6 +37,14 @@ public class ClientControllerIntegrationTest {
     }
     
     @Test
+    public void getShipmentsByClientId() {
+        expect()
+                .statusCode(SC_OK)
+                .when()
+                .get("clients/{id}/shipments", 1);
+    }
+    
+    @Test
     public void createClient() throws Exception {
         JSONObject newClient = new JSONObject();
         newClient.put("name", "created John Doe");

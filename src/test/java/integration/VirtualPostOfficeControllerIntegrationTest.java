@@ -56,6 +56,14 @@ public class VirtualPostOfficeControllerIntegrationTest {
     }
     
     @Test
+    public void getClientsOfVirtualPostOffice() {
+        expect()
+                .statusCode(SC_OK)
+                .when()
+                .get("/virtual-post-offices/{id}/clients", 1);
+    }
+    
+    @Test
     public void getPostOfficeById_notFound() throws Exception {
         expect()
                 .statusCode(SC_NOT_FOUND)
