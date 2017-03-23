@@ -1,5 +1,6 @@
 package com.opinta.service;
 
+import com.opinta.dao.ShipmentDao;
 import com.opinta.model.Address;
 import com.opinta.model.Client;
 import com.opinta.model.Shipment;
@@ -9,11 +10,11 @@ import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
 import org.apache.pdfbox.pdmodel.interactive.form.PDTextField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
 
 @Service
 @Slf4j
@@ -21,18 +22,19 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
     private static final String PDF_LABEL_TEMPLATE = "pdfTemplate/label-template.pdf";
     private static final String PDF_POSTPAY_TEMPLATE = "pdfTemplate/postpay-template.pdf";
 
-    private ShipmentService shipmentService;
+    private ShipmentDao shipmentDao;
     private PDDocument template;
     private PDTextField field;
 
     @Autowired
-    public PDFGeneratorServiceImpl(ShipmentService shipmentService) {
-        this.shipmentService = shipmentService;
+    public PDFGeneratorServiceImpl(ShipmentDao shipmentDao) {
+        this.shipmentDao = shipmentDao;
     }
 
     @Override
+    @Transactional
     public byte[] generatePostpay(long shipmentId) {
-        Shipment shipment = shipmentService.getEntityById(shipmentId);
+        Shipment shipment = shipmentDao.getById(shipmentId);
         File file = new File(getClass()
                 .getClassLoader()
                 .getResource(PDF_POSTPAY_TEMPLATE)
@@ -49,8 +51,10 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
                 field = (PDTextField) acroForm.getField("priceHryvnas");
                 field.setValue(priceParts[0]);
 
-                field = (PDTextField) acroForm.getField("priceKopiyky");
-                field.setValue(priceParts[1]);
+                if(priceParts.length > 1) {
+                    field = (PDTextField) acroForm.getField("priceKopiyky");
+                    field.setValue(priceParts[1]);
+                }
             }
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             template.save(outputStream);
@@ -62,8 +66,9 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
     }
 
     @Override
+    @Transactional
     public byte[] generateLabel(long shipmentId) {
-        Shipment shipment = shipmentService.getEntityById(shipmentId);
+        Shipment shipment = shipmentDao.getById(shipmentId);
         File file = new File(getClass()
                 .getClassLoader()
                 .getResource(PDF_LABEL_TEMPLATE)
@@ -127,8 +132,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
 
     public String processAddress(Address address) {
         return address.getStreet() + " st., " +
-                address.getHouseNumber() + "," +
-                address.getAppartmentNumber() + ", " +
+                address.getHouseNumber() + ", " +
                 address.getCity() + "\n" +
                 address.getPostcode();
     }

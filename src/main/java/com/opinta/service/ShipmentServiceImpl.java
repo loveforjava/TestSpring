@@ -97,10 +97,4 @@ public class ShipmentServiceImpl implements ShipmentService {
         return true;
     }
 
-    @Override
-    @Transactional
-    public Shipment getEntityById(long id) {
-        log.info("Getting postcodePool by id {}", id);
-        return shipmentDao.getById(id);
-    }
 }
