@@ -1,22 +1,20 @@
 package integration;
 
 import org.json.simple.JSONObject;
-import org.junit.Ignore;
 import org.junit.Test;
+
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static javax.servlet.http.HttpServletResponse.SC_OK;
 
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 
-/**
- * Created by Diarsid on 22.03.2017.
- */
 public class PostOfficeControllerIntegrationTest {
-    
     @Test
     public void getPostOffices() throws Exception {
         expect()
-                .statusCode(200)
+                .statusCode(SC_OK)
                 .when()
                 .get("/post-offices");
     }
@@ -24,7 +22,7 @@ public class PostOfficeControllerIntegrationTest {
     @Test
     public void getPostOffice() throws Exception {
         expect()
-                .statusCode(200)
+                .statusCode(SC_OK)
                 .when()
                 .get("/post-offices/{id}", 1)
                 .then()
@@ -34,7 +32,7 @@ public class PostOfficeControllerIntegrationTest {
     @Test
     public void getPostOffice_notFound() throws Exception {
         expect()
-                .statusCode(404)
+                .statusCode(SC_NOT_FOUND)
                 .when()
                 .get("/post-offices/{id}", 764563);
     }
@@ -50,7 +48,7 @@ public class PostOfficeControllerIntegrationTest {
                 .contentType("application/json;charset=UTF-8")
                 .body(newOffice.toJSONString())
                 .expect()
-                .statusCode(200)
+                .statusCode(SC_OK)
                 .when()
                 .post("/post-offices")
                 .then()
@@ -59,7 +57,7 @@ public class PostOfficeControllerIntegrationTest {
                 .path("id");
     
         expect()
-                .statusCode(200)
+                .statusCode(SC_OK)
                 .when()
                 .get("post-offices/{id}", newOfficeId);
     }
@@ -77,7 +75,7 @@ public class PostOfficeControllerIntegrationTest {
                 .contentType("application/json;charset=UTF-8")
                 .body(updatedOffice.toJSONString())
                 .expect()
-                .statusCode(200)
+                .statusCode(SC_OK)
                 .when()
                 .put("/post-offices/{id}", updatedId)
                 .then()
@@ -86,7 +84,7 @@ public class PostOfficeControllerIntegrationTest {
                 .path("name");
     
         expect()
-                .statusCode(200)
+                .statusCode(SC_OK)
                 .when()
                 .get("/post-offices/{id}", updatedId)
                 .then()
@@ -94,25 +92,39 @@ public class PostOfficeControllerIntegrationTest {
     }
     
     @Test
-    @Ignore
     public void deletePostOffice() throws Exception {
         
-        // TODO need to create PostcodePool previously
-        // in order it to be eligible to be removed with
-        // assigned PostOffice due to cascade REMOVE.
+        // create PostcodePool
+        JSONObject newPostcodePool = new JSONObject();
+        newPostcodePool.put("postcode", "03222");
+        newPostcodePool.put("closed", false);
         
-        int newPostcodePoolId = -1;
+        // save PostcodePool and get its real database id
+        int newPostcodePoolId = given()
+                .contentType("application/json;charset=UTF-8")
+                .body(newPostcodePool.toJSONString())
+                .expect()
+                .statusCode(SC_OK)
+                .when()
+                .post("/postcodes")
+                .then()
+                .body("id", greaterThan(0))
+                .extract()
+                .path("id");
         
+        // create new office using previously created
+        // real postcode pool id
         JSONObject newOffice = new JSONObject();
         newOffice.put("name", "Kharkiv post office");
         newOffice.put("addressId", 1);
         newOffice.put("postcodePoolId", newPostcodePoolId);
     
+        // saving office and get its real id
         int newOfficeId = given()
                 .contentType("application/json;charset=UTF-8")
                 .body(newOffice.toJSONString())
                 .expect()
-                .statusCode(200)
+                .statusCode(SC_OK)
                 .when()
                 .post("/post-offices")
                 .then()
@@ -120,13 +132,15 @@ public class PostOfficeControllerIntegrationTest {
                 .extract()
                 .path("id");
     
+        // remove office by real id
         expect()
-                .statusCode(200)
+                .statusCode(SC_OK)
                 .when()
                 .delete("/post-offices/{id}", newOfficeId);
     
+        // assert that office have been removed
         expect()
-                .statusCode(404)
+                .statusCode(SC_NOT_FOUND)
                 .when()
                 .get("/post-offices/{id}", newOfficeId);
     }

@@ -6,33 +6,32 @@ import io.restassured.response.Response;
 import org.json.simple.JSONObject;
 import org.junit.Test;
 
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static javax.servlet.http.HttpServletResponse.SC_OK;
+
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertEquals;
 
-/**
- * Created by Diarsid on 22.03.2017.
- */
 public class ClientControllerIntegrationTest {
-    
     @Test
     public void getAllClients() throws Exception {
-        Response response = expect().statusCode(200).when().get("/clients");
+        Response response = expect().statusCode(SC_OK).when().get("/clients");
         int status = response.getStatusCode();
-        assertEquals(200, status);
+        assertEquals(SC_OK, status);
     }
     
     @Test
     public void getClientById() throws Exception {
-        expect().statusCode(200).when().get("clients/1").then().body("id", equalTo(1));
-        expect().statusCode(200).when().get("clients/2").then().body("id", equalTo(2));
+        expect().statusCode(SC_OK).when().get("clients/1").then().body("id", equalTo(1));
+        expect().statusCode(SC_OK).when().get("clients/2").then().body("id", equalTo(2));
     }
     
     @Test
     public void getClientById_notFound() throws Exception {
         expect()
-                .statusCode(404)
+                .statusCode(SC_NOT_FOUND)
                 .when()
                 .get("clients/{id}", new Random().nextInt());
     }
@@ -49,7 +48,7 @@ public class ClientControllerIntegrationTest {
                 .contentType("application/json;charset=UTF-8")
                 .body(newClient.toJSONString())
                 .expect()
-                .statusCode(200)
+                .statusCode(SC_OK)
                 .when()
                 .post("/clients")
                 .then()
@@ -58,9 +57,9 @@ public class ClientControllerIntegrationTest {
                 .path("id");
     
         expect()
-                .statusCode(200)
+                .statusCode(SC_OK)
                 .when()
-                .delete("clients/{id}", newClientId);
+                .get("clients/{id}", newClientId);
     }
     
     @Test
@@ -75,12 +74,12 @@ public class ClientControllerIntegrationTest {
                 .contentType("application/json;charset=UTF-8")
                 .body(updatedClient.toJSONString())
                 .expect()
-                .statusCode(200)
+                .statusCode(SC_OK)
                 .when()
                 .put("/clients/{id}", 1).then().body("id", greaterThan(0));
     
         expect()
-                .statusCode(200)
+                .statusCode(SC_OK)
                 .when()
                 .get("clients/{id}", 1)
                 .then()
@@ -92,7 +91,7 @@ public class ClientControllerIntegrationTest {
     public void deleteClient() throws Exception {
         try {
             expect()
-                    .statusCode(200)
+                    .statusCode(SC_OK)
                     .when()
                     .delete("clients/{id}", 1);
         } catch (AssertionError e) {
@@ -106,7 +105,7 @@ public class ClientControllerIntegrationTest {
                     .contentType("application/json;charset=UTF-8")
                     .body(newClient.toJSONString())
                     .expect()
-                    .statusCode(200)
+                    .statusCode(SC_OK)
                     .when()
                     .post("/clients")
                     .then()
@@ -115,11 +114,14 @@ public class ClientControllerIntegrationTest {
                     .path("id");
     
             expect()
-                    .statusCode(200)
+                    .statusCode(SC_OK)
                     .when()
                     .delete("clients/{id}", newClientId);
-        }
-        
-    }
     
+            expect()
+                    .statusCode(SC_NOT_FOUND)
+                    .when()
+                    .get("clients/{id}", newClientId);
+        }
+    }
 }

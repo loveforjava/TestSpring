@@ -3,19 +3,18 @@ package integration;
 import org.json.simple.JSONObject;
 import org.junit.Test;
 
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static javax.servlet.http.HttpServletResponse.SC_OK;
+
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 
-/**
- * Created by Diarsid on 22.03.2017.
- */
 public class AddressControllerIntegrationTest {
-    
     @Test
     public void getAddresses() throws Exception {
         expect()
-                .statusCode(200)
+                .statusCode(SC_OK)
                 .when()
                 .get("/addresses");
     }
@@ -23,7 +22,7 @@ public class AddressControllerIntegrationTest {
     @Test
     public void getAddress() throws Exception {
         expect()
-                .statusCode(200)
+                .statusCode(SC_OK)
                 .when()
                 .get("/addresses/{id}", 1)
                 .then()
@@ -54,7 +53,7 @@ public class AddressControllerIntegrationTest {
                 .contentType("application/json;charset=UTF-8")
                 .body(newAddr.toJSONString())
                 .expect()
-                .statusCode(200)
+                .statusCode(SC_OK)
                 .when()
                 .post("/addresses")
                 .then()
@@ -63,7 +62,7 @@ public class AddressControllerIntegrationTest {
                 .path("id");
     
         expect()
-                .statusCode(200)
+                .statusCode(SC_OK)
                 .when()
                 .get("addresses/{id}", newAddrId);
     }
@@ -87,7 +86,7 @@ public class AddressControllerIntegrationTest {
                 .contentType("application/json;charset=UTF-8")
                 .body(updatedAddr.toJSONString())
                 .expect()
-                .statusCode(200)
+                .statusCode(SC_OK)
                 .when()
                 .put("/addresses/{id}", updatedId)
                 .then()
@@ -96,7 +95,7 @@ public class AddressControllerIntegrationTest {
                 .path("district");
     
         expect()
-                .statusCode(200)
+                .statusCode(SC_OK)
                 .when()
                 .get("/addresses/{id}", updatedId)
                 .then()
@@ -119,7 +118,7 @@ public class AddressControllerIntegrationTest {
                 .contentType("application/json;charset=UTF-8")
                 .body(newAddr.toJSONString())
                 .expect()
-                .statusCode(200)
+                .statusCode(SC_OK)
                 .when()
                 .post("/addresses")
                 .then()
@@ -128,12 +127,12 @@ public class AddressControllerIntegrationTest {
                 .path("id");
     
         expect()
-                .statusCode(200)
+                .statusCode(SC_OK)
                 .when()
                 .delete("/addresses/{id}", newAddrId);
     
         expect()
-                .statusCode(404)
+                .statusCode(SC_NOT_FOUND)
                 .when()
                 .get("/addresses/{id}", newAddrId);
     }
