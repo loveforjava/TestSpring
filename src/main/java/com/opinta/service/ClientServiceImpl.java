@@ -5,9 +5,11 @@ import java.util.List;
 import javax.transaction.Transactional;
 
 import com.opinta.dao.ClientDao;
+import com.opinta.dao.VirtualPostOfficeDao;
 import com.opinta.dto.ClientDto;
 import com.opinta.mapper.ClientMapper;
 import com.opinta.model.Client;
+import com.opinta.model.VirtualPostOffice;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,14 +19,16 @@ import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 @Service
 @Slf4j
 public class ClientServiceImpl implements ClientService {
-    
     private final ClientDao clientDao;
+    private final VirtualPostOfficeDao virtualPostOfficeDao;
     private final ClientMapper clientMapper;
 
     @Autowired
-    public ClientServiceImpl(ClientDao clientDao, ClientMapper clientMapper) {
+    public ClientServiceImpl(ClientDao clientDao, ClientMapper clientMapper,
+                             VirtualPostOfficeDao virtualPostOfficeDao) {
         this.clientDao = clientDao;
         this.clientMapper = clientMapper;
+        this.virtualPostOfficeDao = virtualPostOfficeDao;
     }
 
     @Override
@@ -33,6 +37,19 @@ public class ClientServiceImpl implements ClientService {
         log.info("Getting all clients");
         List<Client> allClients = clientDao.getAll();
         return this.clientMapper.toDto(allClients);
+    }
+
+    @Override
+    @Transactional
+    public List<ClientDto> getAllByVirtualPostOfficeId(long virtualPostOfficeId) {
+        VirtualPostOffice virtualPostOffice = virtualPostOfficeDao.getById(virtualPostOfficeId);
+        if (virtualPostOffice == null) {
+            log.debug("Can't get client list by virtualPostOffice. VirtualPostOffice {} doesn't exist",
+                    virtualPostOfficeId);
+            return null;
+        }
+        log.info("Getting all clients by virtualPostOffice {}", virtualPostOffice);
+        return clientMapper.toDto(clientDao.getAllByVirtualPostOffice(virtualPostOffice));
     }
 
     @Override

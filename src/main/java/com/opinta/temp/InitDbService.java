@@ -47,7 +47,6 @@ import static com.opinta.model.BarcodeStatus.USED;
 
 @Service
 public class InitDbService {
-    
     private BarcodeInnerNumberService barcodeInnerNumberService;
     private PostcodePoolService postcodePoolService;
     private ClientService clientService;
@@ -121,7 +120,8 @@ public class InitDbService {
         // create Client with VirtualPostOffice
         PostcodePoolDto postcodePoolDto1 = postcodePoolMapper.toDto(new PostcodePool("00003", false));
         PostcodePoolDto postcodePoolDtoSaved1 = postcodePoolService.save(postcodePoolDto1);
-        VirtualPostOffice virtualPostOffice = new VirtualPostOffice("Modna kasta", postcodePoolMapper.toEntity(postcodePoolDtoSaved1));
+        VirtualPostOffice virtualPostOffice = new VirtualPostOffice("Modna kasta",
+                postcodePoolMapper.toEntity(postcodePoolDtoSaved1));
         VirtualPostOfficeDto virtualPostOfficeDto = this.virtualPostOfficeMapper.toDto(virtualPostOffice);
         virtualPostOfficeDto = virtualPostOfficeService.save(virtualPostOfficeDto);
         virtualPostOffice = virtualPostOfficeMapper.toEntity(virtualPostOfficeDto);
@@ -131,18 +131,21 @@ public class InitDbService {
                 addressMapper.toEntity(addressesSaved.get(0)), virtualPostOffice));
         clients.add(new Client("Petrov PP", "002",
                 addressMapper.toEntity(addressesSaved.get(1)), virtualPostOffice));
-        int a = 5;
-        clients.forEach((client) -> {
-            System.out.println(client.toString());
-        });
-        clients.forEach((Client client) -> {
-            clientsSaved.add(this.clientMapper.toEntity(clientService.save(this.clientMapper.toDto(client))));
-        });
+        clients.forEach((Client client) ->
+            clientsSaved.add(this.clientMapper.toEntity(clientService.save(this.clientMapper.toDto(client))))
+        );
 
         // create Shipment
+        List<ShipmentDto> shipmentsSaved = new ArrayList<>();
         Shipment shipment = new Shipment(clientsSaved.get(0), clientsSaved.get(1), DeliveryType.W2W, 1, 1,
                 new BigDecimal("12.5"), new BigDecimal("2.5"), new BigDecimal("15"));
-        ShipmentDto shipmentSaved = shipmentService.save(shipmentMapper.toDto(shipment));
+        shipmentsSaved.add(shipmentService.save(shipmentMapper.toDto(shipment)));
+        shipment = new Shipment(clientsSaved.get(0), clientsSaved.get(0), DeliveryType.W2D, 2, 2,
+                new BigDecimal("19.5"), new BigDecimal("0.5"), new BigDecimal("20.5"));
+        shipmentsSaved.add(shipmentService.save(shipmentMapper.toDto(shipment)));
+        shipment = new Shipment(clientsSaved.get(1), clientsSaved.get(0), DeliveryType.D2D, 3, 3,
+                new BigDecimal("8.5"), new BigDecimal("2.25"), new BigDecimal("13.5"));
+        shipmentsSaved.add(shipmentService.save(shipmentMapper.toDto(shipment)));
 
         // create PostOffice
         PostcodePoolDto postcodePoolDto2 = postcodePoolMapper.toDto(new PostcodePool("00002", false));
@@ -152,8 +155,9 @@ public class InitDbService {
         PostOfficeDto postOfficeSaved = postOfficeService.save(postOfficeMapper.toDto(postOffice));
 
         // create ShipmentTrackingDetail
-        ShipmentTrackingDetail shipmentTrackingDetail = new ShipmentTrackingDetail(shipmentMapper.toEntity(shipmentSaved),
-                postOfficeMapper.toEntity(postOfficeSaved), ShipmentStatus.PREPARED, new Date());
+        ShipmentTrackingDetail shipmentTrackingDetail =
+                new ShipmentTrackingDetail(shipmentMapper.toEntity(shipmentsSaved.get(0)),
+                        postOfficeMapper.toEntity(postOfficeSaved), ShipmentStatus.PREPARED, new Date());
         shipmentTrackingDetailService.save(shipmentTrackingDetailMapper.toDto(shipmentTrackingDetail));
     }
 }

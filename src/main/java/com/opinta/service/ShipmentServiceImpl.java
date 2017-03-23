@@ -4,9 +4,11 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
+import com.opinta.dao.ClientDao;
 import com.opinta.dao.ShipmentDao;
 import com.opinta.dto.ShipmentDto;
 import com.opinta.mapper.ShipmentMapper;
+import com.opinta.model.Client;
 import com.opinta.model.Shipment;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +19,14 @@ import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 @Service
 @Slf4j
 public class ShipmentServiceImpl implements ShipmentService {
-    private ShipmentDao shipmentDao;
-    private ShipmentMapper shipmentMapper;
+    private final ShipmentDao shipmentDao;
+    private final ClientDao clientDao;
+    private final ShipmentMapper shipmentMapper;
 
     @Autowired
-    public ShipmentServiceImpl(ShipmentDao shipmentDao, ShipmentMapper shipmentMapper) {
+    public ShipmentServiceImpl(ShipmentDao shipmentDao, ClientDao clientDao, ShipmentMapper shipmentMapper) {
         this.shipmentDao = shipmentDao;
+        this.clientDao = clientDao;
         this.shipmentMapper = shipmentMapper;
     }
 
@@ -31,6 +35,18 @@ public class ShipmentServiceImpl implements ShipmentService {
     public List<ShipmentDto> getAll() {
         log.info("Getting all shipments");
         return shipmentMapper.toDto(shipmentDao.getAll());
+    }
+
+    @Override
+    @Transactional
+    public List<ShipmentDto> getAllByClientId(long clientId) {
+        Client client = clientDao.getById(clientId);
+        if (client == null) {
+            log.debug("Can't get shipment list by client. Client {} doesn't exist", clientId);
+            return null;
+        }
+        log.info("Getting all shipments by client {}", client);
+        return shipmentMapper.toDto(shipmentDao.getAllByClient(client));
     }
 
     @Override
