@@ -46,8 +46,12 @@ public class PostOfficeController {
 
 	@PostMapping
     @ResponseStatus(HttpStatus.OK)
-	public void createPostOffice(@RequestBody PostOfficeDto postOfficeDto) {
-		postOfficeService.save(postOfficeDto);
+	public ResponseEntity<?> createPostOffice(@RequestBody PostOfficeDto postOfficeDto) {
+		postOfficeDto = postOfficeService.save(postOfficeDto);
+		if ( postOfficeDto == null && postOfficeDto.getId() <= 0 ) {
+            return new ResponseEntity<>("Failed to create new PostOffice using given data.", HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(postOfficeDto, HttpStatus.OK);
 	}
 
 	@PutMapping("{id}")

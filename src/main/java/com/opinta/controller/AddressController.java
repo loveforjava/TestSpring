@@ -1,8 +1,9 @@
 package com.opinta.controller;
 
+import java.util.List;
+
 import com.opinta.dto.AddressDto;
 import com.opinta.service.AddressService;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,8 +46,12 @@ public class AddressController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
-    public void createAddress(@RequestBody AddressDto addressDto) {
-        addressService.save(addressDto);
+    public ResponseEntity<?> createAddress(@RequestBody AddressDto addressDto) {
+        addressDto = addressService.save(addressDto);
+        if (addressDto == null) {
+            return new ResponseEntity<>("Failed to create new Address using given data.", HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(addressDto, HttpStatus.OK);
     }
 
     @PutMapping("{id}")
