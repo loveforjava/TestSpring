@@ -1,5 +1,11 @@
 package com.opinta.service;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.transaction.Transactional;
+
 import com.opinta.dao.BarcodeInnerNumberDao;
 import com.opinta.dao.PostcodePoolDao;
 import com.opinta.dto.BarcodeInnerNumberDto;
@@ -10,14 +16,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
-import java.util.List;
-
+import static com.opinta.model.BarcodeStatus.USED;
 import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 
 @Service
 @Slf4j
 public class BarcodeInnerNumberServiceImpl implements BarcodeInnerNumberService {
+    private static final Map<String, Integer> POSTCODE_COUNTERS = new HashMap<>();
+    
     private BarcodeInnerNumberDao barcodeInnerNumberDao;
     private PostcodePoolDao postcodePoolDao;
     private BarcodeInnerNumberMapper barcodeInnerNumberMapper;
@@ -48,6 +54,26 @@ public class BarcodeInnerNumberServiceImpl implements BarcodeInnerNumberService 
     public BarcodeInnerNumberDto getById(long id) {
         log.info("Getting barcodeInnerNumber by id {}", id);
         return barcodeInnerNumberMapper.toDto(barcodeInnerNumberDao.getById(id));
+    }
+    
+    @Override
+    public BarcodeInnerNumber generateForPostcodePool(PostcodePool postcodePool) {
+        BarcodeInnerNumber barcodeInnerNumber = new BarcodeInnerNumber();
+        barcodeInnerNumber.setStatus(USED);
+        String barcode = generateBarcodeInnerNumberFor(postcodePool.getPostcode());
+        barcodeInnerNumber.setNumber(barcode);
+        return barcodeInnerNumberDao.save(barcodeInnerNumber);
+    }
+    
+    private String generateBarcodeInnerNumberFor(String postcode) {
+        POSTCODE_COUNTERS.putIfAbsent(postcode, 1);
+        int postcodeCounter = POSTCODE_COUNTERS.get(postcode);
+        POSTCODE_COUNTERS.put(postcode, postcodeCounter + 1);
+        String barcodeNumber = String.format("%07d", postcodeCounter);
+        if (barcodeNumber.length() > 7) {
+            throw new RuntimeException(String.format("Barcode '%d%' is too large", barcodeNumber));
+        }
+        return barcodeNumber;
     }
 
     @Override
