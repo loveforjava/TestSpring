@@ -50,7 +50,7 @@ public class ClientControllerIntegrationTest {
         newClient.put("uniqueRegistrationNumber", "009");
         newClient.put("virtualPostOfficeId", 1);
     
-        int newClientId = given()
+        clientId = given()
                 .contentType("application/json;charset=UTF-8")
                 .body(newClient.toJSONString())
                 .expect()
@@ -61,13 +61,6 @@ public class ClientControllerIntegrationTest {
                 .body("id", greaterThan(0))
                 .extract()
                 .path("id");
-    
-        expect()
-                .statusCode(SC_OK)
-                .when()
-                .get("clients/{id}", newClientId);
-        
-        clientId = newClientId;
     }
     
     @After
