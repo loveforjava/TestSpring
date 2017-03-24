@@ -1,17 +1,19 @@
 package integration;
 
+import io.restassured.response.Response;
 import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import io.restassured.response.Response;
+
+import static java.lang.Integer.MIN_VALUE;
+
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static javax.servlet.http.HttpServletResponse.SC_OK;
 
 import static io.restassured.RestAssured.delete;
 import static io.restassured.RestAssured.expect;
 import static io.restassured.RestAssured.given;
-import static java.lang.Integer.MIN_VALUE;
-import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
-import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertEquals;
@@ -72,9 +74,6 @@ public class ShipmentIntegrationTest {
     public void tearDown() {
         delete("clients/{id}", clientId);
         delete("shipments/{id}", shipmentId);
-
-        shipmentId = MIN_VALUE;
-        clientId = MIN_VALUE;
     }
 
     @Test
@@ -155,6 +154,8 @@ public class ShipmentIntegrationTest {
                 .statusCode(SC_OK)
                 .when()
                 .get("shipments/{id}", newShipmentId);
+        
+        delete("shipments/{id}", newShipmentId);
     }
 
     @Test
