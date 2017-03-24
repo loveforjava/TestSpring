@@ -32,7 +32,7 @@ public class PDFGeneratorServiceTest {
         pdfGeneratorService = new PDFGeneratorServiceImpl(shipmentService);
 
         Address senderAddress = new Address("00001", "Ternopil", "Monastiriska",
-                "Monastiriska", "Sadova", "51", "");
+                        "Monastiriska", "Sadova", "51", "");
         Address recipientAddress = new Address("00002", "Kiev", "", "Kiev", "Khreschatik", "121", "37");
         VirtualPostOffice virtualPostOffice = new VirtualPostOffice("Modna kasta",
                 new PostcodePool("00003", false));

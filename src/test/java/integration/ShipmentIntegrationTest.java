@@ -69,17 +69,15 @@ public class ShipmentIntegrationTest {
                 .extract()
                 .path("id");
 
-        expect()
-                .statusCode(SC_OK)
-                .when()
-                .get("shipments/{id}", newShipmentId);
-
         shipmentId = newShipmentId;
     }
 
     @Test
     public void getShipments() throws Exception {
-        Response response = expect().statusCode(SC_OK).when().get("/shipments");
+        Response response = expect()
+                .statusCode(SC_OK)
+                .when()
+                .get("/shipments");
         int status = response.getStatusCode();
         assertEquals(SC_OK, status);
     }
@@ -87,7 +85,12 @@ public class ShipmentIntegrationTest {
     @Test
     @SuppressWarnings("unchecked")
     public void getShipmentById() throws Exception {
-        expect().statusCode(SC_OK).when().get(String.format("shipments/%d", shipmentId)).then().body("id", equalTo(shipmentId));
+        expect()
+                .statusCode(SC_OK)
+                .when()
+                .get(String.format("shipments/%d", shipmentId))
+                .then()
+                .body("id", equalTo(shipmentId));
     }
 
     @Test
