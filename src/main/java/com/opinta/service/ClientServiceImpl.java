@@ -8,7 +8,6 @@ import com.opinta.dao.ClientDao;
 import com.opinta.dao.VirtualPostOfficeDao;
 import com.opinta.dto.ClientDto;
 import com.opinta.mapper.ClientMapper;
-import com.opinta.mapper.VirtualPostOfficeMapper;
 import com.opinta.model.Client;
 import com.opinta.model.VirtualPostOffice;
 import lombok.extern.slf4j.Slf4j;
