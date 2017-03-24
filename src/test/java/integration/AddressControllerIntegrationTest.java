@@ -1,7 +1,5 @@
 package integration;
 
-import java.util.Random;
-
 import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -12,6 +10,7 @@ import static java.lang.Integer.MIN_VALUE;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 
+import static io.restassured.RestAssured.delete;
 import static io.restassured.RestAssured.expect;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
@@ -21,7 +20,7 @@ public class AddressControllerIntegrationTest {
     int addressId = MIN_VALUE;
     
     @Before
-    public void setupCase() {
+    public void setUp() {
         JSONObject newAddr = new JSONObject();
         newAddr.put("postcode", "02099");
         newAddr.put("region", "Kyiv");
@@ -43,24 +42,11 @@ public class AddressControllerIntegrationTest {
                 .body("id", greaterThan(0))
                 .extract()
                 .path("id");
-    
-        expect()
-                .statusCode(SC_OK)
-                .when()
-                .get("addresses/{id}", addressId);
     }
     
     @After
-    public void teardownCase() {
-        expect()
-                .statusCode(SC_OK)
-                .when()
-                .delete("/addresses/{id}", addressId);
-    
-        expect()
-                .statusCode(SC_NOT_FOUND)
-                .when()
-                .get("/addresses/{id}", addressId);
+    public void tearDown() {
+        delete("/addresses/{id}", addressId);
     }
     
     @Test
@@ -86,7 +72,7 @@ public class AddressControllerIntegrationTest {
         expect()
                 .statusCode(SC_NOT_FOUND)
                 .when()
-                .get("/addresses/{id}", new Random().nextLong());
+                .get("/addresses/{id}", addressId + 1);
     }
     
     @Test
@@ -139,7 +125,7 @@ public class AddressControllerIntegrationTest {
                 .when()
                 .put("/addresses/{id}", addressId)
                 .then()
-                .body("id", greaterThan(0))
+                .body("id", equalTo(addressId))
                 .extract()
                 .path("district");
     
@@ -153,36 +139,14 @@ public class AddressControllerIntegrationTest {
     
     @Test
     public void deleteAddress() throws Exception {
-        JSONObject newAddr = new JSONObject();
-        newAddr.put("postcode", "020991");
-        newAddr.put("region", "Kyiv");
-        newAddr.put("district", "Darnitskyi");
-        newAddr.put("city", "Kyiv");
-        newAddr.put("street", "Yaltinskaya");
-        newAddr.put("houseNumber", "51");
-        newAddr.put("appartmentNumber", "32");
-        newAddr.put("description", "none");
-    
-        int newAddrId = given()
-                .contentType("application/json;charset=UTF-8")
-                .body(newAddr.toJSONString())
-                .expect()
-                .statusCode(SC_OK)
-                .when()
-                .post("/addresses")
-                .then()
-                .body("id", greaterThan(0))
-                .extract()
-                .path("id");
-    
         expect()
                 .statusCode(SC_OK)
                 .when()
-                .delete("/addresses/{id}", newAddrId);
+                .delete("/addresses/{id}", addressId);
     
         expect()
                 .statusCode(SC_NOT_FOUND)
                 .when()
-                .get("/addresses/{id}", newAddrId);
+                .get("/addresses/{id}", addressId);
     }
 }

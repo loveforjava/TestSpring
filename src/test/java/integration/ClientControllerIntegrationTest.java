@@ -1,7 +1,5 @@
 package integration;
 
-import java.util.Random;
-
 import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -12,6 +10,7 @@ import static java.lang.Integer.MIN_VALUE;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 
+import static io.restassured.RestAssured.delete;
 import static io.restassured.RestAssured.expect;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
@@ -22,7 +21,7 @@ public class ClientControllerIntegrationTest {
     int clientAddressId = MIN_VALUE;
     
     @Before
-    public void setupCase() {
+    public void setUp() {
         JSONObject newAddr = new JSONObject();
         newAddr.put("postcode", "02099");
         newAddr.put("region", "Kyiv");
@@ -44,11 +43,6 @@ public class ClientControllerIntegrationTest {
                 .body("id", greaterThan(0))
                 .extract()
                 .path("id");
-    
-        expect()
-                .statusCode(SC_OK)
-                .when()
-                .get("addresses/{id}", clientAddressId);
     
         JSONObject newClient = new JSONObject();
         newClient.put("name", "created John Doe");
@@ -77,16 +71,8 @@ public class ClientControllerIntegrationTest {
     }
     
     @After
-    public void teardownCase() {
-        expect()
-                .statusCode(SC_OK)
-                .when()
-                .delete("clients/{id}", clientId);
-    
-        expect()
-                .statusCode(SC_NOT_FOUND)
-                .when()
-                .get("clients/{id}", clientId);
+    public void tearDown() {
+        delete("clients/{id}", clientId);
     }
     
     @Test
@@ -110,7 +96,7 @@ public class ClientControllerIntegrationTest {
         expect()
                 .statusCode(SC_NOT_FOUND)
                 .when()
-                .get("clients/{id}", new Random().nextLong());
+                .get("clients/{id}", clientId + 1);
     }
     
     @Test
@@ -161,7 +147,9 @@ public class ClientControllerIntegrationTest {
                 .expect()
                 .statusCode(SC_OK)
                 .when()
-                .put("/clients/{id}", clientId).then().body("id", greaterThan(0));
+                .put("/clients/{id}", clientId)
+                .then()
+                .body("id", equalTo(clientId));
     
         expect()
                 .statusCode(SC_OK)
@@ -174,39 +162,14 @@ public class ClientControllerIntegrationTest {
     
     @Test
     public void deleteClient() throws Exception {
-        try {
-            expect()
-                    .statusCode(SC_OK)
-                    .when()
-                    .delete("clients/{id}", 1);
-        } catch (AssertionError e) {
-            JSONObject newClient = new JSONObject();
-            newClient.put("name", "John Doe");
-            newClient.put("addressId", clientAddressId);
-            newClient.put("uniqueRegistrationNumber", "123");
-            newClient.put("virtualPostOfficeId", 1);
-            
-            int newClientId = given()
-                    .contentType("application/json;charset=UTF-8")
-                    .body(newClient.toJSONString())
-                    .expect()
-                    .statusCode(SC_OK)
-                    .when()
-                    .post("/clients")
-                    .then()
-                    .body("id", greaterThan(0))
-                    .extract()
-                    .path("id");
+        expect()
+                .statusCode(SC_OK)
+                .when()
+                .delete("clients/{id}", clientId);
     
-            expect()
-                    .statusCode(SC_OK)
-                    .when()
-                    .delete("clients/{id}", newClientId);
-    
-            expect()
-                    .statusCode(SC_NOT_FOUND)
-                    .when()
-                    .get("clients/{id}", newClientId);
-        }
+        expect()
+                .statusCode(SC_NOT_FOUND)
+                .when()
+                .get("clients/{id}", clientId);
     }
 }

@@ -1,7 +1,5 @@
 package integration;
 
-import java.util.Random;
-
 import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -12,6 +10,7 @@ import static java.lang.Integer.MIN_VALUE;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 
+import static io.restassured.RestAssured.delete;
 import static io.restassured.RestAssured.expect;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
@@ -22,7 +21,7 @@ public class PostOfficeControllerIntegrationTest {
     int postcodePoolId = MIN_VALUE;
     
     @Before
-    public void setupCase() {
+    public void setUp() {
         JSONObject newPostcodePool = new JSONObject();
         newPostcodePool.put("postcode", "03222");
         newPostcodePool.put("closed", false);
@@ -42,8 +41,8 @@ public class PostOfficeControllerIntegrationTest {
         newOffice.put("name", "Kyiv post office");
         newOffice.put("addressId", 1);
         newOffice.put("postcodePoolId", postcodePoolId);
-
-        int newOfficeId = given()
+    
+        postOfficeId = given()
                 .contentType("application/json;charset=UTF-8")
                 .body(newOffice.toJSONString())
                 .expect()
@@ -54,29 +53,11 @@ public class PostOfficeControllerIntegrationTest {
                 .body("id", greaterThan(0))
                 .extract()
                 .path("id");
-
-        expect()
-                .statusCode(SC_OK)
-                .when()
-                .get("post-offices/{id}", newOfficeId);
-
-        postOfficeId = newOfficeId;
     }
 
     @After
-    public void tearDownCase() {
-        expect()
-                .statusCode(SC_OK)
-                .when()
-                .delete("/post-offices/{id}", postOfficeId);
-
-        expect()
-                .statusCode(SC_NOT_FOUND)
-                .when()
-                .get("/post-offices/{id}", postOfficeId);
-
-        postOfficeId = MIN_VALUE;
-        postcodePoolId = MIN_VALUE;
+    public void tearDown() {
+        delete("/post-offices/{id}", postOfficeId);
     }
     
     @Test
@@ -102,7 +83,7 @@ public class PostOfficeControllerIntegrationTest {
         expect()
                 .statusCode(SC_NOT_FOUND)
                 .when()
-                .get("/post-offices/{id}", new Random().nextLong());
+                .get("/post-offices/{id}", postOfficeId + 1);
     }
     
     @Test
@@ -145,7 +126,7 @@ public class PostOfficeControllerIntegrationTest {
                 .when()
                 .put("/post-offices/{id}", postOfficeId)
                 .then()
-                .body("id", greaterThan(0))
+                .body("id", equalTo(postOfficeId))
                 .extract()
                 .path("name");
     
@@ -159,47 +140,14 @@ public class PostOfficeControllerIntegrationTest {
     
     @Test
     public void deletePostOffice() throws Exception {
-        JSONObject newPostcodePool = new JSONObject();
-        newPostcodePool.put("postcode", "03222");
-        newPostcodePool.put("closed", false);
-        
-        int newPostcodePoolId = given()
-                .contentType("application/json;charset=UTF-8")
-                .body(newPostcodePool.toJSONString())
-                .expect()
-                .statusCode(SC_OK)
-                .when()
-                .post("/postcodes")
-                .then()
-                .body("id", greaterThan(0))
-                .extract()
-                .path("id");
-        
-        JSONObject newOffice = new JSONObject();
-        newOffice.put("name", "Kharkiv post office");
-        newOffice.put("addressId", 1);
-        newOffice.put("postcodePoolId", newPostcodePoolId);
-    
-        int newOfficeId = given()
-                .contentType("application/json;charset=UTF-8")
-                .body(newOffice.toJSONString())
-                .expect()
-                .statusCode(SC_OK)
-                .when()
-                .post("/post-offices")
-                .then()
-                .body("id", greaterThan(0))
-                .extract()
-                .path("id");
-    
         expect()
                 .statusCode(SC_OK)
                 .when()
-                .delete("/post-offices/{id}", newOfficeId);
+                .delete("/post-offices/{id}", postOfficeId);
     
         expect()
                 .statusCode(SC_NOT_FOUND)
                 .when()
-                .get("/post-offices/{id}", newOfficeId);
+                .get("/post-offices/{id}", postOfficeId);
     }
 }
