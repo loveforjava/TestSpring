@@ -22,12 +22,15 @@ public class ShipmentServiceImpl implements ShipmentService {
     private final ShipmentDao shipmentDao;
     private final ClientDao clientDao;
     private final ShipmentMapper shipmentMapper;
+    private final ShipmentCalculation shipmentCalculation;
 
     @Autowired
-    public ShipmentServiceImpl(ShipmentDao shipmentDao, ClientDao clientDao, ShipmentMapper shipmentMapper) {
+    public ShipmentServiceImpl(ShipmentDao shipmentDao, ClientDao clientDao, ShipmentMapper shipmentMapper,
+                               ShipmentCalculation shipmentCalculation) {
         this.shipmentDao = shipmentDao;
         this.clientDao = clientDao;
         this.shipmentMapper = shipmentMapper;
+        this.shipmentCalculation = shipmentCalculation;
     }
 
     @Override
@@ -60,7 +63,9 @@ public class ShipmentServiceImpl implements ShipmentService {
     @Transactional
     public ShipmentDto save(ShipmentDto shipmentDto) {
         log.info("Saving shipment {}", shipmentDto);
-        return shipmentMapper.toDto(shipmentDao.save(shipmentMapper.toEntity(shipmentDto)));
+        Shipment shipment = shipmentMapper.toEntity(shipmentDto);
+        shipment.setPrice(shipmentCalculation.calculatePrice(shipment));
+        return shipmentMapper.toDto(shipmentDao.save(shipment));
     }
 
     @Override

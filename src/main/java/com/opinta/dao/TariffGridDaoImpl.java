@@ -6,6 +6,10 @@ import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Property;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -45,5 +49,20 @@ public class TariffGridDaoImpl implements TariffGridDao {
     public void delete(TariffGrid tariffGrid) {
         Session session = sessionFactory.getCurrentSession();
         session.delete(tariffGrid);
+    }
+
+    @Override
+    public TariffGrid getPriceByDimension(float weight, float length) {
+        String id = "id";
+        Session session = sessionFactory.getCurrentSession();
+        DetachedCriteria maxId = DetachedCriteria.forClass(TariffGrid.class).setProjection(Projections.max(id));
+        session.createCriteria(TariffGrid.class)
+//                .add() // where weight <= weight and length <= length
+                .add(Restrictions.le("weight", weight))
+                .add(Restrictions.le("length", length))
+                .add(Property.forName(id).eq(maxId))
+                .list();
+
+        return null;
     }
 }

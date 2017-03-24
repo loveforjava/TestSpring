@@ -14,4 +14,6 @@ public interface TariffGridService {
     TariffGrid update(long id, TariffGrid tariffGrid);
     
     boolean delete(long id);
+
+    TariffGrid getPriceByDimension(float weight, float length);
 }

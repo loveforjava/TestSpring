@@ -9,4 +9,5 @@ public interface TariffGridDao {
     TariffGrid save(TariffGrid tariffGrid);
     void update(TariffGrid tariffGrid);
     void delete(TariffGrid tariffGrid);
+    TariffGrid getPriceByDimension(float weight, float length);
 }

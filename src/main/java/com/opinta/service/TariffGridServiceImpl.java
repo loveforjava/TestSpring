@@ -72,4 +72,10 @@ public class TariffGridServiceImpl implements TariffGridService {
         tariffGridDao.delete(tariffGrid);
         return true;
     }
+
+    @Override
+    @Transactional
+    public TariffGrid getPriceByDimension(float weight, float length) {
+        return tariffGridDao.getPriceByDimension(weight, length);
+    }
 }
