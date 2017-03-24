@@ -18,22 +18,17 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class Shipment {
-    
     @Id
     @GeneratedValue
     private long id;
-    
     @ManyToOne
     @JoinColumn(name = "sender_id")
     private Client sender;
-    
     @ManyToOne
     @JoinColumn(name = "recipient_id")
     private Client recipient;
-    
     @OneToOne
     private BarcodeInnerNumber barcode;
-    
     @Enumerated(EnumType.STRING)
     private DeliveryType deliveryType;
     private float weight;

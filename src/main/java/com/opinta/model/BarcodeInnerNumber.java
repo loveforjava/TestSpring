@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class BarcodeInnerNumber {
     @Id
     @GeneratedValue
-    private long id;    
+    private long id;
     @Size(min = 7, max = 7)
     private String number;
     @Enumerated(EnumType.STRING)
