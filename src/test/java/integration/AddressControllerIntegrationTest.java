@@ -1,16 +1,68 @@
 package integration;
 
+import java.util.Random;
+
 import org.json.simple.JSONObject;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+
+import static java.lang.Integer.MIN_VALUE;
 
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 
-import static io.restassured.RestAssured.*;
+import static io.restassured.RestAssured.expect;
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 
 public class AddressControllerIntegrationTest {
+    int addressId = MIN_VALUE;
+    
+    @Before
+    public void setupCase() {
+        JSONObject newAddr = new JSONObject();
+        newAddr.put("postcode", "02099");
+        newAddr.put("region", "Kyiv");
+        newAddr.put("district", "Darnitskyi");
+        newAddr.put("city", "Kyiv");
+        newAddr.put("street", "Yaltinskaya");
+        newAddr.put("houseNumber", "51");
+        newAddr.put("appartmentNumber", "32");
+        newAddr.put("description", "none");
+    
+        addressId = given()
+                .contentType("application/json;charset=UTF-8")
+                .body(newAddr.toJSONString())
+                .expect()
+                .statusCode(SC_OK)
+                .when()
+                .post("/addresses")
+                .then()
+                .body("id", greaterThan(0))
+                .extract()
+                .path("id");
+    
+        expect()
+                .statusCode(SC_OK)
+                .when()
+                .get("addresses/{id}", addressId);
+    }
+    
+    @After
+    public void teardownCase() {
+        expect()
+                .statusCode(SC_OK)
+                .when()
+                .delete("/addresses/{id}", addressId);
+    
+        expect()
+                .statusCode(SC_NOT_FOUND)
+                .when()
+                .get("/addresses/{id}", addressId);
+    }
+    
     @Test
     public void getAddresses() throws Exception {
         expect()
@@ -32,15 +84,15 @@ public class AddressControllerIntegrationTest {
     @Test
     public void getAddress_notFound() throws Exception {
         expect()
-                .statusCode(404)
+                .statusCode(SC_NOT_FOUND)
                 .when()
-                .get("/addresses/{id}", 764563);
+                .get("/addresses/{id}", new Random().nextLong());
     }
     
     @Test
     public void createAddress() throws Exception {
         JSONObject newAddr = new JSONObject();
-        newAddr.put("postcode", "020991");
+        newAddr.put("postcode", "02099");
         newAddr.put("region", "Kyiv");
         newAddr.put("district", "Darnitskyi");
         newAddr.put("city", "Kyiv");
@@ -69,9 +121,6 @@ public class AddressControllerIntegrationTest {
     
     @Test
     public void updateAddress() throws Exception {
-        
-        int updatedId = 1;
-        
         JSONObject updatedAddr = new JSONObject();
         updatedAddr.put("postcode", "020991");
         updatedAddr.put("region", "Kyiv");
@@ -88,7 +137,7 @@ public class AddressControllerIntegrationTest {
                 .expect()
                 .statusCode(SC_OK)
                 .when()
-                .put("/addresses/{id}", updatedId)
+                .put("/addresses/{id}", addressId)
                 .then()
                 .body("id", greaterThan(0))
                 .extract()
@@ -97,7 +146,7 @@ public class AddressControllerIntegrationTest {
         expect()
                 .statusCode(SC_OK)
                 .when()
-                .get("/addresses/{id}", updatedId)
+                .get("/addresses/{id}", addressId)
                 .then()
                 .body("district", equalTo(newDistrict));
     }
@@ -136,5 +185,4 @@ public class AddressControllerIntegrationTest {
                 .when()
                 .get("/addresses/{id}", newAddrId);
     }
-    
 }
