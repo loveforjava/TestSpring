@@ -25,15 +25,15 @@ public class ShipmentServiceImpl implements ShipmentService {
     private final ShipmentDao shipmentDao;
     private final ClientDao clientDao;
     private final ShipmentMapper shipmentMapper;
-    private final BarcodeInnerNumberService barcodeDao;
+    private final BarcodeInnerNumberService barcodeInnerNumberService;
 
     @Autowired
     public ShipmentServiceImpl(ShipmentDao shipmentDao, ClientDao clientDao,
-                                ShipmentMapper shipmentMapper, BarcodeInnerNumberService barcodeDao) {
+                                ShipmentMapper shipmentMapper, BarcodeInnerNumberService barcodeInnerNumberService) {
         this.shipmentDao = shipmentDao;
         this.clientDao = clientDao;
         this.shipmentMapper = shipmentMapper;
-        this.barcodeDao = barcodeDao;
+        this.barcodeInnerNumberService = barcodeInnerNumberService;
     }
 
     @Override
@@ -68,7 +68,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         Client existingClient = clientDao.getById(shipmentDto.getSenderId());
         VirtualPostOffice virtualPostOffice = existingClient.getVirtualPostOffice();
         PostcodePool postcodePool = virtualPostOffice.getActivePostcodePool();
-        BarcodeInnerNumber newBarcode = barcodeDao.generateForPostcodePool(postcodePool);
+        BarcodeInnerNumber newBarcode = barcodeInnerNumberService.generateForPostcodePool(postcodePool);
         postcodePool.getBarcodeInnerNumbers().add(newBarcode);
         Shipment shipment = shipmentMapper.toEntity(shipmentDto);
         shipment.setBarcode(newBarcode);

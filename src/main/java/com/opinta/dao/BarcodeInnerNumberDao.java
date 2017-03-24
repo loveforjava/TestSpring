@@ -15,4 +15,5 @@ public interface BarcodeInnerNumberDao {
     void update(BarcodeInnerNumber barcodeInnerNumber);
     
     void delete(BarcodeInnerNumber barcodeInnerNumber);
+    
 }
