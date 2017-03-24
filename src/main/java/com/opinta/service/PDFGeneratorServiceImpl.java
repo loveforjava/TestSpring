@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
 
 @Service
 @Slf4j
@@ -33,12 +32,12 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
     @Override
     public byte[] generatePostpay(long shipmentId) {
         Shipment shipment = shipmentService.getEntityById(shipmentId);
-        File file = new File(getClass()
-                .getClassLoader()
-                .getResource(PDF_POSTPAY_TEMPLATE)
-                .getFile());
         byte[] data = null;
         try {
+            File file = new File(getClass()
+                    .getClassLoader()
+                    .getResource(PDF_POSTPAY_TEMPLATE)
+                    .getFile());
             template = PDDocument.load(file);
             PDAcroForm acroForm = template.getDocumentCatalog().getAcroForm();
             if (acroForm != null) {
@@ -49,14 +48,18 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
                 field = (PDTextField) acroForm.getField("priceHryvnas");
                 field.setValue(priceParts[0]);
 
-                field = (PDTextField) acroForm.getField("priceKopiyky");
-                field.setValue(priceParts[1]);
+                if (priceParts.length > 1) {
+                    field = (PDTextField) acroForm.getField("priceKopiyky");
+                    field.setValue(priceParts[1]);
+                }
             }
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             template.save(outputStream);
             data = outputStream.toByteArray();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error while parsing PDF template: " + e.getMessage());
+        } catch (NullPointerException e) {
+            log.error("Error while reading the template file %s", PDF_LABEL_TEMPLATE);
         }
         return data;
     }
@@ -64,12 +67,12 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
     @Override
     public byte[] generateLabel(long shipmentId) {
         Shipment shipment = shipmentService.getEntityById(shipmentId);
-        File file = new File(getClass()
-                .getClassLoader()
-                .getResource(PDF_LABEL_TEMPLATE)
-                .getFile());
         byte[] data = null;
         try {
+            File file = new File(getClass()
+                    .getClassLoader()
+                    .getResource(PDF_LABEL_TEMPLATE)
+                    .getFile());
             template = PDDocument.load(file);
             PDAcroForm acroForm = template.getDocumentCatalog().getAcroForm();
             if (acroForm != null) {
@@ -94,7 +97,9 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             template.save(outputStream);
             data = outputStream.toByteArray();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error while parsing PDF template: " + e.getMessage());
+        } catch (NullPointerException e) {
+            log.error("Error while reading the template file %s", PDF_LABEL_TEMPLATE);
         }
         return data;
     }
@@ -125,12 +130,10 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         field.setValue(processAddress(recipient.getAddress()));
     }
 
-    public String processAddress(Address address) {
+    private String processAddress(Address address) {
         return address.getStreet() + " st., " +
-                address.getHouseNumber() + "," +
-                address.getAppartmentNumber() + ", " +
+                address.getHouseNumber() + ", " +
                 address.getCity() + "\n" +
                 address.getPostcode();
     }
-
 }
