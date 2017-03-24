@@ -109,6 +109,8 @@ public class PostOfficeControllerIntegrationTest {
                 .statusCode(SC_OK)
                 .when()
                 .get("post-offices/{id}", newOfficeId);
+    
+        delete("/post-offices/{id}", newOfficeId);
     }
     
     @Test

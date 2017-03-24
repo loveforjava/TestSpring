@@ -103,6 +103,8 @@ public class AddressControllerIntegrationTest {
                 .statusCode(SC_OK)
                 .when()
                 .get("addresses/{id}", newAddrId);
+    
+        delete("/addresses/{id}", newAddrId);
     }
     
     @Test

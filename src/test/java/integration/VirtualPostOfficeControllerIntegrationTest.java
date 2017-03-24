@@ -95,6 +95,8 @@ public class VirtualPostOfficeControllerIntegrationTest {
                 .statusCode(SC_OK)
                 .when()
                 .get("/virtual-post-offices/{id}", newId);
+    
+        delete("/virtual-post-offices/{id}", newId);
     }
     
     @Test

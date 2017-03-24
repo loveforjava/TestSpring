@@ -124,6 +124,8 @@ public class ClientControllerIntegrationTest {
                 .statusCode(SC_OK)
                 .when()
                 .get("clients/{id}", newClientId);
+    
+        delete("clients/{id}", newClientId);
     }
     
     @Test
