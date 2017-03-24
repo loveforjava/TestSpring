@@ -25,7 +25,7 @@ public class ShipmentIntegrationTest {
 
     @Before
     @SuppressWarnings("unchecked")
-    public void setupCase() {
+    public void setUp() {
         JSONObject newClient = new JSONObject();
         newClient.put("name", "created John Doe");
         newClient.put("addressId", 1);
@@ -209,7 +209,7 @@ public class ShipmentIntegrationTest {
     }
 
     @After
-    public void tearDownCase() {
+    public void tearDown() {
         try {
             expect()
                     .statusCode(SC_NOT_FOUND)
