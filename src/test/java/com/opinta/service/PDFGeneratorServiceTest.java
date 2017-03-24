@@ -1,6 +1,11 @@
 package com.opinta.service;
 
-import com.opinta.model.*;
+import com.opinta.model.Address;
+import com.opinta.model.PostcodePool;
+import com.opinta.model.Shipment;
+import com.opinta.model.VirtualPostOffice;
+import com.opinta.model.Client;
+import com.opinta.model.DeliveryType;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
 import org.apache.pdfbox.pdmodel.interactive.form.PDTextField;
@@ -131,5 +136,4 @@ public class PDFGeneratorServiceTest {
                 .getDocumentCatalog()
                 .getAcroForm();
     }
-
 }

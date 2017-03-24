@@ -4,10 +4,7 @@ import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
 import io.restassured.response.Response;
-
-import java.util.Random;
 
 import static io.restassured.RestAssured.delete;
 import static io.restassured.RestAssured.expect;
@@ -58,7 +55,7 @@ public class ShipmentIntegrationTest {
         newShipment.put("postPay", 71);
         newShipment.put("description", null);
 
-        int newShipmentId = given()
+        shipmentId = given()
                 .contentType("application/json")
                 .body(newShipment.toJSONString())
                 .expect()
@@ -69,18 +66,23 @@ public class ShipmentIntegrationTest {
                 .body("id", greaterThan(0))
                 .extract()
                 .path("id");
+    }
 
-        shipmentId = newShipmentId;
+    @After
+    public void tearDown() {
+        delete("clients/{id}", clientId);
+        delete("shipments/{id}", shipmentId);
+
+        shipmentId = MIN_VALUE;
+        clientId = MIN_VALUE;
     }
 
     @Test
     public void getShipments() throws Exception {
-        Response response = expect()
+        expect()
                 .statusCode(SC_OK)
                 .when()
                 .get("/shipments");
-        int status = response.getStatusCode();
-        assertEquals(SC_OK, status);
     }
 
     @Test
@@ -99,17 +101,17 @@ public class ShipmentIntegrationTest {
         expect()
                 .statusCode(SC_NOT_FOUND)
                 .when()
-                .get("shipments/{id}", new Random().nextLong());
+                .get("shipments/{id}", shipmentId + 1);
     }
 
     @Test
     public void getShipmentLabelForm() throws Exception {
-        Response response = expect().statusCode(SC_OK).when()
+        Response response = expect()
+                .statusCode(SC_OK)
+                .when()
                 .get(String.format("/shipments/%d/label-form", shipmentId));
         String contentType = response.getHeader("Content-Type");
-        int status = response.getStatusCode();
         assertEquals("application/pdf", contentType);
-        assertEquals(SC_OK, status);
     }
 
     @Test
@@ -119,9 +121,7 @@ public class ShipmentIntegrationTest {
                 .when()
                 .get(String.format("/shipments/%d/postpay-form", shipmentId));
         String contentType = response.getHeader("Content-Type");
-        int status = response.getStatusCode();
         assertEquals("application/pdf", contentType);
-        assertEquals(SC_OK, status);
     }
 
     @Test
@@ -181,7 +181,7 @@ public class ShipmentIntegrationTest {
                 .when()
                 .put("/shipments/{id}", shipmentId)
                 .then()
-                .body("id", greaterThan(0));
+                .body("id", equalTo(shipmentId));
 
         expect()
                 .statusCode(SC_OK)
@@ -199,25 +199,11 @@ public class ShipmentIntegrationTest {
         expect()
                 .statusCode(SC_OK)
                 .when()
-                .get("shipments/{id}", shipmentId);
-
-        expect()
-                .statusCode(SC_OK)
-                .when()
                 .delete("shipments/{id}", shipmentId);
 
         expect()
                 .statusCode(SC_NOT_FOUND)
                 .when()
                 .get("shipments/{id}", shipmentId);
-    }
-
-    @After
-    public void tearDown() {
-        delete("clients/{id}", clientId);
-        delete("shipments/{id}", shipmentId);
-
-        shipmentId = MIN_VALUE;
-        clientId = MIN_VALUE;
     }
 }

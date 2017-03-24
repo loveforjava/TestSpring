@@ -1,6 +1,5 @@
 package com.opinta.service;
 
-import com.opinta.dao.ShipmentDao;
 import com.opinta.model.Address;
 import com.opinta.model.Client;
 import com.opinta.model.Shipment;
@@ -10,7 +9,6 @@ import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
 import org.apache.pdfbox.pdmodel.interactive.form.PDTextField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -59,7 +57,9 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             template.save(outputStream);
             data = outputStream.toByteArray();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error while parsing PDF template: " + e.getMessage());
+        } catch (NullPointerException e) {
+            log.error("Error while reading the template file %s", PDF_LABEL_TEMPLATE);
         }
         return data;
     }
@@ -97,7 +97,9 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             template.save(outputStream);
             data = outputStream.toByteArray();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error while parsing PDF template: " + e.getMessage());
+        } catch (NullPointerException e) {
+            log.error("Error while reading the template file %s", PDF_LABEL_TEMPLATE);
         }
         return data;
     }
