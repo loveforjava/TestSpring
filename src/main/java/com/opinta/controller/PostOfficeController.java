@@ -54,9 +54,6 @@ public class PostOfficeController {
         if (postOfficeDto == null) {
             return new ResponseEntity<>("Failed to create new PostOffice using given data.", BAD_REQUEST);
         }
-        if ((postOfficeDto != null) && (postOfficeDto.getId() <= 0)) {
-            return new ResponseEntity<>("Failed to create new PostOffice using given data.", BAD_REQUEST);
-        }
         return new ResponseEntity<>(postOfficeDto, OK);
     }
 
