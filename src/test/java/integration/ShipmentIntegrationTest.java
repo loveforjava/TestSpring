@@ -9,6 +9,7 @@ import io.restassured.response.Response;
 
 import java.util.Random;
 
+import static io.restassured.RestAssured.delete;
 import static io.restassured.RestAssured.expect;
 import static io.restassured.RestAssured.given;
 import static java.lang.Integer.MIN_VALUE;
@@ -213,22 +214,8 @@ public class ShipmentIntegrationTest {
 
     @After
     public void tearDown() {
-        try {
-            expect()
-                    .statusCode(SC_NOT_FOUND)
-                    .when()
-                    .get("shipments/{id}", shipmentId);
-        } catch (AssertionError e) {
-            expect()
-                    .statusCode(SC_OK)
-                    .when()
-                    .delete("shipments/{id}", shipmentId);
-        }
-
-        expect()
-                .statusCode(SC_NOT_FOUND)
-                .when()
-                .get("/shipments/{id}", shipmentId);
+        delete("clients/{id}", clientId);
+        delete("shipments/{id}", shipmentId);
 
         shipmentId = MIN_VALUE;
         clientId = MIN_VALUE;
