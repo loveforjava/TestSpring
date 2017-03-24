@@ -19,4 +19,6 @@ public interface ShipmentService {
     
     boolean delete(long id);
 
+    Shipment getEntityById(long id);
+
 }

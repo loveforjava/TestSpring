@@ -22,25 +22,24 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
     private static final String PDF_LABEL_TEMPLATE = "pdfTemplate/label-template.pdf";
     private static final String PDF_POSTPAY_TEMPLATE = "pdfTemplate/postpay-template.pdf";
 
-    private ShipmentDao shipmentDao;
+    private ShipmentService shipmentService;
     private PDDocument template;
     private PDTextField field;
 
     @Autowired
-    public PDFGeneratorServiceImpl(ShipmentDao shipmentDao) {
-        this.shipmentDao = shipmentDao;
+    public PDFGeneratorServiceImpl(ShipmentService shipmentService) {
+        this.shipmentService = shipmentService;
     }
 
     @Override
-    @Transactional
     public byte[] generatePostpay(long shipmentId) {
-        Shipment shipment = shipmentDao.getById(shipmentId);
-        File file = new File(getClass()
-                .getClassLoader()
-                .getResource(PDF_POSTPAY_TEMPLATE)
-                .getFile());
+        Shipment shipment = shipmentService.getEntityById(shipmentId);
         byte[] data = null;
         try {
+            File file = new File(getClass()
+                    .getClassLoader()
+                    .getResource(PDF_POSTPAY_TEMPLATE)
+                    .getFile());
             template = PDDocument.load(file);
             PDAcroForm acroForm = template.getDocumentCatalog().getAcroForm();
             if (acroForm != null) {
@@ -51,7 +50,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
                 field = (PDTextField) acroForm.getField("priceHryvnas");
                 field.setValue(priceParts[0]);
 
-                if(priceParts.length > 1) {
+                if (priceParts.length > 1) {
                     field = (PDTextField) acroForm.getField("priceKopiyky");
                     field.setValue(priceParts[1]);
                 }
@@ -66,15 +65,14 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
     }
 
     @Override
-    @Transactional
     public byte[] generateLabel(long shipmentId) {
-        Shipment shipment = shipmentDao.getById(shipmentId);
-        File file = new File(getClass()
-                .getClassLoader()
-                .getResource(PDF_LABEL_TEMPLATE)
-                .getFile());
+        Shipment shipment = shipmentService.getEntityById(shipmentId);
         byte[] data = null;
         try {
+            File file = new File(getClass()
+                    .getClassLoader()
+                    .getResource(PDF_LABEL_TEMPLATE)
+                    .getFile());
             template = PDDocument.load(file);
             PDAcroForm acroForm = template.getDocumentCatalog().getAcroForm();
             if (acroForm != null) {
@@ -130,11 +128,10 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         field.setValue(processAddress(recipient.getAddress()));
     }
 
-    public String processAddress(Address address) {
+    private String processAddress(Address address) {
         return address.getStreet() + " st., " +
                 address.getHouseNumber() + ", " +
                 address.getCity() + "\n" +
                 address.getPostcode();
     }
-
 }
