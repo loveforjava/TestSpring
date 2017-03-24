@@ -5,7 +5,6 @@ import java.util.List;
 import com.opinta.dto.PostOfficeDto;
 import com.opinta.service.PostOfficeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static java.lang.String.format;
 
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.OK;
+
 @RestController
 @RequestMapping("/post-offices")
 public class PostOfficeController {
@@ -30,40 +33,47 @@ public class PostOfficeController {
     }
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(OK)
     public List<PostOfficeDto> getPostOffices() {
         return postOfficeService.getAll();
     }
 
-	@GetMapping("{id}")
-	public ResponseEntity<?> getPostOffice(@PathVariable("id") long id) {
+    @GetMapping("{id}")
+    public ResponseEntity<?> getPostOffice(@PathVariable("id") long id) {
         PostOfficeDto postOfficeDto = postOfficeService.getById(id);
-		if (postOfficeDto == null) {
-			return new ResponseEntity<>(format("No PostOffice found for ID %d", id), HttpStatus.NOT_FOUND);
-		}
-		return new ResponseEntity<>(postOfficeDto, HttpStatus.OK);
-	}
+        if (postOfficeDto == null) {
+            return new ResponseEntity<>(format("No PostOffice found for ID %d", id), NOT_FOUND);
+        }
+        return new ResponseEntity<>(postOfficeDto, OK);
+    }
 
-	@PostMapping
-    @ResponseStatus(HttpStatus.OK)
-	public void createPostOffice(@RequestBody PostOfficeDto postOfficeDto) {
-		postOfficeService.save(postOfficeDto);
-	}
+    @PostMapping
+    @ResponseStatus(OK)
+    public ResponseEntity<?> createPostOffice(@RequestBody PostOfficeDto postOfficeDto) {
+        postOfficeDto = postOfficeService.save(postOfficeDto);
+        if (postOfficeDto == null) {
+            return new ResponseEntity<>("Failed to create new PostOffice using given data.", BAD_REQUEST);
+        }
+        if ((postOfficeDto != null) && (postOfficeDto.getId() <= 0)) {
+            return new ResponseEntity<>("Failed to create new PostOffice using given data.", BAD_REQUEST);
+        }
+        return new ResponseEntity<>(postOfficeDto, OK);
+    }
 
-	@PutMapping("{id}")
-	public ResponseEntity<?> updatePostOffice(@PathVariable long id, @RequestBody PostOfficeDto postOfficeDto) {
-		postOfficeDto = postOfficeService.update(id, postOfficeDto);
-		if (postOfficeDto== null) {
-			return new ResponseEntity<>(format("No PostOfficeDto found for ID %d", id), HttpStatus.NOT_FOUND);
-		}
-		return new ResponseEntity<>(postOfficeDto, HttpStatus.OK);
-	}
+    @PutMapping("{id}")
+    public ResponseEntity<?> updatePostOffice(@PathVariable long id, @RequestBody PostOfficeDto postOfficeDto) {
+        postOfficeDto = postOfficeService.update(id, postOfficeDto);
+        if (postOfficeDto == null) {
+            return new ResponseEntity<>(format("No PostOfficeDto found for ID %d", id), NOT_FOUND);
+        }
+        return new ResponseEntity<>(postOfficeDto, OK);
+    }
 
     @DeleteMapping("{id}")
     public ResponseEntity<?> deletePostOffice(@PathVariable long id) {
         if (!postOfficeService.delete(id)) {
-            return new ResponseEntity<>(format("No PostOfficeDto found for ID %d", id), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(format("No PostOfficeDto found for ID %d", id), NOT_FOUND);
         }
-        return new ResponseEntity<>(id, HttpStatus.OK);
+        return new ResponseEntity<>(id, OK);
     }
 }
