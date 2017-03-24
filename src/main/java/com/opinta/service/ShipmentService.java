@@ -10,7 +10,7 @@ public interface ShipmentService {
     List<ShipmentDto> getAll();
 
     List<ShipmentDto> getAllByClientId(long clientId);
-
+    
     ShipmentDto getById(long id);
     
     ShipmentDto save(ShipmentDto shipmentDto);
@@ -18,7 +18,7 @@ public interface ShipmentService {
     ShipmentDto update(long id, ShipmentDto shipmentDto);
     
     boolean delete(long id);
-    
+
     Shipment getEntityById(long id);
 
 }
