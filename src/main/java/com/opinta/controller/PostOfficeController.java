@@ -38,36 +38,36 @@ public class PostOfficeController {
         return postOfficeService.getAll();
     }
 
-	@GetMapping("{id}")
-	public ResponseEntity<?> getPostOffice(@PathVariable("id") long id) {
+    @GetMapping("{id}")
+    public ResponseEntity<?> getPostOffice(@PathVariable("id") long id) {
         PostOfficeDto postOfficeDto = postOfficeService.getById(id);
-		if (postOfficeDto == null) {
-			return new ResponseEntity<>(format("No PostOffice found for ID %d", id), NOT_FOUND);
-		}
-		return new ResponseEntity<>(postOfficeDto, OK);
-	}
+        if (postOfficeDto == null) {
+            return new ResponseEntity<>(format("No PostOffice found for ID %d", id), NOT_FOUND);
+        }
+        return new ResponseEntity<>(postOfficeDto, OK);
+    }
 
-	@PostMapping
+    @PostMapping
     @ResponseStatus(OK)
-	public ResponseEntity<?> createPostOffice(@RequestBody PostOfficeDto postOfficeDto) {
-		postOfficeDto = postOfficeService.save(postOfficeDto);
-		if (postOfficeDto == null) {
+    public ResponseEntity<?> createPostOffice(@RequestBody PostOfficeDto postOfficeDto) {
+        postOfficeDto = postOfficeService.save(postOfficeDto);
+        if (postOfficeDto == null) {
             return new ResponseEntity<>("Failed to create new PostOffice using given data.", BAD_REQUEST);
         }
         if ((postOfficeDto != null) && (postOfficeDto.getId() <= 0)) {
             return new ResponseEntity<>("Failed to create new PostOffice using given data.", BAD_REQUEST);
         }
         return new ResponseEntity<>(postOfficeDto, OK);
-	}
+    }
 
-	@PutMapping("{id}")
-	public ResponseEntity<?> updatePostOffice(@PathVariable long id, @RequestBody PostOfficeDto postOfficeDto) {
-		postOfficeDto = postOfficeService.update(id, postOfficeDto);
-		if (postOfficeDto == null) {
-			return new ResponseEntity<>(format("No PostOfficeDto found for ID %d", id), NOT_FOUND);
-		}
-		return new ResponseEntity<>(postOfficeDto, OK);
-	}
+    @PutMapping("{id}")
+    public ResponseEntity<?> updatePostOffice(@PathVariable long id, @RequestBody PostOfficeDto postOfficeDto) {
+        postOfficeDto = postOfficeService.update(id, postOfficeDto);
+        if (postOfficeDto == null) {
+            return new ResponseEntity<>(format("No PostOfficeDto found for ID %d", id), NOT_FOUND);
+        }
+        return new ResponseEntity<>(postOfficeDto, OK);
+    }
 
     @DeleteMapping("{id}")
     public ResponseEntity<?> deletePostOffice(@PathVariable long id) {
