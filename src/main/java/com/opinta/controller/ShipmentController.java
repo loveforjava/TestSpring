@@ -7,7 +7,6 @@ import com.opinta.service.PDFGeneratorService;
 import com.opinta.service.ShipmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,6 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static java.lang.String.format;
 
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.OK;
+
 @RestController
 @RequestMapping("/shipments")
 public class ShipmentController {
@@ -35,7 +37,7 @@ public class ShipmentController {
     }
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(OK)
     public List<ShipmentDto> getShipments() {
         return shipmentService.getAll();
     }
@@ -44,9 +46,9 @@ public class ShipmentController {
     public ResponseEntity<?> getShipment(@PathVariable("id") long id) {
         ShipmentDto shipmentDto = shipmentService.getById(id);
         if (shipmentDto == null) {
-            return new ResponseEntity<>(format("No Shipment found for ID %d", id), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(format("No Shipment found for ID %d", id), NOT_FOUND);
         }
-        return new ResponseEntity<>(shipmentDto, HttpStatus.OK);
+        return new ResponseEntity<>(shipmentDto, OK);
     }
 
     @GetMapping("{id}/label-form")
@@ -57,7 +59,7 @@ public class ShipmentController {
         String filename = "labelform" + id + ".pdf";
         headers.setContentDispositionFormData(filename, filename);
         headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
-        ResponseEntity<byte[]> response = new ResponseEntity<>(data, headers, HttpStatus.OK);
+        ResponseEntity<byte[]> response = new ResponseEntity<>(data, headers, OK);
         return response;
     }
 
@@ -69,12 +71,12 @@ public class ShipmentController {
         String filename = "postpayform" + id + ".pdf";
         headers.setContentDispositionFormData(filename, filename);
         headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
-        ResponseEntity<byte[]> response = new ResponseEntity<>(data, headers, HttpStatus.OK);
+        ResponseEntity<byte[]> response = new ResponseEntity<>(data, headers, OK);
         return response;
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(OK)
     public ShipmentDto createShipment(@RequestBody ShipmentDto shipmentDto) {
         return shipmentService.save(shipmentDto);
     }
@@ -83,16 +85,16 @@ public class ShipmentController {
     public ResponseEntity<?> updateShipment(@PathVariable long id, @RequestBody ShipmentDto shipmentDto) {
         shipmentDto = shipmentService.update(id, shipmentDto);
         if (shipmentDto == null) {
-            return new ResponseEntity<>(format("No Shipment found for ID %d", id), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(format("No Shipment found for ID %d", id), NOT_FOUND);
         }
-        return new ResponseEntity<>(shipmentDto, HttpStatus.OK);
+        return new ResponseEntity<>(shipmentDto, OK);
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<?> deleteShipment(@PathVariable long id) {
         if (!shipmentService.delete(id)) {
-            return new ResponseEntity<>(format("No Shipment found for ID %d", id), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(format("No Shipment found for ID %d", id), NOT_FOUND);
         }
-        return new ResponseEntity<>(id, HttpStatus.OK);
+        return new ResponseEntity<>(id, OK);
     }
 }
