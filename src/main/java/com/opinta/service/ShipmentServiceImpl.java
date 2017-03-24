@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
-import com.opinta.dao.BarcodeInnerNumberDao;
 import com.opinta.dao.ClientDao;
 import com.opinta.dao.ShipmentDao;
 import com.opinta.dto.ShipmentDto;
@@ -26,14 +25,11 @@ public class ShipmentServiceImpl implements ShipmentService {
     private final ShipmentDao shipmentDao;
     private final ClientDao clientDao;
     private final ShipmentMapper shipmentMapper;
-    private final BarcodeInnerNumberDao barcodeDao;
+    private final BarcodeInnerNumberService barcodeDao;
 
     @Autowired
-    public ShipmentServiceImpl(
-            ShipmentDao shipmentDao,
-            ClientDao clientDao,
-            ShipmentMapper shipmentMapper,
-            BarcodeInnerNumberDao barcodeDao) {
+    public ShipmentServiceImpl(ShipmentDao shipmentDao, ClientDao clientDao,
+                                ShipmentMapper shipmentMapper, BarcodeInnerNumberService barcodeDao) {
         this.shipmentDao = shipmentDao;
         this.clientDao = clientDao;
         this.shipmentMapper = shipmentMapper;
@@ -70,17 +66,8 @@ public class ShipmentServiceImpl implements ShipmentService {
     @Transactional
     public ShipmentDto save(ShipmentDto shipmentDto) {
         Client existingClient = clientDao.getById(shipmentDto.getSenderId());
-//        if (existingClient == null) {
-//
-//        }
         VirtualPostOffice virtualPostOffice = existingClient.getVirtualPostOffice();
-//        if (virtualPostOffice == null) {
-//
-//        }
         PostcodePool postcodePool = virtualPostOffice.getActivePostcodePool();
-//        if (postcode == null) {
-//
-//        }
         BarcodeInnerNumber newBarcode = barcodeDao.generateForPostcodePool(postcodePool);
         postcodePool.getBarcodeInnerNumbers().add(newBarcode);
         Shipment shipment = shipmentMapper.toEntity(shipmentDto);

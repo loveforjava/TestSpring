@@ -3,7 +3,6 @@ package com.opinta.dao;
 import java.util.List;
 
 import com.opinta.model.BarcodeInnerNumber;
-import com.opinta.model.PostcodePool;
 
 public interface BarcodeInnerNumberDao {
     
@@ -11,9 +10,7 @@ public interface BarcodeInnerNumberDao {
     
     BarcodeInnerNumber getById(long id);
     
-    BarcodeInnerNumber generateForPostcodePool(PostcodePool postcodePool);
-    
-//    BarcodeInnerNumber save(BarcodeInnerNumber barcodeInnerNumber);
+    BarcodeInnerNumber save(BarcodeInnerNumber barcodeInnerNumber);
     
     void update(BarcodeInnerNumber barcodeInnerNumber);
     
