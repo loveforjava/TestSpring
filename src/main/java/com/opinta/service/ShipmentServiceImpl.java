@@ -8,8 +8,11 @@ import com.opinta.dao.ClientDao;
 import com.opinta.dao.ShipmentDao;
 import com.opinta.dto.ShipmentDto;
 import com.opinta.mapper.ShipmentMapper;
+import com.opinta.model.BarcodeInnerNumber;
 import com.opinta.model.Client;
+import com.opinta.model.PostcodePool;
 import com.opinta.model.Shipment;
+import com.opinta.model.VirtualPostOffice;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,12 +25,15 @@ public class ShipmentServiceImpl implements ShipmentService {
     private final ShipmentDao shipmentDao;
     private final ClientDao clientDao;
     private final ShipmentMapper shipmentMapper;
+    private final BarcodeInnerNumberService barcodeDao;
 
     @Autowired
-    public ShipmentServiceImpl(ShipmentDao shipmentDao, ClientDao clientDao, ShipmentMapper shipmentMapper) {
+    public ShipmentServiceImpl(ShipmentDao shipmentDao, ClientDao clientDao,
+                                ShipmentMapper shipmentMapper, BarcodeInnerNumberService barcodeDao) {
         this.shipmentDao = shipmentDao;
         this.clientDao = clientDao;
         this.shipmentMapper = shipmentMapper;
+        this.barcodeDao = barcodeDao;
     }
 
     @Override
@@ -55,12 +61,20 @@ public class ShipmentServiceImpl implements ShipmentService {
         log.info("Getting postcodePool by id {}", id);
         return shipmentMapper.toDto(shipmentDao.getById(id));
     }
-
+    
     @Override
     @Transactional
     public ShipmentDto save(ShipmentDto shipmentDto) {
-        log.info("Saving shipment {}", shipmentDto);
-        return shipmentMapper.toDto(shipmentDao.save(shipmentMapper.toEntity(shipmentDto)));
+        Client existingClient = clientDao.getById(shipmentDto.getSenderId());
+        VirtualPostOffice virtualPostOffice = existingClient.getVirtualPostOffice();
+        PostcodePool postcodePool = virtualPostOffice.getActivePostcodePool();
+        BarcodeInnerNumber newBarcode = barcodeDao.generateForPostcodePool(postcodePool);
+        postcodePool.getBarcodeInnerNumbers().add(newBarcode);
+        Shipment shipment = shipmentMapper.toEntity(shipmentDto);
+        shipment.setBarcode(newBarcode);
+        log.info("Saving shipment with assigned barcode", shipmentMapper.toDto(shipment));
+        ShipmentDto saved = shipmentMapper.toDto(shipmentDao.save(shipment));
+        return saved;
     }
 
     @Override

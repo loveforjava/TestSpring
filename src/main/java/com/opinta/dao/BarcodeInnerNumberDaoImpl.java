@@ -11,8 +11,12 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class BarcodeInnerNumberDaoImpl implements BarcodeInnerNumberDao {
+    private final SessionFactory sessionFactory;
+    
     @Autowired
-    SessionFactory sessionFactory;
+    public BarcodeInnerNumberDaoImpl(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
 
     @Override
     @SuppressWarnings("unchecked")
