@@ -1,11 +1,13 @@
 package com.opinta.dao;
 
 import com.opinta.entity.TariffGrid;
+import com.opinta.entity.W2wVariation;
 import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
@@ -51,17 +53,18 @@ public class TariffGridDaoImpl implements TariffGridDao {
     }
 
     @Override
-    public TariffGrid getPriceByDimension(float weight, float length) {
+    @SuppressWarnings("unchecked")
+    public TariffGrid getPriceByDimension(float weight, float length, W2wVariation w2wVariation) {
         String id = "id";
         Session session = sessionFactory.getCurrentSession();
-        DetachedCriteria maxId = DetachedCriteria.forClass(TariffGrid.class).setProjection(Projections.max(id));
-        session.createCriteria(TariffGrid.class)
-//                .add() // where weight <= weight and length <= length
-                .add(Restrictions.le("weight", weight))
-                .add(Restrictions.le("length", length))
-                .add(Property.forName(id).eq(maxId))
-                .list();
-
-        return null;
+        DetachedCriteria minId = DetachedCriteria.forClass(TariffGrid.class).setProjection(Projections.min(id));
+        TariffGrid tariffGrid = (TariffGrid) session.createCriteria(TariffGrid.class)
+                .add(Restrictions.and(Restrictions.ge("weight", weight),
+                        Restrictions.ge("length", length),
+                        Restrictions.eq("w2wVariation", w2wVariation)))
+                .addOrder(Order.asc(id))
+                .setMaxResults(1)
+                .uniqueResult();
+        return tariffGrid;
     }
 }

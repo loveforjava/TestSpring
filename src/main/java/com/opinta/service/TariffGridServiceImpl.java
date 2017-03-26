@@ -2,6 +2,7 @@ package com.opinta.service;
 
 import com.opinta.dao.TariffGridDao;
 import com.opinta.entity.TariffGrid;
+import com.opinta.entity.W2wVariation;
 import java.util.List;
 import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -75,7 +76,7 @@ public class TariffGridServiceImpl implements TariffGridService {
 
     @Override
     @Transactional
-    public TariffGrid getPriceByDimension(float weight, float length) {
-        return tariffGridDao.getPriceByDimension(weight, length);
+    public TariffGrid getPriceByDimension(float weight, float length, W2wVariation w2wVariation) {
+        return tariffGridDao.getPriceByDimension(weight, length, w2wVariation);
     }
 }
