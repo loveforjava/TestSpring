@@ -26,13 +26,16 @@ public class ShipmentServiceImpl implements ShipmentService {
     private final ClientDao clientDao;
     private final ShipmentMapper shipmentMapper;
     private final BarcodeInnerNumberService barcodeInnerNumberService;
+    private final ShipmentCalculation shipmentCalculation;
 
     @Autowired
-    public ShipmentServiceImpl(ShipmentDao shipmentDao, ClientDao clientDao,
-                                ShipmentMapper shipmentMapper, BarcodeInnerNumberService barcodeInnerNumberService) {
+    public ShipmentServiceImpl(ShipmentDao shipmentDao, ClientDao clientDao, ShipmentMapper shipmentMapper,
+                               ShipmentCalculation shipmentCalculation,
+                               BarcodeInnerNumberService barcodeInnerNumberService) {
         this.shipmentDao = shipmentDao;
         this.clientDao = clientDao;
         this.shipmentMapper = shipmentMapper;
+        this.shipmentCalculation = shipmentCalculation;
         this.barcodeInnerNumberService = barcodeInnerNumberService;
     }
 
@@ -61,7 +64,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         log.info("Getting postcodePool by id {}", id);
         return shipmentMapper.toDto(shipmentDao.getById(id));
     }
-    
+
     @Override
     @Transactional
     public ShipmentDto save(ShipmentDto shipmentDto) {
@@ -73,8 +76,8 @@ public class ShipmentServiceImpl implements ShipmentService {
         Shipment shipment = shipmentMapper.toEntity(shipmentDto);
         shipment.setBarcode(newBarcode);
         log.info("Saving shipment with assigned barcode", shipmentMapper.toDto(shipment));
-        ShipmentDto saved = shipmentMapper.toDto(shipmentDao.save(shipment));
-        return saved;
+        shipment.setPrice(shipmentCalculation.calculatePrice(shipment));
+        return shipmentMapper.toDto(shipmentDao.save(shipment));
     }
 
     @Override
