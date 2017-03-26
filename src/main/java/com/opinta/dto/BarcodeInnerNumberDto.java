@@ -1,7 +1,7 @@
 package com.opinta.dto;
 
 import com.opinta.constraint.EnumString;
-import com.opinta.model.BarcodeStatus;
+import com.opinta.entity.BarcodeStatus;
 import javax.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;

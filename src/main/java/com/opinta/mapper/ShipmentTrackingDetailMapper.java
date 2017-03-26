@@ -1,7 +1,7 @@
 package com.opinta.mapper;
 
 import com.opinta.dto.ShipmentTrackingDetailDto;
-import com.opinta.model.ShipmentTrackingDetail;
+import com.opinta.entity.ShipmentTrackingDetail;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;

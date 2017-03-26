@@ -2,7 +2,7 @@ package com.opinta.dao;
 
 import java.util.List;
 
-import com.opinta.model.Address;
+import com.opinta.entity.Address;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;

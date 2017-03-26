@@ -3,8 +3,8 @@ package com.opinta.service;
 import java.util.List;
 
 import com.opinta.dto.BarcodeInnerNumberDto;
-import com.opinta.model.BarcodeInnerNumber;
-import com.opinta.model.PostcodePool;
+import com.opinta.entity.BarcodeInnerNumber;
+import com.opinta.entity.PostcodePool;
 
 public interface BarcodeInnerNumberService {
     

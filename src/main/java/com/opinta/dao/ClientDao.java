@@ -2,8 +2,8 @@ package com.opinta.dao;
 
 import java.util.List;
 
-import com.opinta.model.Client;
-import com.opinta.model.VirtualPostOffice;
+import com.opinta.entity.Client;
+import com.opinta.entity.VirtualPostOffice;
 
 public interface ClientDao {
 

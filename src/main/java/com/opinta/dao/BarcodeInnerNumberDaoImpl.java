@@ -2,8 +2,8 @@ package com.opinta.dao;
 
 import java.util.List;
 
-import com.opinta.model.BarcodeInnerNumber;
-import com.opinta.model.PostcodePool;
+import com.opinta.entity.BarcodeInnerNumber;
+import com.opinta.entity.PostcodePool;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;

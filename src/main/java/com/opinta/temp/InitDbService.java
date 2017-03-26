@@ -21,16 +21,16 @@ import com.opinta.mapper.PostcodePoolMapper;
 import com.opinta.mapper.ShipmentMapper;
 import com.opinta.mapper.ShipmentTrackingDetailMapper;
 import com.opinta.mapper.VirtualPostOfficeMapper;
-import com.opinta.model.Address;
-import com.opinta.model.BarcodeInnerNumber;
-import com.opinta.model.Client;
-import com.opinta.model.DeliveryType;
-import com.opinta.model.PostOffice;
-import com.opinta.model.PostcodePool;
-import com.opinta.model.Shipment;
-import com.opinta.model.ShipmentStatus;
-import com.opinta.model.ShipmentTrackingDetail;
-import com.opinta.model.VirtualPostOffice;
+import com.opinta.entity.Address;
+import com.opinta.entity.BarcodeInnerNumber;
+import com.opinta.entity.Client;
+import com.opinta.entity.DeliveryType;
+import com.opinta.entity.PostOffice;
+import com.opinta.entity.PostcodePool;
+import com.opinta.entity.Shipment;
+import com.opinta.entity.ShipmentStatus;
+import com.opinta.entity.ShipmentTrackingDetail;
+import com.opinta.entity.VirtualPostOffice;
 import com.opinta.service.AddressService;
 import com.opinta.service.BarcodeInnerNumberService;
 import com.opinta.service.ClientService;
@@ -42,8 +42,8 @@ import com.opinta.service.VirtualPostOfficeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.opinta.model.BarcodeStatus.RESERVED;
-import static com.opinta.model.BarcodeStatus.USED;
+import static com.opinta.entity.BarcodeStatus.RESERVED;
+import static com.opinta.entity.BarcodeStatus.USED;
 
 @Service
 public class InitDbService {

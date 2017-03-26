@@ -26,7 +26,7 @@ public class HibernateConfigTest {
     public LocalSessionFactoryBean sessionFactory() {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(dataSource());
-        sessionFactory.setPackagesToScan(new String[]{"com.opinta.model"});
+        sessionFactory.setPackagesToScan(new String[]{"com.opinta.entity"});
         sessionFactory.setHibernateProperties(hibernateProperties());
         return sessionFactory;
     }

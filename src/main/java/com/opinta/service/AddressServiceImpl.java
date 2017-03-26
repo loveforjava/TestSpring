@@ -7,7 +7,7 @@ import javax.transaction.Transactional;
 import com.opinta.dao.AddressDao;
 import com.opinta.dto.AddressDto;
 import com.opinta.mapper.AddressMapper;
-import com.opinta.model.Address;
+import com.opinta.entity.Address;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

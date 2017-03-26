@@ -1,8 +1,7 @@
-package com.opinta.model;
+package com.opinta.entity;
 
 import java.util.ArrayList;
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;

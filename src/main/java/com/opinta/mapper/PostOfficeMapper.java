@@ -1,7 +1,7 @@
 package com.opinta.mapper;
 
 import com.opinta.dto.PostOfficeDto;
-import com.opinta.model.PostOffice;
+import com.opinta.entity.PostOffice;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;

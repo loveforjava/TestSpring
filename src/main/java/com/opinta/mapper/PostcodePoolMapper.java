@@ -1,7 +1,7 @@
 package com.opinta.mapper;
 
 import com.opinta.dto.PostcodePoolDto;
-import com.opinta.model.PostcodePool;
+import com.opinta.entity.PostcodePool;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

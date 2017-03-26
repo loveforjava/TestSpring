@@ -2,7 +2,7 @@ package com.opinta.dao;
 
 import java.util.List;
 
-import com.opinta.model.VirtualPostOffice;
+import com.opinta.entity.VirtualPostOffice;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Criteria;
 import org.hibernate.Session;

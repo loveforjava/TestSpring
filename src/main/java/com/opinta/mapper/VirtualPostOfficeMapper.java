@@ -1,7 +1,7 @@
 package com.opinta.mapper;
 
 import com.opinta.dto.VirtualPostOfficeDto;
-import com.opinta.model.VirtualPostOffice;
+import com.opinta.entity.VirtualPostOffice;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

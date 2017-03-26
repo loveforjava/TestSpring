@@ -1,4 +1,4 @@
-package com.opinta.model;
+package com.opinta.entity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

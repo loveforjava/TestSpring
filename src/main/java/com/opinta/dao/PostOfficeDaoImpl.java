@@ -1,6 +1,6 @@
 package com.opinta.dao;
 
-import com.opinta.model.PostOffice;
+import com.opinta.entity.PostOffice;
 import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.Session;

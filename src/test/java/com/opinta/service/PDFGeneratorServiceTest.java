@@ -1,11 +1,11 @@
 package com.opinta.service;
 
-import com.opinta.model.Address;
-import com.opinta.model.PostcodePool;
-import com.opinta.model.Shipment;
-import com.opinta.model.VirtualPostOffice;
-import com.opinta.model.Client;
-import com.opinta.model.DeliveryType;
+import com.opinta.entity.Address;
+import com.opinta.entity.PostcodePool;
+import com.opinta.entity.Shipment;
+import com.opinta.entity.VirtualPostOffice;
+import com.opinta.entity.Client;
+import com.opinta.entity.DeliveryType;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
 import org.apache.pdfbox.pdmodel.interactive.form.PDTextField;

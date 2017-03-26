@@ -1,4 +1,4 @@
-package com.opinta.model;
+package com.opinta.entity;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

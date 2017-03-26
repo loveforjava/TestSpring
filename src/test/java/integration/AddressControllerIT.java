@@ -1,7 +1,7 @@
 package integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.opinta.model.Address;
+import com.opinta.entity.Address;
 import com.opinta.service.AddressService;
 import io.restassured.path.json.JsonPath;
 import java.io.File;

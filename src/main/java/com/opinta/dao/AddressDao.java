@@ -2,7 +2,7 @@ package com.opinta.dao;
 
 import java.util.List;
 
-import com.opinta.model.Address;
+import com.opinta.entity.Address;
 
 public interface AddressDao {
     List<Address> getAll();

@@ -10,13 +10,13 @@ import com.opinta.dao.BarcodeInnerNumberDao;
 import com.opinta.dao.PostcodePoolDao;
 import com.opinta.dto.BarcodeInnerNumberDto;
 import com.opinta.mapper.BarcodeInnerNumberMapper;
-import com.opinta.model.BarcodeInnerNumber;
-import com.opinta.model.PostcodePool;
+import com.opinta.entity.BarcodeInnerNumber;
+import com.opinta.entity.PostcodePool;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.opinta.model.BarcodeStatus.USED;
+import static com.opinta.entity.BarcodeStatus.USED;
 import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 
 @Service

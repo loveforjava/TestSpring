@@ -1,7 +1,7 @@
 package com.opinta.dao;
 
-import com.opinta.model.Client;
-import com.opinta.model.Shipment;
+import com.opinta.entity.Client;
+import com.opinta.entity.Shipment;
 
 import java.util.List;
 
