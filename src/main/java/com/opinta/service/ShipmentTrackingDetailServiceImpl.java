@@ -3,7 +3,7 @@ package com.opinta.service;
 import com.opinta.dao.ShipmentTrackingDetailDao;
 import com.opinta.dto.ShipmentTrackingDetailDto;
 import com.opinta.mapper.ShipmentTrackingDetailMapper;
-import com.opinta.model.ShipmentTrackingDetail;
+import com.opinta.entity.ShipmentTrackingDetail;
 import java.util.List;
 import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;

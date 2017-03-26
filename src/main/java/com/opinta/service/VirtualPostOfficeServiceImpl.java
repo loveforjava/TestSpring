@@ -7,7 +7,7 @@ import javax.transaction.Transactional;
 import com.opinta.dao.VirtualPostOfficeDao;
 import com.opinta.dto.VirtualPostOfficeDto;
 import com.opinta.mapper.VirtualPostOfficeMapper;
-import com.opinta.model.VirtualPostOffice;
+import com.opinta.entity.VirtualPostOffice;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

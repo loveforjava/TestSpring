@@ -1,7 +1,6 @@
 package com.opinta.dao;
 
-import com.opinta.model.Address;
-import com.opinta.model.TariffGrid;
+import com.opinta.entity.TariffGrid;
 import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.Session;

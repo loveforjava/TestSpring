@@ -2,8 +2,8 @@ package com.opinta.dao;
 
 import java.util.List;
 
-import com.opinta.model.BarcodeInnerNumber;
-import com.opinta.model.PostcodePool;
+import com.opinta.entity.BarcodeInnerNumber;
+import com.opinta.entity.PostcodePool;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +11,12 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class BarcodeInnerNumberDaoImpl implements BarcodeInnerNumberDao {
+    private final SessionFactory sessionFactory;
+    
     @Autowired
-    SessionFactory sessionFactory;
+    public BarcodeInnerNumberDaoImpl(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
 
     @Override
     @SuppressWarnings("unchecked")

@@ -1,4 +1,4 @@
-package com.opinta.model;
+package com.opinta.entity;
 
 public enum DeliveryType {
     W2W("Warehouse to Warehouse"),

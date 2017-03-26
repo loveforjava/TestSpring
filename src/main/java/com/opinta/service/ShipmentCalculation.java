@@ -1,6 +1,6 @@
 package com.opinta.service;
 
-import com.opinta.model.Shipment;
+import com.opinta.entity.Shipment;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

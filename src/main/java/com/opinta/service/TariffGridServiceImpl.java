@@ -1,7 +1,7 @@
 package com.opinta.service;
 
 import com.opinta.dao.TariffGridDao;
-import com.opinta.model.TariffGrid;
+import com.opinta.entity.TariffGrid;
 import java.util.List;
 import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;

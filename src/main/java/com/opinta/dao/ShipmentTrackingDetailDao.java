@@ -1,6 +1,6 @@
 package com.opinta.dao;
 
-import com.opinta.model.ShipmentTrackingDetail;
+import com.opinta.entity.ShipmentTrackingDetail;
 import java.util.List;
 
 public interface ShipmentTrackingDetailDao {

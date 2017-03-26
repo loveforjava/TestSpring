@@ -2,8 +2,8 @@ package com.opinta.dao;
 
 import java.util.List;
 
-import com.opinta.model.Client;
-import com.opinta.model.VirtualPostOffice;
+import com.opinta.entity.Client;
+import com.opinta.entity.VirtualPostOffice;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;

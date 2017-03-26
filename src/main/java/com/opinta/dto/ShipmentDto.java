@@ -3,7 +3,7 @@ package com.opinta.dto;
 import java.math.BigDecimal;
 
 import com.opinta.constraint.EnumString;
-import com.opinta.model.DeliveryType;
+import com.opinta.entity.DeliveryType;
 import lombok.Getter;
 import lombok.Setter;
 

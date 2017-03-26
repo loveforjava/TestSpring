@@ -1,6 +1,6 @@
 package com.opinta.dao;
 
-import com.opinta.model.TariffGrid;
+import com.opinta.entity.TariffGrid;
 import java.util.List;
 
 public interface TariffGridDao {

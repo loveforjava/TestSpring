@@ -3,7 +3,7 @@ package com.opinta.service;
 import com.opinta.dao.PostOfficeDao;
 import com.opinta.dto.PostOfficeDto;
 import com.opinta.mapper.PostOfficeMapper;
-import com.opinta.model.PostOffice;
+import com.opinta.entity.PostOffice;
 import java.util.List;
 import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;

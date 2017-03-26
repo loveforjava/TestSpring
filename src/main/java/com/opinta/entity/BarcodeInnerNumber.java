@@ -1,4 +1,4 @@
-package com.opinta.model;
+package com.opinta.entity;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -20,7 +20,7 @@ public class BarcodeInnerNumber {
     private String number;
     @Enumerated(EnumType.STRING)
     private BarcodeStatus status;
-
+    
     public BarcodeInnerNumber(String number, BarcodeStatus status) {
         this.number = number;
         this.status = status;

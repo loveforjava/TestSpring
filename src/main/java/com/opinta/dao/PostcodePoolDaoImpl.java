@@ -2,7 +2,7 @@ package com.opinta.dao;
 
 import java.util.List;
 
-import com.opinta.model.PostcodePool;
+import com.opinta.entity.PostcodePool;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;

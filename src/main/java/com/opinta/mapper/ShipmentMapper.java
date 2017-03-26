@@ -1,8 +1,8 @@
 package com.opinta.mapper;
 
 import com.opinta.dto.ShipmentDto;
-import com.opinta.model.Client;
-import com.opinta.model.Shipment;
+import com.opinta.entity.Client;
+import com.opinta.entity.Shipment;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;

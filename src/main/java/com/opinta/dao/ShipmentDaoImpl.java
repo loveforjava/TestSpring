@@ -1,7 +1,7 @@
 package com.opinta.dao;
 
-import com.opinta.model.Client;
-import com.opinta.model.Shipment;
+import com.opinta.entity.Client;
+import com.opinta.entity.Shipment;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;

@@ -1,7 +1,7 @@
 package com.opinta.mapper;
 
 import com.opinta.dto.AddressDto;
-import com.opinta.model.Address;
+import com.opinta.entity.Address;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

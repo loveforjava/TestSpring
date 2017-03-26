@@ -1,10 +1,10 @@
 package com.opinta.controller;
 
+import java.util.List;
+
 import com.opinta.dto.ShipmentTrackingDetailDto;
 import com.opinta.service.ShipmentTrackingDetailService;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static java.lang.String.format;
 
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.OK;
+
 @RestController
 @RequestMapping("/shipment-tracking")
 public class ShipmentTrackingDetailController {
@@ -29,7 +32,7 @@ public class ShipmentTrackingDetailController {
     }
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(OK)
     public List<ShipmentTrackingDetailDto> getShipmentTrackingDetails() {
         return shipmentTrackingDetailService.getAll();
     }
@@ -38,13 +41,13 @@ public class ShipmentTrackingDetailController {
 	public ResponseEntity<?> getShipmentTrackingDetail(@PathVariable("id") long id) {
 		ShipmentTrackingDetailDto shipmentTrackingDetailDto = shipmentTrackingDetailService.getById(id);
 		if (shipmentTrackingDetailDto == null) {
-			return new ResponseEntity<>(format("No ShipmentTrackingDetail found for ID %d", id), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(format("No ShipmentTrackingDetail found for ID %d", id), NOT_FOUND);
 		}
-		return new ResponseEntity<>(shipmentTrackingDetailDto, HttpStatus.OK);
+		return new ResponseEntity<>(shipmentTrackingDetailDto, OK);
 	}
 
 	@PostMapping
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(OK)
 	public void createShipmentTrackingDetail(@RequestBody ShipmentTrackingDetailDto shipmentTrackingDetailDto) {
 		shipmentTrackingDetailService.save(shipmentTrackingDetailDto);
 	}
@@ -54,16 +57,16 @@ public class ShipmentTrackingDetailController {
 			@PathVariable long id, @RequestBody ShipmentTrackingDetailDto shipmentTrackingDetailDto) {
 		shipmentTrackingDetailDto = shipmentTrackingDetailService.update(id, shipmentTrackingDetailDto);
 		if (shipmentTrackingDetailDto == null) {
-			return new ResponseEntity<>(format("No ShipmentTrackingDetail found for ID %d", id), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(format("No ShipmentTrackingDetail found for ID %d", id), NOT_FOUND);
 		}
-		return new ResponseEntity<>(shipmentTrackingDetailDto, HttpStatus.OK);
+		return new ResponseEntity<>(shipmentTrackingDetailDto, OK);
 	}
 
     @DeleteMapping("{id}")
     public ResponseEntity<?> deleteShipmentTrackingDetail(@PathVariable long id) {
         if (!shipmentTrackingDetailService.delete(id)) {
-            return new ResponseEntity<>(format("No ShipmentTrackingDetail found for ID %d", id), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(format("No ShipmentTrackingDetail found for ID %d", id), NOT_FOUND);
         }
-        return new ResponseEntity<>(id, HttpStatus.OK);
+        return new ResponseEntity<>(id, OK);
     }
 }

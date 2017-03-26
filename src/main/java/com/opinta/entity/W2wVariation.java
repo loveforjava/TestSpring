@@ -1,4 +1,4 @@
-package com.opinta.model;
+package com.opinta.entity;
 
 public enum W2wVariation {
     TOWN("Inside of the region or Kyiv"),
