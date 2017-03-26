@@ -17,11 +17,15 @@ import java.util.Properties;
 
 @Configuration
 @EnableTransactionManagement
-@ComponentScan({ "com.opinta" })
-@PropertySource(value = { "classpath:application.properties" })
-public class HibernateConfiguration {
-    @Autowired
+@ComponentScan({"com.opinta"})
+@PropertySource(value = {"classpath:application.properties"})
+public class HibernateConfig {
     private Environment environment;
+
+    @Autowired
+    public HibernateConfig(Environment environment) {
+        this.environment = environment;
+    }
 
     @Bean
     public LocalSessionFactoryBean sessionFactory() {
