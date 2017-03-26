@@ -76,7 +76,11 @@ public class ShipmentServiceImpl implements ShipmentService {
         Shipment shipment = shipmentMapper.toEntity(shipmentDto);
         shipment.setBarcode(newBarcode);
         log.info("Saving shipment with assigned barcode", shipmentMapper.toDto(shipment));
+
+        shipment.setSender(clientDao.getById(shipment.getSender().getId()));
+        shipment.setRecipient(clientDao.getById(shipment.getRecipient().getId()));
         shipment.setPrice(shipmentCalculation.calculatePrice(shipment));
+
         return shipmentMapper.toDto(shipmentDao.save(shipment));
     }
 

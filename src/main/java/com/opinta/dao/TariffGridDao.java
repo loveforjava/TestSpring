@@ -17,4 +17,6 @@ public interface TariffGridDao {
     void delete(TariffGrid tariffGrid);
 
     TariffGrid getPriceByDimension(float weight, float length, W2wVariation w2wVariation);
+
+    TariffGrid getLast(W2wVariation w2wVariation);
 }

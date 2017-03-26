@@ -58,13 +58,23 @@ public class TariffGridDaoImpl implements TariffGridDao {
         String id = "id";
         Session session = sessionFactory.getCurrentSession();
         DetachedCriteria minId = DetachedCriteria.forClass(TariffGrid.class).setProjection(Projections.min(id));
-        TariffGrid tariffGrid = (TariffGrid) session.createCriteria(TariffGrid.class)
+        return (TariffGrid) session.createCriteria(TariffGrid.class)
                 .add(Restrictions.and(Restrictions.ge("weight", weight),
                         Restrictions.ge("length", length),
                         Restrictions.eq("w2wVariation", w2wVariation)))
                 .addOrder(Order.asc(id))
                 .setMaxResults(1)
                 .uniqueResult();
-        return tariffGrid;
+    }
+
+    @Override
+    public TariffGrid getLast(W2wVariation w2wVariation) {
+        String id = "id";
+        Session session = sessionFactory.getCurrentSession();
+        return (TariffGrid) session.createCriteria(TariffGrid.class)
+                .add(Restrictions.eq("w2wVariation", w2wVariation))
+                .addOrder(Order.desc(id))
+                .setMaxResults(1)
+                .uniqueResult();
     }
 }
