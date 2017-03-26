@@ -1,5 +1,6 @@
 package com.opinta.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import com.opinta.dto.ShipmentDto;
@@ -20,5 +21,4 @@ public interface ShipmentService {
     boolean delete(long id);
 
     Shipment getEntityById(long id);
-
 }

@@ -77,7 +77,7 @@ public class TariffGridServiceImpl implements TariffGridService {
     @Override
     @Transactional
     public TariffGrid getByDimension(float weight, float length, W2wVariation w2wVariation) {
-        return tariffGridDao.getPriceByDimension(weight, length, w2wVariation);
+        return tariffGridDao.getByDimension(weight, length, w2wVariation);
     }
 
     @Override

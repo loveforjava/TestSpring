@@ -54,7 +54,7 @@ public class TariffGridDaoImpl implements TariffGridDao {
 
     @Override
     @SuppressWarnings("unchecked")
-    public TariffGrid getPriceByDimension(float weight, float length, W2wVariation w2wVariation) {
+    public TariffGrid getByDimension(float weight, float length, W2wVariation w2wVariation) {
         String id = "id";
         Session session = sessionFactory.getCurrentSession();
         DetachedCriteria minId = DetachedCriteria.forClass(TariffGrid.class).setProjection(Projections.min(id));

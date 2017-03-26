@@ -18,5 +18,4 @@ public interface ShipmentDao {
     void update(Shipment shipment);
 
     void delete(Shipment shipment);
-
 }
