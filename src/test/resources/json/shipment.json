@@ -1,6 +1,6 @@
 {
-  "senderId": 1,
-  "recipientId": 1,
+  "senderId": [],
+  "recipientId": [],
   "deliveryType": "D2W",
   "weight": 5,
   "length": 4,
