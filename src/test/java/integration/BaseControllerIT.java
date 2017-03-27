@@ -1,9 +1,8 @@
 package integration;
 
-import com.opinta.config.ApplicationConfigTest;
-import com.opinta.config.HibernateConfigTest;
+import integration.config.ApplicationConfigTest;
+import integration.config.HibernateConfigTest;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
-import java.io.File;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +25,5 @@ public abstract class BaseControllerIT {
     public final void initialize() {
         mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
         RestAssuredMockMvc.mockMvc(mockMvc);
-    }
-
-    public File getFileFromResources(String path) {
-        return new File(getClass().getClassLoader().getResource(path).getFile());
     }
 }

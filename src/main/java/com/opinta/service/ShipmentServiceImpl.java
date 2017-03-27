@@ -68,7 +68,7 @@ public class ShipmentServiceImpl implements ShipmentService {
     @Transactional
     public ShipmentDto getById(long id) {
         log.info("Getting postcodePool by id {}", id);
-        return shipmentMapper.toDto(shipmentDao.getById(id));
+        return shipmentMapper.toDto(getEntityById(id));
     }
 
     @Override
@@ -126,9 +126,23 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
+    public List<Shipment> getAllEntities() {
+        log.info("Getting all shipments");
+        return shipmentDao.getAll();
+    }
+
+    @Override
+    @Transactional
     public Shipment getEntityById(long id) {
         log.info("Getting postcodePool by id {}", id);
         return shipmentDao.getById(id);
+    }
+
+    @Override
+    @Transactional
+    public Shipment saveEntity(Shipment shipment) {
+        log.info("Saving shipment {}", shipment);
+        return shipmentDao.save(shipment);
     }
 
     private BigDecimal calculatePrice(Shipment shipment) {

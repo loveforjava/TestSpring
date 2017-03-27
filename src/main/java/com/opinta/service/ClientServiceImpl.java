@@ -33,6 +33,27 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
+    public List<Client> getAllEntities() {
+        log.info("Getting all clients");
+        return clientDao.getAll();
+    }
+
+    @Override
+    @Transactional
+    public Client getEntityById(long id) {
+        log.info("Getting address by id {}", id);
+        return clientDao.getById(id);
+    }
+
+    @Override
+    @Transactional
+    public Client saveEntity(Client client) {
+        log.info("Saving address {}", client);
+        return clientDao.save(client);
+    }
+
+    @Override
+    @Transactional
     public List<ClientDto> getAll() {
         log.info("Getting all clients");
         List<Client> allClients = clientDao.getAll();
@@ -71,21 +92,22 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public ClientDto update(long id, ClientDto dtoClient) {
-        Client storedClient = this.clientDao.getById(id);
-        if (storedClient == null) {
-            log.info("Can't update client. Client doesn't exist " + id);
+    public ClientDto update(long id, ClientDto clientDto) {
+        Client source = clientMapper.toEntity(clientDto);
+        Client target = clientDao.getById(id);
+        if (target == null) {
+            log.debug("Can't update client. Client doesn't exist {}", id);
             return null;
         }
         try {
-            copyProperties(storedClient, dtoClient);
+            copyProperties(target, source);
         } catch (Exception e) {
             log.error("Can't get properties from object to updatable object for client", e);
         }
-        storedClient.setId(id);
-        log.info("Updating client " + storedClient);
-        clientDao.update(storedClient);
-        return this.clientMapper.toDto(storedClient);
+        target.setId(id);
+        log.info("Updating client {}", target);
+        clientDao.update(target);
+        return clientMapper.toDto(target);
     }
 
     @Override

@@ -7,6 +7,12 @@ import com.opinta.dto.ShipmentDto;
 import com.opinta.entity.Shipment;
 
 public interface ShipmentService {
+
+    List<Shipment> getAllEntities();
+
+    Shipment getEntityById(long id);
+
+    Shipment saveEntity(Shipment shipment);
     
     List<ShipmentDto> getAll();
 
@@ -20,5 +26,4 @@ public interface ShipmentService {
     
     boolean delete(long id);
 
-    Shipment getEntityById(long id);
 }

@@ -26,6 +26,27 @@ public class PostOfficeServiceImpl implements PostOfficeService {
 
     @Override
     @Transactional
+    public List<PostOffice> getAllEntities() {
+        log.info("Getting all post offices");
+        return postOfficeDao.getAll();
+    }
+
+    @Override
+    @Transactional
+    public PostOffice getEntityById(long id) {
+        log.info("Getting client by id {}", id);
+        return postOfficeDao.getById(id);
+    }
+
+    @Override
+    @Transactional
+    public PostOffice saveEntity(PostOffice postOffice) {
+        log.info("Saving client {}", postOffice);
+        return postOfficeDao.save(postOffice);
+    }
+
+    @Override
+    @Transactional
     public List<PostOfficeDto> getAll() {
         log.info("Getting all postOffices");
         return postOfficeMapper.toDto(postOfficeDao.getAll());

@@ -3,8 +3,7 @@ package integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opinta.entity.Address;
 import com.opinta.service.AddressService;
-import io.restassured.path.json.JsonPath;
-import java.io.File;
+import integration.helper.TestHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,13 +23,13 @@ public class AddressControllerIT extends BaseControllerIT {
     private int addressId = MIN_VALUE;
     @Autowired
     private AddressService addressService;
+    @Autowired
+    private TestHelper testHelper;
 
     @Before
     @SuppressWarnings("unchecked")
     public void setUp() {
-        Address address = new Address("00001", "Ternopil", "Monastiriska",
-                "Monastiriska", "Sadova", "51", "");
-        addressId = (int) addressService.saveEntity(address).getId();
+        addressId = (int) testHelper.createAddress().getId();
     }
     
     @After
@@ -45,7 +44,7 @@ public class AddressControllerIT extends BaseControllerIT {
         then().
                 statusCode(SC_OK);
     }
-    
+
     @Test
     public void getAddress() throws Exception {
         when().
@@ -58,7 +57,7 @@ public class AddressControllerIT extends BaseControllerIT {
     @Test
     public void getAddress_notFound() throws Exception {
         when().
-                get("/addresses/{id}", addressId+1).
+                get("/addresses/{id}", addressId + 1).
         then().
                 statusCode(SC_NOT_FOUND);
     }
@@ -66,24 +65,24 @@ public class AddressControllerIT extends BaseControllerIT {
     @Test
     public void createAddress() throws Exception {
         // create
-        File file = getFileFromResources("json/address.json");
-        JsonPath jsonPath = new JsonPath(file);
+        String expectedJson = testHelper.getJsonFromFile("json/address.json");
+
         int newAddressId =
                 given().
                         contentType("application/json;charset=UTF-8").
-                        body(jsonPath.prettify()).
+                        body(expectedJson).
                 when().
                         post("/addresses").
                 then().
                         extract().
                         path("id");
 
-        // check if created
+        // check created data
         Address address = addressService.getEntityById(newAddressId);
         ObjectMapper mapper = new ObjectMapper();
-        String jsonString = mapper.writeValueAsString(address);
+        String actualJson = mapper.writeValueAsString(address);
 
-        JSONAssert.assertEquals(jsonPath.prettify(), jsonString, false);
+        JSONAssert.assertEquals(expectedJson, actualJson, false);
 
         // delete
         addressService.delete(newAddressId);
@@ -92,12 +91,11 @@ public class AddressControllerIT extends BaseControllerIT {
     @Test
     public void updateAddress() throws Exception {
         // update data
-        File file = getFileFromResources("json/address.json");
-        JsonPath jsonPath = new JsonPath(file);
+        String expectedJson = testHelper.getJsonFromFile("json/address.json");
 
         given().
                 contentType("application/json;charset=UTF-8").
-                body(jsonPath.prettify()).
+                body(expectedJson).
         when().
                 put("/addresses/{id}", addressId).
         then().
@@ -106,9 +104,9 @@ public class AddressControllerIT extends BaseControllerIT {
         // check if updated
         Address address = addressService.getEntityById(addressId);
         ObjectMapper mapper = new ObjectMapper();
-        String jsonString = mapper.writeValueAsString(address);
+        String actualJson = mapper.writeValueAsString(address);
 
-        JSONAssert.assertEquals(jsonPath.prettify(), jsonString, false);
+        JSONAssert.assertEquals(expectedJson, actualJson, false);
     }
 
     @Test

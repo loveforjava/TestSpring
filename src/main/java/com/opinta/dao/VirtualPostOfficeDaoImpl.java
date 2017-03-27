@@ -1,5 +1,6 @@
 package com.opinta.dao;
 
+import com.opinta.entity.PostcodePool;
 import java.util.List;
 
 import com.opinta.entity.VirtualPostOffice;
@@ -7,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -34,6 +36,16 @@ public class VirtualPostOfficeDaoImpl implements VirtualPostOfficeDao {
     public VirtualPostOffice getById(long id) {
         Session session = this.sessionFactory.getCurrentSession();
         return (VirtualPostOffice) session.get(VirtualPostOffice.class, id);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<VirtualPostOffice> getByPostcodePool(PostcodePool postcodePool) {
+        Session session = this.sessionFactory.getCurrentSession();
+        return session.createCriteria(VirtualPostOffice.class)
+                .add(Restrictions.eq("activePostcodePool", postcodePool))
+                .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
+                .list();
     }
 
     @Override

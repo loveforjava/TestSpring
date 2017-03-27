@@ -1,4 +1,4 @@
-package com.opinta.config;
+package integration.config;
 
 import java.util.Properties;
 import javax.sql.DataSource;
@@ -33,8 +33,6 @@ public class HibernateConfigTest {
 
     @Bean(name = "dataSource")
     public DataSource dataSource() {
-//        System.out.println("JDBC.URL: " + environment.getRequiredProperty("jdbc.url"));
-
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(environment.getRequiredProperty("jdbcTest.driverClassName"));
         dataSource.setUrl(environment.getRequiredProperty("jdbcTest.url"));

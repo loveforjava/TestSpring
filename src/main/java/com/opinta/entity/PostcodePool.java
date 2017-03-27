@@ -30,7 +30,7 @@ public class PostcodePool {
     @NotNull
     @Size(min = 5, max = 5)
     private String postcode;
-    @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY)
+    @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER)
     @JoinColumn(name="postcode_pool_id")
     private List<BarcodeInnerNumber> barcodeInnerNumbers = new ArrayList<>();
     private boolean closed;
