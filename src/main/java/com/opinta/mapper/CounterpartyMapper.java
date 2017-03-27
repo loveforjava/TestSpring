@@ -1,20 +1,20 @@
 package com.opinta.mapper;
 
-import com.opinta.dto.VirtualPostOfficeDto;
-import com.opinta.entity.VirtualPostOffice;
+import com.opinta.dto.CounterpartyDto;
+import com.opinta.entity.Counterparty;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 
 @Mapper(componentModel = "spring")
-public interface VirtualPostOfficeMapper
-        extends BaseMapper<VirtualPostOfficeDto, VirtualPostOffice> {
+public interface CounterpartyMapper
+        extends BaseMapper<CounterpartyDto, Counterparty> {
     
     @Override
     @Mapping(source = "activePostcodePoolId", target = "activePostcodePool.id")
-    VirtualPostOffice toEntity(VirtualPostOfficeDto dto);
+    Counterparty toEntity(CounterpartyDto dto);
     
     @Override
     @Mapping(source = "activePostcodePool.id", target = "activePostcodePoolId")
-    VirtualPostOfficeDto toDto(VirtualPostOffice entity);
+    CounterpartyDto toDto(Counterparty entity);
 }

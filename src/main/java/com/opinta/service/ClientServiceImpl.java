@@ -1,15 +1,15 @@
 package com.opinta.service;
 
+import com.opinta.entity.Counterparty;
 import java.util.List;
 
 import javax.transaction.Transactional;
 
 import com.opinta.dao.ClientDao;
-import com.opinta.dao.VirtualPostOfficeDao;
+import com.opinta.dao.CounterpartyDao;
 import com.opinta.dto.ClientDto;
 import com.opinta.mapper.ClientMapper;
 import com.opinta.entity.Client;
-import com.opinta.entity.VirtualPostOffice;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,15 +20,15 @@ import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 @Slf4j
 public class ClientServiceImpl implements ClientService {
     private final ClientDao clientDao;
-    private final VirtualPostOfficeDao virtualPostOfficeDao;
+    private final CounterpartyDao counterpartyDao;
     private final ClientMapper clientMapper;
 
     @Autowired
     public ClientServiceImpl(ClientDao clientDao, ClientMapper clientMapper,
-                             VirtualPostOfficeDao virtualPostOfficeDao) {
+                             CounterpartyDao counterpartyDao) {
         this.clientDao = clientDao;
         this.clientMapper = clientMapper;
-        this.virtualPostOfficeDao = virtualPostOfficeDao;
+        this.counterpartyDao = counterpartyDao;
     }
 
     @Override
@@ -62,15 +62,15 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public List<ClientDto> getAllByVirtualPostOfficeId(long virtualPostOfficeId) {
-        VirtualPostOffice virtualPostOffice = virtualPostOfficeDao.getById(virtualPostOfficeId);
-        if (virtualPostOffice == null) {
-            log.debug("Can't get client list by virtualPostOffice. VirtualPostOffice {} doesn't exist",
-                    virtualPostOfficeId);
+    public List<ClientDto> getAllByCounterpartyId(long counterpartyId) {
+        Counterparty counterparty = counterpartyDao.getById(counterpartyId);
+        if (counterparty == null) {
+            log.debug("Can't get client list by counterparty. Counterparty {} doesn't exist",
+                    counterpartyId);
             return null;
         }
-        log.info("Getting all clients by virtualPostOffice {}", virtualPostOffice);
-        return clientMapper.toDto(clientDao.getAllByVirtualPostOffice(virtualPostOffice));
+        log.info("Getting all clients by counterparty {}", counterparty);
+        return clientMapper.toDto(clientDao.getAllByCounterparty(counterparty));
     }
 
     @Override

@@ -1,9 +1,9 @@
 package com.opinta.dao;
 
+import com.opinta.entity.Counterparty;
 import com.opinta.entity.PostcodePool;
 import java.util.List;
 
-import com.opinta.entity.VirtualPostOffice;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -14,62 +14,62 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @Slf4j
-public class VirtualPostOfficeDaoImpl implements VirtualPostOfficeDao {
+public class CounterpartyDaoImpl implements CounterpartyDao {
     
     private final SessionFactory sessionFactory;
     
     @Autowired
-    public VirtualPostOfficeDaoImpl(SessionFactory sessionFactory) {
+    public CounterpartyDaoImpl(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
     
     @Override
     @SuppressWarnings("unchecked")
-    public List<VirtualPostOffice> getAll() {
+    public List<Counterparty> getAll() {
         Session session = this.sessionFactory.getCurrentSession();
-        return session.createCriteria(VirtualPostOffice.class)
+        return session.createCriteria(Counterparty.class)
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                 .list();
     }
 
     @Override
-    public VirtualPostOffice getById(long id) {
+    public Counterparty getById(long id) {
         Session session = this.sessionFactory.getCurrentSession();
-        return (VirtualPostOffice) session.get(VirtualPostOffice.class, id);
+        return (Counterparty) session.get(Counterparty.class, id);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<VirtualPostOffice> getByPostcodePool(PostcodePool postcodePool) {
+    public List<Counterparty> getByPostcodePool(PostcodePool postcodePool) {
         Session session = this.sessionFactory.getCurrentSession();
-        return session.createCriteria(VirtualPostOffice.class)
+        return session.createCriteria(Counterparty.class)
                 .add(Restrictions.eq("activePostcodePool", postcodePool))
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                 .list();
     }
 
     @Override
-    public VirtualPostOffice save(VirtualPostOffice virtualPostOffice) {
+    public Counterparty save(Counterparty counterparty) {
         Session session = this.sessionFactory.getCurrentSession();
-        log.info("saving new virtual post office: " + virtualPostOffice);
-        virtualPostOffice = (VirtualPostOffice) session.merge(virtualPostOffice);
-        log.info("virtual post office saved with id: " + virtualPostOffice.getId());
-        return virtualPostOffice;
+        log.info("saving new virtual post office: " + counterparty);
+        counterparty = (Counterparty) session.merge(counterparty);
+        log.info("virtual post office saved with id: " + counterparty.getId());
+        return counterparty;
     }
 
     @Override
-    public boolean update(VirtualPostOffice virtualPostOffice) {
-        log.info("updating virtual post office using id: " + virtualPostOffice.getId());
+    public boolean update(Counterparty counterparty) {
+        log.info("updating virtual post office using id: " + counterparty.getId());
         Session session = this.sessionFactory.getCurrentSession();
-        session.update(virtualPostOffice);
-        log.info("virtual post office updated with id: " + virtualPostOffice.getId());
+        session.update(counterparty);
+        log.info("virtual post office updated with id: " + counterparty.getId());
         return true;
     }
 
     @Override
-    public boolean delete(VirtualPostOffice virtualPostOffice) {
+    public boolean delete(Counterparty counterparty) {
         Session session = this.sessionFactory.getCurrentSession();
-        session.delete(virtualPostOffice);
+        session.delete(counterparty);
         return true;
     }
 }

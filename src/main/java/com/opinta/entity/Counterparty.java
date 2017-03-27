@@ -12,12 +12,12 @@ import lombok.NoArgsConstructor;
 
 
 /**
- * VirtualPostOffice is the group of clients with the same postcode
+ * Counterparty is the group of clients with the same postcode
  */
 @Entity
 @Data
 @NoArgsConstructor
-public class VirtualPostOffice {
+public class Counterparty {
     @Id
     @GeneratedValue
     private long id;
@@ -28,7 +28,7 @@ public class VirtualPostOffice {
     // TODO add field private List<PostcodePool> closedPostcodePools (unidirectional)
     private String description;
 
-    public VirtualPostOffice(String name, PostcodePool activePostcodePool) {
+    public Counterparty(String name, PostcodePool activePostcodePool) {
         this.name = name;
         this.activePostcodePool = activePostcodePool;
     }

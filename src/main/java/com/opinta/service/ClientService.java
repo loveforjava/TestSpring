@@ -15,7 +15,7 @@ public interface ClientService {
     
     List<ClientDto> getAll();
 
-    List<ClientDto> getAllByVirtualPostOfficeId(long virtualPostOfficeId);
+    List<ClientDto> getAllByCounterpartyId(long counterpartyId);
 
     ClientDto getById(long id);
     

@@ -14,7 +14,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 @EqualsAndHashCode
-public class VirtualPostOfficeDto {
+public class CounterpartyDto {
     
     private long id;
     

@@ -20,7 +20,7 @@ public class TestHelper {
     @Autowired
     private AddressService addressService;
     @Autowired
-    private VirtualPostOfficeService virtualPostOfficeService;
+    private CounterpartyService counterpartyService;
     @Autowired
     private PostcodePoolService postcodePoolService;
     @Autowired
@@ -51,14 +51,14 @@ public class TestHelper {
     }
 
     public Client createClient() {
-        Client newClient = new Client("FOP Ivanov", "001", createAddress(), createVirtualPostOffice());
+        Client newClient = new Client("FOP Ivanov", "001", createAddress(), createCounterparty());
         return clientService.saveEntity(newClient);
     }
 
     public void deleteClient(Client client) {
         clientService.delete(client.getId());
         addressService.delete(client.getAddress().getId());
-        deleteVirtualPostOfficeWithPostcodePool(client.getVirtualPostOffice());
+        deleteCounterpartyWithPostcodePool(client.getCounterparty());
     }
 
     public Address createAddress() {
@@ -67,18 +67,18 @@ public class TestHelper {
         return addressService.saveEntity(address);
     }
 
-    public VirtualPostOffice createVirtualPostOffice() {
-        VirtualPostOffice virtualPostOffice = new VirtualPostOffice("Modna kasta", createPostcodePool());
-        return virtualPostOfficeService.saveEntity(virtualPostOffice);
+    public Counterparty createCounterparty() {
+        Counterparty counterparty = new Counterparty("Modna kasta", createPostcodePool());
+        return counterpartyService.saveEntity(counterparty);
     }
 
     public PostcodePool createPostcodePool() {
         return postcodePoolService.saveEntity(new PostcodePool("12345", false));
     }
 
-    public void deleteVirtualPostOfficeWithPostcodePool(VirtualPostOffice virtualPostOffice) {
-        virtualPostOfficeService.delete(virtualPostOffice.getId());
-        postcodePoolService.delete(virtualPostOffice.getActivePostcodePool().getId());
+    public void deleteCounterpartyWithPostcodePool(Counterparty counterparty) {
+        counterpartyService.delete(counterparty.getId());
+        postcodePoolService.delete(counterparty.getActivePostcodePool().getId());
     }
 
     public JSONObject getJsonObjectFromFile(String filePath) throws IOException, ParseException {

@@ -19,7 +19,7 @@ import com.opinta.entity.BarcodeInnerNumber;
 import com.opinta.entity.Client;
 import com.opinta.entity.PostcodePool;
 import com.opinta.entity.Shipment;
-import com.opinta.entity.VirtualPostOffice;
+import com.opinta.entity.Counterparty;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -75,8 +75,8 @@ public class ShipmentServiceImpl implements ShipmentService {
     @Transactional
     public ShipmentDto save(ShipmentDto shipmentDto) {
         Client existingClient = clientDao.getById(shipmentDto.getSenderId());
-        VirtualPostOffice virtualPostOffice = existingClient.getVirtualPostOffice();
-        PostcodePool postcodePool = virtualPostOffice.getActivePostcodePool();
+        Counterparty counterparty = existingClient.getCounterparty();
+        PostcodePool postcodePool = counterparty.getActivePostcodePool();
         BarcodeInnerNumber newBarcode = barcodeInnerNumberService.generateForPostcodePool(postcodePool);
         postcodePool.getBarcodeInnerNumbers().add(newBarcode);
         Shipment shipment = shipmentMapper.toEntity(shipmentDto);
