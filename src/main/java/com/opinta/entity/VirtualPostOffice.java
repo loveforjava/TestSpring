@@ -22,7 +22,7 @@ public class VirtualPostOffice {
     @GeneratedValue
     private long id;
     private String name;
-    @OneToOne(cascade = CascadeType.REMOVE)
+    @OneToOne
     @NotNull
     private PostcodePool activePostcodePool;
     // TODO add field private List<PostcodePool> closedPostcodePools (unidirectional)

@@ -2,17 +2,16 @@ package integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opinta.dto.PostOfficeDto;
+import com.opinta.entity.PostOffice;
 import com.opinta.mapper.PostOfficeMapper;
 import com.opinta.service.PostOfficeService;
-import io.restassured.path.json.JsonPath;
+import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
-import util.DBHelper;
-
-import java.io.File;
+import integration.helper.TestHelper;
 
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
@@ -22,22 +21,24 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.CoreMatchers.equalTo;
 
 public class PostOfficeControllerIT extends BaseControllerIT {
+    private PostOffice postOffice;
     private int postOfficeId = MIN_VALUE;
     @Autowired
     private PostOfficeMapper postOfficeMapper;
     @Autowired
     private PostOfficeService postOfficeService;
     @Autowired
-    private DBHelper dbHelper;
+    private TestHelper testHelper;
 
     @Before
     public void setUp() throws Exception {
-        postOfficeId = (int) dbHelper.createPostOffice().getId();
+        postOffice = testHelper.createPostOffice();
+        postOfficeId = (int) postOffice.getId();
     }
 
     @After
     public void tearDown() throws Exception {
-        postOfficeService.delete(postOfficeId);
+        testHelper.deletePostOffice(postOffice);
     }
 
     @Test
@@ -61,46 +62,63 @@ public class PostOfficeControllerIT extends BaseControllerIT {
     public void getPostOffice_notFound() throws Exception {
         when().
                 get("/post-offices/{id}", postOfficeId + 1).
-        then()
-                .statusCode(SC_NOT_FOUND);
+        then().
+                statusCode(SC_NOT_FOUND);
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void createPostOffice() throws Exception {
-        File file = getFileFromResources("json/post-office.json");
-        JsonPath jsonPath = new JsonPath(file);
+        // create
+        JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/post-office.json");
+        jsonObject.put("addressId", (int) testHelper.createAddress().getId());
+        jsonObject.put("postcodePoolId", (int) testHelper.createPostcodePool().getId());
+        String expectedJson = jsonObject.toString();
+
         int newPostOfficeId =
                 given().
                         contentType("application/json;charset=UTF-8").
-                        body(jsonPath.prettify()).
+                        body(expectedJson).
                 when().
                         post("/post-offices").
                 then().
                         extract().
                         path("id");
-        PostOfficeDto postOfficeDto = postOfficeMapper.toDto(postOfficeService.getEntityById(newPostOfficeId));
+
+        // check created data
+        PostOffice createdPostOffice = postOfficeService.getEntityById(newPostOfficeId);
         ObjectMapper mapper = new ObjectMapper();
-        String jsonString = mapper.writeValueAsString(postOfficeDto);
-        JSONAssert.assertEquals(jsonPath.prettify(), jsonString, false);
-        postOfficeService.delete(newPostOfficeId);
+        String actualJson = mapper.writeValueAsString(postOfficeMapper.toDto(createdPostOffice));
+
+        JSONAssert.assertEquals(expectedJson, actualJson, false);
+
+        // delete
+        testHelper.deletePostOffice(createdPostOffice);
     }
 
+    @Test
+    @SuppressWarnings("unchecked")
     public void updatePostOffice() throws Exception {
-        File file = getFileFromResources("json/post-office.json");
-        JsonPath jsonPath = new JsonPath(file);
+        // update
+        JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/post-office.json");
+        jsonObject.put("addressId", (int) testHelper.createAddress().getId());
+        jsonObject.put("postcodePoolId", (int) testHelper.createPostcodePool().getId());
+        String expectedJson = jsonObject.toString();
 
         given().
                 contentType("application/json;charset=UTF-8").
-                body(jsonPath.prettify()).
+                body(expectedJson).
         when().
                 put("/post-offices/{id}", postOfficeId).
         then().
                 statusCode(SC_OK);
 
+        // check updated data
         PostOfficeDto postOfficeDto = postOfficeMapper.toDto(postOfficeService.getEntityById(postOfficeId));
         ObjectMapper mapper = new ObjectMapper();
-        String jsonString = mapper.writeValueAsString(postOfficeDto);
-        JSONAssert.assertEquals(jsonPath.prettify(), jsonString, false);
+        String actualJson = mapper.writeValueAsString(postOfficeDto);
+
+        JSONAssert.assertEquals(expectedJson, actualJson, false);
     }
 
     @Test

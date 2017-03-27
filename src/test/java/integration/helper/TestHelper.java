@@ -1,15 +1,20 @@
-package util;
+package integration.helper;
 
-import com.opinta.dao.ClientDao;
 import com.opinta.entity.*;
 import com.opinta.service.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 
 @Component
-public class DBHelper  {
+public class TestHelper {
     @Autowired
     private ClientService clientService;
     @Autowired
@@ -28,15 +33,32 @@ public class DBHelper  {
         return postOfficeService.saveEntity(postOffice);
     }
 
+    public void deletePostOffice(PostOffice postOffice) {
+        postOfficeService.delete(postOffice.getId());
+        postcodePoolService.delete(postOffice.getPostcodePool().getId());
+    }
+
     public Shipment createShipment() {
         Shipment shipment = new Shipment(createClient(), createClient(),
                 DeliveryType.D2D, 4.0F, 3.8F, new BigDecimal(200), new BigDecimal(30), new BigDecimal(35.2));
         return shipmentService.saveEntity(shipment);
     }
 
+    public void deleteShipment(Shipment shipment) {
+        shipmentService.delete(shipment.getId());
+        clientService.delete(shipment.getSender().getId());
+        clientService.delete(shipment.getRecipient().getId());
+    }
+
     public Client createClient() {
         Client newClient = new Client("FOP Ivanov", "001", createAddress(), createVirtualPostOffice());
         return clientService.saveEntity(newClient);
+    }
+
+    public void deleteClient(Client client) {
+        clientService.delete(client.getId());
+        addressService.delete(client.getAddress().getId());
+        deleteVirtualPostOfficeWithPostcodePool(client.getVirtualPostOffice());
     }
 
     public Address createAddress() {
@@ -54,6 +76,21 @@ public class DBHelper  {
         return postcodePoolService.saveEntity(new PostcodePool("12345", false));
     }
 
+    public void deleteVirtualPostOfficeWithPostcodePool(VirtualPostOffice virtualPostOffice) {
+        virtualPostOfficeService.delete(virtualPostOffice.getId());
+        postcodePoolService.delete(virtualPostOffice.getActivePostcodePool().getId());
+    }
 
+    public JSONObject getJsonObjectFromFile(String filePath) throws IOException, ParseException {
+        JSONParser jsonParser = new JSONParser();
+        return (JSONObject) jsonParser.parse(new FileReader(getFileFromResources(filePath)));
+    }
 
+    public String getJsonFromFile(String filePath) throws IOException, ParseException {
+        return getJsonObjectFromFile(filePath).toString();
+    }
+
+    public File getFileFromResources(String path) {
+        return new File(getClass().getClassLoader().getResource(path).getFile());
+    }
 }

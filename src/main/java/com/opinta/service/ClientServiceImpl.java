@@ -92,21 +92,22 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public ClientDto update(long id, ClientDto dtoClient) {
-        Client storedClient = this.clientDao.getById(id);
-        if (storedClient == null) {
-            log.info("Can't update client. Client doesn't exist " + id);
+    public ClientDto update(long id, ClientDto clientDto) {
+        Client source = clientMapper.toEntity(clientDto);
+        Client target = clientDao.getById(id);
+        if (target == null) {
+            log.debug("Can't update client. Client doesn't exist {}", id);
             return null;
         }
         try {
-            copyProperties(storedClient, dtoClient);
+            copyProperties(target, source);
         } catch (Exception e) {
             log.error("Can't get properties from object to updatable object for client", e);
         }
-        storedClient.setId(id);
-        log.info("Updating client " + storedClient);
-        clientDao.update(storedClient);
-        return this.clientMapper.toDto(storedClient);
+        target.setId(id);
+        log.info("Updating client {}", target);
+        clientDao.update(target);
+        return clientMapper.toDto(target);
     }
 
     @Override

@@ -2,27 +2,16 @@ package integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opinta.dto.ClientDto;
-import com.opinta.entity.Address;
 import com.opinta.entity.Client;
-import com.opinta.entity.PostcodePool;
-import com.opinta.entity.VirtualPostOffice;
 import com.opinta.mapper.ClientMapper;
-import com.opinta.service.AddressService;
 import com.opinta.service.ClientService;
-import com.opinta.service.PostcodePoolService;
-import com.opinta.service.VirtualPostOfficeService;
-import io.restassured.RestAssured;
-import io.restassured.path.json.JsonPath;
 import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
-import util.DBHelper;
-
-import javax.transaction.Transactional;
-import java.io.File;
+import integration.helper.TestHelper;
 
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
@@ -32,29 +21,31 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.CoreMatchers.equalTo;
 
 public class ClientControllerIT extends BaseControllerIT {
+    private Client client;
     private int clientId = MIN_VALUE;
     @Autowired
     private ClientService clientService;
     @Autowired
     private ClientMapper clientMapper;
     @Autowired
-    private DBHelper dbHelper;
+    private TestHelper testHelper;
 
     @Before
     public void setUp() throws Exception {
-        clientId = (int) dbHelper.createClient().getId();
+        client = testHelper.createClient();
+        clientId = (int) client.getId();
     }
 
     @After
     public void tearDown() throws Exception {
-        clientService.delete(clientId);
+        testHelper.deleteClient(client);
     }
 
     @Test
     public void getClients() throws Exception {
         when().
                 get("/clients").
-                then().
+        then().
                 statusCode(SC_OK);
     }
 
@@ -62,7 +53,7 @@ public class ClientControllerIT extends BaseControllerIT {
     public void getClient() throws Exception {
         when().
                 get("clients/{id}", clientId).
-                then().
+        then().
                 statusCode(SC_OK).
                 body("id", equalTo(clientId));
     }
@@ -76,56 +67,73 @@ public class ClientControllerIT extends BaseControllerIT {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void createClient() throws Exception {
-        File file = getFileFromResources("json/client.json");
-        JsonPath jsonPath = new JsonPath(file);
+        // create
+        JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/client.json");
+        jsonObject.put("virtualPostOfficeId", (int) testHelper.createVirtualPostOffice().getId());
+        jsonObject.put("addressId", (int) testHelper.createAddress().getId());
+        String expectedJson = jsonObject.toString();
+
         int newClientId =
                 given().
                         contentType("application/json;charset=UTF-8").
-                        body(jsonPath.prettify()).
+                        body(expectedJson).
                 when().
                         post("/clients").
                 then().
                         extract().
                         path("id");
-        ClientDto clientDto = clientMapper.toDto(clientService.getEntityById(newClientId));
+
+        // check created data
+        Client createdClient = clientService.getEntityById(newClientId);
         ObjectMapper mapper = new ObjectMapper();
-        String jsonString = mapper.writeValueAsString(clientDto);
-        JSONAssert.assertEquals(jsonPath.prettify(), jsonString, false);
-        clientService.delete(newClientId);
+        String actualJson = mapper.writeValueAsString(clientMapper.toDto(createdClient));
+
+        JSONAssert.assertEquals(expectedJson, actualJson, false);
+
+        // delete
+        testHelper.deleteClient(createdClient);
     }
 
+    @Test
+    @SuppressWarnings("unchecked")
     public void updateClient() throws Exception {
-        File file = getFileFromResources("json/client.json");
-        JsonPath jsonPath = new JsonPath(file);
+        // update
+        JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/client.json");
+        jsonObject.put("virtualPostOfficeId", (int) testHelper.createVirtualPostOffice().getId());
+        jsonObject.put("addressId", (int) testHelper.createAddress().getId());
+        String expectedJson = jsonObject.toString();
 
         given().
                 contentType("application/json;charset=UTF-8").
-                body(jsonPath.prettify()).
+                body(expectedJson).
         when().
                 put("/clients/{id}", clientId).
         then().
                 statusCode(SC_OK);
 
+        // check updated data
         ClientDto clientDto = clientMapper.toDto(clientService.getEntityById(clientId));
         ObjectMapper mapper = new ObjectMapper();
-        String jsonString = mapper.writeValueAsString(clientDto);
-        JSONAssert.assertEquals(jsonPath.prettify(), jsonString, false);
+        String actualJson = mapper.writeValueAsString(clientDto);
+
+        JSONAssert.assertEquals(expectedJson, actualJson, false);
     }
 
     @Test
     public void deleteClient() throws Exception {
-        when()
-                .delete("/clients/{id}", clientId).
-                then().
+        when().
+                delete("/clients/{id}", clientId).
+        then().
                 statusCode(SC_OK);
     }
 
     @Test
     public void deleteClient_notFound() throws Exception {
-        when()
-                .delete("/clients/{id}", clientId + 1).
-                then().
+        when().
+                delete("/clients/{id}", clientId + 1).
+        then().
                 statusCode(SC_NOT_FOUND);
     }
 }

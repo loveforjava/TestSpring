@@ -1,5 +1,6 @@
 package com.opinta.service;
 
+import com.opinta.entity.PostcodePool;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -17,14 +18,12 @@ import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 @Service
 @Slf4j
 public class VirtualPostOfficeServiceImpl implements VirtualPostOfficeService {
-    
     private final VirtualPostOfficeDao virtualPostOfficeDao;
     private final VirtualPostOfficeMapper virtualPostOfficeMapper;
 
     @Autowired
-    public VirtualPostOfficeServiceImpl(
-            VirtualPostOfficeDao virtualPostOfficeDao,
-            VirtualPostOfficeMapper virtualPostOfficeMapper) {
+    public VirtualPostOfficeServiceImpl(VirtualPostOfficeDao virtualPostOfficeDao,
+                                        VirtualPostOfficeMapper virtualPostOfficeMapper) {
         this.virtualPostOfficeDao = virtualPostOfficeDao;
         this.virtualPostOfficeMapper = virtualPostOfficeMapper;
     }
@@ -45,7 +44,20 @@ public class VirtualPostOfficeServiceImpl implements VirtualPostOfficeService {
 
     @Override
     @Transactional
+    public List<VirtualPostOffice> getEntityByPostcodePool(PostcodePool postcodePool) {
+        log.info("Getting virtualPostOffice by postcodePool {}", postcodePool);
+        return virtualPostOfficeDao.getByPostcodePool(postcodePool);
+    }
+
+    @Override
+    @Transactional
     public VirtualPostOffice saveEntity(VirtualPostOffice virtualPostOffice) {
+        List<VirtualPostOffice> virtualPostOffices = getEntityByPostcodePool(virtualPostOffice.getActivePostcodePool());
+        if (virtualPostOffices.size() != 0) {
+            log.error("PostcodePool {} is already used in the VPO {}", virtualPostOffice.getActivePostcodePool(),
+                    virtualPostOffices);
+            return null;
+        }
         log.info("Saving virtualPostOffice {}", virtualPostOffice);
         return virtualPostOfficeDao.save(virtualPostOffice);
     }
@@ -71,26 +83,27 @@ public class VirtualPostOfficeServiceImpl implements VirtualPostOfficeService {
     public VirtualPostOfficeDto save(VirtualPostOfficeDto virtualPostOfficeDto) {
         log.info("Saving virtualPostOffices " + virtualPostOfficeDto);
         VirtualPostOffice postOffice = this.virtualPostOfficeMapper.toEntity(virtualPostOfficeDto);
-        return this.virtualPostOfficeMapper.toDto(this.virtualPostOfficeDao.save(postOffice));
+        return this.virtualPostOfficeMapper.toDto(saveEntity(postOffice));
     }
 
     @Override
     @Transactional
-    public VirtualPostOfficeDto update(long id, VirtualPostOfficeDto updated) {
-        VirtualPostOffice persisted = this.virtualPostOfficeDao.getById(id);
-        if (persisted == null) {
-            log.info("Can't update virtualPostOffices. VirtualPostOffices doesn't exist " + id);
+    public VirtualPostOfficeDto update(long id, VirtualPostOfficeDto virtualPostOfficeDto) {
+        VirtualPostOffice source = virtualPostOfficeMapper.toEntity(virtualPostOfficeDto);
+        VirtualPostOffice target = virtualPostOfficeDao.getById(id);
+        if (target == null) {
+            log.debug("Can't update virtualPostOffice. VirtualPostOffice doesn't exist {}", id);
             return null;
         }
         try {
-            copyProperties(persisted, updated);
+            copyProperties(target, source);
         } catch (Exception e) {
-            log.error("Can't get properties from object to updatable object for virtualPostOffices", e);
+            log.error("Can't get properties from object to updatable object for virtualPostOffice", e);
         }
-        persisted.setId(id);
-        log.info("Updating virtualPostOffices " + persisted);
-        this.virtualPostOfficeDao.update(persisted);
-        return this.virtualPostOfficeMapper.toDto(persisted);
+        target.setId(id);
+        log.info("Updating virtualPostOffice {}", target);
+        virtualPostOfficeDao.update(target);
+        return virtualPostOfficeMapper.toDto(target);
     }
 
     @Override

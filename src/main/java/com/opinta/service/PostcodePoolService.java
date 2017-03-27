@@ -6,14 +6,12 @@ import com.opinta.dto.BarcodeInnerNumberDto;
 import com.opinta.dto.PostcodePoolDto;
 import com.opinta.entity.PostcodePool;
 
-//import com.opinta.entity.Customer;
-
 public interface PostcodePoolService {
 
     PostcodePool saveEntity(PostcodePool postcodePool);
     
     List<PostcodePoolDto> getAll();
-    
+
     PostcodePoolDto getById(long id);
     
     PostcodePoolDto save(PostcodePoolDto postcodePoolDto);

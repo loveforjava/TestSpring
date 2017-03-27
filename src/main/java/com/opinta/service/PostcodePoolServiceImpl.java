@@ -1,6 +1,5 @@
 package com.opinta.service;
 
-import com.opinta.dao.BarcodeInnerNumberDao;
 import com.opinta.dao.PostcodePoolDao;
 import com.opinta.dto.BarcodeInnerNumberDto;
 import com.opinta.dto.PostcodePoolDto;
@@ -19,7 +18,6 @@ import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 @Slf4j
 public class PostcodePoolServiceImpl implements PostcodePoolService {
     private PostcodePoolDao postcodePoolDao;
-    private BarcodeInnerNumberDao barcodeInnerNumberDao;
     private PostcodePoolMapper postcodePoolMapper;
     private BarcodeInnerNumberMapper barcodeInnerNumberMapper;
 
