@@ -45,7 +45,7 @@ public class AddressControllerIT extends BaseControllerIT {
         then().
                 statusCode(SC_OK);
     }
-    
+
     @Test
     public void getAddress() throws Exception {
         when().
@@ -58,7 +58,7 @@ public class AddressControllerIT extends BaseControllerIT {
     @Test
     public void getAddress_notFound() throws Exception {
         when().
-                get("/addresses/{id}", addressId+1).
+                get("/addresses/{id}", addressId + 1).
         then().
                 statusCode(SC_NOT_FOUND);
     }

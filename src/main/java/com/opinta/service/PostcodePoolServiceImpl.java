@@ -33,6 +33,13 @@ public class PostcodePoolServiceImpl implements PostcodePoolService {
 
     @Override
     @Transactional
+    public PostcodePool saveEntity(PostcodePool postcodePool) {
+        log.info("Saving postcodePool {}", postcodePool);
+        return postcodePoolDao.save(postcodePool);
+    }
+
+    @Override
+    @Transactional
     public List<PostcodePoolDto> getAll() {
         log.info("Getting all postcodePools");
         return postcodePoolMapper.toDto(postcodePoolDao.getAll());

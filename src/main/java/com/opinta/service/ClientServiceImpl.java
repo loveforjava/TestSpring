@@ -33,6 +33,27 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
+    public List<Client> getAllEntities() {
+        log.info("Getting all clients");
+        return clientDao.getAll();
+    }
+
+    @Override
+    @Transactional
+    public Client getEntityById(long id) {
+        log.info("Getting address by id {}", id);
+        return clientDao.getById(id);
+    }
+
+    @Override
+    @Transactional
+    public Client saveEntity(Client client) {
+        log.info("Saving address {}", client);
+        return clientDao.save(client);
+    }
+
+    @Override
+    @Transactional
     public List<ClientDto> getAll() {
         log.info("Getting all clients");
         List<Client> allClients = clientDao.getAll();

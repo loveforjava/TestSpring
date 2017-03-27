@@ -31,6 +31,27 @@ public class VirtualPostOfficeServiceImpl implements VirtualPostOfficeService {
 
     @Override
     @Transactional
+    public List<VirtualPostOffice> getAllEntities() {
+        log.info("Getting all virtualPostOffices");
+        return virtualPostOfficeDao.getAll();
+    }
+
+    @Override
+    @Transactional
+    public VirtualPostOffice getEntityById(long id) {
+        log.info("Getting virtualPostOffice {}", id);
+        return virtualPostOfficeDao.getById(id);
+    }
+
+    @Override
+    @Transactional
+    public VirtualPostOffice saveEntity(VirtualPostOffice virtualPostOffice) {
+        log.info("Saving virtualPostOffice {}", virtualPostOffice);
+        return virtualPostOfficeDao.save(virtualPostOffice);
+    }
+
+    @Override
+    @Transactional
     public List<VirtualPostOfficeDto> getAll() {
         log.info("Getting all virtualPostOffices");
         List<VirtualPostOffice> all =  virtualPostOfficeDao.getAll();
