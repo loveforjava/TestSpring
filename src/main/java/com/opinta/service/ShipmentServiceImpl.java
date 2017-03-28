@@ -124,6 +124,7 @@ public class ShipmentServiceImpl implements ShipmentService {
             log.error("Can't get properties from object to updatable object for shipment", e);
         }
         target.setId(id);
+        target.setPrice(calculatePrice(target));
         log.info("Updating shipment {}", target);
         shipmentDao.update(target);
         return shipmentMapper.toDto(target);

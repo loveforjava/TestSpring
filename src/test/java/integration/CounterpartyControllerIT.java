@@ -71,7 +71,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
     @SuppressWarnings("unchecked")
     public void createCounterparty() throws Exception {
         // create
-        JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/virtual-post-office.json");
+        JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/counterparty.json");
         jsonObject.put("postcodePoolId", (int) testHelper.createPostcodePool().getId());
         String expectedJson = jsonObject.toString();
 
@@ -99,7 +99,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
     @SuppressWarnings("unchecked")
     public void updateCounterparty() throws Exception {
         // update
-        JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/virtual-post-office.json");
+        JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/counterparty.json");
         jsonObject.put("postcodePoolId", (int) testHelper.createPostcodePool().getId());
         String expectedJson = jsonObject.toString();
 
