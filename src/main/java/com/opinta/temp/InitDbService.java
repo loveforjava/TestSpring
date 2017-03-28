@@ -112,9 +112,9 @@ public class InitDbService {
         final long postcodePoolId = postcodePoolService.save(postcodePoolDto).getId();
 
         List<BarcodeInnerNumberDto> barcodeInnerNumbers = new ArrayList<>();
-        barcodeInnerNumbers.add(barcodeInnerNumberMapper.toDto(new BarcodeInnerNumber("0000001", USED)));
-        barcodeInnerNumbers.add(barcodeInnerNumberMapper.toDto(new BarcodeInnerNumber("0000002", RESERVED)));
-        barcodeInnerNumbers.add(barcodeInnerNumberMapper.toDto(new BarcodeInnerNumber("0000003", RESERVED)));
+        barcodeInnerNumbers.add(barcodeInnerNumberMapper.toDto(new BarcodeInnerNumber("00000014", USED)));
+        barcodeInnerNumbers.add(barcodeInnerNumberMapper.toDto(new BarcodeInnerNumber("00000025", RESERVED)));
+        barcodeInnerNumbers.add(barcodeInnerNumberMapper.toDto(new BarcodeInnerNumber("00000036", RESERVED)));
 
         postcodePoolService.addBarcodeInnerNumbers(postcodePoolId, barcodeInnerNumbers);
 

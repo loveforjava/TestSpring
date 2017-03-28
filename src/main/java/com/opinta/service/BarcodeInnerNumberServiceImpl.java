@@ -120,9 +120,9 @@ public class BarcodeInnerNumberServiceImpl implements BarcodeInnerNumberService 
         POSTCODE_COUNTERS.putIfAbsent(postcode, 0);
         int innerNumberCounter = POSTCODE_COUNTERS.get(postcode);
         POSTCODE_COUNTERS.put(postcode, innerNumberCounter + 1);
-        if (innerNumberCounter > 9999999) {
+        if (innerNumberCounter > 99999999) {
             throw new RuntimeException(format("Barcode %d is too large", innerNumberCounter));
         }
-        return String.format("%07d", innerNumberCounter);
+        return String.format("%08d", innerNumberCounter);
     }
 }

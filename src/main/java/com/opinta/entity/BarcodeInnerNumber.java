@@ -16,7 +16,7 @@ public class BarcodeInnerNumber {
     @Id
     @GeneratedValue
     private long id;
-    @Size(min = 7, max = 7)
+    @Size(min = 8, max = 8)
     private String number;
     @Enumerated(EnumType.STRING)
     private BarcodeStatus status;
