@@ -1,8 +1,9 @@
 package com.opinta.temp;
 
-import javax.annotation.PostConstruct;
-
+import org.hsqldb.util.DatabaseManagerSwing;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
 
 @Service
 public class StartHsqlDbManager {
