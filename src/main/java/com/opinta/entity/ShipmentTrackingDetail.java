@@ -29,13 +29,13 @@ public class ShipmentTrackingDetail {
     @Enumerated(EnumType.STRING)
     private ShipmentStatus shipmentStatus;
     @Temporal(TemporalType.TIMESTAMP)
-    private Date date;
+    private Date statusDate;
 
     public ShipmentTrackingDetail(Shipment shipment, PostOffice postOffice, ShipmentStatus shipmentStatus,
-                                  Date date) {
+                                  Date statusDate) {
         this.shipment = shipment;
         this.postOffice = postOffice;
         this.shipmentStatus = shipmentStatus;
-        this.date = date;
+        this.statusDate = statusDate;
     }
 }
