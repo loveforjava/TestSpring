@@ -1,12 +1,7 @@
 package com.opinta.service;
 
-import com.opinta.entity.Address;
+import com.opinta.entity.*;
 import com.opinta.entity.Counterparty;
-import com.opinta.entity.PostcodePool;
-import com.opinta.entity.Shipment;
-import com.opinta.entity.Counterparty;
-import com.opinta.entity.Client;
-import com.opinta.entity.DeliveryType;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
 import org.apache.pdfbox.pdmodel.interactive.form.PDTextField;
@@ -29,7 +24,6 @@ import static org.mockito.Mockito.verify;
 public class PDFGeneratorServiceTest {
     @Mock
     private ShipmentService shipmentService;
-
     private PDFGeneratorService pdfGeneratorService;
     private Shipment shipment;
 
@@ -46,6 +40,7 @@ public class PDFGeneratorServiceTest {
         Client recipient = new Client("Petrov PP", "002", recipientAddress, counterparty);
         shipment = new Shipment(sender, recipient, DeliveryType.W2W, 1, 1,
                 new BigDecimal("12.5"), new BigDecimal("2.5"), new BigDecimal("15.25"));
+        shipment.setBarcode(new BarcodeInnerNumber("12345678", BarcodeStatus.RESERVED));
     }
 
     @Test
@@ -54,7 +49,7 @@ public class PDFGeneratorServiceTest {
         assertNotEquals("PDFGenerator returned an empty label",
                 pdfGeneratorService.generateLabel(1L).length, 0);
         assertNotEquals("PDFGenerator returned an empty postpay form",
-                pdfGeneratorService.generateLabel(1L).length, 0);
+                pdfGeneratorService.generatePostpay(1L).length, 0);
         verify(shipmentService, atLeast(2)).getEntityById(1L);
     }
 
