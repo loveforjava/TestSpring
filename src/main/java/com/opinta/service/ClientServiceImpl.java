@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static java.lang.String.format;
+import static org.apache.commons.beanutils.PropertyUtils.copyProperties;
 
 @Service
 @Slf4j
@@ -114,6 +115,14 @@ public class ClientServiceImpl implements ClientService {
             throw new Exception(e);
         }
 
+        try {
+            copyProperties(target, source);
+        } catch (Exception e) {
+            log.error("Can't get properties from object to updatable object for client", e);
+            throw new Exception("Can't get properties from object to updatable object for client", e);
+        }
+
+        target.setId(id);
         target.setCounterparty(source.getCounterparty());
         target.setPhone(phoneService.getOrCreateEntityByPhoneNumber(clientDto.getPhoneNumber()));
         target.setAddress(source.getAddress());
