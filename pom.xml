@@ -162,11 +162,11 @@
             <artifactId>pdfbox</artifactId>
             <version>2.0.4</version>
         </dependency>
-        <!-- HyperSQL DB -->
+        <!-- Oracle -->
         <dependency>
-            <groupId>org.hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
-            <version>${hsqldb.version}</version>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc</artifactId>
+            <version>8</version>
         </dependency>
     </dependencies>
     <build>
@@ -195,6 +195,29 @@
                                 <include>integration/*</include>
                             </includes>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>2.5.2</version>
+                <executions>
+                    <execution>
+                        <id>install-external</id>
+                        <phase>clean</phase>
+                        <configuration>
+                            <file>${basedir}/src/main/resources/lib/ojdbc-8.jar</file>
+                            <repositoryLayout>default</repositoryLayout>
+                            <groupId>com.oracle</groupId>
+                            <artifactId>ojdbc</artifactId>
+                            <version>8</version>
+                            <packaging>jar</packaging>
+                            <generatePom>true</generatePom>
+                        </configuration>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

@@ -112,7 +112,7 @@ public class BarcodeInnerNumberServiceImpl implements BarcodeInnerNumberService 
     public BarcodeInnerNumber generateBarcodeInnerNumber(PostcodePool postcodePool) {
         BarcodeInnerNumber barcodeInnerNumber = new BarcodeInnerNumber();
         barcodeInnerNumber.setStatus(USED);
-        barcodeInnerNumber.setNumber(getNextInnerNumber(postcodePool.getPostcode()));
+        barcodeInnerNumber.setInnerNumber(getNextInnerNumber(postcodePool.getPostcode()));
         return barcodeInnerNumberDao.save(barcodeInnerNumber);
     }
 
