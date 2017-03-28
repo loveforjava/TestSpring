@@ -5,6 +5,5 @@ import com.opinta.entity.BarcodeInnerNumber;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
-public interface BarcodeInnerNumberMapper
-        extends BaseMapper<BarcodeInnerNumberDto, BarcodeInnerNumber> {
+public interface BarcodeInnerNumberMapper extends BaseMapper<BarcodeInnerNumberDto, BarcodeInnerNumber> {
 }

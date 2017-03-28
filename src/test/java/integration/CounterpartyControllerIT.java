@@ -1,10 +1,10 @@
 package integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.opinta.dto.VirtualPostOfficeDto;
-import com.opinta.entity.VirtualPostOffice;
-import com.opinta.mapper.VirtualPostOfficeMapper;
-import com.opinta.service.VirtualPostOfficeService;
+import com.opinta.dto.CounterpartyDto;
+import com.opinta.entity.Counterparty;
+import com.opinta.mapper.CounterpartyMapper;
+import com.opinta.service.CounterpartyService;
 import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -20,118 +20,118 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.CoreMatchers.equalTo;
 
-public class VirtualPostOfficeControllerIT extends BaseControllerIT {
-    private VirtualPostOffice virtualPostOffice;
-    private int virtualPostOfficeId = MIN_VALUE;
+public class CounterpartyControllerIT extends BaseControllerIT {
+    private Counterparty counterparty;
+    private int counterpartyId = MIN_VALUE;
 
     @Autowired
-    private VirtualPostOfficeService virtualPostOfficeService;
+    private CounterpartyService counterpartyService;
     @Autowired
-    private VirtualPostOfficeMapper virtualPostOfficeMapper;
+    private CounterpartyMapper counterpartyMapper;
     @Autowired
     private TestHelper testHelper;
 
     @Before
     public void setUp() throws Exception {
-        virtualPostOffice = testHelper.createVirtualPostOffice();
-        virtualPostOfficeId = (int) virtualPostOffice.getId();
+        counterparty = testHelper.createCounterparty();
+        counterpartyId = (int) counterparty.getId();
     }
 
     @After
     public void tearDown() throws Exception {
-        testHelper.deleteVirtualPostOfficeWithPostcodePool(virtualPostOffice);
+        testHelper.deleteCounterpartyWithPostcodePool(counterparty);
     }
 
     @Test
-    public void getVirtualPostOffices() throws Exception {
+    public void getCounterparties() throws Exception {
         when().
-                get("/virtual-post-offices").
+                get("/counterparties").
         then().
                 statusCode(SC_OK);
     }
 
     @Test
-    public void getVirtualPostOffice() throws Exception {
+    public void getCounterparty() throws Exception {
         when().
-                get("virtual-post-offices/{id}", virtualPostOfficeId).
+                get("counterparties/{id}", counterpartyId).
         then().
                 statusCode(SC_OK).
-                body("id", equalTo(virtualPostOfficeId));
+                body("id", equalTo(counterpartyId));
     }
 
     @Test
-    public void getVirtualPostOffice_notFound() throws Exception {
+    public void getCounterparty_notFound() throws Exception {
         when().
-                get("/virtual-post-offices/{id}", virtualPostOfficeId + 1).
+                get("/counterparties/{id}", counterpartyId + 1).
         then().
                 statusCode(SC_NOT_FOUND);
     }
 
     @Test
     @SuppressWarnings("unchecked")
-    public void createVirtualPostOffice() throws Exception {
+    public void createCounterparty() throws Exception {
         // create
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/virtual-post-office.json");
-        jsonObject.put("activePostcodePoolId", (int) testHelper.createPostcodePool().getId());
+        jsonObject.put("postcodePoolId", (int) testHelper.createPostcodePool().getId());
         String expectedJson = jsonObject.toString();
 
-        int newVirtualPostOfficeId =
+        int newCounterpartyId =
                 given().
                         contentType("application/json;charset=UTF-8").
                         body(expectedJson).
                 when().
-                        post("/virtual-post-offices/").
+                        post("/counterparties/").
                 then().
                         extract().
                         path("id");
 
         // check created data
-        VirtualPostOffice createdVirtualPostOffice = virtualPostOfficeService.getEntityById(newVirtualPostOfficeId);
+        Counterparty createdCounterparty = counterpartyService.getEntityById(newCounterpartyId);
         ObjectMapper mapper = new ObjectMapper();
-        String actualJson = mapper.writeValueAsString(virtualPostOfficeMapper.toDto(createdVirtualPostOffice));
+        String actualJson = mapper.writeValueAsString(counterpartyMapper.toDto(createdCounterparty));
         JSONAssert.assertEquals(expectedJson, actualJson, false);
 
         // delete
-        testHelper.deleteVirtualPostOfficeWithPostcodePool(createdVirtualPostOffice);
+        testHelper.deleteCounterpartyWithPostcodePool(createdCounterparty);
     }
 
     @Test
     @SuppressWarnings("unchecked")
-    public void updateVirtualPostOffice() throws Exception {
+    public void updateCounterparty() throws Exception {
         // update
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/virtual-post-office.json");
-        jsonObject.put("activePostcodePoolId", (int) testHelper.createPostcodePool().getId());
+        jsonObject.put("postcodePoolId", (int) testHelper.createPostcodePool().getId());
         String expectedJson = jsonObject.toString();
 
         given().
                 contentType("application/json;charset=UTF-8").
                 body(expectedJson).
         when().
-                put("/virtual-post-offices/{id}", virtualPostOfficeId).
+                put("/counterparties/{id}", counterpartyId).
         then().
                 statusCode(SC_OK);
 
         // check updated data
-        VirtualPostOfficeDto virtualPostOfficeDto = virtualPostOfficeMapper
-                .toDto(virtualPostOfficeService.getEntityById(virtualPostOfficeId));
+        CounterpartyDto counterpartyDto = counterpartyMapper
+                .toDto(counterpartyService.getEntityById(counterpartyId));
         ObjectMapper mapper = new ObjectMapper();
-        String actualJson = mapper.writeValueAsString(virtualPostOfficeDto);
+        String actualJson = mapper.writeValueAsString(counterpartyDto);
 
         JSONAssert.assertEquals(expectedJson, actualJson, false);
     }
 
     @Test
-    public void deleteVirtualPostOffice() throws Exception {
+    public void deleteCounterparty() throws Exception {
         when().
-                delete("/virtual-post-offices/{id}", virtualPostOfficeId).
+                delete("/counterparties/{id}", counterpartyId).
         then().
                 statusCode(SC_OK);
     }
 
     @Test
-    public void deleteVirtualPostOffice_notFound() throws Exception {
+    public void deleteCounterparty_notFound() throws Exception {
         when().
-                delete("/virtual-post-offices/{id}", virtualPostOfficeId + 1).
+                delete("/counterparties/{id}", counterpartyId + 1).
         then().
                 statusCode(SC_NOT_FOUND);
     }

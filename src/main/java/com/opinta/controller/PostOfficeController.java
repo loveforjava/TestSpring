@@ -61,7 +61,7 @@ public class PostOfficeController {
     public ResponseEntity<?> updatePostOffice(@PathVariable long id, @RequestBody PostOfficeDto postOfficeDto) {
         postOfficeDto = postOfficeService.update(id, postOfficeDto);
         if (postOfficeDto == null) {
-            return new ResponseEntity<>(format("No PostOfficeDto found for ID %d", id), NOT_FOUND);
+            return new ResponseEntity<>(format("No PostOffice found for ID %d", id), NOT_FOUND);
         }
         return new ResponseEntity<>(postOfficeDto, OK);
     }
@@ -69,8 +69,8 @@ public class PostOfficeController {
     @DeleteMapping("{id}")
     public ResponseEntity<?> deletePostOffice(@PathVariable long id) {
         if (!postOfficeService.delete(id)) {
-            return new ResponseEntity<>(format("No PostOfficeDto found for ID %d", id), NOT_FOUND);
+            return new ResponseEntity<>(format("No PostOffice found for ID %d", id), NOT_FOUND);
         }
-        return new ResponseEntity<>(id, OK);
+        return new ResponseEntity<>(OK);
     }
 }

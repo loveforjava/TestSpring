@@ -61,19 +61,19 @@ public class ClientController {
     }
     
     @PostMapping
-    public ResponseEntity<?> createClient(@RequestBody ClientDto client) {
-        ClientDto saved = clientService.save(client);
-        if (saved == null) {
+    public ResponseEntity<?> createClient(@RequestBody ClientDto clientDto) {
+        clientDto = clientService.save(clientDto);
+        if (clientDto == null) {
             return new ResponseEntity<>("New Client has not been saved", BAD_REQUEST);
         }
-        return new ResponseEntity<>(saved, OK);
+        return new ResponseEntity<>(clientDto, OK);
     }
     
     @PutMapping("{id}")
-    public ResponseEntity<?> updateClient(@PathVariable long id, @RequestBody ClientDto client) {
-        ClientDto updatedClient = clientService.update(id, client);
-        if (updatedClient != null) {
-            return new ResponseEntity<>(updatedClient, OK);
+    public ResponseEntity<?> updateClient(@PathVariable long id, @RequestBody ClientDto clientDto) {
+        clientDto = clientService.update(id, clientDto);
+        if (clientDto != null) {
+            return new ResponseEntity<>(clientDto, OK);
         } else {
             return new ResponseEntity<>(format("No Client found for ID %d", id), NOT_FOUND);
         }
@@ -84,6 +84,6 @@ public class ClientController {
         if (!clientService.delete(id)) {
             return new ResponseEntity<>(format("No Client found for ID %d", id), NOT_FOUND);
         }
-        return new ResponseEntity<>(id, OK);
+        return new ResponseEntity<>(OK);
     }
 }

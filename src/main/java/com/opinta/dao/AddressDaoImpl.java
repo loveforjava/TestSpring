@@ -11,8 +11,12 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class AddressDaoImpl implements AddressDao {
+    private final SessionFactory sessionFactory;
+
     @Autowired
-    SessionFactory sessionFactory;
+    public AddressDaoImpl(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
 
     @Override
     @SuppressWarnings("unchecked")

@@ -5,6 +5,5 @@ import com.opinta.entity.Address;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
-public interface AddressMapper
-        extends BaseMapper<AddressDto, Address> {
+public interface AddressMapper extends BaseMapper<AddressDto, Address> {
 }

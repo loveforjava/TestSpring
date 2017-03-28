@@ -8,6 +8,7 @@ import org.mapstruct.Mappings;
 
 @Mapper(componentModel = "spring")
 public interface PostOfficeMapper extends BaseMapper<PostOfficeDto, PostOffice> {
+
     @Override
     @Mappings({
             @Mapping(source = "address.id", target = "addressId"),

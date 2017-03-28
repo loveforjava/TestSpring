@@ -21,19 +21,19 @@ public class Address {
     private String city;
     private String street;
     private String houseNumber;
-    private String appartmentNumber;
+    private String apartmentNumber;
     private String description;
     private BigDecimal latitude;
     private BigDecimal longitude;
 
     public Address(String postcode, String region, String district, String city, String street, String houseNumber,
-                   String appartmentNumber) {
+                   String apartmentNumber) {
         this.postcode = postcode;
         this.region = region;
         this.district = district;
         this.city = city;
         this.street = street;
         this.houseNumber = houseNumber;
-        this.appartmentNumber = appartmentNumber;
+        this.apartmentNumber = apartmentNumber;
     }
 }

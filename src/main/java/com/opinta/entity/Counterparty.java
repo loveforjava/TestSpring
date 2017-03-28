@@ -1,6 +1,5 @@
 package com.opinta.entity;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -12,24 +11,23 @@ import lombok.NoArgsConstructor;
 
 
 /**
- * VirtualPostOffice is the group of clients with the same postcode
+ * Counterparty is the group of clients with the same postcode
  */
 @Entity
 @Data
 @NoArgsConstructor
-public class VirtualPostOffice {
+public class Counterparty {
     @Id
     @GeneratedValue
     private long id;
     private String name;
     @OneToOne
     @NotNull
-    private PostcodePool activePostcodePool;
-    // TODO add field private List<PostcodePool> closedPostcodePools (unidirectional)
+    private PostcodePool postcodePool;
     private String description;
 
-    public VirtualPostOffice(String name, PostcodePool activePostcodePool) {
+    public Counterparty(String name, PostcodePool postcodePool) {
         this.name = name;
-        this.activePostcodePool = activePostcodePool;
+        this.postcodePool = postcodePool;
     }
 }

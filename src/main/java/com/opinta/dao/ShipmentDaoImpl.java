@@ -13,8 +13,12 @@ import java.util.List;
 
 @Repository
 public class ShipmentDaoImpl implements ShipmentDao {
+    private final SessionFactory sessionFactory;
+
     @Autowired
-    SessionFactory sessionFactory;
+    public ShipmentDaoImpl(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
 
     @Override
     @SuppressWarnings("unchecked")

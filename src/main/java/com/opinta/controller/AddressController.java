@@ -71,6 +71,6 @@ public class AddressController {
         if (!addressService.delete(id)) {
             return new ResponseEntity<>(format("No Address found for ID %d", id), NOT_FOUND);
         }
-        return new ResponseEntity<>(id, OK);
+        return new ResponseEntity<>(OK);
     }
 }

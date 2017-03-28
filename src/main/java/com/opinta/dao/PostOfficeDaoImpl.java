@@ -10,8 +10,12 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class PostOfficeDaoImpl implements PostOfficeDao {
+    private final SessionFactory sessionFactory;
+
     @Autowired
-    SessionFactory sessionFactory;
+    public PostOfficeDaoImpl(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
 
     @Override
     @SuppressWarnings("unchecked")

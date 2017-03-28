@@ -14,16 +14,11 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 @EqualsAndHashCode
-public class VirtualPostOfficeDto {
-    
+public class CounterpartyDto {
     private long id;
-    
     @Size(max = 255)
     private String name;
-    
+    private long postcodePoolId;
     @Size(max = 255)
     private String description;
-    
-    private long activePostcodePoolId;
-    
 }

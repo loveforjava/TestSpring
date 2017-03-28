@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 import com.opinta.constraint.EnumString;
 import com.opinta.entity.DeliveryType;
+import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,5 +23,6 @@ public class ShipmentDto {
     private BigDecimal declaredPrice;
     private BigDecimal price;
     private BigDecimal postPay;
+    @Size(max = 255)
     private String description;
 }

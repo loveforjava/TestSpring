@@ -10,8 +10,12 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class ShipmentTrackingDetailDaoImpl implements ShipmentTrackingDetailDao {
+    private final SessionFactory sessionFactory;
+
     @Autowired
-    SessionFactory sessionFactory;
+    public ShipmentTrackingDetailDaoImpl(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
 
     @Override
     @SuppressWarnings("unchecked")

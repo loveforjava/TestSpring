@@ -1,9 +1,10 @@
 package com.opinta.service;
 
 import com.opinta.entity.Address;
+import com.opinta.entity.Counterparty;
 import com.opinta.entity.PostcodePool;
 import com.opinta.entity.Shipment;
-import com.opinta.entity.VirtualPostOffice;
+import com.opinta.entity.Counterparty;
 import com.opinta.entity.Client;
 import com.opinta.entity.DeliveryType;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -39,10 +40,10 @@ public class PDFGeneratorServiceTest {
         Address senderAddress = new Address("00001", "Ternopil", "Monastiriska",
                         "Monastiriska", "Sadova", "51", "");
         Address recipientAddress = new Address("00002", "Kiev", "", "Kiev", "Khreschatik", "121", "37");
-        VirtualPostOffice virtualPostOffice = new VirtualPostOffice("Modna kasta",
+        Counterparty counterparty = new Counterparty("Modna kasta",
                 new PostcodePool("00003", false));
-        Client sender = new Client("FOP Ivanov", "001", senderAddress, virtualPostOffice);
-        Client recipient = new Client("Petrov PP", "002", recipientAddress, virtualPostOffice);
+        Client sender = new Client("FOP Ivanov", "001", senderAddress, counterparty);
+        Client recipient = new Client("Petrov PP", "002", recipientAddress, counterparty);
         shipment = new Shipment(sender, recipient, DeliveryType.W2W, 1, 1,
                 new BigDecimal("12.5"), new BigDecimal("2.5"), new BigDecimal("15.25"));
     }

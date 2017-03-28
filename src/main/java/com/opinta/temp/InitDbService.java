@@ -2,6 +2,7 @@ package com.opinta.temp;
 
 import com.opinta.dto.PostOfficeDto;
 import com.opinta.dto.ShipmentDto;
+import com.opinta.entity.Counterparty;
 import com.opinta.mapper.ShipmentTrackingDetailMapper;
 import com.opinta.entity.ShipmentStatus;
 import com.opinta.entity.ShipmentTrackingDetail;
@@ -18,18 +19,15 @@ import javax.annotation.PostConstruct;
 
 import com.opinta.dto.AddressDto;
 import com.opinta.dto.BarcodeInnerNumberDto;
-import com.opinta.dto.PostOfficeDto;
 import com.opinta.dto.PostcodePoolDto;
-import com.opinta.dto.ShipmentDto;
-import com.opinta.dto.VirtualPostOfficeDto;
+import com.opinta.dto.CounterpartyDto;
 import com.opinta.mapper.AddressMapper;
 import com.opinta.mapper.BarcodeInnerNumberMapper;
 import com.opinta.mapper.ClientMapper;
 import com.opinta.mapper.PostOfficeMapper;
 import com.opinta.mapper.PostcodePoolMapper;
 import com.opinta.mapper.ShipmentMapper;
-import com.opinta.mapper.ShipmentTrackingDetailMapper;
-import com.opinta.mapper.VirtualPostOfficeMapper;
+import com.opinta.mapper.CounterpartyMapper;
 import com.opinta.entity.Address;
 import com.opinta.entity.BarcodeInnerNumber;
 import com.opinta.entity.Client;
@@ -37,17 +35,13 @@ import com.opinta.entity.DeliveryType;
 import com.opinta.entity.PostOffice;
 import com.opinta.entity.PostcodePool;
 import com.opinta.entity.Shipment;
-import com.opinta.entity.ShipmentStatus;
-import com.opinta.entity.ShipmentTrackingDetail;
-import com.opinta.entity.VirtualPostOffice;
 import com.opinta.service.AddressService;
 import com.opinta.service.BarcodeInnerNumberService;
 import com.opinta.service.ClientService;
 import com.opinta.service.PostOfficeService;
 import com.opinta.service.PostcodePoolService;
 import com.opinta.service.ShipmentService;
-import com.opinta.service.ShipmentTrackingDetailService;
-import com.opinta.service.VirtualPostOfficeService;
+import com.opinta.service.CounterpartyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -61,7 +55,7 @@ public class InitDbService {
     private ClientService clientService;
     private AddressService addressService;
     private ShipmentService shipmentService;
-    private VirtualPostOfficeService virtualPostOfficeService;
+    private CounterpartyService counterpartyService;
     private PostOfficeService postOfficeService;
     private ShipmentTrackingDetailService shipmentTrackingDetailService;
     private TariffGridService tariffGridService;
@@ -72,25 +66,25 @@ public class InitDbService {
     private BarcodeInnerNumberMapper barcodeInnerNumberMapper;
     private ShipmentMapper shipmentMapper;
     private PostOfficeMapper postOfficeMapper;
-    private VirtualPostOfficeMapper virtualPostOfficeMapper;
+    private CounterpartyMapper counterpartyMapper;
     private ShipmentTrackingDetailMapper shipmentTrackingDetailMapper;
 
     @Autowired
     public InitDbService(
             BarcodeInnerNumberService barcodeInnerNumberService, PostcodePoolService postcodePoolService,
             ClientService clientService, AddressService addressService, ShipmentService shipmentService,
-            VirtualPostOfficeService virtualPostOfficeService, PostOfficeService postOfficeService,
+            CounterpartyService counterpartyService, PostOfficeService postOfficeService,
             ShipmentTrackingDetailService shipmentTrackingDetailService, TariffGridService tariffGridService,
             ClientMapper clientMapper, AddressMapper addressMapper, PostcodePoolMapper postcodePoolMapper,
             BarcodeInnerNumberMapper barcodeInnerNumberMapper, ShipmentMapper shipmentMapper,
-            PostOfficeMapper postOfficeMapper, VirtualPostOfficeMapper virtualPostOfficeMapper,
+            PostOfficeMapper postOfficeMapper, CounterpartyMapper counterpartyMapper,
             ShipmentTrackingDetailMapper shipmentTrackingDetailMapper) {
         this.barcodeInnerNumberService = barcodeInnerNumberService;
         this.postcodePoolService = postcodePoolService;
         this.clientService = clientService;
         this.addressService = addressService;
         this.shipmentService = shipmentService;
-        this.virtualPostOfficeService = virtualPostOfficeService;
+        this.counterpartyService = counterpartyService;
         this.postOfficeService = postOfficeService;
         this.shipmentTrackingDetailService = shipmentTrackingDetailService;
         this.tariffGridService = tariffGridService;
@@ -100,7 +94,7 @@ public class InitDbService {
         this.barcodeInnerNumberMapper = barcodeInnerNumberMapper;
         this.shipmentMapper = shipmentMapper;
         this.postOfficeMapper = postOfficeMapper;
-        this.virtualPostOfficeMapper = virtualPostOfficeMapper;
+        this.counterpartyMapper = counterpartyMapper;
         this.shipmentTrackingDetailMapper = shipmentTrackingDetailMapper;
     }
 
@@ -131,20 +125,20 @@ public class InitDbService {
         addresses.add(addressMapper.toDto(new Address("00002", "Kiev", "", "Kiev", "Khreschatik", "121", "37")));
         addresses.forEach((AddressDto addressDto) -> addressesSaved.add(addressService.save(addressDto)));
 
-        // create Client with VirtualPostOffice
+        // create Client with Counterparty
         PostcodePoolDto postcodePoolDto1 = postcodePoolMapper.toDto(new PostcodePool("00003", false));
         PostcodePoolDto postcodePoolDtoSaved1 = postcodePoolService.save(postcodePoolDto1);
-        VirtualPostOffice virtualPostOffice = new VirtualPostOffice("Modna kasta",
+        Counterparty counterparty = new Counterparty("Modna kasta",
                 postcodePoolMapper.toEntity(postcodePoolDtoSaved1));
-        VirtualPostOfficeDto virtualPostOfficeDto = this.virtualPostOfficeMapper.toDto(virtualPostOffice);
-        virtualPostOfficeDto = virtualPostOfficeService.save(virtualPostOfficeDto);
-        virtualPostOffice = virtualPostOfficeMapper.toEntity(virtualPostOfficeDto);
+        CounterpartyDto counterpartyDto = this.counterpartyMapper.toDto(counterparty);
+        counterpartyDto = counterpartyService.save(counterpartyDto);
+        counterparty = counterpartyMapper.toEntity(counterpartyDto);
         List<Client> clients = new ArrayList<>();
         List<Client> clientsSaved = new ArrayList<>();
         clients.add(new Client("FOP Ivanov", "001",
-                addressMapper.toEntity(addressesSaved.get(0)), virtualPostOffice));
+                addressMapper.toEntity(addressesSaved.get(0)), counterparty));
         clients.add(new Client("Petrov PP", "002",
-                addressMapper.toEntity(addressesSaved.get(1)), virtualPostOffice));
+                addressMapper.toEntity(addressesSaved.get(1)), counterparty));
         clients.forEach((Client client) ->
             clientsSaved.add(this.clientMapper.toEntity(clientService.save(this.clientMapper.toDto(client))))
         );

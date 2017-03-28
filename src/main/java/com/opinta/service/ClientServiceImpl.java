@@ -1,15 +1,15 @@
 package com.opinta.service;
 
+import com.opinta.entity.Counterparty;
 import java.util.List;
 
 import javax.transaction.Transactional;
 
 import com.opinta.dao.ClientDao;
-import com.opinta.dao.VirtualPostOfficeDao;
+import com.opinta.dao.CounterpartyDao;
 import com.opinta.dto.ClientDto;
 import com.opinta.mapper.ClientMapper;
 import com.opinta.entity.Client;
-import com.opinta.entity.VirtualPostOffice;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,15 +20,15 @@ import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 @Slf4j
 public class ClientServiceImpl implements ClientService {
     private final ClientDao clientDao;
-    private final VirtualPostOfficeDao virtualPostOfficeDao;
+    private final CounterpartyDao counterpartyDao;
     private final ClientMapper clientMapper;
 
     @Autowired
     public ClientServiceImpl(ClientDao clientDao, ClientMapper clientMapper,
-                             VirtualPostOfficeDao virtualPostOfficeDao) {
+                             CounterpartyDao counterpartyDao) {
         this.clientDao = clientDao;
         this.clientMapper = clientMapper;
-        this.virtualPostOfficeDao = virtualPostOfficeDao;
+        this.counterpartyDao = counterpartyDao;
     }
 
     @Override
@@ -57,37 +57,36 @@ public class ClientServiceImpl implements ClientService {
     public List<ClientDto> getAll() {
         log.info("Getting all clients");
         List<Client> allClients = clientDao.getAll();
-        return this.clientMapper.toDto(allClients);
+        return clientMapper.toDto(allClients);
     }
 
     @Override
     @Transactional
-    public List<ClientDto> getAllByVirtualPostOfficeId(long virtualPostOfficeId) {
-        VirtualPostOffice virtualPostOffice = virtualPostOfficeDao.getById(virtualPostOfficeId);
-        if (virtualPostOffice == null) {
-            log.debug("Can't get client list by virtualPostOffice. VirtualPostOffice {} doesn't exist",
-                    virtualPostOfficeId);
+    public List<ClientDto> getAllByCounterpartyId(long counterpartyId) {
+        Counterparty counterparty = counterpartyDao.getById(counterpartyId);
+        if (counterparty == null) {
+            log.debug("Can't get client list by counterparty. Counterparty {} doesn't exist", counterpartyId);
             return null;
         }
-        log.info("Getting all clients by virtualPostOffice {}", virtualPostOffice);
-        return clientMapper.toDto(clientDao.getAllByVirtualPostOffice(virtualPostOffice));
+        log.info("Getting all clients by counterparty {}", counterparty);
+        return clientMapper.toDto(clientDao.getAllByCounterparty(counterparty));
     }
 
     @Override
     @Transactional
     public ClientDto getById(long id) {
-        log.info("Getting client by id " + id);
-        Client client = this.clientDao.getById(id);
-        return this.clientMapper.toDto(client);
+        log.info("Getting client by id {}", id);
+        Client client = clientDao.getById(id);
+        return clientMapper.toDto(client);
     }
 
     @Override
     @Transactional
     public ClientDto save(ClientDto clientDto) {
-        log.info("Saving client " + clientDto);
-        Client client = this.clientMapper.toEntity(clientDto);
-        client = this.clientDao.save(client);
-        return this.clientMapper.toDto(client);
+        log.info("Saving client {}", clientDto);
+        Client client = clientMapper.toEntity(clientDto);
+        client = clientDao.save(client);
+        return clientMapper.toDto(client);
     }
 
     @Override
@@ -113,13 +112,13 @@ public class ClientServiceImpl implements ClientService {
     @Override
     @Transactional
     public boolean delete(long id) {
-        Client storedClient = this.clientDao.getById(id);
-        if (storedClient == null) {
+        Client client = clientDao.getById(id);
+        if (client == null) {
             log.debug("Can't delete client. Client doesn't exist " + id);
             return false;
         }
-        log.info("Deleting client " + storedClient);
-        clientDao.delete(storedClient);
+        log.info("Deleting client {}", client);
+        clientDao.delete(client);
         return true;
     }
 }

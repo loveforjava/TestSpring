@@ -71,7 +71,7 @@ public class ClientControllerIT extends BaseControllerIT {
     public void createClient() throws Exception {
         // create
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/client.json");
-        jsonObject.put("virtualPostOfficeId", (int) testHelper.createVirtualPostOffice().getId());
+        jsonObject.put("counterpartyId", (int) testHelper.createCounterparty().getId());
         jsonObject.put("addressId", (int) testHelper.createAddress().getId());
         String expectedJson = jsonObject.toString();
 
@@ -101,7 +101,7 @@ public class ClientControllerIT extends BaseControllerIT {
     public void updateClient() throws Exception {
         // update
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/client.json");
-        jsonObject.put("virtualPostOfficeId", (int) testHelper.createVirtualPostOffice().getId());
+        jsonObject.put("counterpartyId", (int) testHelper.createCounterparty().getId());
         jsonObject.put("addressId", (int) testHelper.createAddress().getId());
         String expectedJson = jsonObject.toString();
 
