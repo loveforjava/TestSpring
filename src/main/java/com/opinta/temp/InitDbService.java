@@ -135,7 +135,7 @@ public class InitDbService {
         counterparty = counterpartyMapper.toEntity(counterpartyDto);
         List<Client> clients = new ArrayList<>();
         List<Client> clientsSaved = new ArrayList<>();
-        clients.add(new Client("FOP Ivanov", "001",
+        clients.add(new Client("FOP Ивановї", "001",
                 addressMapper.toEntity(addressesSaved.get(0)), counterparty));
         clients.add(new Client("Petrov PP", "002",
                 addressMapper.toEntity(addressesSaved.get(1)), counterparty));

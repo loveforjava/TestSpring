@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.PDResources;
+import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.graphics.image.JPEGFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
@@ -20,15 +22,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 
 @Service
 @Slf4j
 public class PDFGeneratorServiceImpl implements PDFGeneratorService {
     private static final String PDF_LABEL_TEMPLATE = "pdfTemplate/label-template.pdf";
     private static final String PDF_POSTPAY_TEMPLATE = "pdfTemplate/postpay-template.pdf";
+    private static final String FONT = "fonts/Roboto-Regular.ttf";
 
     private ShipmentService shipmentService;
     private PDDocument template;
@@ -50,10 +51,15 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
                     .getClassLoader()
                     .getResource(PDF_POSTPAY_TEMPLATE)
                     .getFile());
+            File fontFile = new File(getClass()
+                    .getClassLoader()
+                    .getResource(FONT)
+                    .getFile());
             template = PDDocument.load(file);
             PDAcroForm acroForm = template.getDocumentCatalog().getAcroForm();
+
             if (acroForm != null) {
-                generateClientsData(shipment, acroForm);
+                generateClientsData(fontFile, shipment, acroForm);
 
                 String[] priceParts = String.valueOf(shipment.getPostPay()).split("\\.");
 
@@ -82,16 +88,20 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         byte[] data = null;
         try {
             //Getting PDF template from the file
-            File file = new File(getClass()
+            File templateFile = new File(getClass()
                     .getClassLoader()
                     .getResource(PDF_LABEL_TEMPLATE)
                     .getFile());
-            template = PDDocument.load(file);
+            File fontFile = new File(getClass()
+                    .getClassLoader()
+                    .getResource(FONT)
+                    .getFile());
+            template = PDDocument.load(templateFile);
             PDAcroForm acroForm = template.getDocumentCatalog().getAcroForm();
 
             if (acroForm != null) {
                 //Populating client data
-                generateClientsData(shipment, acroForm);
+                generateClientsData(fontFile, shipment, acroForm);
 
                 //Populating rest of the fields
                 field = (PDTextField) acroForm.getField("mass");
@@ -117,10 +127,6 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
                 //Constructing 12 digits of the barcode
                 String barcode = shipment.getSender().getCounterparty().getPostcodePool().getPostcode() +
                         shipment.getBarcode().getNumber();
-                //Appending checksum number
-//                char checkSum = getCheckSum(barcode);
-                char checkSum = '0';
-                barcode = barcode + checkSum;
 
                 //Generating first barcode
                 bitMatrix = new Code128Writer().encode(barcode, BarcodeFormat.CODE_128, 170, 45, null);
@@ -154,30 +160,52 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         return data;
     }
 
-    private void generateClientsData(Shipment shipment, PDAcroForm acroForm) throws IOException {
+    private void populateField(File fontFile, PDAcroForm acroForm,
+                               PDTextField field, String fieldName, String fieldValue) throws IOException {
+        field = (PDTextField) acroForm.getField(fieldName);
+
+        field.setDefaultAppearance("/TiRo 8.64 Tf 0 g");
+        PDResources res = acroForm.getDefaultResources();
+        if (res == null) {
+            res = new PDResources();
+        }
+        InputStream fontStream = new FileInputStream(fontFile);
+        PDType0Font font = PDType0Font.load(template, fontStream);
+        String fontName = res.add(font).getName();
+        acroForm.setDefaultResources(res);
+        field.setDefaultAppearance(String.format("/%s 8.64 Tf 0 g", fontName));
+        field.setValue(fieldValue);
+    }
+
+    private void generateClientsData(File fontFile, Shipment shipment, PDAcroForm acroForm) throws IOException {
         Client sender = shipment.getSender();
 
-        field = (PDTextField) acroForm.getField("senderName");
-        field.setValue(sender.getName());
-
-        field = (PDTextField) acroForm.getField("senderPhone");
-        //TODO: Temporary value! Change later to the phone from the shipment
-        field.setValue("+380673245212");
-
-        field = (PDTextField) acroForm.getField("senderAddress");
-        field.setValue(processAddress(sender.getAddress()));
+        populateField(fontFile, acroForm, field, "senderName", shipment.getSender().getName());
+        populateField(fontFile, acroForm, field, "senderPhone", "+380673245212");
+        populateField(fontFile, acroForm, field, "senderAddress", processAddress(sender.getAddress()));
 
         Client recipient = shipment.getRecipient();
 
-        field = (PDTextField) acroForm.getField("recipientName");
-        field.setValue(recipient.getName());
+        populateField(fontFile, acroForm, field, "recipientName", recipient.getName());
+        populateField(fontFile, acroForm, field, "recipientPhone", "+380984122345");
+        populateField(fontFile, acroForm, field, "recipientAddress", processAddress(recipient.getAddress()));
 
-        field = (PDTextField) acroForm.getField("recipientPhone");
-        //TODO: Temporary value! Change later to the phone from the shipment.
-        field.setValue("+380984122345");
-
-        field = (PDTextField) acroForm.getField("recipientAddress");
-        field.setValue(processAddress(recipient.getAddress()));
+//        field = (PDTextField) acroForm.getField("senderPhone");
+//        //TODO: Temporary value! Change later to the phone from the shipment
+//        field.setValue("+380673245212");
+//
+//        field = (PDTextField) acroForm.getField("senderAddress");
+//        field.setValue(processAddress(sender.getAddress()));
+//
+//        field = (PDTextField) acroForm.getField("recipientName");
+//        field.setValue(recipient.getName());
+//
+//        field = (PDTextField) acroForm.getField("recipientPhone");
+//        //TODO: Temporary value! Change later to the phone from the shipment.
+//        field.setValue("+380984122345");
+//
+//        field = (PDTextField) acroForm.getField("recipientAddress");
+//        field.setValue(processAddress(recipient.getAddress()));
     }
 
     private String processAddress(Address address) {
@@ -186,28 +214,4 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
                 address.getCity() + "\n" +
                 address.getPostcode();
     }
-
-//    char getCheckSum(String barcode) {
-//        int result = 104;
-//        for (int i = 0; i < barcode.length(); i++) {
-//            result += ((int) barcode.charAt(i) - 32) * (i + 1);
-//        }
-//        return (char) (result % 103 + 32);
-//    }
-
-
-//    public int getCheckSum(String barcode) {
-//        int oddSum = 0;
-//        int evenSum = 0;
-//        for(int i = 1; i <= barcode.length(); i++) {
-//            if(i % 2 == 1) {
-//                oddSum += Character.getNumericValue(barcode.charAt(barcode.length() - i));
-//            } else {
-//                evenSum += Character.getNumericValue(barcode.charAt(barcode.length() - i));
-//            }
-//        }
-//        System.out.println(evenSum);
-//        System.out.println(oddSum);
-//        return (10 - ((3 * oddSum + evenSum) % 10)) % 10;
-//    }
 }
