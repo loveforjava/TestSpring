@@ -14,8 +14,12 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class ClientDaoImpl implements ClientDao {
+    private final SessionFactory sessionFactory;
+
     @Autowired
-    SessionFactory sessionFactory;
+    public ClientDaoImpl(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
 
     @Override
     @SuppressWarnings("unchecked")

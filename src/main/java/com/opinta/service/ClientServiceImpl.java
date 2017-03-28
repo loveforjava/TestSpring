@@ -57,7 +57,7 @@ public class ClientServiceImpl implements ClientService {
     public List<ClientDto> getAll() {
         log.info("Getting all clients");
         List<Client> allClients = clientDao.getAll();
-        return this.clientMapper.toDto(allClients);
+        return clientMapper.toDto(allClients);
     }
 
     @Override
@@ -65,8 +65,7 @@ public class ClientServiceImpl implements ClientService {
     public List<ClientDto> getAllByCounterpartyId(long counterpartyId) {
         Counterparty counterparty = counterpartyDao.getById(counterpartyId);
         if (counterparty == null) {
-            log.debug("Can't get client list by counterparty. Counterparty {} doesn't exist",
-                    counterpartyId);
+            log.debug("Can't get client list by counterparty. Counterparty {} doesn't exist", counterpartyId);
             return null;
         }
         log.info("Getting all clients by counterparty {}", counterparty);
@@ -76,18 +75,18 @@ public class ClientServiceImpl implements ClientService {
     @Override
     @Transactional
     public ClientDto getById(long id) {
-        log.info("Getting client by id " + id);
-        Client client = this.clientDao.getById(id);
-        return this.clientMapper.toDto(client);
+        log.info("Getting client by id {}", id);
+        Client client = clientDao.getById(id);
+        return clientMapper.toDto(client);
     }
 
     @Override
     @Transactional
     public ClientDto save(ClientDto clientDto) {
-        log.info("Saving client " + clientDto);
-        Client client = this.clientMapper.toEntity(clientDto);
-        client = this.clientDao.save(client);
-        return this.clientMapper.toDto(client);
+        log.info("Saving client {}", clientDto);
+        Client client = clientMapper.toEntity(clientDto);
+        client = clientDao.save(client);
+        return clientMapper.toDto(client);
     }
 
     @Override
@@ -113,13 +112,13 @@ public class ClientServiceImpl implements ClientService {
     @Override
     @Transactional
     public boolean delete(long id) {
-        Client storedClient = this.clientDao.getById(id);
-        if (storedClient == null) {
+        Client client = clientDao.getById(id);
+        if (client == null) {
             log.debug("Can't delete client. Client doesn't exist " + id);
             return false;
         }
-        log.info("Deleting client " + storedClient);
-        clientDao.delete(storedClient);
+        log.info("Deleting client {}", client);
+        clientDao.delete(client);
         return true;
     }
 }

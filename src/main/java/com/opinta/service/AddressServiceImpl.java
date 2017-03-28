@@ -17,8 +17,8 @@ import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 @Service
 @Slf4j
 public class AddressServiceImpl implements AddressService {
-    private AddressDao addressDao;
-    private AddressMapper addressMapper;
+    private final AddressDao addressDao;
+    private final AddressMapper addressMapper;
 
     @Autowired
     public AddressServiceImpl(AddressDao addressDao, AddressMapper addressMapper) {
@@ -52,7 +52,7 @@ public class AddressServiceImpl implements AddressService {
     public Address updateEntity(long id, Address source) {
         Address target = addressDao.getById(id);
         if (target == null) {
-            log.info("Can't update address. Address doesn't exist {}", id);
+            log.debug("Can't update address. Address doesn't exist {}", id);
             return null;
         }
         try {

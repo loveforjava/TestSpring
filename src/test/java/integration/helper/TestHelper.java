@@ -78,7 +78,7 @@ public class TestHelper {
 
     public void deleteCounterpartyWithPostcodePool(Counterparty counterparty) {
         counterpartyService.delete(counterparty.getId());
-        postcodePoolService.delete(counterparty.getActivePostcodePool().getId());
+        postcodePoolService.delete(counterparty.getPostcodePool().getId());
     }
 
     public JSONObject getJsonObjectFromFile(String filePath) throws IOException, ParseException {

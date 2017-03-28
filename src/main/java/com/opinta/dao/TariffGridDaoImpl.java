@@ -16,8 +16,12 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class TariffGridDaoImpl implements TariffGridDao {
+    private final SessionFactory sessionFactory;
+
     @Autowired
-    SessionFactory sessionFactory;
+    public TariffGridDaoImpl(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
 
     @Override
     @SuppressWarnings("unchecked")

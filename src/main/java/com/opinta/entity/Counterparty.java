@@ -1,6 +1,5 @@
 package com.opinta.entity;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -24,12 +23,11 @@ public class Counterparty {
     private String name;
     @OneToOne
     @NotNull
-    private PostcodePool activePostcodePool;
-    // TODO add field private List<PostcodePool> closedPostcodePools (unidirectional)
+    private PostcodePool postcodePool;
     private String description;
 
-    public Counterparty(String name, PostcodePool activePostcodePool) {
+    public Counterparty(String name, PostcodePool postcodePool) {
         this.name = name;
-        this.activePostcodePool = activePostcodePool;
+        this.postcodePool = postcodePool;
     }
 }

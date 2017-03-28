@@ -18,6 +18,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({METHOD, FIELD, ANNOTATION_TYPE, PARAMETER, CONSTRUCTOR})
 @Retention(RUNTIME)
 public @interface EnumString {
+
     String message() default "{com.opinta.constraint.EnumString.message}";
 
     Class<?>[] groups() default {};
@@ -25,5 +26,4 @@ public @interface EnumString {
     Class<? extends Payload>[] payload() default {};
 
     Class<? extends Enum<?>> source();
-
 }

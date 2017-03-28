@@ -15,17 +15,11 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode
 public class ClientDto {
-    
     private long id;
-    
     @Size(max = 255)
     private String name;
-    
-    @Size(max = 255)
+    @Size(max = 25)
     private String uniqueRegistrationNumber;
-    
     private long counterpartyId;
-    
     private long addressId;
-    
 }

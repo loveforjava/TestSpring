@@ -43,9 +43,9 @@ public class CounterpartyControllerIT extends BaseControllerIT {
     }
 
     @Test
-    public void getCounterpartys() throws Exception {
+    public void getCounterparties() throws Exception {
         when().
-                get("/virtual-post-offices").
+                get("/counterparties").
         then().
                 statusCode(SC_OK);
     }
@@ -53,7 +53,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
     @Test
     public void getCounterparty() throws Exception {
         when().
-                get("virtual-post-offices/{id}", counterpartyId).
+                get("counterparties/{id}", counterpartyId).
         then().
                 statusCode(SC_OK).
                 body("id", equalTo(counterpartyId));
@@ -62,7 +62,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
     @Test
     public void getCounterparty_notFound() throws Exception {
         when().
-                get("/virtual-post-offices/{id}", counterpartyId + 1).
+                get("/counterparties/{id}", counterpartyId + 1).
         then().
                 statusCode(SC_NOT_FOUND);
     }
@@ -72,7 +72,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
     public void createCounterparty() throws Exception {
         // create
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/virtual-post-office.json");
-        jsonObject.put("activePostcodePoolId", (int) testHelper.createPostcodePool().getId());
+        jsonObject.put("postcodePoolId", (int) testHelper.createPostcodePool().getId());
         String expectedJson = jsonObject.toString();
 
         int newCounterpartyId =
@@ -80,7 +80,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
                         contentType("application/json;charset=UTF-8").
                         body(expectedJson).
                 when().
-                        post("/virtual-post-offices/").
+                        post("/counterparties/").
                 then().
                         extract().
                         path("id");
@@ -100,14 +100,14 @@ public class CounterpartyControllerIT extends BaseControllerIT {
     public void updateCounterparty() throws Exception {
         // update
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/virtual-post-office.json");
-        jsonObject.put("activePostcodePoolId", (int) testHelper.createPostcodePool().getId());
+        jsonObject.put("postcodePoolId", (int) testHelper.createPostcodePool().getId());
         String expectedJson = jsonObject.toString();
 
         given().
                 contentType("application/json;charset=UTF-8").
                 body(expectedJson).
         when().
-                put("/virtual-post-offices/{id}", counterpartyId).
+                put("/counterparties/{id}", counterpartyId).
         then().
                 statusCode(SC_OK);
 
@@ -123,7 +123,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
     @Test
     public void deleteCounterparty() throws Exception {
         when().
-                delete("/virtual-post-offices/{id}", counterpartyId).
+                delete("/counterparties/{id}", counterpartyId).
         then().
                 statusCode(SC_OK);
     }
@@ -131,7 +131,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
     @Test
     public void deleteCounterparty_notFound() throws Exception {
         when().
-                delete("/virtual-post-offices/{id}", counterpartyId + 1).
+                delete("/counterparties/{id}", counterpartyId + 1).
         then().
                 statusCode(SC_NOT_FOUND);
     }

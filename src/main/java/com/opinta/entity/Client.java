@@ -22,7 +22,7 @@ public class Client {
     @JoinColumn(name = "address_id")
     private Address address;
     @ManyToOne
-    @JoinColumn(name = "virtual_post_office_id")
+    @JoinColumn(name = "counterparty_id")
     private Counterparty counterparty;
 
     public Client(String name, String uniqueRegistrationNumber, Address address, Counterparty counterparty) {

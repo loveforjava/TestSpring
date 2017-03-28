@@ -47,9 +47,29 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public List<ShipmentDto> getAll() {
+    public List<Shipment> getAllEntities() {
         log.info("Getting all shipments");
-        return shipmentMapper.toDto(shipmentDao.getAll());
+        return shipmentDao.getAll();
+    }
+
+    @Override
+    @Transactional
+    public Shipment getEntityById(long id) {
+        log.info("Getting postcodePool by id {}", id);
+        return shipmentDao.getById(id);
+    }
+
+    @Override
+    @Transactional
+    public Shipment saveEntity(Shipment shipment) {
+        log.info("Saving shipment {}", shipment);
+        return shipmentDao.save(shipment);
+    }
+
+    @Override
+    @Transactional
+    public List<ShipmentDto> getAll() {
+        return shipmentMapper.toDto(getAllEntities());
     }
 
     @Override
@@ -67,7 +87,6 @@ public class ShipmentServiceImpl implements ShipmentService {
     @Override
     @Transactional
     public ShipmentDto getById(long id) {
-        log.info("Getting postcodePool by id {}", id);
         return shipmentMapper.toDto(getEntityById(id));
     }
 
@@ -76,8 +95,8 @@ public class ShipmentServiceImpl implements ShipmentService {
     public ShipmentDto save(ShipmentDto shipmentDto) {
         Client existingClient = clientDao.getById(shipmentDto.getSenderId());
         Counterparty counterparty = existingClient.getCounterparty();
-        PostcodePool postcodePool = counterparty.getActivePostcodePool();
-        BarcodeInnerNumber newBarcode = barcodeInnerNumberService.generateForPostcodePool(postcodePool);
+        PostcodePool postcodePool = counterparty.getPostcodePool();
+        BarcodeInnerNumber newBarcode = barcodeInnerNumberService.generateBarcodeInnerNumber(postcodePool);
         postcodePool.getBarcodeInnerNumbers().add(newBarcode);
         Shipment shipment = shipmentMapper.toEntity(shipmentDto);
         shipment.setBarcode(newBarcode);
@@ -122,27 +141,6 @@ public class ShipmentServiceImpl implements ShipmentService {
         log.info("Deleting shipment {}", shipment);
         shipmentDao.delete(shipment);
         return true;
-    }
-
-    @Override
-    @Transactional
-    public List<Shipment> getAllEntities() {
-        log.info("Getting all shipments");
-        return shipmentDao.getAll();
-    }
-
-    @Override
-    @Transactional
-    public Shipment getEntityById(long id) {
-        log.info("Getting postcodePool by id {}", id);
-        return shipmentDao.getById(id);
-    }
-
-    @Override
-    @Transactional
-    public Shipment saveEntity(Shipment shipment) {
-        log.info("Saving shipment {}", shipment);
-        return shipmentDao.save(shipment);
     }
 
     private BigDecimal calculatePrice(Shipment shipment) {

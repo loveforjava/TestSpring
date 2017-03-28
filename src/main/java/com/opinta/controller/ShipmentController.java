@@ -59,8 +59,7 @@ public class ShipmentController {
         String filename = "labelform" + id + ".pdf";
         headers.setContentDispositionFormData(filename, filename);
         headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
-        ResponseEntity<byte[]> response = new ResponseEntity<>(data, headers, OK);
-        return response;
+        return new ResponseEntity<>(data, headers, OK);
     }
 
     @GetMapping("{id}/postpay-form")
@@ -71,8 +70,7 @@ public class ShipmentController {
         String filename = "postpayform" + id + ".pdf";
         headers.setContentDispositionFormData(filename, filename);
         headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
-        ResponseEntity<byte[]> response = new ResponseEntity<>(data, headers, OK);
-        return response;
+        return new ResponseEntity<>(data, headers, OK);
     }
 
     @PostMapping
@@ -95,6 +93,6 @@ public class ShipmentController {
         if (!shipmentService.delete(id)) {
             return new ResponseEntity<>(format("No Shipment found for ID %d", id), NOT_FOUND);
         }
-        return new ResponseEntity<>(id, OK);
+        return new ResponseEntity<>(OK);
     }
 }

@@ -15,7 +15,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 @Slf4j
 public class CounterpartyDaoImpl implements CounterpartyDao {
-    
     private final SessionFactory sessionFactory;
     
     @Autowired
@@ -43,7 +42,7 @@ public class CounterpartyDaoImpl implements CounterpartyDao {
     public List<Counterparty> getByPostcodePool(PostcodePool postcodePool) {
         Session session = this.sessionFactory.getCurrentSession();
         return session.createCriteria(Counterparty.class)
-                .add(Restrictions.eq("activePostcodePool", postcodePool))
+                .add(Restrictions.eq("postcodePool", postcodePool))
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                 .list();
     }
@@ -51,25 +50,18 @@ public class CounterpartyDaoImpl implements CounterpartyDao {
     @Override
     public Counterparty save(Counterparty counterparty) {
         Session session = this.sessionFactory.getCurrentSession();
-        log.info("saving new virtual post office: " + counterparty);
-        counterparty = (Counterparty) session.merge(counterparty);
-        log.info("virtual post office saved with id: " + counterparty.getId());
-        return counterparty;
+        return (Counterparty) session.merge(counterparty);
     }
 
     @Override
-    public boolean update(Counterparty counterparty) {
-        log.info("updating virtual post office using id: " + counterparty.getId());
+    public void update(Counterparty counterparty) {
         Session session = this.sessionFactory.getCurrentSession();
         session.update(counterparty);
-        log.info("virtual post office updated with id: " + counterparty.getId());
-        return true;
     }
 
     @Override
-    public boolean delete(Counterparty counterparty) {
+    public void delete(Counterparty counterparty) {
         Session session = this.sessionFactory.getCurrentSession();
         session.delete(counterparty);
-        return true;
     }
 }

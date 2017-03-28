@@ -12,11 +12,11 @@ public interface BarcodeInnerNumberService {
     
     BarcodeInnerNumberDto getById(long id);
     
-    BarcodeInnerNumber generateForPostcodePool(PostcodePool postcodePool);
-    
     BarcodeInnerNumberDto save(long postcodeId, BarcodeInnerNumberDto barcodeInnerNumberDto);
     
     BarcodeInnerNumberDto update(long id, BarcodeInnerNumberDto barcodeInnerNumberDto);
     
     boolean delete(long id);
+
+    BarcodeInnerNumber generateBarcodeInnerNumber(PostcodePool postcodePool);
 }

@@ -31,7 +31,7 @@ public class CounterpartyServiceImpl implements CounterpartyService {
     @Override
     @Transactional
     public List<Counterparty> getAllEntities() {
-        log.info("Getting all counterpartys");
+        log.info("Getting all counterparties");
         return counterpartyDao.getAll();
     }
 
@@ -52,9 +52,9 @@ public class CounterpartyServiceImpl implements CounterpartyService {
     @Override
     @Transactional
     public Counterparty saveEntity(Counterparty counterparty) {
-        List<Counterparty> counterparties = getEntityByPostcodePool(counterparty.getActivePostcodePool());
+        List<Counterparty> counterparties = getEntityByPostcodePool(counterparty.getPostcodePool());
         if (counterparties.size() != 0) {
-            log.error("PostcodePool {} is already used in the VPO {}", counterparty.getActivePostcodePool(),
+            log.error("PostcodePool {} is already used in the VPO {}", counterparty.getPostcodePool(),
                     counterparties);
             return null;
         }
@@ -65,25 +65,25 @@ public class CounterpartyServiceImpl implements CounterpartyService {
     @Override
     @Transactional
     public List<CounterpartyDto> getAll() {
-        log.info("Getting all counterpartys");
-        List<Counterparty> all =  counterpartyDao.getAll();
-        return this.counterpartyMapper.toDto(all);
+        log.info("Getting all counterparties");
+        List<Counterparty> counterparties =  counterpartyDao.getAll();
+        return counterpartyMapper.toDto(counterparties);
     }
 
     @Override
     @Transactional
     public CounterpartyDto getById(long id) {
         log.info("Getting counterparty by id " + id);
-        Counterparty office = this.counterpartyDao.getById(id);
-        return this.counterpartyMapper.toDto(office);
+        Counterparty counterparty = counterpartyDao.getById(id);
+        return counterpartyMapper.toDto(counterparty);
     }
 
     @Override
     @Transactional
     public CounterpartyDto save(CounterpartyDto counterpartyDto) {
-        log.info("Saving counterpartys " + counterpartyDto);
-        Counterparty postOffice = this.counterpartyMapper.toEntity(counterpartyDto);
-        return this.counterpartyMapper.toDto(saveEntity(postOffice));
+        log.info("Saving counterparty {}", counterpartyDto);
+        Counterparty counterparty = counterpartyMapper.toEntity(counterpartyDto);
+        return counterpartyMapper.toDto(saveEntity(counterparty));
     }
 
     @Override
@@ -109,14 +109,13 @@ public class CounterpartyServiceImpl implements CounterpartyService {
     @Override
     @Transactional
     public boolean delete(long id) {
-        Counterparty counterparty = this.counterpartyDao.getById(id);
+        Counterparty counterparty = counterpartyDao.getById(id);
         if (counterparty == null) {
-            log.debug("Can't delete counterpartys. Counterpartys doesn't exist " + id);
+            log.debug("Can't delete counterparty. Counterparty doesn't exist " + id);
             return false;
-        } else {
-            log.info("Deleting counterpartys " + counterparty);
-            counterpartyDao.delete(counterparty);
-            return true;
         }
+        log.info("Deleting counterparty " + counterparty);
+        counterpartyDao.delete(counterparty);
+        return true;
     }
 }

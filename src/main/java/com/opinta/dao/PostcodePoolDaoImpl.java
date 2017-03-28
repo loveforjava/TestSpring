@@ -11,9 +11,12 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class PostcodePoolDaoImpl implements PostcodePoolDao {
-    @Autowired
-    SessionFactory sessionFactory;
+    private final SessionFactory sessionFactory;
 
+    @Autowired
+    public PostcodePoolDaoImpl(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
     @Override
     @SuppressWarnings("unchecked")
     public List<PostcodePool> getAll() {

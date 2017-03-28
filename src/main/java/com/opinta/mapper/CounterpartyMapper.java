@@ -7,14 +7,13 @@ import org.mapstruct.Mapping;
 
 
 @Mapper(componentModel = "spring")
-public interface CounterpartyMapper
-        extends BaseMapper<CounterpartyDto, Counterparty> {
+public interface CounterpartyMapper extends BaseMapper<CounterpartyDto, Counterparty> {
     
     @Override
-    @Mapping(source = "activePostcodePoolId", target = "activePostcodePool.id")
+    @Mapping(source = "postcodePoolId", target = "postcodePool.id")
     Counterparty toEntity(CounterpartyDto dto);
     
     @Override
-    @Mapping(source = "activePostcodePool.id", target = "activePostcodePoolId")
+    @Mapping(source = "postcodePool.id", target = "postcodePoolId")
     CounterpartyDto toDto(Counterparty entity);
 }

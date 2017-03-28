@@ -16,7 +16,7 @@ public interface CounterpartyDao {
 
     Counterparty save(Counterparty counterparty);
     
-    boolean update(Counterparty counterparty);
+    void update(Counterparty counterparty);
     
-    boolean delete(Counterparty counterparty);
+    void delete(Counterparty counterparty);
 }

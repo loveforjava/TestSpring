@@ -8,8 +8,7 @@ import org.mapstruct.Mappings;
 
 
 @Mapper(componentModel = "spring")
-public interface ClientMapper
-        extends BaseMapper<ClientDto, Client> {
+public interface ClientMapper extends BaseMapper<ClientDto, Client> {
     
     @Override
     @Mappings({

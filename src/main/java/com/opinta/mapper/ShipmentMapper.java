@@ -9,6 +9,7 @@ import org.mapstruct.Mappings;
 
 @Mapper(componentModel = "spring")
 public interface ShipmentMapper extends BaseMapper<ShipmentDto, Shipment> {
+
     @Override
     @Mappings({
             @Mapping(source = "sender.id", target = "senderId"),
