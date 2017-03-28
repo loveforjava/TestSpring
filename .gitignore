@@ -6,7 +6,6 @@ gitbash*
 dev_private
 desktop.ini
 
-# Package Files #
-*.jar
+# Package Files
 *.war
 *.ear

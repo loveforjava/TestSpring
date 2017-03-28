@@ -168,6 +168,12 @@
             <artifactId>ojdbc</artifactId>
             <version>8</version>
         </dependency>
+        <!-- HyperSQL DB -->
+        <dependency>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>${hsqldb.version}</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
