@@ -9,19 +9,19 @@ public interface ShipmentService {
 
     List<Shipment> getAllEntities();
 
-    Shipment getEntityById(long id);
+    Shipment getEntityById(String id);
 
     Shipment saveEntity(Shipment shipment);
     
     List<ShipmentDto> getAll();
 
-    List<ShipmentDto> getAllByClientId(long clientId);
+    List<ShipmentDto> getAllByClientId(String clientId);
     
-    ShipmentDto getById(long id);
+    ShipmentDto getById(String id);
     
     ShipmentDto save(ShipmentDto shipmentDto);
     
-    ShipmentDto update(long id, ShipmentDto shipmentDto);
+    ShipmentDto update(String id, ShipmentDto shipmentDto);
     
-    boolean delete(long id);
+    boolean delete(String id);
 }

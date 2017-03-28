@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.opinta.entity.Client;
 import com.opinta.entity.Counterparty;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
+@Slf4j
 public class ClientDaoImpl implements ClientDao {
     private final SessionFactory sessionFactory;
 
@@ -41,7 +43,8 @@ public class ClientDaoImpl implements ClientDao {
     }
 
     @Override
-    public Client getById(long id) {
+    public Client getById(String id) {
+        log.info("get Client by id: " + id);
         Session session = sessionFactory.getCurrentSession();
         return (Client) session.get(Client.class, id);
     }
@@ -49,7 +52,9 @@ public class ClientDaoImpl implements ClientDao {
     @Override
     public Client save(Client client) {
         Session session = sessionFactory.getCurrentSession();
-        return (Client) session.merge(client);
+        Client saved = (Client) session.merge(client);
+        session.flush();
+        return saved;
     }
 
     @Override

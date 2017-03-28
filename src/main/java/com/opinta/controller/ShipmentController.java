@@ -43,16 +43,16 @@ public class ShipmentController {
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<?> getShipment(@PathVariable("id") long id) {
+    public ResponseEntity<?> getShipment(@PathVariable("id") String id) {
         ShipmentDto shipmentDto = shipmentService.getById(id);
         if (shipmentDto == null) {
-            return new ResponseEntity<>(format("No Shipment found for ID %d", id), NOT_FOUND);
+            return new ResponseEntity<>(format("No Shipment found for ID %s", id), NOT_FOUND);
         }
         return new ResponseEntity<>(shipmentDto, OK);
     }
 
     @GetMapping("{id}/label-form")
-    public ResponseEntity<?> getShipmentLabelForm(@PathVariable("id") long id) {
+    public ResponseEntity<?> getShipmentLabelForm(@PathVariable("id") String id) {
         byte[] data = pdfGeneratorService.generateLabel(id);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType("application/pdf"));
@@ -63,7 +63,7 @@ public class ShipmentController {
     }
 
     @GetMapping("{id}/postpay-form")
-    public ResponseEntity<?> getShipmentPostpayForm(@PathVariable("id") long id) {
+    public ResponseEntity<?> getShipmentPostpayForm(@PathVariable("id") String id) {
         byte[] data = pdfGeneratorService.generatePostpay(id);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType("application/pdf"));
@@ -80,18 +80,18 @@ public class ShipmentController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<?> updateShipment(@PathVariable long id, @RequestBody ShipmentDto shipmentDto) {
+    public ResponseEntity<?> updateShipment(@PathVariable String id, @RequestBody ShipmentDto shipmentDto) {
         shipmentDto = shipmentService.update(id, shipmentDto);
         if (shipmentDto == null) {
-            return new ResponseEntity<>(format("No Shipment found for ID %d", id), NOT_FOUND);
+            return new ResponseEntity<>(format("No Shipment found for ID %s", id), NOT_FOUND);
         }
         return new ResponseEntity<>(shipmentDto, OK);
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<?> deleteShipment(@PathVariable long id) {
+    public ResponseEntity<?> deleteShipment(@PathVariable String id) {
         if (!shipmentService.delete(id)) {
-            return new ResponseEntity<>(format("No Shipment found for ID %d", id), NOT_FOUND);
+            return new ResponseEntity<>(format("No Shipment found for ID %s", id), NOT_FOUND);
         }
         return new ResponseEntity<>(OK);
     }

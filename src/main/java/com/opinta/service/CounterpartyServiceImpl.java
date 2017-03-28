@@ -37,7 +37,7 @@ public class CounterpartyServiceImpl implements CounterpartyService {
 
     @Override
     @Transactional
-    public Counterparty getEntityById(long id) {
+    public Counterparty getEntityById(String id) {
         log.info("Getting counterparty {}", id);
         return counterpartyDao.getById(id);
     }
@@ -72,8 +72,8 @@ public class CounterpartyServiceImpl implements CounterpartyService {
 
     @Override
     @Transactional
-    public CounterpartyDto getById(long id) {
-        log.info("Getting counterparty by id " + id);
+    public CounterpartyDto getById(String id) {
+        log.info("Getting counterparty by uuid " + id);
         Counterparty counterparty = counterpartyDao.getById(id);
         return counterpartyMapper.toDto(counterparty);
     }
@@ -88,7 +88,7 @@ public class CounterpartyServiceImpl implements CounterpartyService {
 
     @Override
     @Transactional
-    public CounterpartyDto update(long id, CounterpartyDto counterpartyDto) {
+    public CounterpartyDto update(String id, CounterpartyDto counterpartyDto) {
         Counterparty source = counterpartyMapper.toEntity(counterpartyDto);
         Counterparty target = counterpartyDao.getById(id);
         if (target == null) {
@@ -100,7 +100,7 @@ public class CounterpartyServiceImpl implements CounterpartyService {
         } catch (Exception e) {
             log.error("Can't get properties from object to updatable object for counterparty", e);
         }
-        target.setId(id);
+        target.setUuid(id);
         log.info("Updating counterparty {}", target);
         counterpartyDao.update(target);
         return counterpartyMapper.toDto(target);
@@ -108,7 +108,7 @@ public class CounterpartyServiceImpl implements CounterpartyService {
 
     @Override
     @Transactional
-    public boolean delete(long id) {
+    public boolean delete(String id) {
         Counterparty counterparty = counterpartyDao.getById(id);
         if (counterparty == null) {
             log.debug("Can't delete counterparty. Counterparty doesn't exist " + id);

@@ -31,7 +31,7 @@ public class TariffGridServiceImpl implements TariffGridService {
     @Override
     @Transactional
     public TariffGrid getById(long id) {
-        log.info("Getting tariffGrid by id {}", id);
+        log.info("Getting tariffGrid by uuid {}", id);
         return tariffGridDao.getById(id);
     }
 

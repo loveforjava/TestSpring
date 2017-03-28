@@ -2,7 +2,7 @@ package com.opinta.service;
 
 public interface PDFGeneratorService {
 
-    byte[] generateLabel(long id);
+    byte[] generateLabel(String id);
 
-    byte[] generatePostpay(long id);
+    byte[] generatePostpay(String id);
 }

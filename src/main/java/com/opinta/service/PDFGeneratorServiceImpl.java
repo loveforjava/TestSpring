@@ -30,7 +30,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
     }
 
     @Override
-    public byte[] generatePostpay(long shipmentId) {
+    public byte[] generatePostpay(String shipmentId) {
         Shipment shipment = shipmentService.getEntityById(shipmentId);
         byte[] data = null;
         try {
@@ -65,7 +65,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
     }
 
     @Override
-    public byte[] generateLabel(long shipmentId) {
+    public byte[] generateLabel(String shipmentId) {
         Shipment shipment = shipmentService.getEntityById(shipmentId);
         byte[] data = null;
         try {

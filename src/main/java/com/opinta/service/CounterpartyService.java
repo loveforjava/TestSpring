@@ -10,7 +10,7 @@ public interface CounterpartyService {
 
     List<Counterparty> getAllEntities();
 
-    Counterparty getEntityById(long id);
+    Counterparty getEntityById(String id);
 
     List<Counterparty> getEntityByPostcodePool(PostcodePool postcodePool);
 
@@ -18,11 +18,11 @@ public interface CounterpartyService {
     
     List<CounterpartyDto> getAll();
     
-    CounterpartyDto getById(long id);
+    CounterpartyDto getById(String id);
     
-    CounterpartyDto update(long id, CounterpartyDto source);
+    CounterpartyDto update(String id, CounterpartyDto source);
     
     CounterpartyDto save(CounterpartyDto counterparty);
     
-    boolean delete(long id);
+    boolean delete(String id);
 }

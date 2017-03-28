@@ -54,8 +54,8 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public Shipment getEntityById(long id) {
-        log.info("Getting postcodePool by id {}", id);
+    public Shipment getEntityById(String id) {
+        log.info("Getting postcodePool by uuid {}", id);
         return shipmentDao.getById(id);
     }
 
@@ -74,7 +74,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public List<ShipmentDto> getAllByClientId(long clientId) {
+    public List<ShipmentDto> getAllByClientId(String clientId) {
         Client client = clientDao.getById(clientId);
         if (client == null) {
             log.debug("Can't get shipment list by client. Client {} doesn't exist", clientId);
@@ -86,13 +86,14 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public ShipmentDto getById(long id) {
+    public ShipmentDto getById(String id) {
         return shipmentMapper.toDto(getEntityById(id));
     }
 
     @Override
     @Transactional
     public ShipmentDto save(ShipmentDto shipmentDto) {
+        log.info("saving new Shipment for Client: " + shipmentDto.getSenderId());
         Client existingClient = clientDao.getById(shipmentDto.getSenderId());
         Counterparty counterparty = existingClient.getCounterparty();
         PostcodePool postcodePool = counterparty.getPostcodePool();
@@ -102,8 +103,8 @@ public class ShipmentServiceImpl implements ShipmentService {
         shipment.setBarcode(newBarcode);
         log.info("Saving shipment with assigned barcode", shipmentMapper.toDto(shipment));
 
-        shipment.setSender(clientDao.getById(shipment.getSender().getId()));
-        shipment.setRecipient(clientDao.getById(shipment.getRecipient().getId()));
+        shipment.setSender(clientDao.getById(shipment.getSender().getUuid()));
+        shipment.setRecipient(clientDao.getById(shipment.getRecipient().getUuid()));
         shipment.setPrice(calculatePrice(shipment));
 
         return shipmentMapper.toDto(shipmentDao.save(shipment));
@@ -111,7 +112,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public ShipmentDto update(long id, ShipmentDto shipmentDto) {
+    public ShipmentDto update(String id, ShipmentDto shipmentDto) {
         Shipment source = shipmentMapper.toEntity(shipmentDto);
         Shipment target = shipmentDao.getById(id);
         if (target == null) {
@@ -123,7 +124,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         } catch (Exception e) {
             log.error("Can't get properties from object to updatable object for shipment", e);
         }
-        target.setId(id);
+        target.setUuid(id);
         target.setPrice(calculatePrice(target));
         log.info("Updating shipment {}", target);
         shipmentDao.update(target);
@@ -132,13 +133,13 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public boolean delete(long id) {
+    public boolean delete(String id) {
         Shipment shipment = shipmentDao.getById(id);
         if (shipment == null) {
             log.debug("Can't delete shipment. Shipment doesn't exist {}", id);
             return false;
         }
-        shipment.setId(id);
+        shipment.setUuid(id);
         log.info("Deleting shipment {}", shipment);
         shipmentDao.delete(shipment);
         return true;

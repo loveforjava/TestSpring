@@ -15,7 +15,7 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode
 public class CounterpartyDto {
-    private long id;
+    private String id;
     @Size(max = 255)
     private String name;
     private long postcodePoolId;

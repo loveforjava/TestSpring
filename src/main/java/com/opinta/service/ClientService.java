@@ -9,19 +9,19 @@ public interface ClientService {
 
     List<Client> getAllEntities();
 
-    Client getEntityById(long id);
+    Client getEntityById(String id);
 
     Client saveEntity(Client client);
     
     List<ClientDto> getAll();
 
-    List<ClientDto> getAllByCounterpartyId(long counterpartyId);
+    List<ClientDto> getAllByCounterpartyId(String counterpartyId);
 
-    ClientDto getById(long id);
+    ClientDto getById(String id);
     
-    ClientDto update(long id, ClientDto source);
+    ClientDto update(String id, ClientDto source);
     
-    boolean delete(long id);
+    boolean delete(String id);
     
     ClientDto save(ClientDto client);
 }

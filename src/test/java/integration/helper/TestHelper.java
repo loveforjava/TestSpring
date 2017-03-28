@@ -45,9 +45,9 @@ public class TestHelper {
     }
 
     public void deleteShipment(Shipment shipment) {
-        shipmentService.delete(shipment.getId());
-        clientService.delete(shipment.getSender().getId());
-        clientService.delete(shipment.getRecipient().getId());
+        shipmentService.delete(shipment.getUuid());
+        clientService.delete(shipment.getSender().getUuid());
+        clientService.delete(shipment.getRecipient().getUuid());
     }
 
     public Client createClient() {
@@ -56,7 +56,7 @@ public class TestHelper {
     }
 
     public void deleteClient(Client client) {
-        clientService.delete(client.getId());
+        clientService.delete(client.getUuid());
         addressService.delete(client.getAddress().getId());
         deleteCounterpartyWithPostcodePool(client.getCounterparty());
     }
@@ -77,7 +77,7 @@ public class TestHelper {
     }
 
     public void deleteCounterpartyWithPostcodePool(Counterparty counterparty) {
-        counterpartyService.delete(counterparty.getId());
+        counterpartyService.delete(counterparty.getUuid());
         postcodePoolService.delete(counterparty.getPostcodePool().getId());
     }
 

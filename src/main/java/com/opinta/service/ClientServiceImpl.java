@@ -40,8 +40,8 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public Client getEntityById(long id) {
-        log.info("Getting address by id {}", id);
+    public Client getEntityById(String id) {
+        log.info("Getting address by uuid {}", id);
         return clientDao.getById(id);
     }
 
@@ -62,7 +62,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public List<ClientDto> getAllByCounterpartyId(long counterpartyId) {
+    public List<ClientDto> getAllByCounterpartyId(String counterpartyId) {
         Counterparty counterparty = counterpartyDao.getById(counterpartyId);
         if (counterparty == null) {
             log.debug("Can't get client list by counterparty. Counterparty {} doesn't exist", counterpartyId);
@@ -74,8 +74,8 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public ClientDto getById(long id) {
-        log.info("Getting client by id {}", id);
+    public ClientDto getById(String id) {
+        log.info("Getting client by uuid {}", id);
         Client client = clientDao.getById(id);
         return clientMapper.toDto(client);
     }
@@ -86,12 +86,15 @@ public class ClientServiceImpl implements ClientService {
         log.info("Saving client {}", clientDto);
         Client client = clientMapper.toEntity(clientDto);
         client = clientDao.save(client);
-        return clientMapper.toDto(client);
+        log.info("saved Client uuid: " + client.getUuid());
+        clientDto = clientMapper.toDto(client);
+        log.info("saved ClientDto uuid: " + client.getUuid());
+        return clientDto;
     }
 
     @Override
     @Transactional
-    public ClientDto update(long id, ClientDto clientDto) {
+    public ClientDto update(String id, ClientDto clientDto) {
         Client source = clientMapper.toEntity(clientDto);
         Client target = clientDao.getById(id);
         if (target == null) {
@@ -103,7 +106,7 @@ public class ClientServiceImpl implements ClientService {
         } catch (Exception e) {
             log.error("Can't get properties from object to updatable object for client", e);
         }
-        target.setId(id);
+        target.setUuid(id);
         log.info("Updating client {}", target);
         clientDao.update(target);
         return clientMapper.toDto(target);
@@ -111,7 +114,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public boolean delete(long id) {
+    public boolean delete(String id) {
         Client client = clientDao.getById(id);
         if (client == null) {
             log.debug("Can't delete client. Client doesn't exist " + id);

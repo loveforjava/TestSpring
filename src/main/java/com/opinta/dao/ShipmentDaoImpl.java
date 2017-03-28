@@ -40,7 +40,7 @@ public class ShipmentDaoImpl implements ShipmentDao {
     }
 
     @Override
-    public Shipment getById(long id) {
+    public Shipment getById(String id) {
         Session session = sessionFactory.getCurrentSession();
         return (Shipment) session.get(Shipment.class, id);
     }
@@ -48,7 +48,9 @@ public class ShipmentDaoImpl implements ShipmentDao {
     @Override
     public Shipment save(Shipment shipment) {
         Session session = sessionFactory.getCurrentSession();
-        return (Shipment) session.merge(shipment);
+        Shipment saved = (Shipment) session.merge(shipment);
+        session.flush();
+        return saved;
     }
 
     @Override

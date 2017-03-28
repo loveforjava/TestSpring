@@ -18,6 +18,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -32,6 +33,7 @@ public class PDFGeneratorServiceTest {
 
     private PDFGeneratorService pdfGeneratorService;
     private Shipment shipment;
+    private String shipmentId;
 
     @Before
     public void setUp() throws Exception {
@@ -46,23 +48,24 @@ public class PDFGeneratorServiceTest {
         Client recipient = new Client("Petrov PP", "002", recipientAddress, counterparty);
         shipment = new Shipment(sender, recipient, DeliveryType.W2W, 1, 1,
                 new BigDecimal("12.5"), new BigDecimal("2.5"), new BigDecimal("15.25"));
+        shipmentId = UUID.randomUUID().toString();
     }
 
     @Test
     public void generateLabel_and_generatePostpay_ShouldReturnNotEmptyFile() {
-        when(shipmentService.getEntityById(1L)).thenReturn(shipment);
+        when(shipmentService.getEntityById(shipmentId)).thenReturn(shipment);
         assertNotEquals("PDFGenerator returned an empty label",
-                pdfGeneratorService.generateLabel(1L).length, 0);
+                pdfGeneratorService.generateLabel(shipmentId).length, 0);
         assertNotEquals("PDFGenerator returned an empty postpay form",
-                pdfGeneratorService.generateLabel(1L).length, 0);
-        verify(shipmentService, atLeast(2)).getEntityById(1L);
+                pdfGeneratorService.generateLabel(shipmentId).length, 0);
+        verify(shipmentService, atLeast(2)).getEntityById(shipmentId);
     }
 
     @Test
     public void generateLabel_ShouldReturnValidAcroForms() throws Exception {
-        when(shipmentService.getEntityById(1L)).thenReturn(shipment);
+        when(shipmentService.getEntityById(shipmentId)).thenReturn(shipment);
 
-        byte[] labelForm = pdfGeneratorService.generateLabel(1L);
+        byte[] labelForm = pdfGeneratorService.generateLabel(shipmentId);
 
         PDAcroForm acroForm = getAcroFormFromPdfFile(labelForm);
 
@@ -96,14 +99,14 @@ public class PDFGeneratorServiceTest {
         field = (PDTextField) acroForm.getField("totalCost");
         assertEquals("Expected totalCost to be 15", field.getValue(), "15.25");
 
-        verify(shipmentService).getEntityById(1L);
+        verify(shipmentService).getEntityById(shipmentId);
     }
 
     @Test
     public void generatePostpay_ShouldReturnValidAcroForms() throws Exception {
-        when(shipmentService.getEntityById(1L)).thenReturn(shipment);
+        when(shipmentService.getEntityById(shipmentId)).thenReturn(shipment);
 
-        byte[] postpayForm = pdfGeneratorService.generatePostpay(1L);
+        byte[] postpayForm = pdfGeneratorService.generatePostpay(shipmentId);
 
         PDAcroForm acroForm = getAcroFormFromPdfFile(postpayForm);
 
@@ -128,7 +131,7 @@ public class PDFGeneratorServiceTest {
         field = (PDTextField) acroForm.getField("priceKopiyky");
         assertEquals("Expected priceKopiyky to be 25", field.getValue(), "25");
 
-        verify(shipmentService).getEntityById(1L);
+        verify(shipmentService).getEntityById(shipmentId);
     }
 
     private PDAcroForm getAcroFormFromPdfFile(byte[] postpayForm) throws IOException {

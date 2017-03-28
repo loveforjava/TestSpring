@@ -11,7 +11,7 @@ public interface ShipmentDao {
 
     List<Shipment> getAllByClient(Client client);
 
-    Shipment getById(long id);
+    Shipment getById(String id);
 
     Shipment save(Shipment shipment);
 

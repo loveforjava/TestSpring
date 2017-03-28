@@ -12,7 +12,7 @@ public interface ClientDao {
 
     List<Client> getAllByCounterparty(Counterparty counterparty);
 
-    Client getById(long id);
+    Client getById(String id);
 
     Client save(Client client);
 

@@ -35,7 +35,7 @@ public class ShipmentTrackingDetailServiceImpl implements ShipmentTrackingDetail
     @Override
     @Transactional
     public ShipmentTrackingDetailDto getById(long id) {
-        log.info("Getting shipmentTrackingDetail by id {}", id);
+        log.info("Getting shipmentTrackingDetail by uuid {}", id);
         return shipmentTrackingDetailMapper.toDto(shipmentTrackingDetailDao.getById(id));
     }
 

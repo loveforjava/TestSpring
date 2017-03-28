@@ -10,7 +10,7 @@ public interface CounterpartyDao {
     
     List<Counterparty> getAll();
     
-    Counterparty getById(long id);
+    Counterparty getById(String id);
 
     List<Counterparty> getByPostcodePool(PostcodePool postcodePool);
 

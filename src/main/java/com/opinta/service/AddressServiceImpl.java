@@ -36,7 +36,7 @@ public class AddressServiceImpl implements AddressService {
     @Override
     @Transactional
     public Address getEntityById(long id) {
-        log.info("Getting address by id {}", id);
+        log.info("Getting address by uuid {}", id);
         return addressDao.getById(id);
     }
 

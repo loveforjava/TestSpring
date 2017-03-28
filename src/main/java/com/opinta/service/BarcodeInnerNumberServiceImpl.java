@@ -54,7 +54,7 @@ public class BarcodeInnerNumberServiceImpl implements BarcodeInnerNumberService 
     @Override
     @Transactional
     public BarcodeInnerNumberDto getById(long id) {
-        log.info("Getting barcodeInnerNumber by id {}", id);
+        log.info("Getting barcodeInnerNumber by uuid {}", id);
         return barcodeInnerNumberMapper.toDto(barcodeInnerNumberDao.getById(id));
     }
     

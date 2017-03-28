@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
@@ -42,6 +43,7 @@ import com.opinta.service.PostOfficeService;
 import com.opinta.service.PostcodePoolService;
 import com.opinta.service.ShipmentService;
 import com.opinta.service.CounterpartyService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,6 +51,7 @@ import static com.opinta.entity.BarcodeStatus.RESERVED;
 import static com.opinta.entity.BarcodeStatus.USED;
 
 @Service
+@Slf4j
 public class InitDbService {
     private BarcodeInnerNumberService barcodeInnerNumberService;
     private PostcodePoolService postcodePoolService;
@@ -134,26 +137,45 @@ public class InitDbService {
         counterpartyDto = counterpartyService.save(counterpartyDto);
         counterparty = counterpartyMapper.toEntity(counterpartyDto);
         List<Client> clients = new ArrayList<>();
-        List<Client> clientsSaved = new ArrayList<>();
         clients.add(new Client("FOP Ivanov", "001",
                 addressMapper.toEntity(addressesSaved.get(0)), counterparty));
         clients.add(new Client("Petrov PP", "002",
                 addressMapper.toEntity(addressesSaved.get(1)), counterparty));
-        clients.forEach((Client client) ->
-            clientsSaved.add(this.clientMapper.toEntity(clientService.save(this.clientMapper.toDto(client))))
-        );
+        clients.forEach((client) -> {
+            log.info("saving client: " + client);
+        });
+        List<Client> clientsSaved = clients
+                .stream()
+                .map(client -> clientMapper.toDto(client))
+                .map(clientDto -> clientService.save(clientDto))
+                .map(clientDto -> clientMapper.toEntity(clientDto))
+                .collect(Collectors.toList());
 
         // create Shipment
-        List<ShipmentDto> shipmentsSaved = new ArrayList<>();
-        Shipment shipment = new Shipment(clientsSaved.get(0), clientsSaved.get(1), DeliveryType.W2W, 1, 1,
+        List<Shipment> shipments = new ArrayList<>();
+        Shipment shipment1 = new Shipment(clientsSaved.get(0), clientsSaved.get(1), DeliveryType.W2W, 1, 1,
                 new BigDecimal("12.5"), new BigDecimal("2.5"), new BigDecimal("15"));
-        shipmentsSaved.add(shipmentService.save(shipmentMapper.toDto(shipment)));
-        shipment = new Shipment(clientsSaved.get(0), clientsSaved.get(0), DeliveryType.W2D, 2, 2,
+        Shipment shipment2 = new Shipment(clientsSaved.get(0), clientsSaved.get(0), DeliveryType.W2D, 2, 2,
                 new BigDecimal("19.5"), new BigDecimal("0.5"), new BigDecimal("20.5"));
-        shipmentsSaved.add(shipmentService.save(shipmentMapper.toDto(shipment)));
-        shipment = new Shipment(clientsSaved.get(1), clientsSaved.get(0), DeliveryType.D2D, 3, 3,
+        Shipment shipment3 = new Shipment(clientsSaved.get(1), clientsSaved.get(0), DeliveryType.D2D, 3, 3,
                 new BigDecimal("8.5"), new BigDecimal("2.25"), new BigDecimal("13.5"));
-        shipmentsSaved.add(shipmentService.save(shipmentMapper.toDto(shipment)));
+    
+        shipments.add(shipment1);
+        shipments.add(shipment2);
+        shipments.add(shipment3);
+        
+        shipments.forEach(shipm -> log.info("created shipment: " + shipm));
+    
+        List<ShipmentDto> converted = shipments
+                .stream()
+                .map(shipm -> shipmentMapper.toDto(shipm))
+                .peek(shipmDto -> log.info("converted shipment: " + shipmDto))
+                .collect(Collectors.toList());
+        
+        List<ShipmentDto> shipmentsSaved = converted
+                .stream()
+                .map(shipmDto -> shipmentService.save(shipmDto))
+                .collect(Collectors.toList());
 
         // create PostOffice
         PostcodePoolDto postcodePoolDto2 = postcodePoolMapper.toDto(new PostcodePool("00002", false));

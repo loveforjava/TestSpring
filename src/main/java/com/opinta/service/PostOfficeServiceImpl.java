@@ -34,7 +34,7 @@ public class PostOfficeServiceImpl implements PostOfficeService {
     @Override
     @Transactional
     public PostOffice getEntityById(long id) {
-        log.info("Getting client by id {}", id);
+        log.info("Getting client by uuid {}", id);
         return postOfficeDao.getById(id);
     }
 

@@ -32,7 +32,7 @@ public class CounterpartyDaoImpl implements CounterpartyDao {
     }
 
     @Override
-    public Counterparty getById(long id) {
+    public Counterparty getById(String id) {
         Session session = this.sessionFactory.getCurrentSession();
         return (Counterparty) session.get(Counterparty.class, id);
     }
@@ -50,7 +50,10 @@ public class CounterpartyDaoImpl implements CounterpartyDao {
     @Override
     public Counterparty save(Counterparty counterparty) {
         Session session = this.sessionFactory.getCurrentSession();
-        return (Counterparty) session.merge(counterparty);
+        Counterparty saved = (Counterparty) session.merge(counterparty);
+        session.flush();
+        log.info("saved Counterparty UUID: " + saved.getUuid());
+        return saved;
     }
 
     @Override

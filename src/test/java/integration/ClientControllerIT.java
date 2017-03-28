@@ -5,9 +5,11 @@ import com.opinta.dto.ClientDto;
 import com.opinta.entity.Client;
 import com.opinta.mapper.ClientMapper;
 import com.opinta.service.ClientService;
+import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,14 +17,15 @@ import integration.helper.TestHelper;
 
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
-import static java.lang.Integer.MIN_VALUE;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.CoreMatchers.equalTo;
 
+@Slf4j
 public class ClientControllerIT extends BaseControllerIT {
     private Client client;
-    private int clientId = MIN_VALUE;
+    private String clientId = "";
+    private String anotherClientId = "";
     @Autowired
     private ClientService clientService;
     @Autowired
@@ -33,7 +36,10 @@ public class ClientControllerIT extends BaseControllerIT {
     @Before
     public void setUp() throws Exception {
         client = testHelper.createClient();
-        clientId = (int) client.getId();
+        clientId = client.getUuid();
+        log.info("client UUID: " + clientId);
+        anotherClientId = super.anotherUuid(clientId);
+        log.info("another client UUID: " + anotherClientId);
     }
 
     @After
@@ -61,7 +67,7 @@ public class ClientControllerIT extends BaseControllerIT {
     @Test
     public void getClient_notFound() throws Exception {
         when().
-                get("/clients/{id}", clientId + 1).
+                get("/clients/{id}", anotherClientId).
         then().
                 statusCode(SC_NOT_FOUND);
     }
@@ -71,11 +77,11 @@ public class ClientControllerIT extends BaseControllerIT {
     public void createClient() throws Exception {
         // create
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/client.json");
-        jsonObject.put("counterpartyId", (int) testHelper.createCounterparty().getId());
+        jsonObject.put("counterpartyId", testHelper.createCounterparty().getUuid());
         jsonObject.put("addressId", (int) testHelper.createAddress().getId());
         String expectedJson = jsonObject.toString();
 
-        int newClientId =
+        String newClientId =
                 given().
                         contentType("application/json;charset=UTF-8").
                         body(expectedJson).
@@ -101,7 +107,7 @@ public class ClientControllerIT extends BaseControllerIT {
     public void updateClient() throws Exception {
         // update
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/client.json");
-        jsonObject.put("counterpartyId", (int) testHelper.createCounterparty().getId());
+        jsonObject.put("counterpartyId", testHelper.createCounterparty().getUuid());
         jsonObject.put("addressId", (int) testHelper.createAddress().getId());
         String expectedJson = jsonObject.toString();
 
@@ -132,7 +138,7 @@ public class ClientControllerIT extends BaseControllerIT {
     @Test
     public void deleteClient_notFound() throws Exception {
         when().
-                delete("/clients/{id}", clientId + 1).
+                delete("/clients/{id}", anotherClientId).
         then().
                 statusCode(SC_NOT_FOUND);
     }
