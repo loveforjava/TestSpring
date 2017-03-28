@@ -15,18 +15,26 @@ import java.math.BigDecimal;
 
 @Component
 public class TestHelper {
+    private final ClientService clientService;
+    private final AddressService addressService;
+    private final CounterpartyService counterpartyService;
+    private final PostcodePoolService postcodePoolService;
+    private final ShipmentService shipmentService;
+    private final PostOfficeService postOfficeService;
+    private final PhoneService phoneService;
+
     @Autowired
-    private ClientService clientService;
-    @Autowired
-    private AddressService addressService;
-    @Autowired
-    private CounterpartyService counterpartyService;
-    @Autowired
-    private PostcodePoolService postcodePoolService;
-    @Autowired
-    private ShipmentService shipmentService;
-    @Autowired
-    private PostOfficeService postOfficeService;
+    public TestHelper(ClientService clientService, AddressService addressService,
+                      CounterpartyService counterpartyService, PostcodePoolService postcodePoolService,
+                      ShipmentService shipmentService, PostOfficeService postOfficeService, PhoneService phoneService) {
+        this.clientService = clientService;
+        this.addressService = addressService;
+        this.counterpartyService = counterpartyService;
+        this.postcodePoolService = postcodePoolService;
+        this.shipmentService = shipmentService;
+        this.postOfficeService = postOfficeService;
+        this.phoneService = phoneService;
+    }
 
     public PostOffice createPostOffice() {
         PostOffice postOffice = new PostOffice("Lviv post office", createAddress(), createPostcodePool());
@@ -51,7 +59,7 @@ public class TestHelper {
     }
 
     public Client createClient() {
-        Client newClient = new Client("FOP Ivanov", "001", createAddress(), createCounterparty());
+        Client newClient = new Client("FOP Ivanov", "001", createAddress(), createPhone(), createCounterparty());
         return clientService.saveEntity(newClient);
     }
 
@@ -59,6 +67,10 @@ public class TestHelper {
         clientService.delete(client.getId());
         addressService.delete(client.getAddress().getId());
         deleteCounterpartyWithPostcodePool(client.getCounterparty());
+    }
+
+    private Phone createPhone() {
+        return phoneService.saveEntity(new Phone("0934314522"));
     }
 
     public Address createAddress() {

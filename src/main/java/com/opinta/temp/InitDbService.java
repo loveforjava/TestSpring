@@ -3,6 +3,7 @@ package com.opinta.temp;
 import com.opinta.dto.PostOfficeDto;
 import com.opinta.dto.ShipmentDto;
 import com.opinta.entity.Counterparty;
+import com.opinta.entity.Phone;
 import com.opinta.mapper.ShipmentTrackingDetailMapper;
 import com.opinta.entity.ShipmentStatus;
 import com.opinta.entity.ShipmentTrackingDetail;
@@ -122,8 +123,13 @@ public class InitDbService {
         List<AddressDto> addresses = new ArrayList<>();
         List<AddressDto> addressesSaved = new ArrayList<>();
         addresses.add(addressMapper.toDto(new Address("00001", "Ternopil", "Monastiriska", "Monastiriska", "Sadova", "51", "")));
-        addresses.add(addressMapper.toDto(new Address("00002", "Kiev", "", "Kiev", "Khreschatik", "121", "37")));
+        addresses.add(addressMapper.toDto(new Address("00002", "Kiev", "Kiev", "Kiev", "Khreschatik", "121", "37")));
         addresses.forEach((AddressDto addressDto) -> addressesSaved.add(addressService.save(addressDto)));
+
+        // create Phone
+        Phone phone = new Phone("0934314522");
+        Phone phoneReserved = new Phone("0954623442");
+
 
         // create Client with Counterparty
         PostcodePoolDto postcodePoolDto1 = postcodePoolMapper.toDto(new PostcodePool("00003", false));
@@ -136,11 +142,16 @@ public class InitDbService {
         List<Client> clients = new ArrayList<>();
         List<Client> clientsSaved = new ArrayList<>();
         clients.add(new Client("FOP Ivanov", "001",
-                addressMapper.toEntity(addressesSaved.get(0)), counterparty));
+                addressMapper.toEntity(addressesSaved.get(0)), phone, counterparty));
         clients.add(new Client("Petrov PP", "002",
-                addressMapper.toEntity(addressesSaved.get(1)), counterparty));
-        clients.forEach((Client client) ->
-            clientsSaved.add(this.clientMapper.toEntity(clientService.save(this.clientMapper.toDto(client))))
+                addressMapper.toEntity(addressesSaved.get(1)), phoneReserved, counterparty));
+        clients.forEach((Client client) -> {
+                    try {
+                        clientsSaved.add(this.clientMapper.toEntity(clientService.save(this.clientMapper.toDto(client))));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
         );
 
         // create Shipment

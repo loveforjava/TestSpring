@@ -88,6 +88,7 @@ public class BarcodeInnerNumberServiceImpl implements BarcodeInnerNumberService 
             copyProperties(target, source);
         } catch (Exception e) {
             log.error("Can't get properties from object to updatable object for barcodeInnerNumber", e);
+            return null;
         }
         target.setId(id);
         log.info("Updating barcodeInnerNumber {}", target);
