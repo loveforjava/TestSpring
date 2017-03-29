@@ -14,7 +14,7 @@ public interface ClientMapper extends BaseMapper<ClientDto, Client> {
     @Mappings({
             @Mapping(source = "address.id", target = "addressId"),
             @Mapping(source = "counterparty.id", target = "counterpartyId"),
-            @Mapping(source = "phone.phoneNumber", target = "phoneNumber"),})
+            @Mapping(source = "phone.phoneNumber", target = "phoneNumber")})
     ClientDto toDto(Client client);
     
     @Override

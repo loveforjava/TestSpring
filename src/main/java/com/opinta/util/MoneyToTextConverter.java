@@ -46,52 +46,52 @@ public class MoneyToTextConverter {
         segments.add(hryvnas_temp);
         Collections.reverse(segments);
         // Analyzing segments
-        String o = "";
+        String output = "";
         if (hryvnasLong == 0) {// if zero
-            o = "нуль " + morph(0, forms[1][0], forms[1][1], forms[1][2]);
+            output = "нуль " + morph(0, forms[1][0], forms[1][1], forms[1][2]);
             if (stripKopiyky)
-                return o;
+                return output;
             else
-                return o + " " + kopiykyLong + " " + morph(kopiykyLong, forms[0][0], forms[0][1], forms[0][2]);
+                return output + " " + kopiykyLong + " " + morph(kopiykyLong, forms[0][0], forms[0][1], forms[0][2]);
         }
         // More than zero
         int lev = segments.size();
         for (int i = 0; i < segments.size(); i++) {// looking on segments
-            int ri = Integer.valueOf(segments.get(i).toString());// current segment
-            if (ri == 0 && lev > 1) {// is segment ==0 and not the last level
+            int currentSegment = Integer.valueOf(segments.get(i).toString());// current segment
+            if (currentSegment == 0 && lev > 1) {// is segment ==0 and not the last level
                 lev--;
                 continue;
             }
-            String rs = String.valueOf(ri); // number in line
+            String rs = String.valueOf(currentSegment); // number in line
             // Normalize
             if (rs.length() == 1) rs = "00" + rs;// two zeros into the prefix
             if (rs.length() == 2) rs = "0" + rs; // or one
             // getting digits for analyzing
-            int r1 = Integer.valueOf(rs.substring(0, 1)); //first
-            int r2 = Integer.valueOf(rs.substring(1, 2)); //second
-            int r3 = Integer.valueOf(rs.substring(2, 3)); //third
-            int r22 = Integer.valueOf(rs.substring(1, 3)); //second and third
+            int firstDigit = Integer.valueOf(rs.substring(0, 1)); //first
+            int secondDigit = Integer.valueOf(rs.substring(1, 2)); //second
+            int thirdDigit = Integer.valueOf(rs.substring(2, 3)); //third
+            int secondAndThirdDigits = Integer.valueOf(rs.substring(1, 3)); //second and third
             // Analyze digits
-            if (ri > 99) o += str100[r1] + " "; // hundreds
-            if (r22 > 20) {// >20
-                o += str10[r2] + " ";
-                o += strBase[r3] + " ";
+            if (currentSegment > 99) output += str100[firstDigit] + " "; // hundreds
+            if (secondAndThirdDigits > 20) {// >20
+                output += str10[secondDigit] + " ";
+                output += strBase[thirdDigit] + " ";
             } else { // <=20
-                if (r22 > 9) o += str11[r22 - 9] + " "; // 10-20
-                else o += strBase[r3] + " "; // 0-9
+                if (secondAndThirdDigits > 9) output += str11[secondAndThirdDigits - 9] + " "; // 10-20
+                else output += strBase[thirdDigit] + " "; // 0-9
             }
             // Units of measure
-            o += morph(ri, forms[lev][0], forms[lev][1], forms[lev][2]) + " ";
+            output += morph(currentSegment, forms[lev][0], forms[lev][1], forms[lev][2]) + " ";
             lev--;
         }
         // Kopiyky numerical value
         if (stripKopiyky) {
-            o = o.replaceAll(" {2,}", " ");
+            output = output.replaceAll(" {2,}", " ");
         } else {
-            o = o + "" + kopiykyString + " " + morph(kopiykyLong, forms[0][0], forms[0][1], forms[0][2]);
-            o = o.replaceAll(" {2,}", " ");
+            output = output + "" + kopiykyString + " " + morph(kopiykyLong, forms[0][0], forms[0][1], forms[0][2]);
+            output = output.replaceAll(" {2,}", " ");
         }
-        return o;
+        return output;
     }
 
     private static String morph(long n, String f1, String f2, String f5) {

@@ -91,7 +91,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
                     .getFile());
             template = PDDocument.load(templateFile);
             PDAcroForm acroForm = template.getDocumentCatalog().getAcroForm();
-
+            //Getting font from the file
             File fontFile = new File(getClass()
                     .getClassLoader()
                     .getResource(FONT)
@@ -100,6 +100,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             if (res == null) {
                 res = new PDResources();
             }
+            //Adding font to the acro form's resources
             InputStream fontStream = new FileInputStream(fontFile);
             PDType0Font font = PDType0Font.load(template, fontStream);
             fontName = res.add(font).getName();
@@ -121,9 +122,11 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             String priceInText = moneyToTextConverter.convert(postPay, false);
             //Populating text field for the price
             populateField(acroForm, field, "priceInText", priceInText);
-
+            
+            //Removing acrofields
             acroForm.flatten();
 
+            //Saving PDF to byte array
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             template.save(outputStream);
             data = outputStream.toByteArray();
@@ -145,7 +148,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
                     .getFile());
             template = PDDocument.load(templateFile);
             PDAcroForm acroForm = template.getDocumentCatalog().getAcroForm();
-
+            //Getting font from the file
             File fontFile = new File(getClass()
                     .getClassLoader()
                     .getResource(FONT)
@@ -154,11 +157,11 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             if (res == null) {
                 res = new PDResources();
             }
+            //Adding font to the acro form's resources
             InputStream fontStream = new FileInputStream(fontFile);
             PDType0Font font = PDType0Font.load(template, fontStream);
             fontName = res.add(font).getName();
             acroForm.setDefaultResources(res);
-
 
             //Populating client data
             generateClientsData(shipment, acroForm);
@@ -202,8 +205,10 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             field.setDefaultAppearance(String.format("/%s 14 Tf 0 g", fontName));
             field.setValue(barcode);
 
+            //Removing acrofiels
             acroForm.flatten();
 
+            //Saving PDF to byte array
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             template.save(outputStream);
             data = outputStream.toByteArray();
