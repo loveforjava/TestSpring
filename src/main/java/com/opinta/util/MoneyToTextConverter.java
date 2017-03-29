@@ -24,7 +24,7 @@ public class MoneyToTextConverter {
         // Separating hryvnas and kopiykas
         long hryvnasLong = amount.longValue();
         if(hryvnasLong > 999999999999L) {
-            return String.valueOf(hryvnasLong);
+            return (amount.toPlainString());
         }
         String[] splittedAmount = amount.toString().split("\\.");
         long kopiykyLong = Long.valueOf(splittedAmount[1]);
