@@ -54,6 +54,9 @@ public class ShipmentController {
     @GetMapping("{id}/label-form")
     public ResponseEntity<?> getShipmentLabelForm(@PathVariable("id") long id) {
         byte[] data = pdfGeneratorService.generateLabel(id);
+        if(data == null) {
+            return new ResponseEntity<>(format("No Shipment found for ID %d", id), NOT_FOUND);
+        }
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType("application/pdf"));
         String filename = "labelform" + id + ".pdf";
@@ -65,6 +68,9 @@ public class ShipmentController {
     @GetMapping("{id}/postpay-form")
     public ResponseEntity<?> getShipmentPostpayForm(@PathVariable("id") long id) {
         byte[] data = pdfGeneratorService.generatePostpay(id);
+        if(data == null) {
+            return new ResponseEntity<>(format("No Shipment found for ID %d", id), NOT_FOUND);
+        }
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType("application/pdf"));
         String filename = "postpayform" + id + ".pdf";

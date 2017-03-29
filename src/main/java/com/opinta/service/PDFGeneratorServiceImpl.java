@@ -83,20 +83,14 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
 
                 String[] priceParts = String.valueOf(postPay).split("\\.");
 
-                field = (PDTextField) acroForm.getField("priceHryvnas");
-                field.setValue(priceParts[0]);
-
+                populateField(fontFile, acroForm, field, "priceHryvnas", priceParts[0]);
                 if (priceParts.length > 1) {
-                    field = (PDTextField) acroForm.getField("priceKopiyky");
-                    field.setValue(priceParts[1]);
+                    populateField(fontFile, acroForm, field, "priceKopiyky", priceParts[1]);
                 }
 
                 String priceInText = moneyToTextConverter.convert(postPay, false);
 
                 populateField(fontFile, acroForm, field, "priceInText", priceInText);
-
-                field = (PDTextField) acroForm.getField("priceInText");
-                field.setValue(priceInText);
             }
             acroForm.flatten();
 
@@ -142,20 +136,11 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
                 generateClientsData(fontFile, shipment, acroForm);
 
                 //Populating rest of the fields
-                field = (PDTextField) acroForm.getField("mass");
-                field.setValue(String.valueOf(shipment.getWeight()));
-
-                field = (PDTextField) acroForm.getField("value");
-                field.setValue(String.valueOf(shipment.getDeclaredPrice()));
-
-                field = (PDTextField) acroForm.getField("sendingCost");
-                field.setValue(String.valueOf(shipment.getPrice()));
-
-                field = (PDTextField) acroForm.getField("postPrice");
-                field.setValue(String.valueOf(shipment.getPostPay()));
-
-                field = (PDTextField) acroForm.getField("totalCost");
-                field.setValue(String.valueOf(shipment.getPostPay()));
+                populateField(fontFile, acroForm, field, "mass", String.valueOf(shipment.getWeight()));
+                populateField(fontFile, acroForm, field, "value", String.valueOf(shipment.getDeclaredPrice()));
+                populateField(fontFile, acroForm, field, "sendingCost", String.valueOf(shipment.getPrice()));
+                populateField(fontFile, acroForm, field, "postPrice", String.valueOf(shipment.getPostPay()));
+                populateField(fontFile, acroForm, field, "totalCost", String.valueOf(shipment.getPostPay()));
 
                 //Creating content stream for the page to allow data appending
                 PDPage page = template.getPage(0);
@@ -164,7 +149,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
 
                 //Constructing 12 digits of the barcode
                 String barcode = shipment.getSender().getCounterparty().getPostcodePool().getPostcode() +
-                        shipment.getBarcode().getNumber();
+                        shipment.getBarcode().getInnerNumber();
 
                 //Generating first barcode
                 bitMatrix = new Code128Writer().encode(barcode, BarcodeFormat.CODE_128, 170, 45, null);

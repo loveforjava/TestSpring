@@ -17,12 +17,12 @@ public class BarcodeInnerNumber {
     @GeneratedValue
     private long id;
     @Size(min = 8, max = 8)
-    private String number;
+    private String innerNumber;
     @Enumerated(EnumType.STRING)
     private BarcodeStatus status;
     
     public BarcodeInnerNumber(String number, BarcodeStatus status) {
-        this.number = number;
+        this.innerNumber = number;
         this.status = status;
     }
 }
