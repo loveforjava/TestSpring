@@ -101,7 +101,7 @@ public class InitDbService {
 
     @PostConstruct
     public void init() throws Exception {
-        populateDb();
+//        populateDb();
     }
 
     private void populateDb() throws Exception {
