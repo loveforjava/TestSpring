@@ -22,4 +22,5 @@ public class ClientDto {
     private String uniqueRegistrationNumber;
     private String counterpartyId;
     private long addressId;
+    private String phoneNumber;
 }

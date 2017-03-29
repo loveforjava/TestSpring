@@ -3,6 +3,7 @@ package com.opinta.temp;
 import com.opinta.dto.PostOfficeDto;
 import com.opinta.dto.ShipmentDto;
 import com.opinta.entity.Counterparty;
+import com.opinta.entity.Phone;
 import com.opinta.mapper.ShipmentTrackingDetailMapper;
 import com.opinta.entity.ShipmentStatus;
 import com.opinta.entity.ShipmentTrackingDetail;
@@ -14,6 +15,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -125,8 +127,13 @@ public class InitDbService {
         List<AddressDto> addresses = new ArrayList<>();
         List<AddressDto> addressesSaved = new ArrayList<>();
         addresses.add(addressMapper.toDto(new Address("00001", "Ternopil", "Monastiriska", "Monastiriska", "Sadova", "51", "")));
-        addresses.add(addressMapper.toDto(new Address("00002", "Kiev", "", "Kiev", "Khreschatik", "121", "37")));
+        addresses.add(addressMapper.toDto(new Address("00002", "Kiev", "Kiev", "Kiev", "Khreschatik", "121", "37")));
         addresses.forEach((AddressDto addressDto) -> addressesSaved.add(addressService.save(addressDto)));
+
+        // create Phone
+        Phone phone = new Phone("0934314522");
+        Phone phoneReserved = new Phone("0954623442");
+
 
         // create Client with Counterparty
         PostcodePoolDto postcodePoolDto1 = postcodePoolMapper.toDto(new PostcodePool("00003", false));
@@ -138,16 +145,24 @@ public class InitDbService {
         counterparty = counterpartyMapper.toEntity(counterpartyDto);
         List<Client> clients = new ArrayList<>();
         clients.add(new Client("FOP Ivanov", "001",
-                addressMapper.toEntity(addressesSaved.get(0)), counterparty));
+                addressMapper.toEntity(addressesSaved.get(0)), phone, counterparty));
         clients.add(new Client("Petrov PP", "002",
-                addressMapper.toEntity(addressesSaved.get(1)), counterparty));
+                addressMapper.toEntity(addressesSaved.get(1)), phoneReserved, counterparty));
         clients.forEach((client) -> {
             log.info("saving client: " + client);
         });
         List<Client> clientsSaved = clients
                 .stream()
                 .map(client -> clientMapper.toDto(client))
-                .map(clientDto -> clientService.save(clientDto))
+                .map(clientDto -> {
+                    try {
+                        return clientService.save(clientDto);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
                 .map(clientDto -> clientMapper.toEntity(clientDto))
                 .collect(Collectors.toList());
 

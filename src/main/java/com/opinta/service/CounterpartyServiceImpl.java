@@ -99,6 +99,7 @@ public class CounterpartyServiceImpl implements CounterpartyService {
             copyProperties(target, source);
         } catch (Exception e) {
             log.error("Can't get properties from object to updatable object for counterparty", e);
+            return null;
         }
         target.setUuid(id);
         log.info("Updating counterparty {}", target);

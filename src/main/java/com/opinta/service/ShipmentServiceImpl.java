@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static java.lang.String.format;
 import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 
 @Service
@@ -125,10 +126,29 @@ public class ShipmentServiceImpl implements ShipmentService {
             log.error("Can't get properties from object to updatable object for shipment", e);
         }
         target.setUuid(id);
+        try {
+            fillSenderAndRecipient(target);
+        } catch (IllegalArgumentException e) {
+            log.error("Can't update shipment {}. Sender or recipient doesn't exist", target, e);
+            return null;
+        }
         target.setPrice(calculatePrice(target));
         log.info("Updating shipment {}", target);
         shipmentDao.update(target);
         return shipmentMapper.toDto(target);
+    }
+
+    private void fillSenderAndRecipient(Shipment target) throws IllegalArgumentException {
+        target.setSender(clientDao.getById(target.getSender().getUuid()));
+        target.setRecipient(clientDao.getById(target.getRecipient().getUuid()));
+        if (target.getSender() == null) {
+            throw new IllegalArgumentException(
+                    format("Can't calculate price for shipment %s. Sender doesn't exist", target));
+        }
+        if (target.getRecipient() == null) {
+            throw new IllegalArgumentException(
+                    format("Can't calculate price for shipment %s. Recipient doesn't exist", target));
+        }
     }
 
     @Override
@@ -182,6 +202,14 @@ public class ShipmentServiceImpl implements ShipmentService {
             surcharges += 9;
         } else if (shipment.getDeliveryType().equals(DeliveryType.D2D)) {
             surcharges += 12;
+        }
+        BigDecimal declaredPrice = shipment.getDeclaredPrice();
+        BigDecimal topBound = new BigDecimal("500");
+        if (declaredPrice.compareTo(topBound) == 1) {
+            BigDecimal difference = declaredPrice.subtract(topBound);
+            BigDecimal declaredPriceCharge = difference.multiply(new BigDecimal("0.005"));
+            declaredPriceCharge = declaredPriceCharge.setScale(2, BigDecimal.ROUND_HALF_UP);
+            surcharges += declaredPriceCharge.floatValue();
         }
         return surcharges;
     }

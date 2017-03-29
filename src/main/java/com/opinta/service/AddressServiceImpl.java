@@ -59,6 +59,7 @@ public class AddressServiceImpl implements AddressService {
             copyProperties(target, source);
         } catch (Exception e) {
             log.error("Can't get properties from object to updatable object for address", e);
+            return null;
         }
         target.setId(id);
         log.info("Updating address {}", target);

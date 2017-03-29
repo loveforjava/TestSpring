@@ -19,9 +19,9 @@ public interface ClientService {
 
     ClientDto getById(String id);
     
-    ClientDto update(String id, ClientDto source);
-    
+    ClientDto save(ClientDto client) throws Exception;
+
+    ClientDto update(String id, ClientDto source) throws Exception;
+
     boolean delete(String id);
-    
-    ClientDto save(ClientDto client);
 }
