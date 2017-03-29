@@ -1,6 +1,7 @@
 package com.opinta.dao;
 
 import com.opinta.entity.Counterparty;
+import com.opinta.entity.User;
 import java.util.List;
 
 import com.opinta.entity.Client;
@@ -23,9 +24,11 @@ public class ClientDaoImpl implements ClientDao {
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Client> getAll() {
+    public List<Client> getAll(User user) {
         Session session = sessionFactory.getCurrentSession();
-        return session.createCriteria(Client.class)
+        return session.createCriteria(Client.class, "client")
+                .createCriteria("client.counterparty", "counterparty")
+                .add(Restrictions.eq("counterparty.user", user))
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                 .list();
     }

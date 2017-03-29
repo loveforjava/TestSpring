@@ -3,6 +3,8 @@ package com.opinta.service;
 import com.opinta.entity.Address;
 import com.opinta.entity.Client;
 import com.opinta.entity.Shipment;
+import com.opinta.entity.User;
+import javax.naming.AuthenticationException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
@@ -20,18 +22,24 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
     private static final String PDF_LABEL_TEMPLATE = "pdfTemplate/label-template.pdf";
     private static final String PDF_POSTPAY_TEMPLATE = "pdfTemplate/postpay-template.pdf";
 
-    private ShipmentService shipmentService;
+    private final ShipmentService shipmentService;
+    private final UserService userService;
+
     private PDDocument template;
     private PDTextField field;
 
     @Autowired
-    public PDFGeneratorServiceImpl(ShipmentService shipmentService) {
+    public PDFGeneratorServiceImpl(ShipmentService shipmentService, UserService userService) {
         this.shipmentService = shipmentService;
+        this.userService = userService;
     }
 
     @Override
-    public byte[] generatePostpay(long shipmentId) {
-        Shipment shipment = shipmentService.getEntityById(shipmentId);
+    public byte[] generatePostpay(long shipmentId, User user)  throws AuthenticationException {
+        Shipment shipment = shipmentService.getEntityById(shipmentId, user);
+
+        userService.authorizeForAction(shipment, user);
+
         byte[] data = null;
         try {
             File file = new File(getClass()
@@ -65,8 +73,11 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
     }
 
     @Override
-    public byte[] generateLabel(long shipmentId) {
-        Shipment shipment = shipmentService.getEntityById(shipmentId);
+    public byte[] generateLabel(long shipmentId, User user) throws AuthenticationException {
+        Shipment shipment = shipmentService.getEntityById(shipmentId, user);
+
+        userService.authorizeForAction(shipment, user);
+
         byte[] data = null;
         try {
             File file = new File(getClass()
