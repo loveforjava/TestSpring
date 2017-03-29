@@ -3,6 +3,7 @@ package integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opinta.dto.CounterpartyDto;
 import com.opinta.entity.Counterparty;
+import com.opinta.entity.User;
 import com.opinta.mapper.CounterpartyMapper;
 import com.opinta.service.CounterpartyService;
 import org.json.simple.JSONObject;
@@ -23,6 +24,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 public class CounterpartyControllerIT extends BaseControllerIT {
     private Counterparty counterparty;
     private int counterpartyId = MIN_VALUE;
+    private User user;
 
     @Autowired
     private CounterpartyService counterpartyService;
@@ -35,6 +37,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
     public void setUp() throws Exception {
         counterparty = testHelper.createCounterparty();
         counterpartyId = (int) counterparty.getId();
+        user = counterparty.getUser();
     }
 
     @After
@@ -100,11 +103,12 @@ public class CounterpartyControllerIT extends BaseControllerIT {
     public void updateCounterparty() throws Exception {
         // update
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/counterparty.json");
-        jsonObject.put("postcodePoolId", (int) testHelper.createPostcodePool().getId());
+        jsonObject.put("postcodePoolId", (int) counterparty.getId());
         String expectedJson = jsonObject.toString();
 
         given().
                 contentType("application/json;charset=UTF-8").
+                queryParam("token", user.getToken()).
                 body(expectedJson).
         when().
                 put("/counterparties/{id}", counterpartyId).
@@ -112,8 +116,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
                 statusCode(SC_OK);
 
         // check updated data
-        CounterpartyDto counterpartyDto = counterpartyMapper
-                .toDto(counterpartyService.getEntityById(counterpartyId));
+        CounterpartyDto counterpartyDto = counterpartyMapper.toDto(counterpartyService.getEntityById(counterpartyId));
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(counterpartyDto);
 
@@ -122,6 +125,8 @@ public class CounterpartyControllerIT extends BaseControllerIT {
 
     @Test
     public void deleteCounterparty() throws Exception {
+        given().
+                queryParam("token", user.getToken()).
         when().
                 delete("/counterparties/{id}", counterpartyId).
         then().
@@ -130,6 +135,8 @@ public class CounterpartyControllerIT extends BaseControllerIT {
 
     @Test
     public void deleteCounterparty_notFound() throws Exception {
+        given().
+                queryParam("token", user.getToken()).
         when().
                 delete("/counterparties/{id}", counterpartyId + 1).
         then().

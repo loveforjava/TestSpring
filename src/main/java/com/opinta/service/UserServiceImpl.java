@@ -1,7 +1,6 @@
 package com.opinta.service;
 
 import com.opinta.dao.UserDao;
-import com.opinta.dto.CounterpartyDto;
 import com.opinta.entity.Client;
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.Shipment;
@@ -58,8 +57,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void authorizeForAction(Client client, User user) throws AuthenticationException {
-        if (user == null || client.getCounterparty() == null || client.getCounterparty().getUser().getToken() == null
-                || user.getToken() == null || !client.getCounterparty().getUser().getToken().equals(user.getToken())) {
+        if (user == null || client == null || client.getCounterparty() == null
+                || client.getCounterparty().getUser().getToken() == null || user.getToken() == null
+                || !client.getCounterparty().getUser().getToken().equals(user.getToken())) {
             assert user != null;
             throw new AuthenticationException(format("You are not authorized to perform this action (token: %s)!",
                     user.getToken()));
@@ -68,7 +68,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void authorizeForAction(Shipment shipment, User user) throws AuthenticationException {
-        if (user == null || shipment.getSender().getCounterparty() == null
+        if (user == null || shipment == null || shipment.getSender().getCounterparty() == null
                 || shipment.getSender().getCounterparty().getUser().getToken() == null || user.getToken() == null
                 || !shipment.getSender().getCounterparty().getUser().getToken().equals(user.getToken())) {
             assert user != null;

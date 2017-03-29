@@ -13,6 +13,8 @@ public interface ClientService {
 
     Client getEntityById(long id, User user) throws AuthenticationException;
 
+    Client getEntityByIdAnonymous(long id);
+
     Client saveEntity(Client client, User user) throws Exception;
     
     List<ClientDto> getAll(User user);

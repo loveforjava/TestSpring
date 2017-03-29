@@ -61,8 +61,14 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
+    public Client getEntityByIdAnonymous(long id) {
+        log.info("Getting client by id without token check {}", id);
+        return clientDao.getById(id);
+    }
+
+    @Override
+    @Transactional
     public Client saveEntity(Client client, User user) throws Exception {
-        userService.authorizeForAction(client, user);
         // validate reference fields
         try {
             validateInnerReferenceAndFillObjectFromDB(client);
@@ -71,6 +77,8 @@ public class ClientServiceImpl implements ClientService {
         }
 
         client.setPhone(phoneService.getOrCreateEntityByPhoneNumber(client.getPhone().getPhoneNumber()));
+
+        userService.authorizeForAction(client, user);
 
         log.info("Saving client {}", client);
         return clientDao.save(client);

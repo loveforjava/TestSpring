@@ -112,7 +112,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         userService.authorizeForAction(sender, user);
 
         shipment.setSender(sender);
-        shipment.setRecipient(clientService.getEntityById(shipment.getRecipient().getId(), user));
+        shipment.setRecipient(clientService.getEntityByIdAnonymous(shipment.getRecipient().getId()));
         shipment.setPrice(calculatePrice(shipment));
 
         log.info("Saving shipment with assigned barcode", shipmentMapper.toDto(shipment));
@@ -169,7 +169,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     private void fillSenderAndRecipient(Shipment target, User user) throws Exception {
         target.setSender(clientService.getEntityById(target.getSender().getId(), user));
-        target.setRecipient(clientService.getEntityById(target.getRecipient().getId(), user));
+        target.setRecipient(clientService.getEntityByIdAnonymous(target.getRecipient().getId()));
         if (target.getSender() == null) {
             throw new IllegalArgumentException(
                     format("Can't calculate price for shipment %s. Sender doesn't exist", target));
@@ -193,6 +193,10 @@ public class ShipmentServiceImpl implements ShipmentService {
         }
 
         TariffGrid tariffGrid = tariffGridDao.getLast(w2wVariation);
+        if (tariffGrid == null) {
+            return BigDecimal.ZERO;
+        }
+
         if (shipment.getWeight() < tariffGrid.getWeight() &&
                 shipment.getLength() < tariffGrid.getLength()) {
             tariffGrid = tariffGridDao.getByDimension(shipment.getWeight(), shipment.getLength(), w2wVariation);

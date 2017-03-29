@@ -5,7 +5,8 @@ import com.opinta.service.*;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import javax.naming.AuthenticationException;
+
+import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 
 @Component
+@Slf4j
 public class TestHelper {
     private final ClientService clientService;
     private final AddressService addressService;
@@ -54,9 +56,21 @@ public class TestHelper {
     }
 
     public void deleteShipment(Shipment shipment) throws Exception {
-        shipmentService.delete(shipment.getId(), shipment.getSender().getCounterparty().getUser());
-        clientService.delete(shipment.getSender().getId(), shipment.getSender().getCounterparty().getUser());
-        clientService.delete(shipment.getRecipient().getId(), shipment.getSender().getCounterparty().getUser());
+        try {
+            shipmentService.delete(shipment.getId(), shipment.getSender().getCounterparty().getUser());
+        } catch (Exception e) {
+            log.debug(e.getMessage());
+        }
+        try {
+            clientService.delete(shipment.getSender().getId(), shipment.getSender().getCounterparty().getUser());
+        } catch (Exception e) {
+            log.debug(e.getMessage());
+        }
+        try {
+            clientService.delete(shipment.getRecipient().getId(), shipment.getRecipient().getCounterparty().getUser());
+        } catch (Exception e) {
+            log.debug(e.getMessage());
+        }
     }
 
     public Client createClient() throws Exception {
@@ -66,9 +80,21 @@ public class TestHelper {
     }
 
     public void deleteClient(Client client) throws Exception {
-        clientService.delete(client.getId(), client.getCounterparty().getUser());
-        addressService.delete(client.getAddress().getId());
-        deleteCounterpartyWithPostcodePool(client.getCounterparty());
+        try {
+            clientService.delete(client.getId(), client.getCounterparty().getUser());
+        } catch (Exception e) {
+            log.debug(e.getMessage());
+        }
+        try {
+            addressService.delete(client.getAddress().getId());
+        } catch (Exception e) {
+            log.debug(e.getMessage());
+        }
+        try {
+            deleteCounterpartyWithPostcodePool(client.getCounterparty());
+        } catch (Exception e) {
+            log.debug(e.getMessage());
+        }
     }
 
     private Phone createPhone() {
@@ -91,8 +117,16 @@ public class TestHelper {
     }
 
     public void deleteCounterpartyWithPostcodePool(Counterparty counterparty) throws Exception{
-        counterpartyService.delete(counterparty.getId(), counterparty.getUser());
-        postcodePoolService.delete(counterparty.getPostcodePool().getId());
+        try {
+            counterpartyService.delete(counterparty.getId(), counterparty.getUser());
+        } catch (Exception e) {
+            log.debug(e.getMessage());
+        }
+        try {
+            counterpartyService.delete(counterparty.getId(), counterparty.getUser());
+        } catch (Exception e) {
+            log.debug(e.getMessage());
+        }
     }
 
     public JSONObject getJsonObjectFromFile(String filePath) throws IOException, ParseException {
