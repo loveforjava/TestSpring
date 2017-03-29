@@ -25,7 +25,6 @@ import static java.lang.String.format;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @RequestMapping("/clients")
@@ -64,7 +63,7 @@ public class ClientController {
         return new ResponseEntity<>(shipmentDtos, OK);
     }
     
-    @PostMapping(produces = APPLICATION_JSON_VALUE)
+    @PostMapping
     public ResponseEntity<?> createClient(@RequestBody ClientDto clientDto) {
         try {
             clientDto = clientService.save(clientDto);
