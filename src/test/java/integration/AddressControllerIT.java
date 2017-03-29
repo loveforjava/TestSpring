@@ -20,7 +20,6 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 
-@Ignore
 public class AddressControllerIT extends BaseControllerIT {
     private int addressId = MIN_VALUE;
     @Autowired
