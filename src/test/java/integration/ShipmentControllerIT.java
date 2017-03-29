@@ -98,17 +98,6 @@ public class ShipmentControllerIT extends BaseControllerIT {
         testHelper.deleteShipment(createdShipment);
     }
     
-    @Ignore
-//    Tests run: 7, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 1.548 sec <<< FAILURE! - in integration.ShipmentControllerIT
-//    updateShipment(integration.ShipmentControllerIT)  Time elapsed: 0.251 sec  <<< FAILURE!
-//    java.lang.AssertionError: price
-//    Expected: 33
-//    got: 45.0
-//
-//    at org.skyscreamer.jsonassert.JSONAssert.assertEquals(JSONAssert.java:417)
-//    at org.skyscreamer.jsonassert.JSONAssert.assertEquals(JSONAssert.java:394)
-//    at org.skyscreamer.jsonassert.JSONAssert.assertEquals(JSONAssert.java:336)
-//    at integration.ShipmentControllerIT.updateShipment(ShipmentControllerIT.java:121)
     @Test
     @SuppressWarnings("unchecked")
     public void updateShipment() throws Exception {
@@ -131,7 +120,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(shipmentDto);
 
-        JSONAssert.assertEquals(expectedJson, actualJson, false); // <- fails here, expected 33, got 45.0
+        JSONAssert.assertEquals(expectedJson, actualJson, false);
     }
 
     @Test
