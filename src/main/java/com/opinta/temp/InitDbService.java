@@ -146,7 +146,7 @@ public class InitDbService {
         // create Shipment
         List<ShipmentDto> shipmentsSaved = new ArrayList<>();
         Shipment shipment = new Shipment(clientsSaved.get(0), clientsSaved.get(1), DeliveryType.W2W, 1, 1,
-                new BigDecimal("12.5"), new BigDecimal("2.5"), new BigDecimal("15"));
+                new BigDecimal("12.5"), new BigDecimal("2.5"), new BigDecimal("51291.17"));
         shipmentsSaved.add(shipmentService.save(shipmentMapper.toDto(shipment)));
         shipment = new Shipment(clientsSaved.get(0), clientsSaved.get(0), DeliveryType.W2D, 2, 2,
                 new BigDecimal("19.5"), new BigDecimal("0.5"), new BigDecimal("20.5"));

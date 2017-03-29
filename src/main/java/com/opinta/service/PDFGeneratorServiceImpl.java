@@ -8,6 +8,7 @@ import com.google.zxing.oned.Code128Writer;
 import com.opinta.entity.Address;
 import com.opinta.entity.Client;
 import com.opinta.entity.Shipment;
+import com.opinta.util.MoneyToTextConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -23,6 +24,9 @@ import org.springframework.stereotype.Service;
 
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
 
 @Service
 @Slf4j
@@ -31,15 +35,19 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
     private static final String PDF_POSTPAY_TEMPLATE = "pdfTemplate/postpay-template.pdf";
     private static final String FONT = "fonts/Roboto-Regular.ttf";
 
+    private MoneyToTextConverter moneyToTextConverter;
+
     private ShipmentService shipmentService;
     private PDDocument template;
     private PDTextField field;
+    private String fontName;
 
     private BitMatrix bitMatrix;
 
     @Autowired
     public PDFGeneratorServiceImpl(ShipmentService shipmentService) {
         this.shipmentService = shipmentService;
+        moneyToTextConverter = new MoneyToTextConverter();
     }
 
     @Override
@@ -47,21 +55,33 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         Shipment shipment = shipmentService.getEntityById(shipmentId);
         byte[] data = null;
         try {
-            File file = new File(getClass()
+            //Getting PDF template from the file
+            File templateFile = new File(getClass()
                     .getClassLoader()
                     .getResource(PDF_POSTPAY_TEMPLATE)
                     .getFile());
+            template = PDDocument.load(templateFile);
+            PDAcroForm acroForm = template.getDocumentCatalog().getAcroForm();
+
             File fontFile = new File(getClass()
                     .getClassLoader()
                     .getResource(FONT)
                     .getFile());
-            template = PDDocument.load(file);
-            PDAcroForm acroForm = template.getDocumentCatalog().getAcroForm();
+            PDResources res = acroForm.getDefaultResources();
+            if (res == null) {
+                res = new PDResources();
+            }
+            InputStream fontStream = new FileInputStream(fontFile);
+            PDType0Font font = PDType0Font.load(template, fontStream);
+            fontName = res.add(font).getName();
+            acroForm.setDefaultResources(res);
 
             if (acroForm != null) {
                 generateClientsData(fontFile, shipment, acroForm);
 
-                String[] priceParts = String.valueOf(shipment.getPostPay()).split("\\.");
+                BigDecimal postPay = shipment.getPostPay();
+
+                String[] priceParts = String.valueOf(postPay).split("\\.");
 
                 field = (PDTextField) acroForm.getField("priceHryvnas");
                 field.setValue(priceParts[0]);
@@ -70,7 +90,16 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
                     field = (PDTextField) acroForm.getField("priceKopiyky");
                     field.setValue(priceParts[1]);
                 }
+
+                String priceInText = moneyToTextConverter.convert(postPay, false);
+
+                populateField(fontFile, acroForm, field, "priceInText", priceInText);
+
+                field = (PDTextField) acroForm.getField("priceInText");
+                field.setValue(priceInText);
             }
+            acroForm.flatten();
+
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             template.save(outputStream);
             data = outputStream.toByteArray();
@@ -92,12 +121,21 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
                     .getClassLoader()
                     .getResource(PDF_LABEL_TEMPLATE)
                     .getFile());
+            template = PDDocument.load(templateFile);
+            PDAcroForm acroForm = template.getDocumentCatalog().getAcroForm();
+
             File fontFile = new File(getClass()
                     .getClassLoader()
                     .getResource(FONT)
                     .getFile());
-            template = PDDocument.load(templateFile);
-            PDAcroForm acroForm = template.getDocumentCatalog().getAcroForm();
+            PDResources res = acroForm.getDefaultResources();
+            if (res == null) {
+                res = new PDResources();
+            }
+            InputStream fontStream = new FileInputStream(fontFile);
+            PDType0Font font = PDType0Font.load(template, fontStream);
+            fontName = res.add(font).getName();
+            acroForm.setDefaultResources(res);
 
             if (acroForm != null) {
                 //Populating client data
@@ -146,6 +184,8 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
                 field = (PDTextField) acroForm.getField("barcodeText");
                 field.setValue(barcode);
             }
+            acroForm.flatten();
+
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             template.save(outputStream);
             data = outputStream.toByteArray();
@@ -164,15 +204,9 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
                                PDTextField field, String fieldName, String fieldValue) throws IOException {
         field = (PDTextField) acroForm.getField(fieldName);
 
-        field.setDefaultAppearance("/TiRo 8.64 Tf 0 g");
-        PDResources res = acroForm.getDefaultResources();
-        if (res == null) {
-            res = new PDResources();
-        }
-        InputStream fontStream = new FileInputStream(fontFile);
-        PDType0Font font = PDType0Font.load(template, fontStream);
-        String fontName = res.add(font).getName();
-        acroForm.setDefaultResources(res);
+//        field.setDefaultAppearance("/TiRo 8.64 Tf 0 g");
+
+
         field.setDefaultAppearance(String.format("/%s 8.64 Tf 0 g", fontName));
         field.setValue(fieldValue);
     }
@@ -189,29 +223,12 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         populateField(fontFile, acroForm, field, "recipientName", recipient.getName());
         populateField(fontFile, acroForm, field, "recipientPhone", "+380984122345");
         populateField(fontFile, acroForm, field, "recipientAddress", processAddress(recipient.getAddress()));
-
-//        field = (PDTextField) acroForm.getField("senderPhone");
-//        //TODO: Temporary value! Change later to the phone from the shipment
-//        field.setValue("+380673245212");
-//
-//        field = (PDTextField) acroForm.getField("senderAddress");
-//        field.setValue(processAddress(sender.getAddress()));
-//
-//        field = (PDTextField) acroForm.getField("recipientName");
-//        field.setValue(recipient.getName());
-//
-//        field = (PDTextField) acroForm.getField("recipientPhone");
-//        //TODO: Temporary value! Change later to the phone from the shipment.
-//        field.setValue("+380984122345");
-//
-//        field = (PDTextField) acroForm.getField("recipientAddress");
-//        field.setValue(processAddress(recipient.getAddress()));
     }
 
     private String processAddress(Address address) {
         return address.getStreet() + " st., " +
                 address.getHouseNumber() + ", " +
-                address.getCity() + "\n" +
+                address.getCity() + ", " +
                 address.getPostcode();
     }
 }
