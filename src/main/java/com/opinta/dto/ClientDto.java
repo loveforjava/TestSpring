@@ -20,6 +20,7 @@ public class ClientDto {
     private String name;
     @Size(max = 25)
     private String uniqueRegistrationNumber;
-    private long counterpartyId;
     private long addressId;
+    private String phoneNumber;
+    private long counterpartyId;
 }

@@ -13,12 +13,14 @@ public interface ClientMapper extends BaseMapper<ClientDto, Client> {
     @Override
     @Mappings({
             @Mapping(source = "address.id", target = "addressId"),
-            @Mapping(source = "counterparty.id", target = "counterpartyId")})
+            @Mapping(source = "counterparty.id", target = "counterpartyId"),
+            @Mapping(source = "phone.phoneNumber", target = "phoneNumber")})
     ClientDto toDto(Client client);
     
     @Override
     @Mappings({
             @Mapping(source = "addressId", target = "address.id"),
-            @Mapping(source = "counterpartyId", target = "counterparty.id")})
+            @Mapping(source = "counterpartyId", target = "counterparty.id"),
+            @Mapping(source = "phoneNumber", target = "phone.phoneNumber")})
     Client toEntity(ClientDto clientDto);
 }

@@ -88,6 +88,7 @@ public class BarcodeInnerNumberServiceImpl implements BarcodeInnerNumberService 
             copyProperties(target, source);
         } catch (Exception e) {
             log.error("Can't get properties from object to updatable object for barcodeInnerNumber", e);
+            return null;
         }
         target.setId(id);
         log.info("Updating barcodeInnerNumber {}", target);
@@ -112,7 +113,7 @@ public class BarcodeInnerNumberServiceImpl implements BarcodeInnerNumberService 
     public BarcodeInnerNumber generateBarcodeInnerNumber(PostcodePool postcodePool) {
         BarcodeInnerNumber barcodeInnerNumber = new BarcodeInnerNumber();
         barcodeInnerNumber.setStatus(USED);
-        barcodeInnerNumber.setNumber(getNextInnerNumber(postcodePool.getPostcode()));
+        barcodeInnerNumber.setInnerNumber(getNextInnerNumber(postcodePool.getPostcode()));
         return barcodeInnerNumberDao.save(barcodeInnerNumber);
     }
 

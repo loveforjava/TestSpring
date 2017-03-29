@@ -167,17 +167,17 @@
             <artifactId>xmpbox</artifactId>
             <version>2.0.4</version>
         </dependency>
-        <!-- iText -->
-        <dependency>
-            <groupId>com.itextpdf</groupId>
-            <artifactId>itextpdf</artifactId>
-            <version>5.0.6</version>
-        </dependency>
         <!-- Google's ZXing (Barcode framework) -->
         <dependency>
             <groupId>com.google.zxing</groupId>
             <artifactId>javase</artifactId>
             <version>3.3.0</version>
+        </dependency>
+        <!-- Oracle -->
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc</artifactId>
+            <version>8</version>
         </dependency>
         <!-- HyperSQL DB -->
         <dependency>
@@ -212,6 +212,29 @@
                                 <include>integration/*</include>
                             </includes>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>2.5.2</version>
+                <executions>
+                    <execution>
+                        <id>install-external</id>
+                        <phase>clean</phase>
+                        <configuration>
+                            <file>${basedir}/src/main/resources/lib/ojdbc-8.jar</file>
+                            <repositoryLayout>default</repositoryLayout>
+                            <groupId>com.oracle</groupId>
+                            <artifactId>ojdbc</artifactId>
+                            <version>8</version>
+                            <packaging>jar</packaging>
+                            <generatePom>true</generatePom>
+                        </configuration>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

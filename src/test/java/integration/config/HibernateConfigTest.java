@@ -34,18 +34,19 @@ public class HibernateConfigTest {
     @Bean(name = "dataSource")
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName(environment.getRequiredProperty("jdbcTest.driverClassName"));
-        dataSource.setUrl(environment.getRequiredProperty("jdbcTest.url"));
-        dataSource.setUsername(environment.getRequiredProperty("jdbcTest.username"));
-        dataSource.setPassword(environment.getRequiredProperty("jdbcTest.password"));
+        dataSource.setDriverClassName(environment.getRequiredProperty("test.jdbc.driverClassName"));
+        dataSource.setUrl(environment.getRequiredProperty("test.jdbc.url"));
+        dataSource.setUsername(environment.getRequiredProperty("test.jdbc.username"));
+        dataSource.setPassword(environment.getRequiredProperty("test.jdbc.password"));
         return dataSource;
     }
 
     private Properties hibernateProperties() {
         Properties properties = new Properties();
-        properties.put("hibernate.dialect", environment.getRequiredProperty("hibernate.dialect"));
-        properties.put("hibernate.show_sql", environment.getRequiredProperty("hibernate.show_sql"));
-        properties.put("hibernate.hbm2ddl.auto", environment.getRequiredProperty("hibernate.hbm2ddl.auto"));
+        properties.put("hibernate.dialect", environment.getRequiredProperty("test.hibernate.dialect"));
+        properties.put("hibernate.show_sql", environment.getRequiredProperty("test.hibernate.show_sql"));
+        properties.put("hibernate.format_sql", environment.getRequiredProperty("test.hibernate.format_sql"));
+        properties.put("hibernate.hbm2ddl.auto", environment.getRequiredProperty("test.hibernate.hbm2ddl.auto"));
         return properties;
     }
 
