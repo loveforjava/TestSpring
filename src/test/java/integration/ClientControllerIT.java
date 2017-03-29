@@ -1,5 +1,7 @@
 package integration;
 
+import java.util.UUID;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opinta.dto.ClientDto;
 import com.opinta.entity.Client;
@@ -24,8 +26,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 @Slf4j
 public class ClientControllerIT extends BaseControllerIT {
     private Client client;
-    private String clientId = "";
-    private String anotherClientId = "";
+    private UUID clientId = null;
+    private UUID anotherClientId = null;
     @Autowired
     private ClientService clientService;
     @Autowired
@@ -58,16 +60,16 @@ public class ClientControllerIT extends BaseControllerIT {
     @Test
     public void getClient() throws Exception {
         when().
-                get("clients/{id}", clientId).
+                get("clients/{id}", clientId.toString()).
         then().
                 statusCode(SC_OK).
-                body("id", equalTo(clientId));
+                body("id", equalTo(clientId.toString()));
     }
 
     @Test
     public void getClient_notFound() throws Exception {
         when().
-                get("/clients/{id}", anotherClientId).
+                get("/clients/{id}", anotherClientId.toString()).
         then().
                 statusCode(SC_NOT_FOUND);
     }
@@ -77,11 +79,11 @@ public class ClientControllerIT extends BaseControllerIT {
     public void createClient() throws Exception {
         // create
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/client.json");
-        jsonObject.put("counterpartyId", testHelper.createCounterparty().getUuid());
+        jsonObject.put("counterpartyId", testHelper.createCounterparty().getUuid().toString());
         jsonObject.put("addressId", (int) testHelper.createAddress().getId());
         String expectedJson = jsonObject.toString();
 
-        String newClientId =
+        String newClientIdString =
                 given().
                         contentType("application/json;charset=UTF-8").
                         body(expectedJson).
@@ -90,6 +92,8 @@ public class ClientControllerIT extends BaseControllerIT {
                 then().
                         extract().
                         path("id");
+        
+        UUID newClientId = UUID.fromString(newClientIdString);
 
         // check created data
         Client createdClient = clientService.getEntityById(newClientId);
@@ -107,7 +111,7 @@ public class ClientControllerIT extends BaseControllerIT {
     public void updateClient() throws Exception {
         // update
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/client.json");
-        jsonObject.put("counterpartyId", testHelper.createCounterparty().getUuid());
+        jsonObject.put("counterpartyId", testHelper.createCounterparty().getUuid().toString());
         jsonObject.put("addressId", (int) testHelper.createAddress().getId());
         String expectedJson = jsonObject.toString();
 

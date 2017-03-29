@@ -1,5 +1,7 @@
 package com.opinta.dto;
 
+import java.util.UUID;
+
 import javax.validation.constraints.Size;
 
 import lombok.EqualsAndHashCode;
@@ -15,12 +17,12 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode
 public class ClientDto {
-    private String id;
+    private UUID id;
     @Size(max = 255)
     private String name;
     @Size(max = 25)
     private String uniqueRegistrationNumber;
-    private String counterpartyId;
+    private UUID counterpartyId;
     private long addressId;
     private String phoneNumber;
 }

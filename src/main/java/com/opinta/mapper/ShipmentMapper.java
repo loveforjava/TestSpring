@@ -1,5 +1,7 @@
 package com.opinta.mapper;
 
+import java.util.UUID;
+
 import com.opinta.dto.ShipmentDto;
 import com.opinta.entity.Client;
 import com.opinta.entity.Shipment;
@@ -26,7 +28,7 @@ public interface ShipmentMapper extends BaseMapper<ShipmentDto, Shipment> {
     })
     Shipment toEntity(ShipmentDto shipmentDto);
 
-    default Client createClientById(String id) {
+    default Client createClientById(UUID id) {
         Client client = new Client();
         client.setUuid(id);
         return client;

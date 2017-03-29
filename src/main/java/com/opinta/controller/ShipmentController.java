@@ -1,6 +1,7 @@
 package com.opinta.controller;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.opinta.dto.ShipmentDto;
 import com.opinta.service.PDFGeneratorService;
@@ -43,7 +44,7 @@ public class ShipmentController {
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<?> getShipment(@PathVariable("id") String id) {
+    public ResponseEntity<?> getShipment(@PathVariable("id") UUID id) {
         ShipmentDto shipmentDto = shipmentService.getById(id);
         if (shipmentDto == null) {
             return new ResponseEntity<>(format("No Shipment found for ID %s", id), NOT_FOUND);
@@ -52,7 +53,7 @@ public class ShipmentController {
     }
 
     @GetMapping("{id}/label-form")
-    public ResponseEntity<?> getShipmentLabelForm(@PathVariable("id") String id) {
+    public ResponseEntity<?> getShipmentLabelForm(@PathVariable("id") UUID id) {
         byte[] data = pdfGeneratorService.generateLabel(id);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType("application/pdf"));
@@ -63,7 +64,7 @@ public class ShipmentController {
     }
 
     @GetMapping("{id}/postpay-form")
-    public ResponseEntity<?> getShipmentPostpayForm(@PathVariable("id") String id) {
+    public ResponseEntity<?> getShipmentPostpayForm(@PathVariable("id") UUID id) {
         byte[] data = pdfGeneratorService.generatePostpay(id);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType("application/pdf"));
@@ -80,7 +81,7 @@ public class ShipmentController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<?> updateShipment(@PathVariable String id, @RequestBody ShipmentDto shipmentDto) {
+    public ResponseEntity<?> updateShipment(@PathVariable UUID id, @RequestBody ShipmentDto shipmentDto) {
         shipmentDto = shipmentService.update(id, shipmentDto);
         if (shipmentDto == null) {
             return new ResponseEntity<>(format("No Shipment found for ID %s", id), NOT_FOUND);
@@ -89,7 +90,7 @@ public class ShipmentController {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<?> deleteShipment(@PathVariable String id) {
+    public ResponseEntity<?> deleteShipment(@PathVariable UUID id) {
         if (!shipmentService.delete(id)) {
             return new ResponseEntity<>(format("No Shipment found for ID %s", id), NOT_FOUND);
         }

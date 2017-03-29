@@ -1,5 +1,7 @@
 package integration;
 
+import java.util.UUID;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opinta.dto.CounterpartyDto;
 import com.opinta.entity.Counterparty;
@@ -20,10 +22,11 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.CoreMatchers.equalTo;
 
+
 public class CounterpartyControllerIT extends BaseControllerIT {
     private Counterparty counterparty;
-    private String counterpartyId = "";
-    private String anotherCounterpartyId = "";
+    private UUID counterpartyId = null;
+    private UUID anotherCounterpartyId = null;
 
     @Autowired
     private CounterpartyService counterpartyService;
@@ -55,16 +58,16 @@ public class CounterpartyControllerIT extends BaseControllerIT {
     @Test
     public void getCounterparty() throws Exception {
         when().
-                get("counterparties/{id}", counterpartyId).
+                get("counterparties/{id}", counterpartyId.toString()).
         then().
                 statusCode(SC_OK).
-                body("id", equalTo(counterpartyId));
+                body("id", equalTo(counterpartyId.toString()));
     }
 
     @Test
     public void getCounterparty_notFound() throws Exception {
         when().
-                get("/counterparties/{id}", anotherCounterpartyId).
+                get("/counterparties/{id}", anotherCounterpartyId.toString()).
         then().
                 statusCode(SC_NOT_FOUND);
     }
@@ -77,7 +80,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
         jsonObject.put("postcodePoolId", (int) testHelper.createPostcodePool().getId());
         String expectedJson = jsonObject.toString();
 
-        String newCounterpartyId =
+        String newCounterpartyIdString =
                 given().
                         contentType("application/json;charset=UTF-8").
                         body(expectedJson).
@@ -86,7 +89,9 @@ public class CounterpartyControllerIT extends BaseControllerIT {
                 then().
                         extract().
                         path("id");
-
+        
+        UUID newCounterpartyId = UUID.fromString(newCounterpartyIdString);
+        
         // check created data
         Counterparty createdCounterparty = counterpartyService.getEntityById(newCounterpartyId);
         ObjectMapper mapper = new ObjectMapper();

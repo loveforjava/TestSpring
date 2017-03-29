@@ -1,6 +1,7 @@
 package com.opinta.dto;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 import com.opinta.constraint.EnumString;
 import com.opinta.entity.DeliveryType;
@@ -13,9 +14,9 @@ import lombok.ToString;
 @Setter
 @ToString
 public class ShipmentDto {
-    private String id;
-    private String senderId;
-    private String recipientId;
+    private UUID id;
+    private UUID senderId;
+    private UUID recipientId;
     @EnumString(source = DeliveryType.class)
     private DeliveryType deliveryType;
     private float weight;

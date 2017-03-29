@@ -3,6 +3,7 @@ package com.opinta.service;
 import com.opinta.entity.Address;
 import com.opinta.entity.Counterparty;
 import java.util.List;
+import java.util.UUID;
 
 import javax.transaction.Transactional;
 
@@ -45,7 +46,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public Client getEntityById(String id) {
+    public Client getEntityById(UUID id) {
         log.info("Getting address by uuid {}", id);
         return clientDao.getById(id);
     }
@@ -67,7 +68,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public List<ClientDto> getAllByCounterpartyId(String counterpartyId) {
+    public List<ClientDto> getAllByCounterpartyId(UUID counterpartyId) {
         Counterparty counterparty = counterpartyService.getEntityById(counterpartyId);
         if (counterparty == null) {
             log.debug("Can't get client list by counterparty. Counterparty {} doesn't exist", counterpartyId);
@@ -79,7 +80,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public ClientDto getById(String id) {
+    public ClientDto getById(UUID id) {
         log.info("Getting client by uuid {}", id);
         Client client = clientDao.getById(id);
         return clientMapper.toDto(client);
@@ -108,7 +109,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public ClientDto update(String id, ClientDto clientDto) throws Exception {
+    public ClientDto update(UUID id, ClientDto clientDto) throws Exception {
         Client source = clientMapper.toEntity(clientDto);
         Client target = clientDao.getById(id);
         // validate reference fields
@@ -136,7 +137,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public boolean delete(String id) {
+    public boolean delete(UUID id) {
         Client client = clientDao.getById(id);
         if (client == null) {
             log.debug("Can't delete client. Client doesn't exist " + id);

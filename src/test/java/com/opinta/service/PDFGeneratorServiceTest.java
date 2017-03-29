@@ -33,7 +33,7 @@ public class PDFGeneratorServiceTest {
 
     private PDFGeneratorService pdfGeneratorService;
     private Shipment shipment;
-    private String shipmentId;
+    private UUID shipmentId;
 
     @Before
     public void setUp() throws Exception {
@@ -48,7 +48,7 @@ public class PDFGeneratorServiceTest {
         Client recipient = new Client("Petrov PP", "002", recipientAddress, counterparty);
         shipment = new Shipment(sender, recipient, DeliveryType.W2W, 1, 1,
                 new BigDecimal("12.5"), new BigDecimal("2.5"), new BigDecimal("15.25"));
-        shipmentId = UUID.randomUUID().toString();
+        shipmentId = UUID.randomUUID();
     }
 
     @Test

@@ -29,10 +29,10 @@ public abstract class BaseControllerIT {
         RestAssuredMockMvc.mockMvc(mockMvc);
     }
     
-    public String anotherUuid(String existingUuid) {
-        String anotherUuid = "";
+    public UUID anotherUuid(UUID existingUuid) {
+        UUID anotherUuid = null;
         do {
-            anotherUuid = UUID.randomUUID().toString();
+            anotherUuid = UUID.randomUUID();
         } while (anotherUuid.equals(existingUuid));
         return anotherUuid;
     }

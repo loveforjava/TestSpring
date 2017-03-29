@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -30,7 +31,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
     }
 
     @Override
-    public byte[] generatePostpay(String shipmentId) {
+    public byte[] generatePostpay(UUID shipmentId) {
         Shipment shipment = shipmentService.getEntityById(shipmentId);
         byte[] data = null;
         try {
@@ -65,7 +66,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
     }
 
     @Override
-    public byte[] generateLabel(String shipmentId) {
+    public byte[] generateLabel(UUID shipmentId) {
         Shipment shipment = shipmentService.getEntityById(shipmentId);
         byte[] data = null;
         try {

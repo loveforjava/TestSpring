@@ -2,6 +2,7 @@ package com.opinta.dao;
 
 import com.opinta.entity.Counterparty;
 import java.util.List;
+import java.util.UUID;
 
 import com.opinta.entity.Client;
 import com.opinta.entity.Counterparty;
@@ -43,7 +44,7 @@ public class ClientDaoImpl implements ClientDao {
     }
 
     @Override
-    public Client getById(String id) {
+    public Client getById(UUID id) {
         log.info("get Client by id: " + id);
         Session session = sessionFactory.getCurrentSession();
         return (Client) session.get(Client.class, id);

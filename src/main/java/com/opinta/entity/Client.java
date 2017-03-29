@@ -1,6 +1,9 @@
 package com.opinta.entity;
 
+import java.util.UUID;
+
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -20,7 +23,8 @@ public class Client {
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
-    private String uuid;
+    @Column(columnDefinition = "BINARY(16)")
+    private UUID uuid;
     private String name;
     private String uniqueRegistrationNumber;
     @ManyToOne

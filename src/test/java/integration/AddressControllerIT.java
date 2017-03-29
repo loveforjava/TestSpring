@@ -6,6 +6,7 @@ import com.opinta.service.AddressService;
 import integration.helper.TestHelper;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 
+@Ignore
 public class AddressControllerIT extends BaseControllerIT {
     private int addressId = MIN_VALUE;
     @Autowired

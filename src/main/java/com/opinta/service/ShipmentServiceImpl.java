@@ -8,6 +8,7 @@ import com.opinta.entity.W2wVariation;
 import com.opinta.util.AddressUtil;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 import javax.transaction.Transactional;
 
@@ -55,7 +56,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public Shipment getEntityById(String id) {
+    public Shipment getEntityById(UUID id) {
         log.info("Getting postcodePool by uuid {}", id);
         return shipmentDao.getById(id);
     }
@@ -75,7 +76,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public List<ShipmentDto> getAllByClientId(String clientId) {
+    public List<ShipmentDto> getAllByClientId(UUID clientId) {
         Client client = clientDao.getById(clientId);
         if (client == null) {
             log.debug("Can't get shipment list by client. Client {} doesn't exist", clientId);
@@ -87,7 +88,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public ShipmentDto getById(String id) {
+    public ShipmentDto getById(UUID id) {
         return shipmentMapper.toDto(getEntityById(id));
     }
 
@@ -113,7 +114,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public ShipmentDto update(String id, ShipmentDto shipmentDto) {
+    public ShipmentDto update(UUID id, ShipmentDto shipmentDto) {
         Shipment source = shipmentMapper.toEntity(shipmentDto);
         Shipment target = shipmentDao.getById(id);
         if (target == null) {
@@ -153,7 +154,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public boolean delete(String id) {
+    public boolean delete(UUID id) {
         Shipment shipment = shipmentDao.getById(id);
         if (shipment == null) {
             log.debug("Can't delete shipment. Shipment doesn't exist {}", id);

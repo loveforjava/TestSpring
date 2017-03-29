@@ -1,5 +1,7 @@
 package integration;
 
+import java.util.UUID;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opinta.dto.ShipmentDto;
 import com.opinta.entity.Shipment;
@@ -22,8 +24,8 @@ import static org.hamcrest.Matchers.equalTo;
 
 public class ShipmentControllerIT extends BaseControllerIT {
     private Shipment shipment;
-    private String shipmentId = "";
-    private String anotherShipmentId = "";
+    private UUID shipmentId = null;
+    private UUID anotherShipmentId = null;
     @Autowired
     private ShipmentMapper shipmentMapper;
     @Autowired
@@ -54,16 +56,16 @@ public class ShipmentControllerIT extends BaseControllerIT {
     @Test
     public void getShipment() throws Exception {
         when().
-                get("shipments/{id}", shipmentId).
+                get("shipments/{id}", shipmentId.toString()).
         then().
                 statusCode(SC_OK).
-                body("id", equalTo(shipmentId));
+                body("id", equalTo(shipmentId.toString()));
     }
 
     @Test
     public void getShipment_notFound() throws Exception {
         when().
-                get("/shipments/{id}", anotherShipmentId).
+                get("/shipments/{id}", anotherShipmentId.toString()).
         then().
                 statusCode(SC_NOT_FOUND);
     }
@@ -73,11 +75,11 @@ public class ShipmentControllerIT extends BaseControllerIT {
     public void createClient() throws Exception {
         // create
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
-        jsonObject.put("senderId", testHelper.createClient().getUuid());
-        jsonObject.put("recipientId", testHelper.createClient().getUuid());
+        jsonObject.put("senderId", testHelper.createClient().getUuid().toString());
+        jsonObject.put("recipientId", testHelper.createClient().getUuid().toString());
         String expectedJson = jsonObject.toString();
 
-        String newShipmentId =
+        String newShipmentIdString =
                 given().
                         contentType("application/json;charset=UTF-8").
                         body(expectedJson).
@@ -87,6 +89,8 @@ public class ShipmentControllerIT extends BaseControllerIT {
                         extract().
                         path("id");
 
+        UUID newShipmentId = UUID.fromString(newShipmentIdString);
+        
         // check created data
         Shipment createdShipment = shipmentService.getEntityById(newShipmentId);
         ObjectMapper mapper = new ObjectMapper();
@@ -103,8 +107,8 @@ public class ShipmentControllerIT extends BaseControllerIT {
     public void updateShipment() throws Exception {
         // update
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
-        jsonObject.put("senderId", testHelper.createClient().getUuid());
-        jsonObject.put("recipientId", testHelper.createClient().getUuid());
+        jsonObject.put("senderId", testHelper.createClient().getUuid().toString());
+        jsonObject.put("recipientId", testHelper.createClient().getUuid().toString());
         String expectedJson = jsonObject.toString();
 
         given().
