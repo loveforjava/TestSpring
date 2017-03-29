@@ -1,5 +1,7 @@
 package integration;
 
+import java.util.UUID;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opinta.dto.ShipmentDto;
 import com.opinta.entity.Shipment;
@@ -8,6 +10,7 @@ import com.opinta.service.ShipmentService;
 import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,14 +18,14 @@ import integration.helper.TestHelper;
 
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
-import static java.lang.Integer.MIN_VALUE;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.Matchers.equalTo;
 
 public class ShipmentControllerIT extends BaseControllerIT {
     private Shipment shipment;
-    private int shipmentId = MIN_VALUE;
+    private UUID shipmentId = null;
+    private UUID anotherShipmentId = null;
     @Autowired
     private ShipmentMapper shipmentMapper;
     @Autowired
@@ -33,7 +36,8 @@ public class ShipmentControllerIT extends BaseControllerIT {
     @Before
     public void setUp() throws Exception {
         shipment = testHelper.createShipment();
-        shipmentId = (int) shipment.getId();
+        shipmentId = shipment.getUuid();
+        anotherShipmentId = super.anotherUuid(shipmentId);
     }
 
     @After
@@ -52,16 +56,16 @@ public class ShipmentControllerIT extends BaseControllerIT {
     @Test
     public void getShipment() throws Exception {
         when().
-                get("shipments/{id}", shipmentId).
+                get("shipments/{id}", shipmentId.toString()).
         then().
                 statusCode(SC_OK).
-                body("id", equalTo(shipmentId));
+                body("id", equalTo(shipmentId.toString()));
     }
 
     @Test
     public void getShipment_notFound() throws Exception {
         when().
-                get("/shipments/{id}", shipmentId + 1).
+                get("/shipments/{id}", anotherShipmentId.toString()).
         then().
                 statusCode(SC_NOT_FOUND);
     }
@@ -71,11 +75,11 @@ public class ShipmentControllerIT extends BaseControllerIT {
     public void createClient() throws Exception {
         // create
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
-        jsonObject.put("senderId", (int) testHelper.createClient().getId());
-        jsonObject.put("recipientId", (int) testHelper.createClient().getId());
+        jsonObject.put("senderId", testHelper.createClient().getUuid().toString());
+        jsonObject.put("recipientId", testHelper.createClient().getUuid().toString());
         String expectedJson = jsonObject.toString();
 
-        int newShipmentId =
+        String newShipmentIdString =
                 given().
                         contentType("application/json;charset=UTF-8").
                         body(expectedJson).
@@ -85,6 +89,8 @@ public class ShipmentControllerIT extends BaseControllerIT {
                         extract().
                         path("id");
 
+        UUID newShipmentId = UUID.fromString(newShipmentIdString);
+        
         // check created data
         Shipment createdShipment = shipmentService.getEntityById(newShipmentId);
         ObjectMapper mapper = new ObjectMapper();
@@ -95,14 +101,14 @@ public class ShipmentControllerIT extends BaseControllerIT {
         // delete
         testHelper.deleteShipment(createdShipment);
     }
-
+    
     @Test
     @SuppressWarnings("unchecked")
     public void updateShipment() throws Exception {
         // update
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
-        jsonObject.put("senderId", (int) testHelper.createClient().getId());
-        jsonObject.put("recipientId", (int) testHelper.createClient().getId());
+        jsonObject.put("senderId", testHelper.createClient().getUuid().toString());
+        jsonObject.put("recipientId", testHelper.createClient().getUuid().toString());
         String expectedJson = jsonObject.toString();
 
         given().
@@ -132,7 +138,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
     @Test
     public void deleteShipment_notFound() throws Exception {
         when().
-                delete("/shipments/{id}", shipmentId + 1).
+                delete("/shipments/{id}", anotherShipmentId).
         then().
                 statusCode(SC_NOT_FOUND);
     }

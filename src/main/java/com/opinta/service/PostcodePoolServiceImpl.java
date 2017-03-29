@@ -46,7 +46,7 @@ public class PostcodePoolServiceImpl implements PostcodePoolService {
     @Override
     @Transactional
     public PostcodePoolDto getById(long id) {
-        log.info("Getting postcodePool by id {}", id);
+        log.info("Getting postcodePool by uuid {}", id);
         return postcodePoolMapper.toDto(postcodePoolDao.getById(id));
     }
 

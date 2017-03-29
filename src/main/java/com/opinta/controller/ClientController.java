@@ -1,11 +1,13 @@
 package com.opinta.controller;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.opinta.dto.ClientDto;
 import com.opinta.dto.ShipmentDto;
 import com.opinta.service.ClientService;
 import com.opinta.service.ShipmentService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,6 +28,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 @RestController
 @RequestMapping("/clients")
+@Slf4j
 public class ClientController {
     private final ClientService clientService;
     private final ShipmentService shipmentService;
@@ -43,19 +46,19 @@ public class ClientController {
     }
     
     @GetMapping("{id}")
-    public ResponseEntity<?> getClient(@PathVariable("id") long id) {
+    public ResponseEntity<?> getClient(@PathVariable("id") UUID id) {
         ClientDto clientDto = clientService.getById(id);
         if (clientDto == null) {
-            return new ResponseEntity<>(format("No Client found for ID %d", id), NOT_FOUND);
+            return new ResponseEntity<>(format("No Client found for ID %s", id), NOT_FOUND);
         }
         return new ResponseEntity<>(clientDto, OK);
     }
 
     @GetMapping("{clientId}/shipments")
-    public ResponseEntity<?> getShipmentsByClientId(@PathVariable long clientId) {
+    public ResponseEntity<?> getShipmentsByClientId(@PathVariable UUID clientId) {
         List<ShipmentDto> shipmentDtos = shipmentService.getAllByClientId(clientId);
         if (shipmentDtos == null) {
-            return new ResponseEntity<>(format("Client %d doesn't exist", clientId), NOT_FOUND);
+            return new ResponseEntity<>(format("Client %s doesn't exist", clientId), NOT_FOUND);
         }
         return new ResponseEntity<>(shipmentDtos, OK);
     }
@@ -71,19 +74,19 @@ public class ClientController {
     }
     
     @PutMapping("{id}")
-    public ResponseEntity<?> updateClient(@PathVariable long id, @RequestBody ClientDto clientDto) {
+    public ResponseEntity<?> updateClient(@PathVariable UUID id, @RequestBody ClientDto clientDto) {
         try {
             clientDto = clientService.update(id, clientDto);
         } catch (Exception e) {
-            return new ResponseEntity<>(format("Error while updating %d", id) + ". " + e.getMessage(), NOT_FOUND);
+            return new ResponseEntity<>(format("Error while updating %s", id) + ". " + e.getMessage(), NOT_FOUND);
         }
         return new ResponseEntity<>(clientDto, OK);
     }
     
     @DeleteMapping("{id}")
-    public ResponseEntity<?> deleteClient(@PathVariable long id) {
+    public ResponseEntity<?> deleteClient(@PathVariable UUID id) {
         if (!clientService.delete(id)) {
-            return new ResponseEntity<>(format("No Client found for ID %d", id), NOT_FOUND);
+            return new ResponseEntity<>(format("No Client found for ID %s", id), NOT_FOUND);
         }
         return new ResponseEntity<>(OK);
     }

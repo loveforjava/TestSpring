@@ -8,6 +8,7 @@ import com.opinta.entity.W2wVariation;
 import com.opinta.util.AddressUtil;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 import javax.transaction.Transactional;
 
@@ -55,8 +56,8 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public Shipment getEntityById(long id) {
-        log.info("Getting postcodePool by id {}", id);
+    public Shipment getEntityById(UUID id) {
+        log.info("Getting postcodePool by uuid {}", id);
         return shipmentDao.getById(id);
     }
 
@@ -75,7 +76,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public List<ShipmentDto> getAllByClientId(long clientId) {
+    public List<ShipmentDto> getAllByClientId(UUID clientId) {
         Client client = clientDao.getById(clientId);
         if (client == null) {
             log.debug("Can't get shipment list by client. Client {} doesn't exist", clientId);
@@ -87,13 +88,14 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public ShipmentDto getById(long id) {
+    public ShipmentDto getById(UUID id) {
         return shipmentMapper.toDto(getEntityById(id));
     }
 
     @Override
     @Transactional
     public ShipmentDto save(ShipmentDto shipmentDto) {
+        log.info("saving new Shipment for Client: " + shipmentDto.getSenderId());
         Client existingClient = clientDao.getById(shipmentDto.getSenderId());
         Counterparty counterparty = existingClient.getCounterparty();
         PostcodePool postcodePool = counterparty.getPostcodePool();
@@ -103,8 +105,8 @@ public class ShipmentServiceImpl implements ShipmentService {
         shipment.setBarcode(newBarcode);
         log.info("Saving shipment with assigned barcode", shipmentMapper.toDto(shipment));
 
-        shipment.setSender(clientDao.getById(shipment.getSender().getId()));
-        shipment.setRecipient(clientDao.getById(shipment.getRecipient().getId()));
+        shipment.setSender(clientDao.getById(shipment.getSender().getUuid()));
+        shipment.setRecipient(clientDao.getById(shipment.getRecipient().getUuid()));
         shipment.setPrice(calculatePrice(shipment));
 
         return shipmentMapper.toDto(shipmentDao.save(shipment));
@@ -112,7 +114,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public ShipmentDto update(long id, ShipmentDto shipmentDto) {
+    public ShipmentDto update(UUID id, ShipmentDto shipmentDto) {
         Shipment source = shipmentMapper.toEntity(shipmentDto);
         Shipment target = shipmentDao.getById(id);
         if (target == null) {
@@ -124,7 +126,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         } catch (Exception e) {
             log.error("Can't get properties from object to updatable object for shipment", e);
         }
-        target.setId(id);
+        target.setUuid(id);
         try {
             fillSenderAndRecipient(target);
         } catch (IllegalArgumentException e) {
@@ -138,8 +140,8 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
     private void fillSenderAndRecipient(Shipment target) throws IllegalArgumentException {
-        target.setSender(clientDao.getById(target.getSender().getId()));
-        target.setRecipient(clientDao.getById(target.getRecipient().getId()));
+        target.setSender(clientDao.getById(target.getSender().getUuid()));
+        target.setRecipient(clientDao.getById(target.getRecipient().getUuid()));
         if (target.getSender() == null) {
             throw new IllegalArgumentException(
                     format("Can't calculate price for shipment %s. Sender doesn't exist", target));
@@ -152,13 +154,13 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public boolean delete(long id) {
+    public boolean delete(UUID id) {
         Shipment shipment = shipmentDao.getById(id);
         if (shipment == null) {
             log.debug("Can't delete shipment. Shipment doesn't exist {}", id);
             return false;
         }
-        shipment.setId(id);
+        shipment.setUuid(id);
         log.info("Deleting shipment {}", shipment);
         shipmentDao.delete(shipment);
         return true;

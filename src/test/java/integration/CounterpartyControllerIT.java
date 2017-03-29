@@ -1,5 +1,7 @@
 package integration;
 
+import java.util.UUID;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opinta.dto.CounterpartyDto;
 import com.opinta.entity.Counterparty;
@@ -8,6 +10,7 @@ import com.opinta.service.CounterpartyService;
 import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,14 +18,15 @@ import integration.helper.TestHelper;
 
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
-import static java.lang.Integer.MIN_VALUE;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.CoreMatchers.equalTo;
 
+
 public class CounterpartyControllerIT extends BaseControllerIT {
     private Counterparty counterparty;
-    private int counterpartyId = MIN_VALUE;
+    private UUID counterpartyId = null;
+    private UUID anotherCounterpartyId = null;
 
     @Autowired
     private CounterpartyService counterpartyService;
@@ -34,7 +38,8 @@ public class CounterpartyControllerIT extends BaseControllerIT {
     @Before
     public void setUp() throws Exception {
         counterparty = testHelper.createCounterparty();
-        counterpartyId = (int) counterparty.getId();
+        counterpartyId = counterparty.getUuid();
+        anotherCounterpartyId = super.anotherUuid(counterpartyId);
     }
 
     @After
@@ -53,16 +58,16 @@ public class CounterpartyControllerIT extends BaseControllerIT {
     @Test
     public void getCounterparty() throws Exception {
         when().
-                get("counterparties/{id}", counterpartyId).
+                get("counterparties/{id}", counterpartyId.toString()).
         then().
                 statusCode(SC_OK).
-                body("id", equalTo(counterpartyId));
+                body("id", equalTo(counterpartyId.toString()));
     }
 
     @Test
     public void getCounterparty_notFound() throws Exception {
         when().
-                get("/counterparties/{id}", counterpartyId + 1).
+                get("/counterparties/{id}", anotherCounterpartyId.toString()).
         then().
                 statusCode(SC_NOT_FOUND);
     }
@@ -75,7 +80,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
         jsonObject.put("postcodePoolId", (int) testHelper.createPostcodePool().getId());
         String expectedJson = jsonObject.toString();
 
-        int newCounterpartyId =
+        String newCounterpartyIdString =
                 given().
                         contentType("application/json;charset=UTF-8").
                         body(expectedJson).
@@ -84,7 +89,9 @@ public class CounterpartyControllerIT extends BaseControllerIT {
                 then().
                         extract().
                         path("id");
-
+        
+        UUID newCounterpartyId = UUID.fromString(newCounterpartyIdString);
+        
         // check created data
         Counterparty createdCounterparty = counterpartyService.getEntityById(newCounterpartyId);
         ObjectMapper mapper = new ObjectMapper();
@@ -131,7 +138,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
     @Test
     public void deleteCounterparty_notFound() throws Exception {
         when().
-                delete("/counterparties/{id}", counterpartyId + 1).
+                delete("/counterparties/{id}", anotherCounterpartyId).
         then().
                 statusCode(SC_NOT_FOUND);
     }

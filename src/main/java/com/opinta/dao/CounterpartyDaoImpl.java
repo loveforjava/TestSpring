@@ -3,6 +3,7 @@ package com.opinta.dao;
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.PostcodePool;
 import java.util.List;
+import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Criteria;
@@ -32,7 +33,7 @@ public class CounterpartyDaoImpl implements CounterpartyDao {
     }
 
     @Override
-    public Counterparty getById(long id) {
+    public Counterparty getById(UUID id) {
         Session session = this.sessionFactory.getCurrentSession();
         return (Counterparty) session.get(Counterparty.class, id);
     }
@@ -50,7 +51,10 @@ public class CounterpartyDaoImpl implements CounterpartyDao {
     @Override
     public Counterparty save(Counterparty counterparty) {
         Session session = this.sessionFactory.getCurrentSession();
-        return (Counterparty) session.merge(counterparty);
+        Counterparty saved = (Counterparty) session.merge(counterparty);
+        session.flush();
+        log.info("saved Counterparty UUID: " + saved.getUuid());
+        return saved;
     }
 
     @Override

@@ -1,5 +1,7 @@
 package integration;
 
+import java.util.UUID;
+
 import integration.config.ApplicationConfigTest;
 import integration.config.HibernateConfigTest;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
@@ -25,5 +27,13 @@ public abstract class BaseControllerIT {
     public final void initialize() {
         mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
         RestAssuredMockMvc.mockMvc(mockMvc);
+    }
+    
+    public UUID anotherUuid(UUID existingUuid) {
+        UUID anotherUuid = null;
+        do {
+            anotherUuid = UUID.randomUUID();
+        } while (anotherUuid.equals(existingUuid));
+        return anotherUuid;
     }
 }

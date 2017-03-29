@@ -3,6 +3,7 @@ package com.opinta.dao;
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.PostcodePool;
 import java.util.List;
+import java.util.UUID;
 
 import com.opinta.entity.Counterparty;
 
@@ -10,7 +11,7 @@ public interface CounterpartyDao {
     
     List<Counterparty> getAll();
     
-    Counterparty getById(long id);
+    Counterparty getById(UUID id);
 
     List<Counterparty> getByPostcodePool(PostcodePool postcodePool);
 

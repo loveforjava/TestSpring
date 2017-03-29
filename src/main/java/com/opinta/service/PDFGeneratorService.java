@@ -1,8 +1,10 @@
 package com.opinta.service;
 
+import java.util.UUID;
+
 public interface PDFGeneratorService {
 
-    byte[] generateLabel(long id);
+    byte[] generateLabel(UUID id);
 
-    byte[] generatePostpay(long id);
+    byte[] generatePostpay(UUID id);
 }

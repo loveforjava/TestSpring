@@ -1,6 +1,7 @@
 package com.opinta.service;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.opinta.dto.ClientDto;
 import com.opinta.entity.Client;
@@ -9,19 +10,19 @@ public interface ClientService {
 
     List<Client> getAllEntities();
 
-    Client getEntityById(long id);
+    Client getEntityById(UUID id);
 
     Client saveEntity(Client client);
     
     List<ClientDto> getAll();
 
-    List<ClientDto> getAllByCounterpartyId(long counterpartyId);
+    List<ClientDto> getAllByCounterpartyId(UUID counterpartyId);
 
-    ClientDto getById(long id);
+    ClientDto getById(UUID id);
     
     ClientDto save(ClientDto client) throws Exception;
 
-    ClientDto update(long id, ClientDto source) throws Exception;
+    ClientDto update(UUID id, ClientDto source) throws Exception;
 
-    boolean delete(long id);
+    boolean delete(UUID id);
 }

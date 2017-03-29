@@ -4,6 +4,7 @@ import com.opinta.entity.Client;
 import com.opinta.entity.Shipment;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface ShipmentDao {
 
@@ -11,7 +12,7 @@ public interface ShipmentDao {
 
     List<Shipment> getAllByClient(Client client);
 
-    Shipment getById(long id);
+    Shipment getById(UUID id);
 
     Shipment save(Shipment shipment);
 
