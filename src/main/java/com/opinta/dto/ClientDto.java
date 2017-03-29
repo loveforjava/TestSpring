@@ -23,4 +23,5 @@ public class ClientDto {
     private long addressId;
     private String phoneNumber;
     private long counterpartyId;
+    private boolean individual;
 }

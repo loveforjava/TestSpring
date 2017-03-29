@@ -2,16 +2,12 @@ package com.opinta.service;
 
 import com.opinta.entity.*;
 import com.opinta.entity.Counterparty;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
-import org.apache.pdfbox.pdmodel.interactive.form.PDTextField;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 
 import static org.junit.Assert.assertEquals;
@@ -37,7 +33,9 @@ public class PDFGeneratorServiceTest {
         Counterparty counterparty = new Counterparty("Modna kasta",
                 new PostcodePool("00003", false));
         Client sender = new Client("FOP Ivanov", "001", senderAddress, counterparty);
+        sender.setPhone(new Phone("80991234567"));
         Client recipient = new Client("Petrov PP", "002", recipientAddress, counterparty);
+        recipient.setPhone(new Phone("80951234567"));
         shipment = new Shipment(sender, recipient, DeliveryType.W2W, 1, 1,
                 new BigDecimal("12.5"), new BigDecimal("2.5"), new BigDecimal("15.25"));
         shipment.setBarcode(new BarcodeInnerNumber("12345678", BarcodeStatus.RESERVED));
@@ -46,10 +44,9 @@ public class PDFGeneratorServiceTest {
     @Test
     public void generateLabel_and_generatePostpay_ShouldReturnNotEmptyFile() {
         when(shipmentService.getEntityById(1L)).thenReturn(shipment);
+        byte[] generate = pdfGeneratorService.generate(1L);
         assertNotEquals("PDFGenerator returned an empty label",
-                pdfGeneratorService.generateLabel(1L).length, 0);
-        assertNotEquals("PDFGenerator returned an empty postpay form",
-                pdfGeneratorService.generatePostpay(1L).length, 0);
-        verify(shipmentService, atLeast(2)).getEntityById(1L);
+                generate.length, 0);
+        verify(shipmentService, atLeast(1)).getEntityById(1L);
     }
 }

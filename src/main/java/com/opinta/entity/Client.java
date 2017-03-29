@@ -30,6 +30,7 @@ public class Client {
     @ManyToOne
     @JoinColumn(name = "counterparty_id")
     private Counterparty counterparty;
+    private boolean individual;
 
     public Client(String name, String uniqueRegistrationNumber, Address address,
                   Counterparty counterparty) {

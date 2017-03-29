@@ -10,6 +10,7 @@ import com.opinta.entity.Client;
 import com.opinta.entity.Shipment;
 import com.opinta.util.MoneyToTextConverter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -18,15 +19,19 @@ import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.graphics.image.JPEGFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
+import org.apache.pdfbox.pdmodel.interactive.form.PDCheckBox;
 import org.apache.pdfbox.pdmodel.interactive.form.PDTextField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
 
 @Service
 @Slf4j
@@ -51,8 +56,32 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
     }
 
     @Override
-    public byte[] generatePostpay(long shipmentId) {
+    public byte[] generate(long shipmentId) {
         Shipment shipment = shipmentService.getEntityById(shipmentId);
+        byte[] labelForm = generateLabel(shipment);
+        if (labelForm == null) {
+            return labelForm;
+        }
+        BigDecimal postPay = shipment.getPostPay();
+        //Checking postPay value, if more than 0 append postpay form
+        if (postPay.compareTo(new BigDecimal(0)) > 0) {
+            PDFMergerUtility merger = new PDFMergerUtility();
+            merger.addSource(new ByteArrayInputStream(labelForm));
+            merger.addSource(new ByteArrayInputStream(generatePostpay(shipment)));
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            merger.setDestinationStream(outputStream);
+            try {
+                merger.mergeDocuments(null);
+            } catch (IOException e) {
+                log.error("Got an error while merging the documents");
+            }
+            return outputStream.toByteArray();
+        } else {
+            return labelForm;
+        }
+    }
+
+    public byte[] generatePostpay(Shipment shipment) {
         byte[] data = null;
         try {
             //Getting PDF template from the file
@@ -76,22 +105,23 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             fontName = res.add(font).getName();
             acroForm.setDefaultResources(res);
 
-            if (acroForm != null) {
-                generateClientsData(fontFile, shipment, acroForm);
+            //Populating clients data
+            generateClientsData(shipment, acroForm);
 
-                BigDecimal postPay = shipment.getPostPay();
+            //Splitting price to hryvnas and kopiykas
+            BigDecimal postPay = shipment.getPostPay();
+            String[] priceParts = String.valueOf(postPay).split("\\.");
 
-                String[] priceParts = String.valueOf(postPay).split("\\.");
-
-                populateField(fontFile, acroForm, field, "priceHryvnas", priceParts[0]);
-                if (priceParts.length > 1) {
-                    populateField(fontFile, acroForm, field, "priceKopiyky", priceParts[1]);
-                }
-
-                String priceInText = moneyToTextConverter.convert(postPay, false);
-
-                populateField(fontFile, acroForm, field, "priceInText", priceInText);
+            //Populating price fields
+            populateField(acroForm, field, "priceHryvnas", priceParts[0]);
+            if (priceParts.length > 1) {
+                populateField(acroForm, field, "priceKopiyky", priceParts[1]);
             }
+            //Converting numerical value to text
+            String priceInText = moneyToTextConverter.convert(postPay, false);
+            //Populating text field for the price
+            populateField(acroForm, field, "priceInText", priceInText);
+
             acroForm.flatten();
 
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -105,9 +135,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         return data;
     }
 
-    @Override
-    public byte[] generateLabel(long shipmentId) {
-        Shipment shipment = shipmentService.getEntityById(shipmentId);
+    public byte[] generateLabel(Shipment shipment) {
         byte[] data = null;
         try {
             //Getting PDF template from the file
@@ -131,44 +159,49 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             fontName = res.add(font).getName();
             acroForm.setDefaultResources(res);
 
-            if (acroForm != null) {
-                //Populating client data
-                generateClientsData(fontFile, shipment, acroForm);
 
-                //Populating rest of the fields
-                populateField(fontFile, acroForm, field, "mass", String.valueOf(shipment.getWeight()));
-                populateField(fontFile, acroForm, field, "value", String.valueOf(shipment.getDeclaredPrice()));
-                populateField(fontFile, acroForm, field, "sendingCost", String.valueOf(shipment.getPrice()));
-                populateField(fontFile, acroForm, field, "postPrice", String.valueOf(shipment.getPostPay()));
-                populateField(fontFile, acroForm, field, "totalCost", String.valueOf(shipment.getPostPay()));
+            //Populating client data
+            generateClientsData(shipment, acroForm);
+            setCheckBoxes(shipment, acroForm);
 
-                //Creating content stream for the page to allow data appending
-                PDPage page = template.getPage(0);
-                PDPageContentStream contentStream =
-                        new PDPageContentStream(template, page, PDPageContentStream.AppendMode.APPEND, true);
+            //Populating rest of the fields
+            populateField(acroForm, field, "weight", String.valueOf(shipment.getWeight()));
+            populateField(acroForm, field, "declaredPrice", String.valueOf(shipment.getDeclaredPrice()));
+            populateField(acroForm, field, "postPay", String.valueOf(shipment.getPostPay()));
+            populateField(acroForm, field, "price", String.valueOf(shipment.getPrice()));
 
-                //Constructing 12 digits of the barcode
-                String barcode = shipment.getSender().getCounterparty().getPostcodePool().getPostcode() +
-                        shipment.getBarcode().getInnerNumber();
+            //TODO: Not interactive fields yet!
+            populateField(acroForm, field, "sendingCost", String.valueOf(shipment.getPrice()));
+            populateField(acroForm, field, "additionalCosts", "0");
 
-                //Generating first barcode
-                bitMatrix = new Code128Writer().encode(barcode, BarcodeFormat.CODE_128, 170, 45, null);
-                BufferedImage buffImg = MatrixToImageWriter.toBufferedImage(bitMatrix);
-                PDImageXObject ximage = JPEGFactory.createFromImage(template, buffImg);
-                contentStream.drawImage(ximage, 242, 780);
+            //Creating content stream for the page to allow data appending
+            PDPage page = template.getPage(0);
+            PDPageContentStream contentStream =
+                    new PDPageContentStream(template, page, PDPageContentStream.AppendMode.APPEND, true);
 
-                //Generate second barcode
-                bitMatrix = new Code128Writer().encode(barcode, BarcodeFormat.CODE_128, 170, 45, null);
-                buffImg = MatrixToImageWriter.toBufferedImage(bitMatrix);
-                ximage = JPEGFactory.createFromImage(template, buffImg);
-                contentStream.drawImage(ximage, 242, 367);
+            //Constructing 13 digits of the barcode
+            String barcode = shipment.getSender().getCounterparty().getPostcodePool().getPostcode() +
+                    shipment.getBarcode().getInnerNumber();
 
-                contentStream.close();
+            //Generating first barcode
+            bitMatrix = new Code128Writer().encode(barcode, BarcodeFormat.CODE_128, 170, 32, null);
+            BufferedImage buffImg = MatrixToImageWriter.toBufferedImage(bitMatrix);
+            PDImageXObject ximage = JPEGFactory.createFromImage(template, buffImg);
+            contentStream.drawImage(ximage, 242, 790);
 
-                //Generating barcode digits
-                field = (PDTextField) acroForm.getField("barcodeText");
-                field.setValue(barcode);
-            }
+            //Generating second barcode
+            bitMatrix = new Code128Writer().encode(barcode, BarcodeFormat.CODE_128, 170, 32, null);
+            buffImg = MatrixToImageWriter.toBufferedImage(bitMatrix);
+            ximage = JPEGFactory.createFromImage(template, buffImg);
+            contentStream.drawImage(ximage, 242, 377);
+
+            contentStream.close();
+
+            //Generating barcode digits
+            field = (PDTextField) acroForm.getField("barcodeText");
+            field.setDefaultAppearance(String.format("/%s 14 Tf 0 g", fontName));
+            field.setValue(barcode);
+
             acroForm.flatten();
 
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -185,29 +218,45 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         return data;
     }
 
-    private void populateField(File fontFile, PDAcroForm acroForm,
+    private void populateField(PDAcroForm acroForm,
                                PDTextField field, String fieldName, String fieldValue) throws IOException {
         field = (PDTextField) acroForm.getField(fieldName);
-
-//        field.setDefaultAppearance("/TiRo 8.64 Tf 0 g");
-
-
         field.setDefaultAppearance(String.format("/%s 8.64 Tf 0 g", fontName));
         field.setValue(fieldValue);
     }
 
-    private void generateClientsData(File fontFile, Shipment shipment, PDAcroForm acroForm) throws IOException {
+    private void setCheckBoxes(Shipment shipment, PDAcroForm acroForm) throws IOException {
+        PDCheckBox checkBox;
+        Client sender = shipment.getSender();
+        if (sender.isIndividual()) {
+            checkBox = (PDCheckBox) acroForm.getField("senderIsIndividual");
+            checkBox.check();
+        } else {
+            checkBox = (PDCheckBox) acroForm.getField("senderIsEntity");
+            checkBox.check();
+        }
+        Client recipient = shipment.getRecipient();
+        if (recipient.isIndividual()) {
+            checkBox = (PDCheckBox) acroForm.getField("recipientIsIndividual");
+            checkBox.check();
+        } else {
+            checkBox = (PDCheckBox) acroForm.getField("recipientIsEntity");
+            checkBox.check();
+        }
+    }
+
+    private void generateClientsData(Shipment shipment, PDAcroForm acroForm) throws IOException {
         Client sender = shipment.getSender();
 
-        populateField(fontFile, acroForm, field, "senderName", shipment.getSender().getName());
-        populateField(fontFile, acroForm, field, "senderPhone", "+380673245212");
-        populateField(fontFile, acroForm, field, "senderAddress", processAddress(sender.getAddress()));
+        populateField(acroForm, field, "senderName", shipment.getSender().getName());
+        populateField(acroForm, field, "senderPhone", sender.getPhone().getPhoneNumber());
+        populateField(acroForm, field, "senderAddress", processAddress(sender.getAddress()));
 
         Client recipient = shipment.getRecipient();
 
-        populateField(fontFile, acroForm, field, "recipientName", recipient.getName());
-        populateField(fontFile, acroForm, field, "recipientPhone", "+380984122345");
-        populateField(fontFile, acroForm, field, "recipientAddress", processAddress(recipient.getAddress()));
+        populateField(acroForm, field, "recipientName", recipient.getName());
+        populateField(acroForm, field, "recipientPhone", recipient.getPhone().getPhoneNumber());
+        populateField(acroForm, field, "recipientAddress", processAddress(recipient.getAddress()));
     }
 
     private String processAddress(Address address) {
