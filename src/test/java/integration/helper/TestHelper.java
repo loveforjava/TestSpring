@@ -5,6 +5,7 @@ import com.opinta.service.*;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import javax.naming.AuthenticationException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -46,25 +47,26 @@ public class TestHelper {
         postcodePoolService.delete(postOffice.getPostcodePool().getId());
     }
 
-    public Shipment createShipment() {
+    public Shipment createShipment() throws Exception {
         Shipment shipment = new Shipment(createClient(), createClient(),
                 DeliveryType.D2D, 4.0F, 3.8F, new BigDecimal(200), new BigDecimal(30), new BigDecimal(35.2));
         return shipmentService.saveEntity(shipment);
     }
 
-    public void deleteShipment(Shipment shipment) {
-        shipmentService.delete(shipment.getId());
-        clientService.delete(shipment.getSender().getId());
-        clientService.delete(shipment.getRecipient().getId());
+    public void deleteShipment(Shipment shipment) throws Exception {
+        shipmentService.delete(shipment.getId(), shipment.getSender().getCounterparty().getUser());
+        clientService.delete(shipment.getSender().getId(), shipment.getSender().getCounterparty().getUser());
+        clientService.delete(shipment.getRecipient().getId(), shipment.getSender().getCounterparty().getUser());
     }
 
-    public Client createClient() {
-        Client newClient = new Client("FOP Ivanov", "001", createAddress(), createPhone(), createCounterparty());
-        return clientService.saveEntity(newClient);
+    public Client createClient() throws Exception {
+        Client newClient = new Client("FOP Ivanov", "001", createAddress(), createPhone(),
+                createCounterparty());
+        return clientService.saveEntity(newClient, newClient.getCounterparty().getUser());
     }
 
-    public void deleteClient(Client client) {
-        clientService.delete(client.getId());
+    public void deleteClient(Client client) throws Exception {
+        clientService.delete(client.getId(), client.getCounterparty().getUser());
         addressService.delete(client.getAddress().getId());
         deleteCounterpartyWithPostcodePool(client.getCounterparty());
     }
@@ -79,7 +81,7 @@ public class TestHelper {
         return addressService.saveEntity(address);
     }
 
-    public Counterparty createCounterparty() {
+    public Counterparty createCounterparty() throws Exception {
         Counterparty counterparty = new Counterparty("Modna kasta", createPostcodePool());
         return counterpartyService.saveEntity(counterparty);
     }
@@ -88,8 +90,8 @@ public class TestHelper {
         return postcodePoolService.saveEntity(new PostcodePool("12345", false));
     }
 
-    public void deleteCounterpartyWithPostcodePool(Counterparty counterparty) {
-        counterpartyService.delete(counterparty.getId());
+    public void deleteCounterpartyWithPostcodePool(Counterparty counterparty) throws Exception{
+        counterpartyService.delete(counterparty.getId(), counterparty.getUser());
         postcodePoolService.delete(counterparty.getPostcodePool().getId());
     }
 

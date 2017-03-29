@@ -3,6 +3,7 @@ package integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opinta.dto.ShipmentDto;
 import com.opinta.entity.Shipment;
+import com.opinta.entity.User;
 import com.opinta.mapper.ShipmentMapper;
 import com.opinta.service.ShipmentService;
 import org.json.simple.JSONObject;
@@ -69,6 +70,9 @@ public class ShipmentControllerIT extends BaseControllerIT {
     @Test
     @SuppressWarnings("unchecked")
     public void createClient() throws Exception {
+        // TODO
+        User user = new User();
+
         // create
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
         jsonObject.put("senderId", (int) testHelper.createClient().getId());
@@ -86,7 +90,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
                         path("id");
 
         // check created data
-        Shipment createdShipment = shipmentService.getEntityById(newShipmentId);
+        Shipment createdShipment = shipmentService.getEntityById(newShipmentId, user);
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(shipmentMapper.toDto(createdShipment));
 
@@ -99,6 +103,9 @@ public class ShipmentControllerIT extends BaseControllerIT {
     @Test
     @SuppressWarnings("unchecked")
     public void updateShipment() throws Exception {
+        // TODO
+        User user = new User();
+
         // update
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
         jsonObject.put("senderId", (int) testHelper.createClient().getId());
@@ -114,7 +121,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
                 statusCode(SC_OK);
 
         // check updated data
-        ShipmentDto shipmentDto = shipmentMapper.toDto(shipmentService.getEntityById(shipmentId));
+        ShipmentDto shipmentDto = shipmentMapper.toDto(shipmentService.getEntityById(shipmentId, user));
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(shipmentDto);
 

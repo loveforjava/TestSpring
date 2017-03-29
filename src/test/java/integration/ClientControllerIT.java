@@ -3,6 +3,7 @@ package integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opinta.dto.ClientDto;
 import com.opinta.entity.Client;
+import com.opinta.entity.User;
 import com.opinta.mapper.ClientMapper;
 import com.opinta.service.ClientService;
 import org.json.simple.JSONObject;
@@ -69,6 +70,9 @@ public class ClientControllerIT extends BaseControllerIT {
     @Test
     @SuppressWarnings("unchecked")
     public void createClient() throws Exception {
+        // TODO
+        User user = new User();
+
         // create
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/client.json");
         jsonObject.put("counterpartyId", (int) testHelper.createCounterparty().getId());
@@ -86,7 +90,7 @@ public class ClientControllerIT extends BaseControllerIT {
                         path("id");
 
         // check created data
-        Client createdClient = clientService.getEntityById(newClientId);
+        Client createdClient = clientService.getEntityById(newClientId, user);
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientMapper.toDto(createdClient));
 
@@ -99,6 +103,9 @@ public class ClientControllerIT extends BaseControllerIT {
     @Test
     @SuppressWarnings("unchecked")
     public void updateClient() throws Exception {
+        // TODO
+        User user = new User();
+
         // update
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/client.json");
         jsonObject.put("counterpartyId", (int) testHelper.createCounterparty().getId());
@@ -114,7 +121,7 @@ public class ClientControllerIT extends BaseControllerIT {
                 statusCode(SC_OK);
 
         // check updated data
-        ClientDto clientDto = clientMapper.toDto(clientService.getEntityById(clientId));
+        ClientDto clientDto = clientMapper.toDto(clientService.getEntityById(clientId, user));
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientDto);
 

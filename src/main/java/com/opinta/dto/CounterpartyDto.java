@@ -1,5 +1,6 @@
 package com.opinta.dto;
 
+import java.util.UUID;
 import javax.validation.constraints.Size;
 
 import lombok.EqualsAndHashCode;
@@ -21,4 +22,5 @@ public class CounterpartyDto {
     private long postcodePoolId;
     @Size(max = 255)
     private String description;
+    private UUID token;
 }

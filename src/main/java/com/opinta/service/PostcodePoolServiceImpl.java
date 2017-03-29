@@ -30,6 +30,18 @@ public class PostcodePoolServiceImpl implements PostcodePoolService {
     }
 
     @Override
+    public List<PostcodePool> getAllEntities() {
+        log.info("Getting all postcodePools");
+        return postcodePoolDao.getAll();
+    }
+
+    @Override
+    public PostcodePool getEntityById(long id) {
+        log.info("Getting postcodePool by id {}", id);
+        return postcodePoolDao.getById(id);
+    }
+
+    @Override
     @Transactional
     public PostcodePool saveEntity(PostcodePool postcodePool) {
         log.info("Saving postcodePool {}", postcodePool);
@@ -39,15 +51,13 @@ public class PostcodePoolServiceImpl implements PostcodePoolService {
     @Override
     @Transactional
     public List<PostcodePoolDto> getAll() {
-        log.info("Getting all postcodePools");
-        return postcodePoolMapper.toDto(postcodePoolDao.getAll());
+        return postcodePoolMapper.toDto(getAllEntities());
     }
 
     @Override
     @Transactional
     public PostcodePoolDto getById(long id) {
-        log.info("Getting postcodePool by id {}", id);
-        return postcodePoolMapper.toDto(postcodePoolDao.getById(id));
+        return postcodePoolMapper.toDto(getEntityById(id));
     }
 
     @Override

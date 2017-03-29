@@ -7,6 +7,7 @@ import com.opinta.entity.Shipment;
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.Client;
 import com.opinta.entity.DeliveryType;
+import com.opinta.entity.User;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
 import org.apache.pdfbox.pdmodel.interactive.form.PDTextField;
@@ -29,13 +30,15 @@ import static org.mockito.Mockito.verify;
 public class PDFGeneratorServiceTest {
     @Mock
     private ShipmentService shipmentService;
-
+    @Mock
+    private UserService userService;
     private PDFGeneratorService pdfGeneratorService;
+
     private Shipment shipment;
 
     @Before
     public void setUp() throws Exception {
-        pdfGeneratorService = new PDFGeneratorServiceImpl(shipmentService);
+        pdfGeneratorService = new PDFGeneratorServiceImpl(shipmentService, userService);
 
         Address senderAddress = new Address("00001", "Ternopil", "Monastiriska",
                         "Monastiriska", "Sadova", "51", "");
@@ -49,20 +52,26 @@ public class PDFGeneratorServiceTest {
     }
 
     @Test
-    public void generateLabel_and_generatePostpay_ShouldReturnNotEmptyFile() {
-        when(shipmentService.getEntityById(1L)).thenReturn(shipment);
+    public void generateLabel_and_generatePostpay_ShouldReturnNotEmptyFile() throws Exception {
+        // TODO
+        User user = new User();
+
+        when(shipmentService.getEntityById(1L, user)).thenReturn(shipment);
         assertNotEquals("PDFGenerator returned an empty label",
-                pdfGeneratorService.generateLabel(1L).length, 0);
+                pdfGeneratorService.generateLabel(1L, user).length, 0);
         assertNotEquals("PDFGenerator returned an empty postpay form",
-                pdfGeneratorService.generateLabel(1L).length, 0);
-        verify(shipmentService, atLeast(2)).getEntityById(1L);
+                pdfGeneratorService.generateLabel(1L, user).length, 0);
+        verify(shipmentService, atLeast(2)).getEntityById(1L, user);
     }
 
     @Test
     public void generateLabel_ShouldReturnValidAcroForms() throws Exception {
-        when(shipmentService.getEntityById(1L)).thenReturn(shipment);
+        // TODO
+        User user = new User();
 
-        byte[] labelForm = pdfGeneratorService.generateLabel(1L);
+        when(shipmentService.getEntityById(1L, user)).thenReturn(shipment);
+
+        byte[] labelForm = pdfGeneratorService.generateLabel(1L, user);
 
         PDAcroForm acroForm = getAcroFormFromPdfFile(labelForm);
 
@@ -96,14 +105,17 @@ public class PDFGeneratorServiceTest {
         field = (PDTextField) acroForm.getField("totalCost");
         assertEquals("Expected totalCost to be 15", field.getValue(), "15.25");
 
-        verify(shipmentService).getEntityById(1L);
+        verify(shipmentService).getEntityById(1L, user);
     }
 
     @Test
     public void generatePostpay_ShouldReturnValidAcroForms() throws Exception {
-        when(shipmentService.getEntityById(1L)).thenReturn(shipment);
+        // TODO
+        User user = new User();
 
-        byte[] postpayForm = pdfGeneratorService.generatePostpay(1L);
+        when(shipmentService.getEntityById(1L, user)).thenReturn(shipment);
+
+        byte[] postpayForm = pdfGeneratorService.generatePostpay(1L, user);
 
         PDAcroForm acroForm = getAcroFormFromPdfFile(postpayForm);
 
@@ -128,7 +140,7 @@ public class PDFGeneratorServiceTest {
         field = (PDTextField) acroForm.getField("priceKopiyky");
         assertEquals("Expected priceKopiyky to be 25", field.getValue(), "25");
 
-        verify(shipmentService).getEntityById(1L);
+        verify(shipmentService).getEntityById(1L, user);
     }
 
     private PDAcroForm getAcroFormFromPdfFile(byte[] postpayForm) throws IOException {

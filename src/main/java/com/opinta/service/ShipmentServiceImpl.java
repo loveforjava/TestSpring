@@ -4,11 +4,13 @@ import com.opinta.dao.TariffGridDao;
 import com.opinta.entity.Address;
 import com.opinta.entity.DeliveryType;
 import com.opinta.entity.TariffGrid;
+import com.opinta.entity.User;
 import com.opinta.entity.W2wVariation;
 import com.opinta.util.AddressUtil;
 import java.math.BigDecimal;
 import java.util.List;
 
+import javax.naming.AuthenticationException;
 import javax.transaction.Transactional;
 
 import com.opinta.dao.ClientDao;
@@ -31,16 +33,19 @@ import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 @Slf4j
 public class ShipmentServiceImpl implements ShipmentService {
     private final ShipmentDao shipmentDao;
-    private final ClientDao clientDao;
+    private final ClientService clientService;
+    private final UserService userService;
     private final TariffGridDao tariffGridDao;
     private final ShipmentMapper shipmentMapper;
     private final BarcodeInnerNumberService barcodeInnerNumberService;
 
     @Autowired
-    public ShipmentServiceImpl(ShipmentDao shipmentDao, ClientDao clientDao, TariffGridDao tariffGridDao,
-                               ShipmentMapper shipmentMapper, BarcodeInnerNumberService barcodeInnerNumberService) {
+    public ShipmentServiceImpl(ShipmentDao shipmentDao, ClientService clientService, UserService userService,
+                               TariffGridDao tariffGridDao, ShipmentMapper shipmentMapper,
+                               BarcodeInnerNumberService barcodeInnerNumberService) {
         this.shipmentDao = shipmentDao;
-        this.clientDao = clientDao;
+        this.clientService = clientService;
+        this.userService = userService;
         this.tariffGridDao = tariffGridDao;
         this.shipmentMapper = shipmentMapper;
         this.barcodeInnerNumberService = barcodeInnerNumberService;
@@ -48,16 +53,20 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public List<Shipment> getAllEntities() {
+    public List<Shipment> getAllEntities(User user) {
         log.info("Getting all shipments");
-        return shipmentDao.getAll();
+        return shipmentDao.getAll(user);
     }
 
     @Override
     @Transactional
-    public Shipment getEntityById(long id) {
+    public Shipment getEntityById(long id, User user) throws AuthenticationException {
         log.info("Getting postcodePool by id {}", id);
-        return shipmentDao.getById(id);
+        Shipment shipment = shipmentDao.getById(id);
+
+        userService.authorizeForAction(shipment, user);
+
+        return shipment;
     }
 
     @Override
@@ -69,67 +78,72 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public List<ShipmentDto> getAll() {
-        return shipmentMapper.toDto(getAllEntities());
+    public List<ShipmentDto> getAll(User user) {
+        return shipmentMapper.toDto(getAllEntities(user));
     }
 
     @Override
     @Transactional
-    public List<ShipmentDto> getAllByClientId(long clientId) {
-        Client client = clientDao.getById(clientId);
-        if (client == null) {
-            log.debug("Can't get shipment list by client. Client {} doesn't exist", clientId);
-            return null;
-        }
+    public List<ShipmentDto> getAllByClientId(long id, User user) throws AuthenticationException {
+        Client client = clientService.getEntityById(id, user);
         log.info("Getting all shipments by client {}", client);
-        return shipmentMapper.toDto(shipmentDao.getAllByClient(client));
+        return shipmentMapper.toDto(shipmentDao.getAllByClient(client, user));
     }
 
     @Override
     @Transactional
-    public ShipmentDto getById(long id) {
-        return shipmentMapper.toDto(getEntityById(id));
+    public ShipmentDto getById(long id, User user) throws AuthenticationException {
+        return shipmentMapper.toDto(getEntityById(id, user));
     }
 
     @Override
     @Transactional
-    public ShipmentDto save(ShipmentDto shipmentDto) {
-        Client existingClient = clientDao.getById(shipmentDto.getSenderId());
+    public ShipmentDto save(ShipmentDto shipmentDto, User user) throws AuthenticationException {
+        Client existingClient = clientService.getEntityById(shipmentDto.getSenderId(), user);
         Counterparty counterparty = existingClient.getCounterparty();
         PostcodePool postcodePool = counterparty.getPostcodePool();
         BarcodeInnerNumber newBarcode = barcodeInnerNumberService.generateBarcodeInnerNumber(postcodePool);
         postcodePool.getBarcodeInnerNumbers().add(newBarcode);
         Shipment shipment = shipmentMapper.toEntity(shipmentDto);
         shipment.setBarcode(newBarcode);
-        log.info("Saving shipment with assigned barcode", shipmentMapper.toDto(shipment));
 
-        shipment.setSender(clientDao.getById(shipment.getSender().getId()));
-        shipment.setRecipient(clientDao.getById(shipment.getRecipient().getId()));
+        Client sender = clientService.getEntityById(shipment.getSender().getId(), user);
+
+        userService.authorizeForAction(sender, user);
+
+        shipment.setSender(sender);
+        shipment.setRecipient(clientService.getEntityById(shipment.getRecipient().getId(), user));
         shipment.setPrice(calculatePrice(shipment));
 
+        log.info("Saving shipment with assigned barcode", shipmentMapper.toDto(shipment));
         return shipmentMapper.toDto(shipmentDao.save(shipment));
     }
 
     @Override
     @Transactional
-    public ShipmentDto update(long id, ShipmentDto shipmentDto) {
+    public ShipmentDto update(long id, ShipmentDto shipmentDto, User user) throws Exception {
         Shipment source = shipmentMapper.toEntity(shipmentDto);
         Shipment target = shipmentDao.getById(id);
+
         if (target == null) {
             log.debug("Can't update shipment. Shipment doesn't exist {}", id);
-            return null;
+            throw new Exception(format("Can't update shipment. Shipment doesn't exist %d", id));
         }
+
+        userService.authorizeForAction(target, user);
+
         try {
             copyProperties(target, source);
         } catch (Exception e) {
             log.error("Can't get properties from object to updatable object for shipment", e);
+            throw new Exception("Can't get properties from object to updatable object for shipment", e);
         }
         target.setId(id);
         try {
-            fillSenderAndRecipient(target);
+            fillSenderAndRecipient(target, user);
         } catch (IllegalArgumentException e) {
             log.error("Can't update shipment {}. Sender or recipient doesn't exist", target, e);
-            return null;
+            throw new Exception(format("Can't update shipment %s. Sender or recipient doesn't exist", target), e);
         }
         target.setPrice(calculatePrice(target));
         log.info("Updating shipment {}", target);
@@ -137,9 +151,25 @@ public class ShipmentServiceImpl implements ShipmentService {
         return shipmentMapper.toDto(target);
     }
 
-    private void fillSenderAndRecipient(Shipment target) throws IllegalArgumentException {
-        target.setSender(clientDao.getById(target.getSender().getId()));
-        target.setRecipient(clientDao.getById(target.getRecipient().getId()));
+    @Override
+    @Transactional
+    public void delete(long id, User user) throws Exception {
+        Shipment shipment = shipmentDao.getById(id);
+        if (shipment == null) {
+            log.debug("Can't delete shipment. Shipment doesn't exist {}", id);
+            throw new Exception(format("Can't delete shipment. Shipment doesn't exist {}", id));
+        }
+
+        userService.authorizeForAction(shipment, user);
+
+        shipment.setId(id);
+        log.info("Deleting shipment {}", shipment);
+        shipmentDao.delete(shipment);
+    }
+
+    private void fillSenderAndRecipient(Shipment target, User user) throws Exception {
+        target.setSender(clientService.getEntityById(target.getSender().getId(), user));
+        target.setRecipient(clientService.getEntityById(target.getRecipient().getId(), user));
         if (target.getSender() == null) {
             throw new IllegalArgumentException(
                     format("Can't calculate price for shipment %s. Sender doesn't exist", target));
@@ -148,20 +178,6 @@ public class ShipmentServiceImpl implements ShipmentService {
             throw new IllegalArgumentException(
                     format("Can't calculate price for shipment %s. Recipient doesn't exist", target));
         }
-    }
-
-    @Override
-    @Transactional
-    public boolean delete(long id) {
-        Shipment shipment = shipmentDao.getById(id);
-        if (shipment == null) {
-            log.debug("Can't delete shipment. Shipment doesn't exist {}", id);
-            return false;
-        }
-        shipment.setId(id);
-        log.info("Deleting shipment {}", shipment);
-        shipmentDao.delete(shipment);
-        return true;
     }
 
     private BigDecimal calculatePrice(Shipment shipment) {
