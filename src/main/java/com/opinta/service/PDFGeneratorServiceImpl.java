@@ -92,7 +92,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
     }
 
     public byte[] generatePostpay(Shipment shipment) throws IOException {
-        byte[] data = null;
+        byte[] data;
         try {
             //Getting PDF template from the file
             File templateFile = new File(getClass()
@@ -142,7 +142,6 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             template.save(outputStream);
             data = outputStream.toByteArray();
-//            template.close();
         } catch (IOException e) {
             log.error("Error while parsing and populating PDF template: {}", e.getMessage());
             throw new IOException("Error while parsing and populating PDF template");
@@ -151,7 +150,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
     }
 
     public byte[] generateLabel(Shipment shipment) throws IOException {
-        byte[] data = null;
+        byte[] data;
         try {
             //Getting PDF template from the file
             File templateFile = new File(getClass()
