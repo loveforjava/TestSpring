@@ -292,8 +292,10 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         String output = "вул. " + address.getStreet() + ", " +
                 address.getHouseNumber() + ", " +
                 (address.getApartmentNumber() == null ? "" : "кв. " + address.getApartmentNumber() + ", ") +
-                address.getCity() +
-                "\n" + address.getPostcode();
+                address.getCity() + ", " +
+                (address.getDistrict() == null ? "" : address.getDistrict() + " р-н ") +
+                (address.getRegion() == null ? "" : address.getRegion() + " обл.") +
+                " " + address.getPostcode();
         return output;
     }
 }
