@@ -2,6 +2,7 @@ package com.opinta.dao;
 
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.ShipmentGroup;
+import com.opinta.entity.User;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -23,9 +24,11 @@ public class ShipmentGroupDaoImpl implements ShipmentGroupDao {
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<ShipmentGroup> getAll() {
+    public List<ShipmentGroup> getAll(User user) {
         Session session = sessionFactory.getCurrentSession();
-        return session.createCriteria(ShipmentGroup.class)
+        return session.createCriteria(ShipmentGroup.class, "shipmentGroup")
+                .createCriteria("shipmentGroup.counterparty", "counterparty")
+                .add(Restrictions.eq("counterparty.user", user))
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                 .list();
     }

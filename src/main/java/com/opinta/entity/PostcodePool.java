@@ -14,6 +14,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import lombok.ToString;
 
 /**
  * PostcodePool holds all postcodes ("00000"-"99999") and pool of the inner numbers for each postcode
@@ -23,6 +24,7 @@ import java.util.List;
 @Entity
 @Data
 @NoArgsConstructor
+@ToString(exclude = {"barcodeInnerNumbers"})
 public class PostcodePool {
     @Id
     @GeneratedValue
