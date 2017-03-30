@@ -5,6 +5,6 @@ import javax.naming.AuthenticationException;
 
 public interface PDFGeneratorService {
 
-    byte[] generate(long id, User user) throws Exception, AuthenticationException;
+    byte[] generate(long id, User user) throws Exception;
 
 }
