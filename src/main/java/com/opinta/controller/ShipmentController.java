@@ -47,7 +47,7 @@ public class ShipmentController {
 
     @GetMapping("{id}")
     public ResponseEntity<?> getShipment(@PathVariable("id") UUID id) {
-        ShipmentDto shipmentDto = shipmentService.getById(id);
+        ShipmentDto shipmentDto = shipmentService.getByUuid(id);
         if (shipmentDto == null) {
             return new ResponseEntity<>(format("No Shipment found for ID %s", id), NOT_FOUND);
         }

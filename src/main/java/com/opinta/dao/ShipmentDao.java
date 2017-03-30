@@ -12,7 +12,7 @@ public interface ShipmentDao {
 
     List<Shipment> getAllByClient(Client client);
 
-    Shipment getById(UUID id);
+    Shipment getByUuid(UUID uuid);
 
     Shipment save(Shipment shipment);
 

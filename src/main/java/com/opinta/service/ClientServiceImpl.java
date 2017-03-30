@@ -46,15 +46,15 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public Client getEntityById(UUID id) {
-        log.info("Getting address by uuid {}", id);
-        return clientDao.getById(id);
+    public Client getEntityByUuid(UUID uuid) {
+        log.info("Getting Client by uuid {}", uuid);
+        return clientDao.getByUuid(uuid);
     }
 
     @Override
     @Transactional
     public Client saveEntity(Client client) {
-        log.info("Saving address {}", client);
+        log.info("Saving Client {}", client);
         return clientDao.save(client);
     }
 
@@ -68,10 +68,10 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public List<ClientDto> getAllByCounterpartyId(UUID counterpartyId) {
-        Counterparty counterparty = counterpartyService.getEntityById(counterpartyId);
+    public List<ClientDto> getAllByCounterpartyUuid(UUID counterpartyUuid) {
+        Counterparty counterparty = counterpartyService.getEntityByUuid(counterpartyUuid);
         if (counterparty == null) {
-            log.debug("Can't get client list by counterparty. Counterparty {} doesn't exist", counterpartyId);
+            log.debug("Can't get client list by counterparty. Counterparty {} doesn't exist", counterpartyUuid);
             return null;
         }
         log.info("Getting all clients by counterparty {}", counterparty);
@@ -80,9 +80,9 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public ClientDto getById(UUID id) {
-        log.info("Getting client by uuid {}", id);
-        Client client = clientDao.getById(id);
+    public ClientDto getByUuid(UUID uuid) {
+        log.info("Getting client by uuid {}", uuid);
+        Client client = clientDao.getByUuid(uuid);
         return clientMapper.toDto(client);
     }
 
@@ -102,16 +102,14 @@ public class ClientServiceImpl implements ClientService {
         log.info("Saving client {}", clientDto);
         client = clientDao.save(client);
         log.info("saved Client uuid: " + client.getUuid());
-        clientDto = clientMapper.toDto(client);
-        log.info("saved ClientDto uuid: " + client.getUuid());
-        return clientDto;
+        return clientMapper.toDto(client);
     }
 
     @Override
     @Transactional
-    public ClientDto update(UUID id, ClientDto clientDto) throws Exception {
+    public ClientDto update(UUID uuid, ClientDto clientDto) throws Exception {
         Client source = clientMapper.toEntity(clientDto);
-        Client target = clientDao.getById(id);
+        Client target = clientDao.getByUuid(uuid);
         // validate reference fields
         try {
             validateInnerReferenceAndFillObjectFromDB(source);
@@ -126,7 +124,7 @@ public class ClientServiceImpl implements ClientService {
             throw new Exception("Can't get properties from object to updatable object for client", e);
         }
 
-        target.setUuid(id);
+        target.setUuid(uuid);
         target.setCounterparty(source.getCounterparty());
         target.setPhone(phoneService.getOrCreateEntityByPhoneNumber(clientDto.getPhoneNumber()));
         target.setAddress(source.getAddress());
@@ -137,10 +135,10 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public boolean delete(UUID id) {
-        Client client = clientDao.getById(id);
+    public boolean delete(UUID uuid) {
+        Client client = clientDao.getByUuid(uuid);
         if (client == null) {
-            log.debug("Can't delete client. Client doesn't exist " + id);
+            log.debug("Can't delete client. Client doesn't exist " + uuid);
             return false;
         }
         log.info("Deleting client {}", client);
@@ -149,7 +147,7 @@ public class ClientServiceImpl implements ClientService {
     }
 
     private void validateInnerReferenceAndFillObjectFromDB(Client source) throws Exception {
-        Counterparty counterparty = counterpartyService.getEntityById(source.getCounterparty().getUuid());
+        Counterparty counterparty = counterpartyService.getEntityByUuid(source.getCounterparty().getUuid());
         if (counterparty == null) {
             log.error("Counterparty %s doesn't exist ", source.getCounterparty().getUuid());
             throw new Exception(format("Counterparty %s doesn't exist ", source.getCounterparty().getUuid()));

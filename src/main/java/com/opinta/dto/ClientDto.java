@@ -17,12 +17,12 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode
 public class ClientDto {
-    private UUID id;
+    private UUID uuid;
     @Size(max = 255)
     private String name;
     @Size(max = 25)
     private String uniqueRegistrationNumber;
-    private UUID counterpartyId;
+    private UUID counterpartyUuid;
     private long addressId;
     private String phoneNumber;
 }

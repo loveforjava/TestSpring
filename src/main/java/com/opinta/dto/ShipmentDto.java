@@ -14,9 +14,9 @@ import lombok.ToString;
 @Setter
 @ToString
 public class ShipmentDto {
-    private UUID id;
-    private UUID senderId;
-    private UUID recipientId;
+    private UUID uuid;
+    private UUID senderUuid;
+    private UUID recipientUuid;
     @EnumString(source = DeliveryType.class)
     private DeliveryType deliveryType;
     @Size(min = 13, max = 13)

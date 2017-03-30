@@ -25,10 +25,10 @@ public class Shipment {
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     private UUID uuid;
     @ManyToOne
-    @JoinColumn(name = "sender_id")
+    @JoinColumn(name = "sender_uuid")
     private Client sender;
     @ManyToOne
-    @JoinColumn(name = "recipient_id")
+    @JoinColumn(name = "recipient_uuid")
     private Client recipient;
     @OneToOne
     private BarcodeInnerNumber barcode;

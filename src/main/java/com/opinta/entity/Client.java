@@ -32,7 +32,7 @@ public class Client {
     @JoinColumn(name = "phone_id")
     private Phone phone;
     @ManyToOne
-    @JoinColumn(name = "counterparty_id")
+    @JoinColumn(name = "counterparty_uuid")
     private Counterparty counterparty;
 
     public Client(String name, String uniqueRegistrationNumber, Address address,

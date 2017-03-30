@@ -23,8 +23,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 
 public class ClientControllerIT extends BaseControllerIT {
     private Client client;
-    private UUID clientId = null;
-    private UUID anotherClientId = null;
+    private UUID clientUuid;
     @Autowired
     private ClientService clientService;
     @Autowired
@@ -35,8 +34,7 @@ public class ClientControllerIT extends BaseControllerIT {
     @Before
     public void setUp() throws Exception {
         client = testHelper.createClient();
-        clientId = client.getUuid();
-        anotherClientId = super.anotherUuid(clientId);
+        clientUuid = client.getUuid();
     }
 
     @After
@@ -55,16 +53,16 @@ public class ClientControllerIT extends BaseControllerIT {
     @Test
     public void getClient() throws Exception {
         when().
-                get("clients/{id}", clientId.toString()).
+                get("clients/{uuid}", clientUuid.toString()).
         then().
                 statusCode(SC_OK).
-                body("id", equalTo(clientId.toString()));
+                body("uuid", equalTo(clientUuid.toString()));
     }
 
     @Test
     public void getClient_notFound() throws Exception {
         when().
-                get("/clients/{id}", anotherClientId.toString()).
+                get("/clients/{uuid}", UUID.randomUUID().toString()).
         then().
                 statusCode(SC_NOT_FOUND);
     }
@@ -74,7 +72,7 @@ public class ClientControllerIT extends BaseControllerIT {
     public void createClient() throws Exception {
         // create
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/client.json");
-        jsonObject.put("counterpartyId", testHelper.createCounterparty().getUuid().toString());
+        jsonObject.put("counterpartyUuid", testHelper.createCounterparty().getUuid().toString());
         jsonObject.put("addressId", (int) testHelper.createAddress().getId());
         String expectedJson = jsonObject.toString();
 
@@ -86,12 +84,12 @@ public class ClientControllerIT extends BaseControllerIT {
                         post("/clients").
                 then().
                         extract().
-                        path("id");
+                        path("uuid");
         
         UUID newClientId = UUID.fromString(newClientIdString);
 
         // check created data
-        Client createdClient = clientService.getEntityById(newClientId);
+        Client createdClient = clientService.getEntityByUuid(newClientId);
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientMapper.toDto(createdClient));
 
@@ -106,7 +104,7 @@ public class ClientControllerIT extends BaseControllerIT {
     public void updateClient() throws Exception {
         // update
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/client.json");
-        jsonObject.put("counterpartyId", testHelper.createCounterparty().getUuid().toString());
+        jsonObject.put("counterpartyUuid", testHelper.createCounterparty().getUuid().toString());
         jsonObject.put("addressId", (int) testHelper.createAddress().getId());
         String expectedJson = jsonObject.toString();
 
@@ -114,12 +112,12 @@ public class ClientControllerIT extends BaseControllerIT {
                 contentType("application/json;charset=UTF-8").
                 body(expectedJson).
         when().
-                put("/clients/{id}", clientId).
+                put("/clients/{uuid}", clientUuid.toString()).
         then().
                 statusCode(SC_OK);
 
         // check updated data
-        ClientDto clientDto = clientMapper.toDto(clientService.getEntityById(clientId));
+        ClientDto clientDto = clientMapper.toDto(clientService.getEntityByUuid(clientUuid));
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientDto);
 
@@ -129,7 +127,7 @@ public class ClientControllerIT extends BaseControllerIT {
     @Test
     public void deleteClient() throws Exception {
         when().
-                delete("/clients/{id}", clientId).
+                delete("/clients/{uuid}", clientUuid.toString()).
         then().
                 statusCode(SC_OK);
     }
@@ -137,7 +135,7 @@ public class ClientControllerIT extends BaseControllerIT {
     @Test
     public void deleteClient_notFound() throws Exception {
         when().
-                delete("/clients/{id}", anotherClientId).
+                delete("/clients/{uuid}", UUID.randomUUID().toString()).
         then().
                 statusCode(SC_NOT_FOUND);
     }

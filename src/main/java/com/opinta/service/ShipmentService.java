@@ -10,19 +10,19 @@ public interface ShipmentService {
 
     List<Shipment> getAllEntities();
 
-    Shipment getEntityById(UUID id);
+    Shipment getEntityByUuid(UUID uuid);
 
     Shipment saveEntity(Shipment shipment);
     
     List<ShipmentDto> getAll();
 
-    List<ShipmentDto> getAllByClientId(UUID clientId);
+    List<ShipmentDto> getAllByClientUuid(UUID clientUuid);
     
-    ShipmentDto getById(UUID id);
+    ShipmentDto getByUuid(UUID uuid);
     
     ShipmentDto save(ShipmentDto shipmentDto);
     
-    ShipmentDto update(UUID id, ShipmentDto shipmentDto);
+    ShipmentDto update(UUID uuid, ShipmentDto shipmentDto);
     
-    boolean delete(UUID id);
+    boolean delete(UUID uuid);
 }

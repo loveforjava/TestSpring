@@ -10,19 +10,19 @@ public interface ClientService {
 
     List<Client> getAllEntities();
 
-    Client getEntityById(UUID id);
+    Client getEntityByUuid(UUID uuid);
 
     Client saveEntity(Client client);
     
     List<ClientDto> getAll();
 
-    List<ClientDto> getAllByCounterpartyId(UUID counterpartyId);
+    List<ClientDto> getAllByCounterpartyUuid(UUID counterpartyUuid);
 
-    ClientDto getById(UUID id);
+    ClientDto getByUuid(UUID uuid);
     
     ClientDto save(ClientDto client) throws Exception;
 
-    ClientDto update(UUID id, ClientDto source) throws Exception;
+    ClientDto update(UUID uuid, ClientDto source) throws Exception;
 
-    boolean delete(UUID id);
+    boolean delete(UUID uuid);
 }

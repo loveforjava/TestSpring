@@ -5,7 +5,6 @@ import com.opinta.entity.PostcodePool;
 import java.util.List;
 import java.util.UUID;
 
-import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -14,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-@Slf4j
 public class CounterpartyDaoImpl implements CounterpartyDao {
     private final SessionFactory sessionFactory;
     
@@ -33,9 +31,9 @@ public class CounterpartyDaoImpl implements CounterpartyDao {
     }
 
     @Override
-    public Counterparty getById(UUID id) {
+    public Counterparty getByUuid(UUID uuid) {
         Session session = this.sessionFactory.getCurrentSession();
-        return (Counterparty) session.get(Counterparty.class, id);
+        return (Counterparty) session.get(Counterparty.class, uuid);
     }
 
     @Override
@@ -51,10 +49,7 @@ public class CounterpartyDaoImpl implements CounterpartyDao {
     @Override
     public Counterparty save(Counterparty counterparty) {
         Session session = this.sessionFactory.getCurrentSession();
-        Counterparty saved = (Counterparty) session.merge(counterparty);
-        session.flush();
-        log.info("saved Counterparty UUID: " + saved.getUuid());
-        return saved;
+        return (Counterparty) session.merge(counterparty);
     }
 
     @Override

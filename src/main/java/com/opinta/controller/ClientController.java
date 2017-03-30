@@ -7,7 +7,6 @@ import com.opinta.dto.ClientDto;
 import com.opinta.dto.ShipmentDto;
 import com.opinta.service.ClientService;
 import com.opinta.service.ShipmentService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,7 +27,6 @@ import static org.springframework.http.HttpStatus.OK;
 
 @RestController
 @RequestMapping("/clients")
-@Slf4j
 public class ClientController {
     private final ClientService clientService;
     private final ShipmentService shipmentService;
@@ -47,7 +45,7 @@ public class ClientController {
     
     @GetMapping("{id}")
     public ResponseEntity<?> getClient(@PathVariable("id") UUID id) {
-        ClientDto clientDto = clientService.getById(id);
+        ClientDto clientDto = clientService.getByUuid(id);
         if (clientDto == null) {
             return new ResponseEntity<>(format("No Client found for ID %s", id), NOT_FOUND);
         }
@@ -56,7 +54,7 @@ public class ClientController {
 
     @GetMapping("{clientId}/shipments")
     public ResponseEntity<?> getShipmentsByClientId(@PathVariable UUID clientId) {
-        List<ShipmentDto> shipmentDtos = shipmentService.getAllByClientId(clientId);
+        List<ShipmentDto> shipmentDtos = shipmentService.getAllByClientUuid(clientId);
         if (shipmentDtos == null) {
             return new ResponseEntity<>(format("Client %s doesn't exist", clientId), NOT_FOUND);
         }

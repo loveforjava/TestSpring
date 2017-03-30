@@ -56,9 +56,9 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public Shipment getEntityById(UUID id) {
-        log.info("Getting postcodePool by uuid {}", id);
-        return shipmentDao.getById(id);
+    public Shipment getEntityByUuid(UUID uuid) {
+        log.info("Getting postcodePool by uuid {}", uuid);
+        return shipmentDao.getByUuid(uuid);
     }
 
     @Override
@@ -76,10 +76,10 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public List<ShipmentDto> getAllByClientId(UUID clientId) {
-        Client client = clientDao.getById(clientId);
+    public List<ShipmentDto> getAllByClientUuid(UUID clientUuid) {
+        Client client = clientDao.getByUuid(clientUuid);
         if (client == null) {
-            log.debug("Can't get shipment list by client. Client {} doesn't exist", clientId);
+            log.debug("Can't get shipment list by client. Client {} doesn't exist", clientUuid);
             return null;
         }
         log.info("Getting all shipments by client {}", client);
@@ -88,23 +88,23 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public ShipmentDto getById(UUID id) {
-        return shipmentMapper.toDto(getEntityById(id));
+    public ShipmentDto getByUuid(UUID uuid) {
+        return shipmentMapper.toDto(getEntityByUuid(uuid));
     }
 
     @Override
     @Transactional
     public ShipmentDto save(ShipmentDto shipmentDto) {
-        log.info("saving new Shipment for Client: " + shipmentDto.getSenderId());
-        Client existingClient = clientDao.getById(shipmentDto.getSenderId());
+        log.info("saving new Shipment for Client: " + shipmentDto.getSenderUuid());
+        Client existingClient = clientDao.getByUuid(shipmentDto.getSenderUuid());
         Counterparty counterparty = existingClient.getCounterparty();
         PostcodePool postcodePool = counterparty.getPostcodePool();
         BarcodeInnerNumber newBarcode = barcodeInnerNumberService.generateBarcodeInnerNumber(postcodePool);
         postcodePool.getBarcodeInnerNumbers().add(newBarcode);
         Shipment shipment = shipmentMapper.toEntity(shipmentDto);
         shipment.setBarcode(newBarcode);
-        shipment.setSender(clientDao.getById(shipment.getSender().getUuid()));
-        shipment.setRecipient(clientDao.getById(shipment.getRecipient().getUuid()));
+        shipment.setSender(clientDao.getByUuid(shipment.getSender().getUuid()));
+        shipment.setRecipient(clientDao.getByUuid(shipment.getRecipient().getUuid()));
         shipment.setPrice(calculatePrice(shipment));
         log.info("Saving shipment ", shipmentMapper.toDto(shipment));
 
@@ -113,11 +113,11 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public ShipmentDto update(UUID id, ShipmentDto shipmentDto) {
+    public ShipmentDto update(UUID uuid, ShipmentDto shipmentDto) {
         Shipment source = shipmentMapper.toEntity(shipmentDto);
-        Shipment target = shipmentDao.getById(id);
+        Shipment target = shipmentDao.getByUuid(uuid);
         if (target == null) {
-            log.debug("Can't update shipment. Shipment doesn't exist {}", id);
+            log.debug("Can't update shipment. Shipment doesn't exist {}", uuid);
             return null;
         }
         try {
@@ -125,7 +125,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         } catch (Exception e) {
             log.error("Can't get properties from object to updatable object for shipment", e);
         }
-        target.setUuid(id);
+        target.setUuid(uuid);
         try {
             fillSenderAndRecipient(target);
         } catch (IllegalArgumentException e) {
@@ -139,8 +139,8 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
     private void fillSenderAndRecipient(Shipment target) throws IllegalArgumentException {
-        target.setSender(clientDao.getById(target.getSender().getUuid()));
-        target.setRecipient(clientDao.getById(target.getRecipient().getUuid()));
+        target.setSender(clientDao.getByUuid(target.getSender().getUuid()));
+        target.setRecipient(clientDao.getByUuid(target.getRecipient().getUuid()));
         if (target.getSender() == null) {
             throw new IllegalArgumentException(
                     format("Can't calculate price for shipment %s. Sender doesn't exist", target));
@@ -153,13 +153,13 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public boolean delete(UUID id) {
-        Shipment shipment = shipmentDao.getById(id);
+    public boolean delete(UUID uuid) {
+        Shipment shipment = shipmentDao.getByUuid(uuid);
         if (shipment == null) {
-            log.debug("Can't delete shipment. Shipment doesn't exist {}", id);
+            log.debug("Can't delete shipment. Shipment doesn't exist {}", uuid);
             return false;
         }
-        shipment.setUuid(id);
+        shipment.setUuid(uuid);
         log.info("Deleting shipment {}", shipment);
         shipmentDao.delete(shipment);
         return true;

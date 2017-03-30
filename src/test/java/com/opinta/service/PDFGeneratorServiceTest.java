@@ -4,7 +4,6 @@ import com.opinta.entity.Address;
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.PostcodePool;
 import com.opinta.entity.Shipment;
-import com.opinta.entity.Counterparty;
 import com.opinta.entity.Client;
 import com.opinta.entity.DeliveryType;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -53,17 +52,17 @@ public class PDFGeneratorServiceTest {
 
     @Test
     public void generateLabel_and_generatePostpay_ShouldReturnNotEmptyFile() {
-        when(shipmentService.getEntityById(shipmentId)).thenReturn(shipment);
+        when(shipmentService.getEntityByUuid(shipmentId)).thenReturn(shipment);
         assertNotEquals("PDFGenerator returned an empty label",
                 pdfGeneratorService.generateLabel(shipmentId).length, 0);
         assertNotEquals("PDFGenerator returned an empty postpay form",
                 pdfGeneratorService.generateLabel(shipmentId).length, 0);
-        verify(shipmentService, atLeast(2)).getEntityById(shipmentId);
+        verify(shipmentService, atLeast(2)).getEntityByUuid(shipmentId);
     }
 
     @Test
     public void generateLabel_ShouldReturnValidAcroForms() throws Exception {
-        when(shipmentService.getEntityById(shipmentId)).thenReturn(shipment);
+        when(shipmentService.getEntityByUuid(shipmentId)).thenReturn(shipment);
 
         byte[] labelForm = pdfGeneratorService.generateLabel(shipmentId);
 
@@ -99,12 +98,12 @@ public class PDFGeneratorServiceTest {
         field = (PDTextField) acroForm.getField("totalCost");
         assertEquals("Expected totalCost to be 15", field.getValue(), "15.25");
 
-        verify(shipmentService).getEntityById(shipmentId);
+        verify(shipmentService).getEntityByUuid(shipmentId);
     }
 
     @Test
     public void generatePostpay_ShouldReturnValidAcroForms() throws Exception {
-        when(shipmentService.getEntityById(shipmentId)).thenReturn(shipment);
+        when(shipmentService.getEntityByUuid(shipmentId)).thenReturn(shipment);
 
         byte[] postpayForm = pdfGeneratorService.generatePostpay(shipmentId);
 
@@ -131,7 +130,7 @@ public class PDFGeneratorServiceTest {
         field = (PDTextField) acroForm.getField("priceKopiyky");
         assertEquals("Expected priceKopiyky to be 25", field.getValue(), "25");
 
-        verify(shipmentService).getEntityById(shipmentId);
+        verify(shipmentService).getEntityByUuid(shipmentId);
     }
 
     private PDAcroForm getAcroFormFromPdfFile(byte[] postpayForm) throws IOException {
