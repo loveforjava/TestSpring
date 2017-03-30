@@ -46,23 +46,27 @@ public class ClientServiceImpl implements ClientService {
     @Override
     @Transactional
     public Client getEntityById(long id) {
-        log.info("Getting address by id {}", id);
+        log.info("Getting client by id {}", id);
         return clientDao.getById(id);
     }
 
     @Override
     @Transactional
-    public Client saveEntity(Client client) {
-        log.info("Saving address {}", client);
+    public Client saveEntity(Client client) throws Exception {
+        log.info("Saving client {}", client);
+        try {
+            validateInnerReferenceAndFillObjectFromDB(client);
+        } catch (Exception e) {
+            throw new Exception(e);
+        }
+        client.setPhone(phoneService.getOrCreateEntityByPhoneNumber(client.getPhone().getPhoneNumber()));
         return clientDao.save(client);
     }
 
     @Override
     @Transactional
     public List<ClientDto> getAll() {
-        log.info("Getting all clients");
-        List<Client> allClients = clientDao.getAll();
-        return clientMapper.toDto(allClients);
+        return clientMapper.toDto(clientDao.getAll());
     }
 
     @Override
@@ -88,19 +92,7 @@ public class ClientServiceImpl implements ClientService {
     @Override
     @Transactional
     public ClientDto save(ClientDto clientDto) throws Exception {
-        Client client = clientMapper.toEntity(clientDto);
-        // validate reference fields
-        try {
-            validateInnerReferenceAndFillObjectFromDB(client);
-        } catch (Exception e) {
-            throw new Exception(e);
-        }
-
-        client.setPhone(phoneService.getOrCreateEntityByPhoneNumber(clientDto.getPhoneNumber()));
-
-        log.info("Saving client {}", clientDto);
-        client = clientDao.save(client);
-        return clientMapper.toDto(client);
+        return clientMapper.toDto(saveEntity(clientMapper.toEntity(clientDto)));
     }
 
     @Override

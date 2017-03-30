@@ -46,7 +46,7 @@ public class TestHelper {
         postcodePoolService.delete(postOffice.getPostcodePool().getId());
     }
 
-    public Shipment createShipment() {
+    public Shipment createShipment() throws Exception {
         Shipment shipment = new Shipment(createClient(), createClient(),
                 DeliveryType.D2D, 4.0F, 3.8F, new BigDecimal(200), new BigDecimal(30), new BigDecimal(35.2));
         return shipmentService.saveEntity(shipment);
@@ -58,7 +58,7 @@ public class TestHelper {
         clientService.delete(shipment.getRecipient().getId());
     }
 
-    public Client createClient() {
+    public Client createClient() throws Exception {
         Client newClient = new Client("FOP Ivanov", "001", createAddress(), createPhone(), createCounterparty());
         return clientService.saveEntity(newClient);
     }

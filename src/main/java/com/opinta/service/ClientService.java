@@ -11,7 +11,7 @@ public interface ClientService {
 
     Client getEntityById(long id);
 
-    Client saveEntity(Client client);
+    Client saveEntity(Client client) throws Exception;
     
     List<ClientDto> getAll();
 
@@ -19,9 +19,9 @@ public interface ClientService {
 
     ClientDto getById(long id);
     
-    ClientDto save(ClientDto client) throws Exception;
+    ClientDto save(ClientDto clientDto) throws Exception;
 
-    ClientDto update(long id, ClientDto source) throws Exception;
+    ClientDto update(long id, ClientDto clientDto) throws Exception;
 
     boolean delete(long id);
 }

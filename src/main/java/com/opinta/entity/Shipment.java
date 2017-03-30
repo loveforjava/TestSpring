@@ -27,6 +27,9 @@ public class Shipment {
     @ManyToOne
     @JoinColumn(name = "recipient_id")
     private Client recipient;
+    @ManyToOne
+    @JoinColumn(name = "shipment_group_uuid")
+    private ShipmentGroup shipmentGroup;
     @OneToOne
     private BarcodeInnerNumber barcode;
     @Enumerated(EnumType.STRING)
