@@ -8,8 +8,12 @@ import com.opinta.entity.PostcodePool;
 
 public interface PostcodePoolService {
 
+    List<PostcodePool> getAllEntities();
+
+    PostcodePool getEntityById(long id);
+
     PostcodePool saveEntity(PostcodePool postcodePool);
-    
+
     List<PostcodePoolDto> getAll();
 
     PostcodePoolDto getById(long id);

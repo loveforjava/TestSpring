@@ -10,6 +10,8 @@ import com.opinta.entity.Client;
 import com.opinta.entity.Phone;
 import com.opinta.entity.Shipment;
 import com.opinta.util.MoneyToTextConverter;
+import com.opinta.entity.User;
+import javax.naming.AuthenticationException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -46,7 +48,9 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
 
     private MoneyToTextConverter moneyToTextConverter;
 
-    private ShipmentService shipmentService;
+    private final ShipmentService shipmentService;
+    private final UserService userService;
+
     private PDDocument template;
     private PDTextField field;
     private String fontName;
@@ -54,17 +58,18 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
     private BitMatrix bitMatrix;
 
     @Autowired
-    public PDFGeneratorServiceImpl(ShipmentService shipmentService) {
+    public PDFGeneratorServiceImpl(ShipmentService shipmentService, UserService userService) {
         this.shipmentService = shipmentService;
         this.moneyToTextConverter = new MoneyToTextConverter();
+        this.userService = userService;
     }
 
     @Override
-    public byte[] generate(long shipmentId) throws Exception {
-        Shipment shipment = shipmentService.getEntityById(shipmentId);
-        if (shipment == null) {
-            throw new IllegalArgumentException(format("No shipment found for id %d", shipmentId));
-        }
+    public byte[] generate(long shipmentId, User user) throws AuthenticationException, Exception {
+        Shipment shipment = shipmentService.getEntityById(shipmentId, user);
+
+        userService.authorizeForAction(shipment, user);
+
         byte[] labelForm = generateLabel(shipment);
         BigDecimal postPay = shipment.getPostPay();
         //Checking postPay value, if more than 0 append postpay form

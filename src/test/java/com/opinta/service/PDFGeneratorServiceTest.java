@@ -9,6 +9,13 @@ import com.opinta.entity.DeliveryType;
 import com.opinta.entity.Phone;
 import com.opinta.entity.PostcodePool;
 import com.opinta.entity.Shipment;
+import com.opinta.entity.Counterparty;
+import com.opinta.entity.Client;
+import com.opinta.entity.DeliveryType;
+import com.opinta.entity.User;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
+import org.apache.pdfbox.pdmodel.interactive.form.PDTextField;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,6 +24,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.math.BigDecimal;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.atLeast;
@@ -26,12 +34,15 @@ import static org.mockito.Mockito.verify;
 public class PDFGeneratorServiceTest {
     @Mock
     private ShipmentService shipmentService;
+    @Mock
+    private UserService userService;
     private PDFGeneratorService pdfGeneratorService;
+
     private Shipment shipment;
 
     @Before
     public void setUp() throws Exception {
-        pdfGeneratorService = new PDFGeneratorServiceImpl(shipmentService);
+        pdfGeneratorService = new PDFGeneratorServiceImpl(shipmentService, userService);
 
         Address senderAddress = new Address("00001", "Ternopil", "Monastiriska",
                         "Monastiriska", "Sadova", "51", "");
@@ -39,25 +50,19 @@ public class PDFGeneratorServiceTest {
         Counterparty counterparty = new Counterparty("Modna kasta",
                 new PostcodePool("00003", false));
         Client sender = new Client("FOP Ivanov", "001", senderAddress, counterparty);
-        sender.setPhone(new Phone("80991234567"));
         Client recipient = new Client("Petrov PP", "002", recipientAddress, counterparty);
-        recipient.setPhone(new Phone("80951234567"));
         shipment = new Shipment(sender, recipient, DeliveryType.W2W, 1, 1,
                 new BigDecimal("12.5"), new BigDecimal("2.5"), new BigDecimal("15.25"));
-        shipment.setBarcode(new BarcodeInnerNumber("12345678", BarcodeStatus.RESERVED));
     }
 
     @Test
-    public void generateLabel_and_generatePostpay_ShouldReturnNotEmptyFile() {
-        when(shipmentService.getEntityById(1L)).thenReturn(shipment);
-        byte[] generate = new byte[0];
-        try {
-            generate = pdfGeneratorService.generate(1L);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void generateLabel_and_generatePostpay_ShouldReturnNotEmptyFile() throws Exception {
+        // TODO
+        User user = new User();
+
+        when(shipmentService.getEntityById(1L, user)).thenReturn(shipment);
         assertNotEquals("PDFGenerator returned an empty label",
-                generate.length, 0);
-        verify(shipmentService, atLeast(1)).getEntityById(1L);
+                pdfGeneratorService.generate(1L, user).length, 0);
+        verify(shipmentService, atLeast(1)).getEntityById(1L, user);
     }
 }
