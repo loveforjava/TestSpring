@@ -70,12 +70,12 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
 
         userService.authorizeForAction(shipment, user);
 
-        byte[] labelForm = generateLabel(shipment);
+        byte[] output = generateLabel(shipment);
         BigDecimal postPay = shipment.getPostPay();
         //Checking postPay value, if more than 0 append postpay form
         if (postPay.compareTo(BigDecimal.ZERO) > 0) {
             PDFMergerUtility merger = new PDFMergerUtility();
-            merger.addSource(new ByteArrayInputStream(labelForm));
+            merger.addSource(new ByteArrayInputStream(output));
             merger.addSource(new ByteArrayInputStream(generatePostpay(shipment)));
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             merger.setDestinationStream(outputStream);
@@ -85,12 +85,10 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
                 log.error("Got an error while merging the documents, {}", e.getMessage());
                 throw new IOException("Error while merging templates");
             }
-            template.close();
-            return outputStream.toByteArray();
-        } else {
-            template.close();
-            return labelForm;
+            output = outputStream.toByteArray();
         }
+        template.close();
+        return output;
     }
 
     public byte[] generatePostpay(Shipment shipment) throws IOException {
