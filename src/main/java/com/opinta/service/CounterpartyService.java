@@ -11,7 +11,7 @@ public interface CounterpartyService {
 
     List<Counterparty> getAllEntities();
 
-    Counterparty getEntityById(UUID id);
+    Counterparty getEntityByUuid(UUID uuid);
 
     List<Counterparty> getEntityByPostcodePool(PostcodePool postcodePool);
 
@@ -19,11 +19,11 @@ public interface CounterpartyService {
     
     List<CounterpartyDto> getAll();
     
-    CounterpartyDto getById(UUID id);
+    CounterpartyDto getByUuid(UUID uuid);
     
-    CounterpartyDto update(UUID id, CounterpartyDto source);
+    CounterpartyDto update(UUID uuid, CounterpartyDto source);
     
     CounterpartyDto save(CounterpartyDto counterparty);
     
-    boolean delete(UUID id);
+    boolean delete(UUID uuid);
 }

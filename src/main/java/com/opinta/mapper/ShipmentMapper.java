@@ -14,17 +14,15 @@ public interface ShipmentMapper extends BaseMapper<ShipmentDto, Shipment> {
 
     @Override
     @Mappings({
-            @Mapping(source = "sender.uuid", target = "senderId"),
-            @Mapping(source = "recipient.uuid", target = "recipientId"),
-            @Mapping(source = "uuid", target = "id")
+            @Mapping(source = "sender.uuid", target = "senderUuid"),
+            @Mapping(source = "recipient.uuid", target = "recipientUuid")
     })
     ShipmentDto toDto(Shipment shipment);
 
     @Override
     @Mappings({
-            @Mapping(target = "sender", expression = "java(createClientById(shipmentDto.getSenderId()))"),
-            @Mapping(target = "recipient", expression = "java(createClientById(shipmentDto.getRecipientId()))"),
-            @Mapping(source = "id", target = "uuid")
+            @Mapping(target = "sender", expression = "java(createClientById(shipmentDto.getSenderUuid()))"),
+            @Mapping(target = "recipient", expression = "java(createClientById(shipmentDto.getRecipientUuid()))")
     })
     Shipment toEntity(ShipmentDto shipmentDto);
 

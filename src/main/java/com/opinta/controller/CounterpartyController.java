@@ -46,7 +46,7 @@ public class CounterpartyController {
 
     @GetMapping("{id}")
     public ResponseEntity<?> getPostOffice(@PathVariable("id") UUID id) {
-        CounterpartyDto counterpartyDto = counterpartyService.getById(id);
+        CounterpartyDto counterpartyDto = counterpartyService.getByUuid(id);
         if (counterpartyDto == null) {
             return new ResponseEntity<>(format("No Counterparty found for ID %s", id), NOT_FOUND);
         }
@@ -55,7 +55,7 @@ public class CounterpartyController {
 
     @GetMapping("{counterpartyId}/clients")
     public ResponseEntity<?> getClientsByCounterpartyId(@PathVariable UUID counterpartyId) {
-        List<ClientDto> clientDtos = clientService.getAllByCounterpartyId(counterpartyId);
+        List<ClientDto> clientDtos = clientService.getAllByCounterpartyUuid(counterpartyId);
         if (clientDtos == null) {
             return new ResponseEntity<>(format("No Counterparty found for ID %s", counterpartyId), NOT_FOUND);
         }

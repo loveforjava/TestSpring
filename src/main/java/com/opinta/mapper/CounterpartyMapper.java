@@ -11,14 +11,10 @@ import org.mapstruct.Mappings;
 public interface CounterpartyMapper extends BaseMapper<CounterpartyDto, Counterparty> {
     
     @Override
-    @Mappings({
-            @Mapping(source = "postcodePoolId", target = "postcodePool.id"),
-            @Mapping(source = "id", target = "uuid")})
+    @Mapping(source = "postcodePoolId", target = "postcodePool.id")
     Counterparty toEntity(CounterpartyDto dto);
     
     @Override
-    @Mappings({
-            @Mapping(source = "postcodePool.id", target = "postcodePoolId"),
-            @Mapping(source = "uuid", target = "id")})
+    @Mapping(source = "postcodePool.id", target = "postcodePoolId")
     CounterpartyDto toDto(Counterparty entity);
 }

@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.UUID;
 
 import com.opinta.entity.Client;
-import com.opinta.entity.Counterparty;
-import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -15,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-@Slf4j
 public class ClientDaoImpl implements ClientDao {
     private final SessionFactory sessionFactory;
 
@@ -44,18 +41,15 @@ public class ClientDaoImpl implements ClientDao {
     }
 
     @Override
-    public Client getById(UUID id) {
-        log.info("get Client by id: " + id);
+    public Client getByUuid(UUID uuid) {
         Session session = sessionFactory.getCurrentSession();
-        return (Client) session.get(Client.class, id);
+        return (Client) session.get(Client.class, uuid);
     }
 
     @Override
     public Client save(Client client) {
         Session session = sessionFactory.getCurrentSession();
-        Client saved = (Client) session.merge(client);
-        session.flush();
-        return saved;
+        return (Client) session.merge(client);
     }
 
     @Override

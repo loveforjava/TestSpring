@@ -32,7 +32,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
 
     @Override
     public byte[] generatePostpay(UUID shipmentId) {
-        Shipment shipment = shipmentService.getEntityById(shipmentId);
+        Shipment shipment = shipmentService.getEntityByUuid(shipmentId);
         byte[] data = null;
         try {
             File file = new File(getClass()
@@ -67,7 +67,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
 
     @Override
     public byte[] generateLabel(UUID shipmentId) {
-        Shipment shipment = shipmentService.getEntityById(shipmentId);
+        Shipment shipment = shipmentService.getEntityByUuid(shipmentId);
         byte[] data = null;
         try {
             File file = new File(getClass()

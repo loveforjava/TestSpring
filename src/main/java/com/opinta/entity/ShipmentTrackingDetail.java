@@ -21,7 +21,7 @@ public class ShipmentTrackingDetail {
     @GeneratedValue
     private long id;
     @ManyToOne
-    @JoinColumn(name = "shipment_id")
+    @JoinColumn(name = "shipment_uuid")
     private Shipment shipment;
     @ManyToOne
     @JoinColumn(name = "post_office_id")

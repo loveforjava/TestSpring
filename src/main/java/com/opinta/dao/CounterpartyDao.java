@@ -11,7 +11,7 @@ public interface CounterpartyDao {
     
     List<Counterparty> getAll();
     
-    Counterparty getById(UUID id);
+    Counterparty getByUuid(UUID uuid);
 
     List<Counterparty> getByPostcodePool(PostcodePool postcodePool);
 

@@ -13,7 +13,7 @@ public interface ClientDao {
 
     List<Client> getAllByCounterparty(Counterparty counterparty);
 
-    Client getById(UUID id);
+    Client getByUuid(UUID uuid);
 
     Client save(Client client);
 

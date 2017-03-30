@@ -41,17 +41,15 @@ public class ShipmentDaoImpl implements ShipmentDao {
     }
 
     @Override
-    public Shipment getById(UUID id) {
+    public Shipment getByUuid(UUID uuid) {
         Session session = sessionFactory.getCurrentSession();
-        return (Shipment) session.get(Shipment.class, id);
+        return (Shipment) session.get(Shipment.class, uuid);
     }
 
     @Override
     public Shipment save(Shipment shipment) {
         Session session = sessionFactory.getCurrentSession();
-        Shipment saved = (Shipment) session.merge(shipment);
-        session.flush();
-        return saved;
+        return (Shipment) session.merge(shipment);
     }
 
     @Override
