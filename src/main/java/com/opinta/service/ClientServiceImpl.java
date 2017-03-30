@@ -69,17 +69,13 @@ public class ClientServiceImpl implements ClientService {
     @Override
     @Transactional
     public Client saveEntity(Client client, User user) throws Exception {
-        // validate reference fields
         try {
             validateInnerReferenceAndFillObjectFromDB(client);
         } catch (Exception e) {
             throw new Exception(e);
         }
-
         client.setPhone(phoneService.getOrCreateEntityByPhoneNumber(client.getPhone().getPhoneNumber()));
-
         userService.authorizeForAction(client, user);
-
         log.info("Saving client {}", client);
         return clientDao.save(client);
     }
@@ -87,9 +83,7 @@ public class ClientServiceImpl implements ClientService {
     @Override
     @Transactional
     public List<ClientDto> getAll(User user) {
-        log.info("Getting all clients");
-        List<Client> allClients = clientDao.getAll(user);
-        return clientMapper.toDto(allClients);
+        return clientMapper.toDto(getAllEntities(user));
     }
 
     @Override
@@ -107,15 +101,13 @@ public class ClientServiceImpl implements ClientService {
     @Override
     @Transactional
     public ClientDto getById(long id, User user) throws AuthenticationException {
-        Client client = getEntityById(id, user);
-        return clientMapper.toDto(client);
+        return clientMapper.toDto(getEntityById(id, user));
     }
 
     @Override
     @Transactional
     public ClientDto save(ClientDto clientDto, User user) throws Exception {
-        Client client = clientMapper.toEntity(clientDto);
-        return clientMapper.toDto(saveEntity(client, user));
+        return clientMapper.toDto(saveEntity(clientMapper.toEntity(clientDto), user));
     }
 
     @Override
@@ -126,7 +118,6 @@ public class ClientServiceImpl implements ClientService {
 
         userService.authorizeForAction(target, user);
 
-        // validate reference fields
         validateInnerReferenceAndFillObjectFromDB(source);
 
         try {

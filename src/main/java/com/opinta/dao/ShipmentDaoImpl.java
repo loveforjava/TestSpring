@@ -2,6 +2,7 @@ package com.opinta.dao;
 
 import com.opinta.entity.Client;
 import com.opinta.entity.Shipment;
+import com.opinta.entity.ShipmentGroup;
 import com.opinta.entity.User;
 import javax.naming.AuthenticationException;
 import org.hibernate.Criteria;
@@ -40,6 +41,19 @@ public class ShipmentDaoImpl implements ShipmentDao {
         Session session = sessionFactory.getCurrentSession();
         return session.createCriteria(Shipment.class, "shipment")
                 .add(Restrictions.eq("sender", client))
+                .createCriteria("shipment.sender", "sender")
+                .createCriteria("sender.counterparty", "counterparty")
+                .add(Restrictions.eq("counterparty.user", user))
+                .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
+                .list();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Shipment> getAllByShipmentGroup(ShipmentGroup shipmentGroup, User user) {
+        Session session = sessionFactory.getCurrentSession();
+        return session.createCriteria(Shipment.class, "shipment")
+                .add(Restrictions.eq("shipmentGroup", shipmentGroup))
                 .createCriteria("shipment.sender", "sender")
                 .createCriteria("sender.counterparty", "counterparty")
                 .add(Restrictions.eq("counterparty.user", user))

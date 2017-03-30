@@ -6,7 +6,6 @@ import com.opinta.entity.User;
 import java.util.List;
 
 import com.opinta.dto.CounterpartyDto;
-import javax.transaction.Transactional;
 
 public interface CounterpartyService {
 

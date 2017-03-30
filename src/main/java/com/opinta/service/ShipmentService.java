@@ -2,6 +2,7 @@ package com.opinta.service;
 
 import com.opinta.entity.User;
 import java.util.List;
+import java.util.UUID;
 
 import com.opinta.dto.ShipmentDto;
 import com.opinta.entity.Shipment;
@@ -18,7 +19,9 @@ public interface ShipmentService {
     List<ShipmentDto> getAll(User user);
 
     List<ShipmentDto> getAllByClientId(long clientId, User user) throws AuthenticationException;
-    
+
+    List<ShipmentDto> getAllByShipmentGroupId(UUID uuid, User user) throws Exception;
+
     ShipmentDto getById(long id, User user) throws AuthenticationException;
     
     ShipmentDto save(ShipmentDto shipmentDto, User user) throws AuthenticationException;

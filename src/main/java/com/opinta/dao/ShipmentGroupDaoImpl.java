@@ -1,10 +1,8 @@
 package com.opinta.dao;
 
 import com.opinta.entity.Counterparty;
+import com.opinta.entity.ShipmentGroup;
 import com.opinta.entity.User;
-import java.util.List;
-
-import com.opinta.entity.Client;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -12,21 +10,24 @@ import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.UUID;
+
 @Repository
-public class ClientDaoImpl implements ClientDao {
+public class ShipmentGroupDaoImpl implements ShipmentGroupDao {
     private final SessionFactory sessionFactory;
 
     @Autowired
-    public ClientDaoImpl(SessionFactory sessionFactory) {
+    public ShipmentGroupDaoImpl(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Client> getAll(User user) {
+    public List<ShipmentGroup> getAll(User user) {
         Session session = sessionFactory.getCurrentSession();
-        return session.createCriteria(Client.class, "client")
-                .createCriteria("client.counterparty", "counterparty")
+        return session.createCriteria(ShipmentGroup.class, "shipmentGroup")
+                .createCriteria("shipmentGroup.counterparty", "counterparty")
                 .add(Restrictions.eq("counterparty.user", user))
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                 .list();
@@ -34,35 +35,35 @@ public class ClientDaoImpl implements ClientDao {
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Client> getAllByCounterparty(Counterparty counterparty) {
+    public List<ShipmentGroup> getAllByCounterparty(Counterparty counterparty) {
         Session session = sessionFactory.getCurrentSession();
-        return session.createCriteria(Client.class)
+        return session.createCriteria(ShipmentGroup.class)
                 .add(Restrictions.eq("counterparty", counterparty))
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                 .list();
     }
 
     @Override
-    public Client getById(long id) {
+    public ShipmentGroup getById(UUID uuid) {
         Session session = sessionFactory.getCurrentSession();
-        return (Client) session.get(Client.class, id);
+        return (ShipmentGroup) session.get(ShipmentGroup.class, uuid);
     }
 
     @Override
-    public Client save(Client client) {
+    public ShipmentGroup save(ShipmentGroup shipmentGroup) {
         Session session = sessionFactory.getCurrentSession();
-        return (Client) session.merge(client);
+        return (ShipmentGroup) session.merge(shipmentGroup);
     }
 
     @Override
-    public void update(Client client) {
+    public void update(ShipmentGroup shipmentGroup) {
         Session session = sessionFactory.getCurrentSession();
-        session.update(client);
+        session.update(shipmentGroup);
     }
 
     @Override
-    public void delete(Client client) {
+    public void delete(ShipmentGroup shipmentGroup) {
         Session session = sessionFactory.getCurrentSession();
-        session.delete(client);
+        session.delete(shipmentGroup);
     }
 }

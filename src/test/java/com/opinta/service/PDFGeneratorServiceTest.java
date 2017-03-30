@@ -9,7 +9,6 @@ import com.opinta.entity.DeliveryType;
 import com.opinta.entity.Phone;
 import com.opinta.entity.PostcodePool;
 import com.opinta.entity.Shipment;
-import com.opinta.entity.Counterparty;
 import com.opinta.entity.Client;
 import com.opinta.entity.DeliveryType;
 import com.opinta.entity.User;

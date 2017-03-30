@@ -1,9 +1,9 @@
 package com.opinta.service;
 
-import com.opinta.dto.CounterpartyDto;
 import com.opinta.entity.Client;
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.Shipment;
+import com.opinta.entity.ShipmentGroup;
 import com.opinta.entity.User;
 import java.util.UUID;
 import javax.naming.AuthenticationException;
@@ -19,4 +19,6 @@ public interface UserService {
     void authorizeForAction(Client client, User user) throws AuthenticationException;
 
     void authorizeForAction(Shipment shipment, User user) throws AuthenticationException;
+
+    void authorizeForAction(ShipmentGroup shipmentGroup, User user) throws AuthenticationException;
 }
