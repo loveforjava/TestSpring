@@ -17,6 +17,7 @@ import integration.helper.TestHelper;
 import org.springframework.http.MediaType;
 
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
+import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
 import static java.lang.Integer.MIN_VALUE;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
@@ -70,6 +71,8 @@ public class ShipmentControllerIT extends BaseControllerIT {
 
     @Test
     public void getShipmentForm() throws Exception {
+        given().
+                queryParam("token", user.getToken()).
         when().
                 get("shipments/{id}/form", shipmentId).
         then().

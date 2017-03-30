@@ -1,7 +1,6 @@
 package com.opinta.temp;
 
-import com.opinta.dto.PostOfficeDto;
-import com.opinta.dto.ShipmentDto;
+import com.opinta.dto.*;
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.Phone;
 import com.opinta.mapper.ShipmentTrackingDetailMapper;
@@ -18,10 +17,6 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import com.opinta.dto.AddressDto;
-import com.opinta.dto.BarcodeInnerNumberDto;
-import com.opinta.dto.PostcodePoolDto;
-import com.opinta.dto.CounterpartyDto;
 import com.opinta.mapper.AddressMapper;
 import com.opinta.mapper.BarcodeInnerNumberMapper;
 import com.opinta.mapper.ClientMapper;
@@ -147,8 +142,9 @@ public class InitDbService {
                 addressMapper.toEntity(addressesSaved.get(1)), phoneReserved, counterparty));
         clients.forEach((Client client) -> {
                     try {
+                        ClientDto save = clientService.save(clientMapper.toDto(client), client.getCounterparty().getUser());
                         clientsSaved.add(this.clientMapper.toEntity(
-                                clientService.save(clientMapper.toDto(client), client.getCounterparty().getUser())));
+                                save));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
