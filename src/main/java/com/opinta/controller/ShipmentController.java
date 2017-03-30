@@ -23,6 +23,8 @@ import static java.lang.String.format;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
+import static org.springframework.http.MediaType.parseMediaType;
 
 @RestController
 @RequestMapping("/shipments")
@@ -53,12 +55,15 @@ public class ShipmentController {
 
     @GetMapping("{id}/form")
     public ResponseEntity<?> getShipmentLabelForm(@PathVariable("id") long id) {
-        byte[] data = pdfGeneratorService.generate(id);
-        if(data == null) {
-            return new ResponseEntity<>(format("No Shipment found for ID %d", id), NOT_FOUND);
+        byte[] data;
+        try {
+            data = pdfGeneratorService.generate(id);
+        } catch(Exception e) {
+            return new ResponseEntity<>(format("Error while creating form for shipment %d: " , id)
+                    + e.getMessage(), NOT_FOUND);
         }
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.parseMediaType("application/pdf"));
+        headers.setContentType(parseMediaType(APPLICATION_PDF_VALUE));
         String filename = "labelform" + id + ".pdf";
         headers.setContentDispositionFormData(filename, filename);
         headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");

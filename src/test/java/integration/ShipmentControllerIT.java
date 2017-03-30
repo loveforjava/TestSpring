@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import integration.helper.TestHelper;
+import org.springframework.http.MediaType;
 
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
@@ -56,6 +57,15 @@ public class ShipmentControllerIT extends BaseControllerIT {
         then().
                 statusCode(SC_OK).
                 body("id", equalTo(shipmentId));
+    }
+
+    @Test
+    public void getShipmentForm() throws Exception {
+        when().
+                get("shipments/{id}/form", shipmentId).
+        then().
+                statusCode(SC_OK).
+                contentType(MediaType.APPLICATION_PDF_VALUE);
     }
 
     @Test

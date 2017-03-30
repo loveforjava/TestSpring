@@ -2,6 +2,6 @@ package com.opinta.service;
 
 public interface PDFGeneratorService {
 
-    byte[] generate(long id);
+    byte[] generate(long id) throws Exception;
 
 }

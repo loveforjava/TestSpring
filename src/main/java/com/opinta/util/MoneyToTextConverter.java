@@ -5,12 +5,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class MoneyToTextConverter {
-
     private String[] strBase = {"", "одна", "дві", "три", "чотири", "п'ять", "шість", "сім", "вісім", "дев'ять"};
-    private String[] str100 = {"", "сто", "двісті", "триста", "чотириста", "п'ятсот", "шістьсот", "сімсот", "вісімсот", "дев'ятсот"};
+    private String[] str100 = {"", "сто", "двісті", "триста", "чотириста", "п'ятсот", "шістьсот",
+            "сімсот", "вісімсот", "дев'ятсот"};
     private String[] str11 = {"", "десять", "одинадцять", "дванадцять", "тринадцять", "чотирнадцять", "п'ятнадцять",
             "шістнадцять", "сімнадцять", "вісімнадцять", "дев'ятнадцять", "двадцять"};
-    private String[] str10 = {"", "десять", "двадцать", "тридцять", "сорок", "п'ятдесят", "шістдесят", "сімдесят", "вісімьдесят", "дев'яносто"};
+    private String[] str10 = {"", "десять", "двадцать", "тридцять", "сорок", "п'ятдесят", "шістдесят",
+            "сімдесят", "вісімьдесят", "дев'яносто"};
     private String[][] forms = {
             {"копійка", "копійки", "копійок", "1"},
             {"гривня", "гривні", "гривень", "0"},
@@ -20,17 +21,17 @@ public class MoneyToTextConverter {
     };
 
     public String convert(BigDecimal amount, boolean stripKopiyky) {
-
         // Separating hryvnas and kopiykas
         long hryvnasLong = amount.longValue();
-        if(hryvnasLong > 999999999999L) {
-            return (amount.toPlainString());
-        }
+        if(hryvnasLong > 999999999999L) return (amount.toPlainString());
         String[] splittedAmount = amount.toString().split("\\.");
-        long kopiykyLong = Long.valueOf(splittedAmount[1]);
-        if (!splittedAmount[1].substring(0, 1).equals("0")) { //doesn't start with zero
-            if (kopiykyLong < 10)
-                kopiykyLong *= 10;
+        long kopiykyLong = 0;
+        if(splittedAmount.length > 1) {
+            kopiykyLong = Long.valueOf(splittedAmount[1]);
+            if (!splittedAmount[1].substring(0, 1).equals("0")) { //doesn't start with zero
+                if (kopiykyLong < 10)
+                    kopiykyLong *= 10;
+            }
         }
         String kopiykyString = String.valueOf(kopiykyLong);
         if (kopiykyString.length() == 1)
@@ -102,5 +103,4 @@ public class MoneyToTextConverter {
         if (n1 == 1) return f1;
         return f5;
     }
-
 }

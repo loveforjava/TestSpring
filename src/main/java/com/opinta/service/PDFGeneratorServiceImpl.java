@@ -7,6 +7,7 @@ import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.oned.Code128Writer;
 import com.opinta.entity.Address;
 import com.opinta.entity.Client;
+import com.opinta.entity.Phone;
 import com.opinta.entity.Shipment;
 import com.opinta.util.MoneyToTextConverter;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 
+import static java.lang.String.format;
+import static org.apache.commons.lang3.StringUtils.rightPad;
+
 @Service
 @Slf4j
 public class PDFGeneratorServiceImpl implements PDFGeneratorService {
@@ -52,19 +56,19 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
     @Autowired
     public PDFGeneratorServiceImpl(ShipmentService shipmentService) {
         this.shipmentService = shipmentService;
-        moneyToTextConverter = new MoneyToTextConverter();
+        this.moneyToTextConverter = new MoneyToTextConverter();
     }
 
     @Override
-    public byte[] generate(long shipmentId) {
+    public byte[] generate(long shipmentId) throws Exception {
         Shipment shipment = shipmentService.getEntityById(shipmentId);
-        byte[] labelForm = generateLabel(shipment);
-        if (labelForm == null) {
-            return labelForm;
+        if (shipment == null) {
+            throw new IllegalArgumentException(format("No shipment found for id %d", shipmentId));
         }
+        byte[] labelForm = generateLabel(shipment);
         BigDecimal postPay = shipment.getPostPay();
         //Checking postPay value, if more than 0 append postpay form
-        if (postPay.compareTo(new BigDecimal(0)) > 0) {
+        if (postPay.compareTo(BigDecimal.ZERO) > 0) {
             PDFMergerUtility merger = new PDFMergerUtility();
             merger.addSource(new ByteArrayInputStream(labelForm));
             merger.addSource(new ByteArrayInputStream(generatePostpay(shipment)));
@@ -73,15 +77,18 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             try {
                 merger.mergeDocuments(null);
             } catch (IOException e) {
-                log.error("Got an error while merging the documents");
+                log.error("Got an error while merging the documents, {}", e.getMessage());
+                throw new IOException("Error while merging templates");
             }
+            template.close();
             return outputStream.toByteArray();
         } else {
+            template.close();
             return labelForm;
         }
     }
 
-    public byte[] generatePostpay(Shipment shipment) {
+    public byte[] generatePostpay(Shipment shipment) throws IOException {
         byte[] data = null;
         try {
             //Getting PDF template from the file
@@ -116,13 +123,15 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             //Populating price fields
             populateField(acroForm, field, "priceHryvnas", priceParts[0]);
             if (priceParts.length > 1) {
-                populateField(acroForm, field, "priceKopiyky", priceParts[1]);
+                populateField(acroForm, field, "priceKopiyky", rightPad(priceParts[1], 2, '0'));
+            } else {
+                populateField(acroForm, field, "priceKopiyky", "00");
             }
             //Converting numerical value to text
             String priceInText = moneyToTextConverter.convert(postPay, false);
             //Populating text field for the price
             populateField(acroForm, field, "priceInText", priceInText);
-            
+
             //Removing acrofields
             acroForm.flatten();
 
@@ -130,15 +139,15 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             template.save(outputStream);
             data = outputStream.toByteArray();
+//            template.close();
         } catch (IOException e) {
-            log.error("Error while parsing PDF template: " + e.getMessage());
-        } catch (NullPointerException e) {
-            log.error("Error while reading the template file %s", PDF_LABEL_TEMPLATE);
+            log.error("Error while parsing and populating PDF template: {}", e.getMessage());
+            throw new IOException("Error while parsing and populating PDF template");
         }
         return data;
     }
 
-    public byte[] generateLabel(Shipment shipment) {
+    public byte[] generateLabel(Shipment shipment) throws IOException {
         byte[] data = null;
         try {
             //Getting PDF template from the file
@@ -173,7 +182,6 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             populateField(acroForm, field, "postPay", String.valueOf(shipment.getPostPay()));
             populateField(acroForm, field, "price", String.valueOf(shipment.getPrice()));
 
-            //TODO: Not interactive fields yet!
             populateField(acroForm, field, "sendingCost", String.valueOf(shipment.getPrice()));
             populateField(acroForm, field, "additionalCosts", "0");
 
@@ -202,7 +210,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
 
             //Generating barcode digits
             field = (PDTextField) acroForm.getField("barcodeText");
-            field.setDefaultAppearance(String.format("/%s 14 Tf 0 g", fontName));
+            field.setDefaultAppearance(format("/%s 14 Tf 0 g", fontName));
             field.setValue(barcode);
 
             //Removing acrofiels
@@ -214,19 +222,19 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             data = outputStream.toByteArray();
             outputStream.close();
         } catch (IOException e) {
-            log.error("Error while parsing PDF template: " + e.getMessage());
-        } catch (NullPointerException e) {
-            log.error("Error while reading the template file: " + e.getMessage());
+            log.error("Error while parsing and populating PDF template: {}", e.getStackTrace());
+            throw new IOException("Error while parsing and populating PDF template");
         } catch (WriterException e) {
-            log.error("Error while generating barcode: " + e.getMessage());
+            log.error("Error while generating barcode: {}", e.getStackTrace());
+            throw new IOException("Error during barcode generating.");
         }
         return data;
     }
 
-    private void populateField(PDAcroForm acroForm,
-                               PDTextField field, String fieldName, String fieldValue) throws IOException {
+    private void populateField(PDAcroForm acroForm, PDTextField field, String fieldName, String fieldValue)
+            throws IOException {
         field = (PDTextField) acroForm.getField(fieldName);
-        field.setDefaultAppearance(String.format("/%s 8.64 Tf 0 g", fontName));
+        field.setDefaultAppearance(format("/%s 8.64 Tf 0 g", fontName));
         field.setValue(fieldValue);
     }
 
@@ -253,21 +261,34 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
     private void generateClientsData(Shipment shipment, PDAcroForm acroForm) throws IOException {
         Client sender = shipment.getSender();
 
-        populateField(acroForm, field, "senderName", shipment.getSender().getName());
-        populateField(acroForm, field, "senderPhone", sender.getPhone().getPhoneNumber());
+        populateField(acroForm, field, "senderName", sender.getName());
         populateField(acroForm, field, "senderAddress", processAddress(sender.getAddress()));
+
+        Phone phone = sender.getPhone();
+        if (phone != null) {
+            populateField(acroForm, field, "senderPhone", phone.getPhoneNumber());
+        }
 
         Client recipient = shipment.getRecipient();
 
         populateField(acroForm, field, "recipientName", recipient.getName());
-        populateField(acroForm, field, "recipientPhone", recipient.getPhone().getPhoneNumber());
         populateField(acroForm, field, "recipientAddress", processAddress(recipient.getAddress()));
+
+        phone = recipient.getPhone();
+        if (phone != null) {
+            populateField(acroForm, field, "recipientPhone", phone.getPhoneNumber());
+        }
     }
 
     private String processAddress(Address address) {
-        return address.getStreet() + " st., " +
+        if (address == null) {
+            return "";
+        }
+        String output = "вул. " + address.getStreet() + ", " +
                 address.getHouseNumber() + ", " +
-                address.getCity() + ", " +
-                address.getPostcode();
+                (address.getApartmentNumber() == null ? "" : "кв. " + address.getApartmentNumber() + ", ") +
+                address.getCity() +
+                "\n" + address.getPostcode();
+        return output;
     }
 }

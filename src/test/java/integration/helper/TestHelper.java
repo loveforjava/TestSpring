@@ -22,11 +22,13 @@ public class TestHelper {
     private final ShipmentService shipmentService;
     private final PostOfficeService postOfficeService;
     private final PhoneService phoneService;
+    private final BarcodeInnerNumberService barcodeInnerNumberService;
 
     @Autowired
     public TestHelper(ClientService clientService, AddressService addressService,
                       CounterpartyService counterpartyService, PostcodePoolService postcodePoolService,
-                      ShipmentService shipmentService, PostOfficeService postOfficeService, PhoneService phoneService) {
+                      ShipmentService shipmentService, PostOfficeService postOfficeService, PhoneService phoneService,
+                      BarcodeInnerNumberService barcodeInnerNumberService) {
         this.clientService = clientService;
         this.addressService = addressService;
         this.counterpartyService = counterpartyService;
@@ -34,6 +36,7 @@ public class TestHelper {
         this.shipmentService = shipmentService;
         this.postOfficeService = postOfficeService;
         this.phoneService = phoneService;
+        this.barcodeInnerNumberService = barcodeInnerNumberService;
     }
 
     public PostOffice createPostOffice() {
@@ -49,6 +52,7 @@ public class TestHelper {
     public Shipment createShipment() {
         Shipment shipment = new Shipment(createClient(), createClient(),
                 DeliveryType.D2D, 4.0F, 3.8F, new BigDecimal(200), new BigDecimal(30), new BigDecimal(35.2));
+        shipment.setBarcode(barcodeInnerNumberService.saveEntity(new BarcodeInnerNumber("12345678", BarcodeStatus.RESERVED)));
         return shipmentService.saveEntity(shipment);
     }
 

@@ -41,6 +41,18 @@ public class BarcodeInnerNumberServiceImpl implements BarcodeInnerNumberService 
 
     @Override
     @Transactional
+    public BarcodeInnerNumber getEntityById(long id) {
+        return barcodeInnerNumberDao.getById(id);
+    }
+
+    @Override
+    @Transactional
+    public BarcodeInnerNumber saveEntity(BarcodeInnerNumber barcodeInnerNumber) {
+        return barcodeInnerNumberDao.save(barcodeInnerNumber);
+    }
+
+    @Override
+    @Transactional
     public List<BarcodeInnerNumberDto> getAll(long postcodeId) {
         PostcodePool postcodePool = postcodePoolDao.getById(postcodeId);
         if (postcodePool == null) {

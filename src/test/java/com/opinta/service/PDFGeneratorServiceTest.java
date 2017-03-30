@@ -1,7 +1,14 @@
 package com.opinta.service;
 
-import com.opinta.entity.*;
+import com.opinta.entity.Address;
+import com.opinta.entity.BarcodeInnerNumber;
+import com.opinta.entity.BarcodeStatus;
+import com.opinta.entity.Client;
 import com.opinta.entity.Counterparty;
+import com.opinta.entity.DeliveryType;
+import com.opinta.entity.Phone;
+import com.opinta.entity.PostcodePool;
+import com.opinta.entity.Shipment;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,7 +17,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.math.BigDecimal;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.atLeast;
@@ -44,7 +50,12 @@ public class PDFGeneratorServiceTest {
     @Test
     public void generateLabel_and_generatePostpay_ShouldReturnNotEmptyFile() {
         when(shipmentService.getEntityById(1L)).thenReturn(shipment);
-        byte[] generate = pdfGeneratorService.generate(1L);
+        byte[] generate = new byte[0];
+        try {
+            generate = pdfGeneratorService.generate(1L);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         assertNotEquals("PDFGenerator returned an empty label",
                 generate.length, 0);
         verify(shipmentService, atLeast(1)).getEntityById(1L);
