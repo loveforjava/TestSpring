@@ -1,7 +1,12 @@
 package com.opinta.service;
 
 import com.opinta.entity.Address;
+import com.opinta.entity.BarcodeInnerNumber;
+import com.opinta.entity.BarcodeStatus;
+import com.opinta.entity.Client;
 import com.opinta.entity.Counterparty;
+import com.opinta.entity.DeliveryType;
+import com.opinta.entity.Phone;
 import com.opinta.entity.PostcodePool;
 import com.opinta.entity.Shipment;
 import com.opinta.entity.Client;
@@ -16,10 +21,10 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+import static com.opinta.entity.BarcodeStatus.RESERVED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Mockito.when;
@@ -51,6 +56,7 @@ public class PDFGeneratorServiceTest {
         shipment = new Shipment(sender, recipient, DeliveryType.W2W, 1, 1,
                 new BigDecimal("12.5"), new BigDecimal("2.5"), new BigDecimal("15.25"));
         shipmentId = UUID.randomUUID();
+        shipment.setBarcode(new BarcodeInnerNumber("12345678", RESERVED));
     }
 
     @Test
@@ -60,95 +66,7 @@ public class PDFGeneratorServiceTest {
 
         when(shipmentService.getEntityByUuid(shipmentId, user)).thenReturn(shipment);
         assertNotEquals("PDFGenerator returned an empty label",
-                pdfGeneratorService.generateLabel(shipmentId, user).length, 0);
-        assertNotEquals("PDFGenerator returned an empty postpay form",
-                pdfGeneratorService.generateLabel(shipmentId, user).length, 0);
-        verify(shipmentService, atLeast(2)).getEntityByUuid(shipmentId, user);
-    }
-
-    @Test
-    public void generateLabel_ShouldReturnValidAcroForms() throws Exception {
-        // TODO
-        User user = new User();
-
-        when(shipmentService.getEntityByUuid(shipmentId, user)).thenReturn(shipment);
-
-        byte[] labelForm = pdfGeneratorService.generateLabel(shipmentId, user);
-
-        PDAcroForm acroForm = getAcroFormFromPdfFile(labelForm);
-
-        PDTextField field = (PDTextField) acroForm.getField("senderName");
-        assertEquals("Expected senderName form to contain FOP Ivanov",
-                field.getValue(), "FOP Ivanov");
-
-        field = (PDTextField) acroForm.getField("senderAddress");
-        assertEquals("Expected senderAddress form to contain Sadova st., 51, Monastiriska\n00001",
-                field.getValue(), "Sadova st., 51, Monastiriska\n00001");
-
-        field = (PDTextField) acroForm.getField("recipientName");
-        assertEquals("Expected senderName form to contain Petrov PP", field.getValue(), "Petrov PP");
-
-        field = (PDTextField) acroForm.getField("recipientAddress");
-        assertEquals("Expected recipientAddress form to contain Khreschatik st., 121, Kiev\n00002",
-                field.getValue(), "Khreschatik st., 121, Kiev\n00002");
-
-        field = (PDTextField) acroForm.getField("mass");
-        assertEquals("Expected mass to be 1.0", field.getValue(), "1.0");
-
-        field = (PDTextField) acroForm.getField("value");
-        assertEquals("Expected value to be 12.5", field.getValue(), "12.5");
-
-        field = (PDTextField) acroForm.getField("sendingCost");
-        assertEquals("Expected sendingCost to be 2.5", field.getValue(), "2.5");
-
-        field = (PDTextField) acroForm.getField("postPrice");
-        assertEquals("Expected postPrice to be 15.25", field.getValue(), "15.25");
-
-        field = (PDTextField) acroForm.getField("totalCost");
-        assertEquals("Expected totalCost to be 15", field.getValue(), "15.25");
-
-        verify(shipmentService).getEntityByUuid(shipmentId, user);
-    }
-
-    @Test
-    public void generatePostpay_ShouldReturnValidAcroForms() throws Exception {
-        // TODO
-        User user = new User();
-
-        when(shipmentService.getEntityByUuid(shipmentId, user)).thenReturn(shipment);
-
-        byte[] postpayForm = pdfGeneratorService.generatePostpay(shipmentId, user);
-
-        PDAcroForm acroForm = getAcroFormFromPdfFile(postpayForm);
-
-        PDTextField field = (PDTextField) acroForm.getField("senderName");
-        assertEquals("Expected senderName form to contain FOP Ivanov",
-                field.getValue(), "FOP Ivanov");
-
-        field = (PDTextField) acroForm.getField("senderAddress");
-        assertEquals("Expected senderAddress form to contain Sadova st., 51, Monastiriska\n00001",
-                field.getValue(), "Sadova st., 51, Monastiriska\n00001");
-
-        field = (PDTextField) acroForm.getField("recipientName");
-        assertEquals("Expected senderName form to contain Petrov PP", field.getValue(), "Petrov PP");
-
-        field = (PDTextField) acroForm.getField("recipientAddress");
-        assertEquals("Expected recipientAddress form to contain Khreschatik st., 121, Kiev\n00002",
-                field.getValue(), "Khreschatik st., 121, Kiev\n00002");
-
-        field = (PDTextField) acroForm.getField("priceHryvnas");
-        assertEquals("Expected priceHryvnas to be 15", field.getValue(), "15");
-
-        field = (PDTextField) acroForm.getField("priceKopiyky");
-        assertEquals("Expected priceKopiyky to be 25", field.getValue(), "25");
-
-        verify(shipmentService).getEntityByUuid(shipmentId, user);
-    }
-
-    private PDAcroForm getAcroFormFromPdfFile(byte[] postpayForm) throws IOException {
-        return PDDocument
-                .load(postpayForm)
-                .getDocumentCatalog()
-                .getAcroForm();
+                pdfGeneratorService.generate(shipmentId, user).length, 0);
+        verify(shipmentService, atLeast(1)).getEntityByUuid(shipmentId, user);
     }
 }

@@ -1,6 +1,10 @@
 package com.opinta.temp;
 
+import com.opinta.dto.AddressDto;
+import com.opinta.dto.BarcodeInnerNumberDto;
+import com.opinta.dto.CounterpartyDto;
 import com.opinta.dto.PostOfficeDto;
+import com.opinta.dto.PostcodePoolDto;
 import com.opinta.dto.ShipmentDto;
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.Phone;
@@ -17,13 +21,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
 import javax.annotation.PostConstruct;
 
-import com.opinta.dto.AddressDto;
-import com.opinta.dto.BarcodeInnerNumberDto;
-import com.opinta.dto.PostcodePoolDto;
-import com.opinta.dto.CounterpartyDto;
 import com.opinta.mapper.AddressMapper;
 import com.opinta.mapper.BarcodeInnerNumberMapper;
 import com.opinta.mapper.ClientMapper;
@@ -104,7 +103,7 @@ public class InitDbService {
     }
 
     @PostConstruct
-    public void init() throws Exception{
+    public void init() throws Exception {
         //populateDb();
     }
 

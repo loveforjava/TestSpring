@@ -7,6 +7,10 @@ import com.opinta.entity.BarcodeInnerNumber;
 import com.opinta.entity.PostcodePool;
 
 public interface BarcodeInnerNumberService {
+
+    BarcodeInnerNumber getEntityById(long id);
+
+    BarcodeInnerNumber saveEntity(BarcodeInnerNumber barcodeInnerNumber);
     
     List<BarcodeInnerNumberDto> getAll(long postcodeId);
     

@@ -25,4 +25,5 @@ public class ClientDto {
     private UUID counterpartyUuid;
     private long addressId;
     private String phoneNumber;
+    private boolean individual;
 }

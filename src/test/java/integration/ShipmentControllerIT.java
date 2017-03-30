@@ -13,7 +13,6 @@ import io.restassured.module.mockmvc.response.MockMvcResponse;
 import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +23,7 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.hamcrest.Matchers.equalTo;
+import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 import static org.junit.Assert.assertEquals;
 
 public class ShipmentControllerIT extends BaseControllerIT {
@@ -68,6 +68,17 @@ public class ShipmentControllerIT extends BaseControllerIT {
         then().
                 statusCode(SC_OK).
                 body("uuid", equalTo(shipmentUuid.toString()));
+    }
+
+    @Test
+    public void getShipmentForm() throws Exception {
+        given().
+                queryParam("token", user.getToken()).
+        when().
+                get("shipments/{id}/form", shipmentUuid).
+        then().
+                statusCode(SC_OK).
+                contentType(APPLICATION_PDF_VALUE);
     }
 
     @Test

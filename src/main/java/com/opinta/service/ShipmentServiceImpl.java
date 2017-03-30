@@ -74,6 +74,10 @@ public class ShipmentServiceImpl implements ShipmentService {
     @Transactional
     public Shipment saveEntity(Shipment shipment) {
         log.info("Saving shipment {}", shipment);
+        PostcodePool postcodePool = shipment.getSender().getCounterparty().getPostcodePool();
+        BarcodeInnerNumber newBarcode = barcodeInnerNumberService.generateBarcodeInnerNumber(postcodePool);
+        postcodePool.getBarcodeInnerNumbers().add(newBarcode);
+        shipment.setBarcode(newBarcode);
         return shipmentDao.save(shipment);
     }
 

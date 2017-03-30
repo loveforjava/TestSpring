@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.opinta.entity.BarcodeStatus.RESERVED;
+
 @Component
 @Slf4j
 public class TestHelper {
@@ -29,12 +31,14 @@ public class TestHelper {
     private final PostOfficeService postOfficeService;
     private final PhoneService phoneService;
     private final TariffGridService tariffGridService;
+    private final BarcodeInnerNumberService barcodeInnerNumberService;
 
     @Autowired
     public TestHelper(ClientService clientService, AddressService addressService,
                       CounterpartyService counterpartyService, PostcodePoolService postcodePoolService,
                       ShipmentService shipmentService, PostOfficeService postOfficeService,
-                      PhoneService phoneService, TariffGridService tariffGridService) {
+                      PhoneService phoneService, TariffGridService tariffGridService,
+                      BarcodeInnerNumberService barcodeInnerNumberService) {
         this.clientService = clientService;
         this.addressService = addressService;
         this.counterpartyService = counterpartyService;
@@ -42,6 +46,7 @@ public class TestHelper {
         this.shipmentService = shipmentService;
         this.postOfficeService = postOfficeService;
         this.phoneService = phoneService;
+        this.barcodeInnerNumberService = barcodeInnerNumberService;
         this.tariffGridService = tariffGridService;
     }
 
