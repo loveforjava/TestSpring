@@ -104,11 +104,11 @@ public class InitDbService {
     }
 
     @PostConstruct
-    public void init() {
+    public void init() throws Exception{
         //populateDb();
     }
 
-    private void populateDb() {
+    private void populateDb() throws Exception {
         // populate TariffGrid
         populateTariffGrid();
 
@@ -153,10 +153,9 @@ public class InitDbService {
         });
         List<Client> clientsSaved = clients
                 .stream()
-                .map(client -> clientMapper.toDto(client))
-                .map(clientDto -> {
+                .map(client -> {
                     try {
-                        return clientService.save(clientDto);
+                        return clientService.save(clientMapper.toDto(client), client.getCounterparty().getUser());
                     } catch (Exception e) {
                         e.printStackTrace();
                         return null;
@@ -167,30 +166,16 @@ public class InitDbService {
                 .collect(Collectors.toList());
 
         // create Shipment
-        List<Shipment> shipments = new ArrayList<>();
-        Shipment shipment1 = new Shipment(clientsSaved.get(0), clientsSaved.get(1), DeliveryType.W2W, 1, 1,
+        List<ShipmentDto> shipmentsSaved = new ArrayList<>();
+        Shipment shipment = new Shipment(clientsSaved.get(0), clientsSaved.get(1), DeliveryType.W2W, 1, 1,
                 new BigDecimal("12.5"), new BigDecimal("2.5"), new BigDecimal("15"));
-        Shipment shipment2 = new Shipment(clientsSaved.get(0), clientsSaved.get(0), DeliveryType.W2D, 2, 2,
+        shipmentsSaved.add(shipmentService.save(shipmentMapper.toDto(shipment), shipment.getSender().getCounterparty().getUser()));
+        shipment = new Shipment(clientsSaved.get(0), clientsSaved.get(0), DeliveryType.W2D, 2, 2,
                 new BigDecimal("19.5"), new BigDecimal("0.5"), new BigDecimal("20.5"));
-        Shipment shipment3 = new Shipment(clientsSaved.get(1), clientsSaved.get(0), DeliveryType.D2D, 3, 3,
+        shipmentsSaved.add(shipmentService.save(shipmentMapper.toDto(shipment), shipment.getSender().getCounterparty().getUser()));
+        shipment = new Shipment(clientsSaved.get(1), clientsSaved.get(0), DeliveryType.D2D, 3, 3,
                 new BigDecimal("8.5"), new BigDecimal("2.25"), new BigDecimal("13.5"));
-    
-        shipments.add(shipment1);
-        shipments.add(shipment2);
-        shipments.add(shipment3);
-        
-        shipments.forEach(shipm -> log.info("created shipment: " + shipm));
-    
-        List<ShipmentDto> converted = shipments
-                .stream()
-                .map(shipm -> shipmentMapper.toDto(shipm))
-                .peek(shipmDto -> log.info("converted shipment: " + shipmDto))
-                .collect(Collectors.toList());
-        
-        List<ShipmentDto> shipmentsSaved = converted
-                .stream()
-                .map(shipmDto -> shipmentService.save(shipmDto))
-                .collect(Collectors.toList());
+        shipmentsSaved.add(shipmentService.save(shipmentMapper.toDto(shipment), shipment.getSender().getCounterparty().getUser()));
 
         // create PostOffice
         PostcodePoolDto postcodePoolDto2 = postcodePoolMapper.toDto(new PostcodePool("00002", false));

@@ -1,5 +1,7 @@
 package com.opinta.controller;
 
+import com.opinta.entity.User;
+import com.opinta.service.UserService;
 import java.util.List;
 import java.util.UUID;
 
@@ -7,6 +9,8 @@ import com.opinta.dto.ClientDto;
 import com.opinta.dto.ShipmentDto;
 import com.opinta.service.ClientService;
 import com.opinta.service.ShipmentService;
+import java.util.UUID;
+import javax.naming.AuthenticationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,7 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import static java.lang.String.format;
@@ -24,68 +28,93 @@ import static java.lang.String.format;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @RestController
 @RequestMapping("/clients")
 public class ClientController {
     private final ClientService clientService;
     private final ShipmentService shipmentService;
+    private final UserService userService;
     
     @Autowired
-    public ClientController(ClientService clientService, ShipmentService shipmentService) {
+    public ClientController(ClientService clientService, ShipmentService shipmentService, UserService userService) {
         this.clientService = clientService;
         this.shipmentService = shipmentService;
+        this.userService = userService;
     }
     
     @GetMapping
-    @ResponseStatus(OK)
-    public List<ClientDto> getAllClients() {
-        return this.clientService.getAll();
+    public ResponseEntity<?> getAllClients(@RequestParam(value = "token") UUID token) {
+        try {
+            User user = userService.authenticate(token);
+            return new ResponseEntity<>(clientService.getAll(user), OK);
+        } catch (AuthenticationException e) {
+            return new ResponseEntity<>(e.getMessage(), UNAUTHORIZED);
+        }
     }
     
     @GetMapping("{id}")
-    public ResponseEntity<?> getClient(@PathVariable("id") UUID id) {
-        ClientDto clientDto = clientService.getByUuid(id);
-        if (clientDto == null) {
-            return new ResponseEntity<>(format("No Client found for ID %s", id), NOT_FOUND);
+    public ResponseEntity<?> getClient(@PathVariable("id") UUID id, @RequestParam(value = "token") UUID token) {
+        try {
+            User user = userService.authenticate(token);
+            return new ResponseEntity<>(clientService.getByUuid(id, user), OK);
+        } catch (AuthenticationException e) {
+            return new ResponseEntity<>(e.getMessage(), UNAUTHORIZED);
         }
-        return new ResponseEntity<>(clientDto, OK);
     }
 
-    @GetMapping("{clientId}/shipments")
-    public ResponseEntity<?> getShipmentsByClientId(@PathVariable UUID clientId) {
-        List<ShipmentDto> shipmentDtos = shipmentService.getAllByClientUuid(clientId);
-        if (shipmentDtos == null) {
-            return new ResponseEntity<>(format("Client %s doesn't exist", clientId), NOT_FOUND);
+    @GetMapping("{id}/shipments")
+    public ResponseEntity<?> getShipmentsByClientId(@PathVariable UUID id,
+                                                    @RequestParam(value = "token") UUID token) {
+        try {
+            User user = userService.authenticate(token);
+            return new ResponseEntity<>(shipmentService.getAllByClientUuid(id, user), OK);
+        } catch (AuthenticationException e) {
+            return new ResponseEntity<>(format("Client %s doesn't exist. " + e.getMessage(), id), UNAUTHORIZED);
         }
-        return new ResponseEntity<>(shipmentDtos, OK);
     }
     
     @PostMapping
-    public ResponseEntity<?> createClient(@RequestBody ClientDto clientDto) {
+    public ResponseEntity<?> createClient(@RequestBody ClientDto clientDto, @RequestParam(value = "token") UUID token) {
         try {
-            clientDto = clientService.save(clientDto);
+            User user = userService.authenticate(token);
+            return new ResponseEntity<>(clientService.save(clientDto, user), OK);
+        } catch (AuthenticationException e) {
+            return new ResponseEntity<>("New Client has not been saved. " + e.getMessage(), UNAUTHORIZED);
         } catch (Exception e) {
-            return new ResponseEntity<>("New Client has not been saved", BAD_REQUEST);
+            return new ResponseEntity<>("New Client has not been saved. " + e.getMessage(), BAD_REQUEST);
         }
-        return new ResponseEntity<>(clientDto, OK);
     }
-    
+
     @PutMapping("{id}")
-    public ResponseEntity<?> updateClient(@PathVariable UUID id, @RequestBody ClientDto clientDto) {
+    public ResponseEntity<?> updateClient(@PathVariable UUID id, @RequestBody ClientDto clientDto,
+                                          @RequestParam(value = "token") UUID token) {
         try {
-            clientDto = clientService.update(id, clientDto);
+            User user = userService.authenticate(token);
+            return new ResponseEntity<>(clientService.update(id, clientDto, user), OK);
+        } catch (AuthenticationException e) {
+            return new ResponseEntity<>(format("Client %s has not been updated. ", id)
+                    + ". " + e.getMessage(), UNAUTHORIZED);
         } catch (Exception e) {
-            return new ResponseEntity<>(format("Error while updating %s", id) + ". " + e.getMessage(), NOT_FOUND);
+            return new ResponseEntity<>(format("Client %s has not been updated. ", id)
+                    + ". " + e.getMessage(), NOT_FOUND);
         }
-        return new ResponseEntity<>(clientDto, OK);
     }
     
     @DeleteMapping("{id}")
-    public ResponseEntity<?> deleteClient(@PathVariable UUID id) {
-        if (!clientService.delete(id)) {
-            return new ResponseEntity<>(format("No Client found for ID %s", id), NOT_FOUND);
+    public ResponseEntity<?> deleteClient(@PathVariable UUID id,
+                                          @RequestParam(value = "token") UUID token) {
+        try {
+            User user = userService.authenticate(token);
+            clientService.delete(id, user);
+            return new ResponseEntity<>(OK);
+        } catch (AuthenticationException e) {
+            return new ResponseEntity<>(format("Client %s has not been deleted. ", id)
+                    + ". " + e.getMessage(), UNAUTHORIZED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(format("Client %s has not been deleted. ", id)
+                    + ". " + e.getMessage(), NOT_FOUND);
         }
-        return new ResponseEntity<>(OK);
     }
 }

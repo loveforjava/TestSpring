@@ -42,7 +42,7 @@ public class AddressController {
     public ResponseEntity<?> getAddress(@PathVariable("id") long id) {
         AddressDto addressDto = addressService.getById(id);
         if (addressDto == null) {
-            return new ResponseEntity<>(format("No Address found for ID %d", id), NOT_FOUND);
+            return new ResponseEntity<>(format("No Address found for ID %s", id), NOT_FOUND);
         }
         return new ResponseEntity<>(addressDto, OK);
     }
@@ -61,7 +61,7 @@ public class AddressController {
     public ResponseEntity<?> updateAddress(@PathVariable long id, @RequestBody AddressDto addressDto) {
         addressDto = addressService.update(id, addressDto);
         if (addressDto == null) {
-            return new ResponseEntity<>(format("No Address found for ID %d", id), NOT_FOUND);
+            return new ResponseEntity<>(format("No Address found for ID %s", id), NOT_FOUND);
         }
         return new ResponseEntity<>(addressDto, OK);
     }
@@ -69,7 +69,7 @@ public class AddressController {
     @DeleteMapping("{id}")
     public ResponseEntity<?> deleteAddress(@PathVariable long id) {
         if (!addressService.delete(id)) {
-            return new ResponseEntity<>(format("No Address found for ID %d", id), NOT_FOUND);
+            return new ResponseEntity<>(format("No Address found for ID %s", id), NOT_FOUND);
         }
         return new ResponseEntity<>(OK);
     }

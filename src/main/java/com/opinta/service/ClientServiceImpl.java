@@ -2,9 +2,11 @@ package com.opinta.service;
 
 import com.opinta.entity.Address;
 import com.opinta.entity.Counterparty;
+import com.opinta.entity.User;
 import java.util.List;
 import java.util.UUID;
 
+import javax.naming.AuthenticationException;
 import javax.transaction.Transactional;
 
 import com.opinta.dao.ClientDao;
@@ -25,44 +27,69 @@ public class ClientServiceImpl implements ClientService {
     private final CounterpartyService counterpartyService;
     private final PhoneService phoneService;
     private final AddressService addressService;
+    private final UserService userService;
     private final ClientMapper clientMapper;
 
     @Autowired
     public ClientServiceImpl(ClientDao clientDao, ClientMapper clientMapper, PhoneService phoneService,
-                             AddressService addressService, CounterpartyService counterpartyService) {
+                             AddressService addressService, CounterpartyService counterpartyService,
+                             UserService userService) {
         this.clientDao = clientDao;
         this.counterpartyService = counterpartyService;
         this.phoneService = phoneService;
         this.addressService = addressService;
         this.clientMapper = clientMapper;
+        this.userService = userService;
     }
 
     @Override
     @Transactional
-    public List<Client> getAllEntities() {
+    public List<Client> getAllEntities(User user) {
         log.info("Getting all clients");
-        return clientDao.getAll();
+        return clientDao.getAll(user);
     }
 
     @Override
     @Transactional
-    public Client getEntityByUuid(UUID uuid) {
-        log.info("Getting Client by uuid {}", uuid);
+    public Client getEntityByUuid(UUID uuid, User user) throws AuthenticationException {
+        log.info("Getting client by uuid: ", uuid);
+        Client client = clientDao.getByUuid(uuid);
+
+        userService.authorizeForAction(client, user);
+
+        return client;
+    }
+
+    @Override
+    @Transactional
+    public Client getEntityByUuidAnonymous(UUID uuid) {
+        log.info("Getting client by uuid without token check ", uuid);
         return clientDao.getByUuid(uuid);
     }
 
     @Override
     @Transactional
-    public Client saveEntity(Client client) {
-        log.info("Saving Client {}", client);
+    public Client saveEntity(Client client, User user) throws Exception {
+        // validate reference fields
+        try {
+            validateInnerReferenceAndFillObjectFromDB(client);
+        } catch (Exception e) {
+            throw new Exception(e);
+        }
+
+        client.setPhone(phoneService.getOrCreateEntityByPhoneNumber(client.getPhone().getPhoneNumber()));
+
+        userService.authorizeForAction(client, user);
+
+        log.info("Saving client {}", client);
         return clientDao.save(client);
     }
 
     @Override
     @Transactional
-    public List<ClientDto> getAll() {
+    public List<ClientDto> getAll(User user) {
         log.info("Getting all clients");
-        List<Client> allClients = clientDao.getAll();
+        List<Client> allClients = clientDao.getAll(user);
         return clientMapper.toDto(allClients);
     }
 
@@ -80,42 +107,27 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public ClientDto getByUuid(UUID uuid) {
-        log.info("Getting client by uuid {}", uuid);
-        Client client = clientDao.getByUuid(uuid);
+    public ClientDto getByUuid(UUID uuid, User user) throws AuthenticationException {
+        Client client = getEntityByUuid(uuid, user);
         return clientMapper.toDto(client);
     }
 
     @Override
     @Transactional
-    public ClientDto save(ClientDto clientDto) throws Exception {
+    public ClientDto save(ClientDto clientDto, User user) throws Exception {
         Client client = clientMapper.toEntity(clientDto);
-        // validate reference fields
-        try {
-            validateInnerReferenceAndFillObjectFromDB(client);
-        } catch (Exception e) {
-            throw new Exception(e);
-        }
-
-        client.setPhone(phoneService.getOrCreateEntityByPhoneNumber(clientDto.getPhoneNumber()));
-
-        log.info("Saving client {}", clientDto);
-        client = clientDao.save(client);
-        log.info("saved Client uuid: " + client.getUuid());
-        return clientMapper.toDto(client);
+        return clientMapper.toDto(saveEntity(client, user));
     }
 
     @Override
     @Transactional
-    public ClientDto update(UUID uuid, ClientDto clientDto) throws Exception {
+    public ClientDto update(UUID uuid, ClientDto clientDto, User user) throws Exception {
         Client source = clientMapper.toEntity(clientDto);
         Client target = clientDao.getByUuid(uuid);
+
+        userService.authorizeForAction(target, user);
         // validate reference fields
-        try {
-            validateInnerReferenceAndFillObjectFromDB(source);
-        } catch (Exception e) {
-            throw new Exception(e);
-        }
+        validateInnerReferenceAndFillObjectFromDB(source);
 
         try {
             copyProperties(target, source);
@@ -135,15 +147,17 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public boolean delete(UUID uuid) {
+    public void delete(UUID uuid, User user) throws AuthenticationException {
         Client client = clientDao.getByUuid(uuid);
+
+        userService.authorizeForAction(client, user);
+
         if (client == null) {
-            log.debug("Can't delete client. Client doesn't exist " + uuid);
-            return false;
+            log.error("Can't delete client. Client {} doesn't exist ", uuid);
+            throw new AuthenticationException(format("Can't delete client. Client %s doesn't exist ", uuid));
         }
         log.info("Deleting client {}", client);
         clientDao.delete(client);
-        return true;
     }
 
     private void validateInnerReferenceAndFillObjectFromDB(Client source) throws Exception {

@@ -41,7 +41,7 @@ public class ShipmentTrackingDetailController {
 	public ResponseEntity<?> getShipmentTrackingDetail(@PathVariable("id") long id) {
 		ShipmentTrackingDetailDto shipmentTrackingDetailDto = shipmentTrackingDetailService.getById(id);
 		if (shipmentTrackingDetailDto == null) {
-			return new ResponseEntity<>(format("No ShipmentTrackingDetail found for ID %d", id), NOT_FOUND);
+			return new ResponseEntity<>(format("No ShipmentTrackingDetail found for ID %s", id), NOT_FOUND);
 		}
 		return new ResponseEntity<>(shipmentTrackingDetailDto, OK);
 	}
@@ -57,7 +57,7 @@ public class ShipmentTrackingDetailController {
 			@PathVariable long id, @RequestBody ShipmentTrackingDetailDto shipmentTrackingDetailDto) {
 		shipmentTrackingDetailDto = shipmentTrackingDetailService.update(id, shipmentTrackingDetailDto);
 		if (shipmentTrackingDetailDto == null) {
-			return new ResponseEntity<>(format("No ShipmentTrackingDetail found for ID %d", id), NOT_FOUND);
+			return new ResponseEntity<>(format("No ShipmentTrackingDetail found for ID %s", id), NOT_FOUND);
 		}
 		return new ResponseEntity<>(shipmentTrackingDetailDto, OK);
 	}
@@ -65,7 +65,7 @@ public class ShipmentTrackingDetailController {
     @DeleteMapping("{id}")
     public ResponseEntity<?> deleteShipmentTrackingDetail(@PathVariable long id) {
         if (!shipmentTrackingDetailService.delete(id)) {
-            return new ResponseEntity<>(format("No ShipmentTrackingDetail found for ID %d", id), NOT_FOUND);
+            return new ResponseEntity<>(format("No ShipmentTrackingDetail found for ID %s", id), NOT_FOUND);
         }
         return new ResponseEntity<>(OK);
     }

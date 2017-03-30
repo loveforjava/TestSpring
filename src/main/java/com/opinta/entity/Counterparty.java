@@ -1,10 +1,12 @@
 package com.opinta.entity;
 
 import java.util.UUID;
-
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
@@ -29,6 +31,9 @@ public class Counterparty {
     @NotNull
     private PostcodePool postcodePool;
     private String description;
+    @ManyToOne(cascade = CascadeType.MERGE)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     public Counterparty(String name, PostcodePool postcodePool) {
         this.name = name;

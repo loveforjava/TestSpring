@@ -5,11 +5,13 @@ import java.util.UUID;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opinta.dto.CounterpartyDto;
 import com.opinta.entity.Counterparty;
+import com.opinta.entity.User;
 import com.opinta.mapper.CounterpartyMapper;
 import com.opinta.service.CounterpartyService;
 import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 public class CounterpartyControllerIT extends BaseControllerIT {
     private Counterparty counterparty;
     private UUID counterpartyUuid;
+    private User user;
 
     @Autowired
     private CounterpartyService counterpartyService;
@@ -36,6 +39,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
     public void setUp() throws Exception {
         counterparty = testHelper.createCounterparty();
         counterpartyUuid = counterparty.getUuid();
+        user = counterparty.getUser();
     }
 
     @After
@@ -103,11 +107,12 @@ public class CounterpartyControllerIT extends BaseControllerIT {
     public void updateCounterparty() throws Exception {
         // update
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/counterparty.json");
-        jsonObject.put("postcodePoolId", (int) testHelper.createPostcodePool().getId());
+        jsonObject.put("postcodePoolId", counterparty.getPostcodePool().getId());
         String expectedJson = jsonObject.toString();
 
         given().
                 contentType("application/json;charset=UTF-8").
+                queryParam("token", user.getToken()).
                 body(expectedJson).
         when().
                 put("/counterparties/{uuid}", counterpartyUuid.toString()).
@@ -115,8 +120,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
                 statusCode(SC_OK);
 
         // check updated data
-        CounterpartyDto counterpartyDto = counterpartyMapper
-                .toDto(counterpartyService.getEntityByUuid(counterpartyUuid));
+        CounterpartyDto counterpartyDto = counterpartyMapper.toDto(counterpartyService.getEntityByUuid(counterpartyUuid));
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(counterpartyDto);
 
@@ -125,6 +129,8 @@ public class CounterpartyControllerIT extends BaseControllerIT {
 
     @Test
     public void deleteCounterparty() throws Exception {
+        given().
+                queryParam("token", user.getToken()).
         when().
                 delete("/counterparties/{uuid}", counterpartyUuid.toString()).
         then().
@@ -133,6 +139,8 @@ public class CounterpartyControllerIT extends BaseControllerIT {
 
     @Test
     public void deleteCounterparty_notFound() throws Exception {
+        given().
+                queryParam("token", user.getToken()).
         when().
                 delete("/counterparties/{uuid}", UUID.randomUUID().toString()).
         then().
