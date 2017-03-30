@@ -71,7 +71,7 @@ public class ShipmentController {
             byte[] data = pdfGeneratorService.generate(id, user);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(parseMediaType(APPLICATION_PDF_VALUE));
-            String filename = "labelform" + id + ".pdf";
+            String filename = id + ".pdf";
             headers.setContentDispositionFormData(filename, filename);
             headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
             return new ResponseEntity<>(data, headers, OK);
