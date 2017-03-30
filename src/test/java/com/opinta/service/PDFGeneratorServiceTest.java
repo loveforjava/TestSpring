@@ -24,6 +24,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.math.BigDecimal;
 
+import static com.opinta.entity.BarcodeStatus.RESERVED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Mockito.when;
@@ -53,7 +54,7 @@ public class PDFGeneratorServiceTest {
         Client recipient = new Client("Petrov PP", "002", recipientAddress, counterparty);
         shipment = new Shipment(sender, recipient, DeliveryType.W2W, 1, 1,
                 new BigDecimal("12.5"), new BigDecimal("2.5"), new BigDecimal("15.25"));
-        shipment.setBarcode(new BarcodeInnerNumber("12345678", BarcodeStatus.RESERVED));
+        shipment.setBarcode(new BarcodeInnerNumber("12345678", RESERVED));
     }
 
     @Test

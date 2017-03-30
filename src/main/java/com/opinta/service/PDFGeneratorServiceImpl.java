@@ -224,10 +224,10 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             data = outputStream.toByteArray();
             outputStream.close();
         } catch (IOException e) {
-            log.error("Error while parsing and populating PDF template: {}", e.getStackTrace());
+            log.error("Error while parsing and populating PDF template: {}", e);
             throw new IOException("Error while parsing and populating PDF template");
         } catch (WriterException e) {
-            log.error("Error while generating barcode: {}", e.getStackTrace());
+            log.error("Error while generating barcode: {}", e);
             throw new IOException("Error during barcode generating.");
         }
         return data;

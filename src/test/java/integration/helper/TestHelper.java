@@ -15,6 +15,8 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 
+import static com.opinta.entity.BarcodeStatus.RESERVED;
+
 @Component
 @Slf4j
 public class TestHelper {
@@ -55,7 +57,7 @@ public class TestHelper {
     public Shipment createShipment() throws Exception {
         Shipment shipment = new Shipment(createClient(), createClient(),
                 DeliveryType.D2D, 4.0F, 3.8F, new BigDecimal(200), new BigDecimal(30), new BigDecimal(35.2));
-        shipment.setBarcode(barcodeInnerNumberService.saveEntity(new BarcodeInnerNumber("12345678", BarcodeStatus.RESERVED)));
+        shipment.setBarcode(barcodeInnerNumberService.saveEntity(new BarcodeInnerNumber("12345678", RESERVED)));
         return shipmentService.saveEntity(shipment);
     }
 

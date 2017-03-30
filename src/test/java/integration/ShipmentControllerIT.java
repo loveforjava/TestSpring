@@ -23,6 +23,7 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.hamcrest.Matchers.equalTo;
+import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 
 public class ShipmentControllerIT extends BaseControllerIT {
     private Shipment shipment;
@@ -77,7 +78,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
                 get("shipments/{id}/form", shipmentId).
         then().
                 statusCode(SC_OK).
-                contentType(MediaType.APPLICATION_PDF_VALUE);
+                contentType(APPLICATION_PDF_VALUE);
     }
 
     @Test

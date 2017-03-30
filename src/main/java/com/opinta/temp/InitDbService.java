@@ -1,6 +1,12 @@
 package com.opinta.temp;
 
-import com.opinta.dto.*;
+import com.opinta.dto.AddressDto;
+import com.opinta.dto.BarcodeInnerNumberDto;
+import com.opinta.dto.ClientDto;
+import com.opinta.dto.CounterpartyDto;
+import com.opinta.dto.PostOfficeDto;
+import com.opinta.dto.PostcodePoolDto;
+import com.opinta.dto.ShipmentDto;
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.Phone;
 import com.opinta.mapper.ShipmentTrackingDetailMapper;
