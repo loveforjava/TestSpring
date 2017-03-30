@@ -286,13 +286,23 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         if (address == null) {
             return "";
         }
-        String output = "вул. " + address.getStreet() + ", " +
-                address.getHouseNumber() + ", " +
-                (address.getApartmentNumber() == null ? "" : "кв. " + address.getApartmentNumber() + ", ") +
-                address.getCity() + ", " +
-                (address.getDistrict() == null ? "" : address.getDistrict() + " р-н ") +
-                (address.getRegion() == null ? "" : address.getRegion() + " обл.") +
-                " " + address.getPostcode();
+
+        String street = address.getStreet();
+        String houseNumber = address.getHouseNumber();
+        String apartmentNumber = address.getApartmentNumber();
+        String city = address.getCity();
+        String district = address.getDistrict();
+        String region = address.getRegion();
+        String postcode = address.getPostcode();
+
+        String output = (street == null ? "" : "вул. " + street + ", ") +
+                (houseNumber == null ? "" : houseNumber + ", ") +
+                (apartmentNumber == null ? "" : "кв. " + apartmentNumber + ", ") +
+                (city == null ? "" : city + ", ") +
+                (district == null ? "" : district + " р-н ") +
+                (region == null ? "" : region + " обл.") +
+                (postcode == null ? "" : " " + postcode);
+
         return output;
     }
 }
