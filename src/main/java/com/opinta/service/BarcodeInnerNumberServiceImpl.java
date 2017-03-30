@@ -108,22 +108,30 @@ public class BarcodeInnerNumberServiceImpl implements BarcodeInnerNumberService 
         barcodeInnerNumberDao.delete(barcodeInnerNumber);
         return true;
     }
-
+    
     @Override
+    @Transactional
     public BarcodeInnerNumber generateBarcodeInnerNumber(PostcodePool postcodePool) {
-        BarcodeInnerNumber barcodeInnerNumber = new BarcodeInnerNumber();
-        barcodeInnerNumber.setStatus(USED);
-        barcodeInnerNumber.setInnerNumber(getNextInnerNumber(postcodePool.getPostcode()));
-        return barcodeInnerNumberDao.save(barcodeInnerNumber);
+        BarcodeInnerNumber barcode = barcodeInnerNumberDao.generateForPostcodePool(postcodePool);
+        log.info("generated barcode: " + barcode.toString());
+        return barcode;
     }
 
-    private String getNextInnerNumber(String postcode) {
-        POSTCODE_COUNTERS.putIfAbsent(postcode, 0);
-        int innerNumberCounter = POSTCODE_COUNTERS.get(postcode);
-        POSTCODE_COUNTERS.put(postcode, innerNumberCounter + 1);
-        if (innerNumberCounter > 9999999) {
-            throw new RuntimeException(format("Barcode %d is too large", innerNumberCounter));
-        }
-        return String.format("%07d", innerNumberCounter);
-    }
+//    @Override
+//    public BarcodeInnerNumber generateBarcodeInnerNumber(PostcodePool postcodePool) {
+//        BarcodeInnerNumber barcodeInnerNumber = new BarcodeInnerNumber();
+//        barcodeInnerNumber.setStatus(USED);
+//        barcodeInnerNumber.setInnerNumber(getNextInnerNumber(postcodePool.getPostcode()));
+//        return barcodeInnerNumberDao.save(barcodeInnerNumber);
+//    }
+//
+//    private String getNextInnerNumber(String postcode) {
+//        POSTCODE_COUNTERS.putIfAbsent(postcode, 0);
+//        int innerNumberCounter = POSTCODE_COUNTERS.get(postcode);
+//        POSTCODE_COUNTERS.put(postcode, innerNumberCounter + 1);
+//        if (innerNumberCounter > 9999999) {
+//            throw new RuntimeException(format("Barcode %d is too large", innerNumberCounter));
+//        }
+//        return String.format("%07d", innerNumberCounter);
+//    }
 }

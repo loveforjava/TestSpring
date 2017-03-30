@@ -105,7 +105,7 @@ public class InitDbService {
 
     @PostConstruct
     public void init() {
-        populateDb();
+        //populateDb();
     }
 
     private void populateDb() {

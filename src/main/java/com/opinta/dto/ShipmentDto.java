@@ -19,6 +19,8 @@ public class ShipmentDto {
     private UUID recipientId;
     @EnumString(source = DeliveryType.class)
     private DeliveryType deliveryType;
+    @Size(min = 13, max = 13)
+    private String barcode;
     private float weight;
     private float length;
     private float width;

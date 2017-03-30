@@ -23,7 +23,7 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.CoreMatchers.equalTo;
 
-@Slf4j
+@Ignore
 public class ClientControllerIT extends BaseControllerIT {
     private Client client;
     private UUID clientId = null;
@@ -39,9 +39,7 @@ public class ClientControllerIT extends BaseControllerIT {
     public void setUp() throws Exception {
         client = testHelper.createClient();
         clientId = client.getUuid();
-        log.info("client UUID: " + clientId);
         anotherClientId = super.anotherUuid(clientId);
-        log.info("another client UUID: " + anotherClientId);
     }
 
     @After

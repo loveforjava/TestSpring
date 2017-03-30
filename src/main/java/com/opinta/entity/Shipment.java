@@ -3,7 +3,6 @@ package com.opinta.entity;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -24,7 +23,6 @@ public class Shipment {
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
-    @Column(columnDefinition = "BINARY(16)")
     private UUID uuid;
     @ManyToOne
     @JoinColumn(name = "sender_id")

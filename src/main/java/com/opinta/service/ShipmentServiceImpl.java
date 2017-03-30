@@ -103,11 +103,10 @@ public class ShipmentServiceImpl implements ShipmentService {
         postcodePool.getBarcodeInnerNumbers().add(newBarcode);
         Shipment shipment = shipmentMapper.toEntity(shipmentDto);
         shipment.setBarcode(newBarcode);
-        log.info("Saving shipment with assigned barcode", shipmentMapper.toDto(shipment));
-
         shipment.setSender(clientDao.getById(shipment.getSender().getUuid()));
         shipment.setRecipient(clientDao.getById(shipment.getRecipient().getUuid()));
         shipment.setPrice(calculatePrice(shipment));
+        log.info("Saving shipment ", shipmentMapper.toDto(shipment));
 
         return shipmentMapper.toDto(shipmentDao.save(shipment));
     }

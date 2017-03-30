@@ -6,6 +6,7 @@ import java.util.UUID;
 import com.opinta.dto.ShipmentDto;
 import com.opinta.service.PDFGeneratorService;
 import com.opinta.service.ShipmentService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -25,6 +26,7 @@ import static java.lang.String.format;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
+@Slf4j
 @RestController
 @RequestMapping("/shipments")
 public class ShipmentController {
@@ -77,7 +79,9 @@ public class ShipmentController {
     @PostMapping
     @ResponseStatus(OK)
     public ShipmentDto createShipment(@RequestBody ShipmentDto shipmentDto) {
-        return shipmentService.save(shipmentDto);
+        shipmentDto = shipmentService.save(shipmentDto);
+        log.info("created shipment: " + shipmentDto);
+        return shipmentDto;
     }
 
     @PutMapping("{id}")

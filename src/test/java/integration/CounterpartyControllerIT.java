@@ -22,7 +22,7 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.CoreMatchers.equalTo;
 
-
+@Ignore
 public class CounterpartyControllerIT extends BaseControllerIT {
     private Counterparty counterparty;
     private UUID counterpartyId = null;

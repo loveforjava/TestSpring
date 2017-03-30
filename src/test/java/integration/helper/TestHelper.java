@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class TestHelper {
@@ -22,11 +24,13 @@ public class TestHelper {
     private final ShipmentService shipmentService;
     private final PostOfficeService postOfficeService;
     private final PhoneService phoneService;
+    private final TariffGridService tariffGridService;
 
     @Autowired
     public TestHelper(ClientService clientService, AddressService addressService,
                       CounterpartyService counterpartyService, PostcodePoolService postcodePoolService,
-                      ShipmentService shipmentService, PostOfficeService postOfficeService, PhoneService phoneService) {
+                      ShipmentService shipmentService, PostOfficeService postOfficeService,
+                      PhoneService phoneService, TariffGridService tariffGridService) {
         this.clientService = clientService;
         this.addressService = addressService;
         this.counterpartyService = counterpartyService;
@@ -34,6 +38,7 @@ public class TestHelper {
         this.shipmentService = shipmentService;
         this.postOfficeService = postOfficeService;
         this.phoneService = phoneService;
+        this.tariffGridService = tariffGridService;
     }
 
     public PostOffice createPostOffice() {
@@ -104,5 +109,47 @@ public class TestHelper {
 
     public File getFileFromResources(String path) {
         return new File(getClass().getClassLoader().getResource(path).getFile());
+    }
+    
+    public void populateTariffGrid() {
+        List<TariffGrid> tariffGrids = new ArrayList<>();
+        
+        tariffGrids.add(new TariffGrid(0.25f, 30f, W2wVariation.TOWN, 12f));
+        tariffGrids.add(new TariffGrid(0.25f, 30f, W2wVariation.REGION, 15f));
+        tariffGrids.add(new TariffGrid(0.25f, 30f, W2wVariation.COUNTRY, 21f));
+        
+        tariffGrids.add(new TariffGrid(0.5f, 30f, W2wVariation.TOWN, 15f));
+        tariffGrids.add(new TariffGrid(0.5f, 30f, W2wVariation.REGION, 18f));
+        tariffGrids.add(new TariffGrid(0.5f, 30f, W2wVariation.COUNTRY, 24f));
+        
+        tariffGrids.add(new TariffGrid(1f, 30f, W2wVariation.TOWN, 18f));
+        tariffGrids.add(new TariffGrid(1f, 30f, W2wVariation.REGION, 21f));
+        tariffGrids.add(new TariffGrid(1f, 30f, W2wVariation.COUNTRY, 27f));
+        
+        tariffGrids.add(new TariffGrid(2f, 30f, W2wVariation.TOWN, 21f));
+        tariffGrids.add(new TariffGrid(2f, 30f, W2wVariation.REGION, 24f));
+        tariffGrids.add(new TariffGrid(2f, 30f, W2wVariation.COUNTRY, 30f));
+        
+        tariffGrids.add(new TariffGrid(5f, 70f, W2wVariation.TOWN, 24f));
+        tariffGrids.add(new TariffGrid(5f, 70f, W2wVariation.REGION, 27f));
+        tariffGrids.add(new TariffGrid(5f, 70f, W2wVariation.COUNTRY, 36f));
+        
+        tariffGrids.add(new TariffGrid(10f, 70f, W2wVariation.TOWN, 27f));
+        tariffGrids.add(new TariffGrid(10f, 70f, W2wVariation.REGION, 30f));
+        tariffGrids.add(new TariffGrid(10f, 70f, W2wVariation.COUNTRY, 42f));
+        
+        tariffGrids.add(new TariffGrid(15f, 70f, W2wVariation.TOWN, 30f));
+        tariffGrids.add(new TariffGrid(15f, 70f, W2wVariation.REGION, 36f));
+        tariffGrids.add(new TariffGrid(15f, 70f, W2wVariation.COUNTRY, 48f));
+        
+        tariffGrids.add(new TariffGrid(20f, 70f, W2wVariation.TOWN, 36f));
+        tariffGrids.add(new TariffGrid(20f, 70f, W2wVariation.REGION, 42f));
+        tariffGrids.add(new TariffGrid(20f, 70f, W2wVariation.COUNTRY, 54f));
+        
+        tariffGrids.add(new TariffGrid(30f, 70f, W2wVariation.TOWN, 42f));
+        tariffGrids.add(new TariffGrid(30f, 70f, W2wVariation.REGION, 48f));
+        tariffGrids.add(new TariffGrid(30f, 70f, W2wVariation.COUNTRY, 60f));
+        
+        tariffGrids.forEach(tariffGridService::save);
     }
 }
