@@ -41,6 +41,18 @@ public class BarcodeInnerNumberServiceImpl implements BarcodeInnerNumberService 
 
     @Override
     @Transactional
+    public BarcodeInnerNumber getEntityById(long id) {
+        return barcodeInnerNumberDao.getById(id);
+    }
+
+    @Override
+    @Transactional
+    public BarcodeInnerNumber saveEntity(BarcodeInnerNumber barcodeInnerNumber) {
+        return barcodeInnerNumberDao.save(barcodeInnerNumber);
+    }
+
+    @Override
+    @Transactional
     public List<BarcodeInnerNumberDto> getAll(long postcodeId) {
         PostcodePool postcodePool = postcodePoolDao.getById(postcodeId);
         if (postcodePool == null) {
@@ -121,9 +133,9 @@ public class BarcodeInnerNumberServiceImpl implements BarcodeInnerNumberService 
         POSTCODE_COUNTERS.putIfAbsent(postcode, 0);
         int innerNumberCounter = POSTCODE_COUNTERS.get(postcode);
         POSTCODE_COUNTERS.put(postcode, innerNumberCounter + 1);
-        if (innerNumberCounter > 9999999) {
+        if (innerNumberCounter > 99999999) {
             throw new RuntimeException(format("Barcode %d is too large", innerNumberCounter));
         }
-        return String.format("%07d", innerNumberCounter);
+        return String.format("%08d", innerNumberCounter);
     }
 }

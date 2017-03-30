@@ -10,7 +10,6 @@ import java.util.UUID;
 import javax.naming.AuthenticationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
+import static org.springframework.http.MediaType.parseMediaType;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @RestController
@@ -61,39 +62,23 @@ public class ShipmentController {
         }
     }
 
-    @GetMapping("{id}/label-form")
-    public ResponseEntity<?> getShipmentLabelForm(@PathVariable("id") long id,
+    @GetMapping("{id}/form")
+    public ResponseEntity<?> getShipmentForm(@PathVariable("id") long id,
                                                   @RequestParam(value = "token") UUID token) {
         try {
             User user = userService.authenticate(token);
 
-            byte[] data = pdfGeneratorService.generateLabel(id, user);
+            byte[] data = pdfGeneratorService.generate(id, user);
             HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.parseMediaType("application/pdf"));
-            String filename = "labelform" + id + ".pdf";
+            headers.setContentType(parseMediaType(APPLICATION_PDF_VALUE));
+            String filename = id + ".pdf";
             headers.setContentDispositionFormData(filename, filename);
             headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
             return new ResponseEntity<>(data, headers, OK);
         } catch (AuthenticationException e) {
             return new ResponseEntity<>(e.getMessage(), UNAUTHORIZED);
-        }
-    }
-
-    @GetMapping("{id}/postpay-form")
-    public ResponseEntity<?> getShipmentPostpayForm(@PathVariable("id") long id,
-                                                    @RequestParam(value = "token") UUID token) {
-        try {
-            User user = userService.authenticate(token);
-
-            byte[] data = pdfGeneratorService.generatePostpay(id, user);
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.parseMediaType("application/pdf"));
-            String filename = "postpayform" + id + ".pdf";
-            headers.setContentDispositionFormData(filename, filename);
-            headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
-            return new ResponseEntity<>(data, headers, OK);
-        } catch (AuthenticationException e) {
-            return new ResponseEntity<>(e.getMessage(), UNAUTHORIZED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), NOT_FOUND);
         }
     }
 
