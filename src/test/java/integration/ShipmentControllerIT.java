@@ -1,16 +1,18 @@
 package integration;
 
+import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opinta.dto.ShipmentDto;
 import com.opinta.entity.Shipment;
+import com.opinta.entity.TariffGrid;
 import com.opinta.mapper.ShipmentMapper;
 import com.opinta.service.ShipmentService;
+import io.restassured.module.mockmvc.response.MockMvcResponse;
 import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertEquals;
 
 public class ShipmentControllerIT extends BaseControllerIT {
     private Shipment shipment;
@@ -36,7 +39,6 @@ public class ShipmentControllerIT extends BaseControllerIT {
     @Before
     public void setUp() throws Exception {
         shipment = testHelper.createShipment();
-        testHelper.populateTariffGrid();
         shipmentId = shipment.getUuid();
         anotherShipmentId = super.anotherUuid(shipmentId);
     }
@@ -46,7 +48,6 @@ public class ShipmentControllerIT extends BaseControllerIT {
         testHelper.deleteShipment(shipment);
     }
 
-    @Ignore
     @Test
     public void getShipments() throws Exception {
         when().
@@ -55,7 +56,6 @@ public class ShipmentControllerIT extends BaseControllerIT {
                 statusCode(SC_OK);
     }
     
-    @Ignore
     @Test
     public void getShipment() throws Exception {
         when().
@@ -65,7 +65,6 @@ public class ShipmentControllerIT extends BaseControllerIT {
                 body("id", equalTo(shipmentId.toString()));
     }
     
-    @Ignore
     @Test
     public void getShipment_notFound() throws Exception {
         when().
@@ -83,15 +82,18 @@ public class ShipmentControllerIT extends BaseControllerIT {
         jsonObject.put("recipientId", testHelper.createClient().getUuid().toString());
         String expectedJson = jsonObject.toString();
 
-        String newShipmentIdString =
+        MockMvcResponse response =
                 given().
                         contentType("application/json;charset=UTF-8").
                         body(expectedJson).
                 when().
                         post("/shipments").
                 then().
-                        extract().
-                        path("id");
+                        extract().response();
+        
+        String newShipmentIdString = response.path("id");
+        String generatedBarcode = response.path("barcode");
+        assertEquals(13, generatedBarcode.length());
 
         UUID newShipmentId = UUID.fromString(newShipmentIdString);
         
@@ -131,7 +133,6 @@ public class ShipmentControllerIT extends BaseControllerIT {
         JSONAssert.assertEquals(expectedJson, actualJson, false);
     }
     
-    @Ignore
     @Test
     public void deleteShipment() throws Exception {
         when().
@@ -140,7 +141,6 @@ public class ShipmentControllerIT extends BaseControllerIT {
                 statusCode(SC_OK);
     }
     
-    @Ignore
     @Test
     public void deleteShipment_notFound() throws Exception {
         when().

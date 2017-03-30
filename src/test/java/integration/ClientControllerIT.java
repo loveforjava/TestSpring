@@ -7,11 +7,9 @@ import com.opinta.dto.ClientDto;
 import com.opinta.entity.Client;
 import com.opinta.mapper.ClientMapper;
 import com.opinta.service.ClientService;
-import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +21,6 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.CoreMatchers.equalTo;
 
-@Ignore
 public class ClientControllerIT extends BaseControllerIT {
     private Client client;
     private UUID clientId = null;

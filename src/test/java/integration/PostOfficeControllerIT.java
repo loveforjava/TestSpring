@@ -8,7 +8,6 @@ import com.opinta.service.PostOfficeService;
 import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,6 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.CoreMatchers.equalTo;
 
-@Ignore
 public class PostOfficeControllerIT extends BaseControllerIT {
     private PostOffice postOffice;
     private int postOfficeId = MIN_VALUE;

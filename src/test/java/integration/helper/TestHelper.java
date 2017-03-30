@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class TestHelper {
@@ -111,7 +112,7 @@ public class TestHelper {
         return new File(getClass().getClassLoader().getResource(path).getFile());
     }
     
-    public void populateTariffGrid() {
+    public List<TariffGrid> populateTariffGrid() {
         List<TariffGrid> tariffGrids = new ArrayList<>();
         
         tariffGrids.add(new TariffGrid(0.25f, 30f, W2wVariation.TOWN, 12f));
@@ -150,6 +151,15 @@ public class TestHelper {
         tariffGrids.add(new TariffGrid(30f, 70f, W2wVariation.REGION, 48f));
         tariffGrids.add(new TariffGrid(30f, 70f, W2wVariation.COUNTRY, 60f));
         
-        tariffGrids.forEach(tariffGridService::save);
+        tariffGrids = tariffGrids
+                .stream()
+                .map(unsavedGrid -> tariffGridService.save(unsavedGrid))
+                .collect(Collectors.toList());
+        
+        return tariffGrids;
+    }
+    
+    public void deleteTariffGrids(List<TariffGrid> tariffGrids) {
+        tariffGridService.deleteGrids(tariffGrids);
     }
 }

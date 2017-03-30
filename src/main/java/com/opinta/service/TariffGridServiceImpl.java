@@ -73,6 +73,13 @@ public class TariffGridServiceImpl implements TariffGridService {
         tariffGridDao.delete(tariffGrid);
         return true;
     }
+    
+    @Override
+    @Transactional
+    public boolean deleteGrids(List<TariffGrid> tariffGrids) {
+        tariffGrids.forEach(tariffGridDao::delete);
+        return true;
+    }
 
     @Override
     @Transactional
