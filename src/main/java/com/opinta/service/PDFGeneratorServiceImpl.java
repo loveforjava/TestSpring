@@ -298,14 +298,6 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         String region = address.getRegion();
         String postcode = address.getPostcode();
 
-//        String output = (street == null ? "" : "вул. " + street + ", ") +
-//                (houseNumber == null ? "" : houseNumber + ", ") +
-//                (apartmentNumber == null ? "" : "кв. " + apartmentNumber + ", ") +
-//                (city == null ? "" : city + ", ") +
-//                (district == null ? "" : district + " р-н ") +
-//                (region == null ? "" : region + " обл.") +
-//                (postcode == null ? "" : " " + postcode);
-
         String output = (street == null ? "" : String.format("вул. %s, ", street)) +
                 (houseNumber == null ? "" : String.format("%s, ", houseNumber)) +
                 (apartmentNumber == null ? "" : String.format("кв. %s, ", apartmentNumber)) +
@@ -313,7 +305,6 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
                 (district == null ? "" : String.format("%s р-н ", district)) +
                 (region == null ? "" : String.format("%s обл.", region)) +
                 (postcode == null ? "" : " " + postcode);
-
         try {
             byte[] outputBytes = output.getBytes("UTF-8");
             output = new String(outputBytes, "UTF-8");
