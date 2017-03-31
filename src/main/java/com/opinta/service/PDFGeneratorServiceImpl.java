@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 
+import static java.lang.Math.round;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.rightPad;
 import java.util.UUID;
@@ -180,7 +181,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             setCheckBoxes(shipment, acroForm);
 
             //Populating rest of the fields
-            populateField(acroForm, field, "weight", String.valueOf(shipment.getWeight()));
+            populateField(acroForm, field, "weight", String.valueOf(round(shipment.getWeight())));
             populateField(acroForm, field, "declaredPrice", String.valueOf(shipment.getDeclaredPrice()));
             populateField(acroForm, field, "postPay", String.valueOf(shipment.getPostPay()));
             populateField(acroForm, field, "price", String.valueOf(shipment.getPrice()));
