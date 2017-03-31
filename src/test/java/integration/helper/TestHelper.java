@@ -18,8 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.opinta.entity.BarcodeStatus.RESERVED;
-
 @Component
 @Slf4j
 public class TestHelper {
@@ -31,14 +29,14 @@ public class TestHelper {
     private final PostOfficeService postOfficeService;
     private final PhoneService phoneService;
     private final TariffGridService tariffGridService;
-    private final BarcodeInnerNumberService barcodeInnerNumberService;
+    private final ShipmentGroupService shipmentGroupService;
 
     @Autowired
     public TestHelper(ClientService clientService, AddressService addressService,
                       CounterpartyService counterpartyService, PostcodePoolService postcodePoolService,
                       ShipmentService shipmentService, PostOfficeService postOfficeService,
                       PhoneService phoneService, TariffGridService tariffGridService,
-                      BarcodeInnerNumberService barcodeInnerNumberService) {
+                      ShipmentGroupService shipmentGroupService) {
         this.clientService = clientService;
         this.addressService = addressService;
         this.counterpartyService = counterpartyService;
@@ -46,8 +44,8 @@ public class TestHelper {
         this.shipmentService = shipmentService;
         this.postOfficeService = postOfficeService;
         this.phoneService = phoneService;
-        this.barcodeInnerNumberService = barcodeInnerNumberService;
         this.tariffGridService = tariffGridService;
+        this.shipmentGroupService = shipmentGroupService;
     }
 
     public PostOffice createPostOffice() {
@@ -85,9 +83,9 @@ public class TestHelper {
     }
 
     public Client createClient() throws Exception {
-        Client newClient = new Client("FOP Ivanov", "001", createAddress(), createPhone(),
+        Client client = new Client("FOP Ivanov", "001", createAddress(), createPhone(),
                 createCounterparty());
-        return clientService.saveEntity(newClient, newClient.getCounterparty().getUser());
+        return clientService.saveEntity(client, client.getCounterparty().getUser());
     }
 
     public void deleteClient(Client client) throws Exception {
@@ -103,6 +101,26 @@ public class TestHelper {
         }
         try {
             deleteCounterpartyWithPostcodePool(client.getCounterparty());
+        } catch (Exception e) {
+            log.debug(e.getMessage());
+        }
+    }
+
+    public ShipmentGroup createShipmentGroup() throws Exception {
+        ShipmentGroup shipmentGroup = new ShipmentGroup();
+        shipmentGroup.setName("Group 1");
+        shipmentGroup.setCounterparty(createCounterparty());
+        return shipmentGroupService.saveEntity(shipmentGroup, shipmentGroup.getCounterparty().getUser());
+    }
+
+    public void deleteShipmentGroup(ShipmentGroup shipmentGroup) throws Exception {
+        try {
+            shipmentGroupService.delete(shipmentGroup.getUuid(), shipmentGroup.getCounterparty().getUser());
+        } catch (Exception e) {
+            log.debug(e.getMessage());
+        }
+        try {
+            deleteCounterpartyWithPostcodePool(shipmentGroup.getCounterparty());
         } catch (Exception e) {
             log.debug(e.getMessage());
         }
