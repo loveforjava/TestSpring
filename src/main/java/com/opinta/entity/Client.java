@@ -12,7 +12,10 @@ import javax.persistence.ManyToOne;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
+
+import static java.lang.String.join;
 
 @Entity
 @Data
@@ -54,5 +57,50 @@ public class Client {
         this.address = address;
         this.phone = phone;
         this.counterparty = counterparty;
+    }
+    
+    private void generateName() {
+        if (individual) {
+            name = join(" ",
+                    StringUtils.isEmpty(firstName) ? "" : firstName,
+                    StringUtils.isEmpty(middleName) ? "" : middleName,
+                    StringUtils.isEmpty(lastName) ? "" : lastName)
+                    // regular expression to replace possible multiple spaces with exactly one space
+                    .replaceAll("\\s+", " ");
+        }
+    }
+    
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+        generateName();
+    }
+    
+    public void setMiddleName(String middleName) {
+        this.middleName = middleName;
+        generateName();
+    }
+    
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+        generateName();
+    }
+    
+    public void setName(String name) {
+        if (individual) {
+            generateName();
+        } else {
+            this.name = name;
+        }
+    }
+    
+    public void setIndividual(boolean individual) {
+        this.individual = individual;
+        if (this.individual) {
+            generateName();
+        } else {
+            firstName = "";
+            middleName = "";
+            lastName = "";
+        }
     }
 }
