@@ -18,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static java.lang.String.format;
+import static java.lang.String.join;
+
 import static org.apache.commons.beanutils.PropertyUtils.copyProperties;
 
 @Service
@@ -75,10 +77,22 @@ public class ClientServiceImpl implements ClientService {
         } catch (Exception e) {
             throw new Exception(e);
         }
+        processClientPersonalData(client);
         client.setPhone(phoneService.getOrCreateEntityByPhoneNumber(client.getPhone().getPhoneNumber()));
         userService.authorizeForAction(client, user);
         log.info("Saving client {}", client);
         return clientDao.save(client);
+    }
+    
+    private void processClientPersonalData(Client client) {
+        if (client.isIndividual()) {
+            String fullName = join(" ", client.getFirstName(), client.getMiddleName(), client.getLastName());
+            client.setName(fullName);
+        } else {
+            client.setFirstName("");
+            client.setMiddleName("");
+            client.setLastName("");
+        }
     }
 
     @Override
@@ -127,7 +141,7 @@ public class ClientServiceImpl implements ClientService {
             log.error("Can't get properties from object to updatable object for client", e);
             throw new Exception("Can't get properties from object to updatable object for client", e);
         }
-
+        processClientPersonalData(target);
         target.setUuid(uuid);
         target.setCounterparty(source.getCounterparty());
         target.setPhone(phoneService.getOrCreateEntityByPhoneNumber(clientDto.getPhoneNumber()));

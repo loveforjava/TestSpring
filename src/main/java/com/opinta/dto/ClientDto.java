@@ -20,6 +20,12 @@ public class ClientDto {
     private UUID uuid;
     @Size(max = 255)
     private String name;
+    @Size(max = 255)
+    private String firstName;
+    @Size(max = 255)
+    private String middleName;
+    @Size(max = 255)
+    private String lastName;
     @Size(max = 25)
     private String uniqueRegistrationNumber;
     private UUID counterpartyUuid;
