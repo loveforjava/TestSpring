@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 
 import static java.lang.Math.round;
@@ -297,13 +298,20 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         String region = address.getRegion();
         String postcode = address.getPostcode();
 
-        String output = (street == null ? "" : "вул. " + street + ", ") +
-                (houseNumber == null ? "" : houseNumber + ", ") +
-                (apartmentNumber == null ? "" : "кв. " + apartmentNumber + ", ") +
-                (city == null ? "" : city + ", ") +
-                (district == null ? "" : district + " р-н ") +
-                (region == null ? "" : region + " обл.") +
+        //PDF has problems with encodings on Linux, converting to bytes and formatting help dealing with the problem
+        String output = (street == null ? "" : String.format("вул. %s, ", street)) +
+                (houseNumber == null ? "" : String.format("%s, ", houseNumber)) +
+                (apartmentNumber == null ? "" : String.format("кв. %s, ", apartmentNumber)) +
+                (city == null ? "" : String.format("%s, ", city)) +
+                (district == null ? "" : String.format("%s р-н ", district)) +
+                (region == null ? "" : String.format("%s обл.", region)) +
                 (postcode == null ? "" : " " + postcode);
+        try {
+            byte[] outputBytes = output.getBytes("UTF-8");
+            output = new String(outputBytes, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
         return output;
     }

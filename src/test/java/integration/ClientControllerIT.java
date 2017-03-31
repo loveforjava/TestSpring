@@ -1,15 +1,20 @@
 package integration;
 
 import java.util.UUID;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.opinta.entity.Address;
 import com.opinta.entity.Client;
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.User;
+import com.opinta.mapper.ClientMapper;
 import com.opinta.service.ClientService;
-import io.restassured.module.mockmvc.response.MockMvcResponse;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import integration.helper.TestHelper;
 
@@ -27,6 +32,8 @@ public class ClientControllerIT extends BaseControllerIT {
     private User user;
     @Autowired
     private ClientService clientService;
+    @Autowired
+    private ClientMapper clientMapper;
     @Autowired
     private TestHelper testHelper;
 
@@ -75,38 +82,48 @@ public class ClientControllerIT extends BaseControllerIT {
     
     @Test
     @SuppressWarnings("unchecked")
-    public void createIndividualClient() throws Exception {
+    public void createClientAsIndividual() throws Exception {
         // create
         Counterparty newCounterparty = testHelper.createCounterparty();
+        Address newAddress = testHelper.createAddress();
 
-        JSONObject newClientJsonObject = testHelper.getJsonObjectFromFile("json/client-individual.json");
-        newClientJsonObject.put("counterpartyUuid", newCounterparty.getUuid().toString());
-        newClientJsonObject.put("addressId", (int) testHelper.createAddress().getId());
+        JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client.json");
+        inputJson.put("counterpartyUuid", newCounterparty.getUuid().toString());
+        inputJson.put("addressId", (int) newAddress.getId());
+        inputJson.put("individual", true);
     
-        MockMvcResponse response =
+        String firstName = (String) inputJson.get("firstName");
+        String middleName = (String) inputJson.get("middleName");
+        String lastName = (String) inputJson.get("lastName");
+        String expectedFullName = join(" ", lastName, firstName, middleName);
+    
+        String newUuid =
                 given().
                         contentType("application/json;charset=UTF-8").
                         queryParam("token", newCounterparty.getUser().getToken()).
-                        body(newClientJsonObject.toString()).
+                        body(inputJson.toString()).
                 when().
                         post("/clients").
                 then().
                         statusCode(SC_OK).
+                        body("name", equalTo(expectedFullName)).
+                        body("firstName", equalTo(firstName)).
+                        body("middleName", equalTo(middleName)).
+                        body("lastName", equalTo(lastName)).
                         extract().
-                        response();
+                        path("uuid");
+    
+        JSONParser parser = new JSONParser();
+        JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
+        expectedJson.put("name", expectedFullName);
         
-        UUID newClientUuid = UUID.fromString(response.path("uuid"));
+        UUID newClientUuid = UUID.fromString(newUuid);
 
         // check created data
         Client createdClient = clientService.getEntityByUuid(newClientUuid, newCounterparty.getUser());
-        
-        // manually formulate expected full name data from raw input json
-        String expectedFullName = join(" ",
-                (String) newClientJsonObject.get("firstName"),
-                (String) newClientJsonObject.get("middleName"),
-                (String) newClientJsonObject.get("lastName"));
-        assertEquals(expectedFullName, createdClient.getName());
-        assertEquals(expectedFullName, response.path("name"));
+        ObjectMapper mapper = new ObjectMapper();
+        String actualJson = mapper.writeValueAsString(clientMapper.toDto(createdClient));
+        JSONAssert.assertEquals(expectedJson.toJSONString(), actualJson, false);
 
         // delete
         testHelper.deleteClient(createdClient);
@@ -114,63 +131,83 @@ public class ClientControllerIT extends BaseControllerIT {
     
     @Test
     @SuppressWarnings("unchecked")
-    public void updateIndividualClient() throws Exception {
+    public void updateClientAsIndividual() throws Exception {
         // update
-        JSONObject updatedClientJsonObject = testHelper.getJsonObjectFromFile("json/client-individual.json");
-        updatedClientJsonObject.put("counterpartyUuid", client.getCounterparty().getUuid().toString());
-        updatedClientJsonObject.put("addressId", (int) client.getAddress().getId());
-        updatedClientJsonObject.put("middleName", "Jakson [edited]");
+        JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client.json");
+        inputJson.put("counterpartyUuid", client.getCounterparty().getUuid().toString());
+        inputJson.put("addressId", (int) client.getAddress().getId());
+        inputJson.put("middleName", "Jakson [edited]");
+        inputJson.put("individual", true);
 
+        String firstName = (String) inputJson.get("firstName");
+        String middleName = (String) inputJson.get("middleName");
+        String lastName = (String) inputJson.get("lastName");
+        
         given().
                 contentType("application/json;charset=UTF-8").
                 queryParam("token", user.getToken()).
-                body(updatedClientJsonObject.toString()).
+                body(inputJson.toString()).
         when().
                 put("/clients/{uuid}", clientUuid.toString()).
         then().
                 statusCode(SC_OK);
+    
+        JSONParser parser = new JSONParser();
+        JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
+        String expectedFullName = join(" ", lastName, firstName, middleName);
+        expectedJson.put("name", expectedFullName);
+        expectedJson.put("middleName", "Jakson [edited]");
 
         // check updated data
-        Client client = clientService.getEntityByUuid(clientUuid, user);
-    
-        // manually formulate expected full name data from raw input json
-        String expectedFullName = join(" ",
-                (String) updatedClientJsonObject.get("firstName"),
-                (String) updatedClientJsonObject.get("middleName"),
-                (String) updatedClientJsonObject.get("lastName"));
-        assertEquals(expectedFullName, client.getName());
+        Client updatedClient = clientService.getEntityByUuid(clientUuid, user);
+        ObjectMapper mapper = new ObjectMapper();
+        String actualJson = mapper.writeValueAsString(clientMapper.toDto(updatedClient));
+        JSONAssert.assertEquals(expectedJson.toJSONString(), actualJson, false);
     }
     
     @Test
     @SuppressWarnings("unchecked")
-    public void createCompanyClient() throws Exception {
+    public void createClientAsCompany() throws Exception {
         // create
         Counterparty newCounterparty = testHelper.createCounterparty();
+        Address newAddress = testHelper.createAddress();
         
-        JSONObject newClientJsonObject = testHelper.getJsonObjectFromFile("json/client-company.json");
-        newClientJsonObject.put("counterpartyUuid", newCounterparty.getUuid().toString());
-        newClientJsonObject.put("addressId", (int) testHelper.createAddress().getId());
+        JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client.json");
+        inputJson.put("counterpartyUuid", newCounterparty.getUuid().toString());
+        inputJson.put("addressId", (int) newAddress.getId());
+        inputJson.put("individual", false);
         
-        MockMvcResponse response =
+        String expectedFullName = (String) inputJson.get("name");
+        
+        String newUuid =
                 given().
                         contentType("application/json;charset=UTF-8").
                         queryParam("token", newCounterparty.getUser().getToken()).
-                        body(newClientJsonObject.toString()).
+                        body(inputJson.toString()).
                 when().
                         post("/clients").
                 then().
                         statusCode(SC_OK).
+                        body("name", equalTo(expectedFullName)).
+                        body("firstName", equalTo("")).
+                        body("middleName", equalTo("")).
+                        body("lastName", equalTo("")).
                         extract().
-                        response();
+                        path("uuid");
+    
+        JSONParser parser = new JSONParser();
+        JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
+        expectedJson.put("firstName", "");
+        expectedJson.put("middleName", "");
+        expectedJson.put("lastName", "");
         
-        UUID newClientUuid = UUID.fromString(response.path("uuid"));
+        UUID newClientUuid = UUID.fromString(newUuid);
         
         // check created data
         Client createdClient = clientService.getEntityByUuid(newClientUuid, newCounterparty.getUser());
-        
-        String expectedFullName = (String) newClientJsonObject.get("name");
-        assertEquals(expectedFullName, createdClient.getName());
-        assertEquals(expectedFullName, response.path("name"));
+        ObjectMapper mapper = new ObjectMapper();
+        String actualJson = mapper.writeValueAsString(clientMapper.toDto(createdClient));
+        JSONAssert.assertEquals(expectedJson.toJSONString(), actualJson, false);
         
         // delete
         testHelper.deleteClient(createdClient);
@@ -178,28 +215,35 @@ public class ClientControllerIT extends BaseControllerIT {
     
     @Test
     @SuppressWarnings("unchecked")
-    public void updateCompanyClient() throws Exception {
+    public void updateClientAsCompany() throws Exception {
         // update
-        JSONObject updatedClientJsonObject = testHelper.getJsonObjectFromFile("json/client-company.json");
-        updatedClientJsonObject.put("counterpartyUuid", client.getCounterparty().getUuid().toString());
-        updatedClientJsonObject.put("addressId", (int) client.getAddress().getId());
-        updatedClientJsonObject.put("name", "Rozetka & Roga & Kopyta [edited]");
+        JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client.json");
+        inputJson.put("counterpartyUuid", client.getCounterparty().getUuid().toString());
+        inputJson.put("addressId", (int) client.getAddress().getId());
+        inputJson.put("name", "Rozetka & Roga & Kopyta [edited]");
+        inputJson.put("individual", false);
     
         given().
                 contentType("application/json;charset=UTF-8").
                 queryParam("token", user.getToken()).
-                body(updatedClientJsonObject.toString()).
+                body(inputJson.toString()).
         when().
                 put("/clients/{uuid}", clientUuid.toString()).
         then().
                 statusCode(SC_OK);
+    
+        JSONParser parser = new JSONParser();
+        JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
+        expectedJson.put("name", "Rozetka & Roga & Kopyta [edited]");
+        expectedJson.put("firstName", "");
+        expectedJson.put("middleName", "");
+        expectedJson.put("lastName", "");
         
         // check updated data
-        Client client = clientService.getEntityByUuid(clientUuid, user);
-        
-        // manually formulate expected full name data from raw input json
-        String expectedFullName = (String) updatedClientJsonObject.get("name");
-        assertEquals(expectedFullName, client.getName());
+        Client updatedClient = clientService.getEntityByUuid(clientUuid, user);
+        ObjectMapper mapper = new ObjectMapper();
+        String actualJson = mapper.writeValueAsString(clientMapper.toDto(updatedClient));
+        JSONAssert.assertEquals(expectedJson.toJSONString(), actualJson, false);
     }
     
     @Test
