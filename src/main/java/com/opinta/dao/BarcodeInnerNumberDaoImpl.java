@@ -83,19 +83,4 @@ public class BarcodeInnerNumberDaoImpl implements BarcodeInnerNumberDao {
         session.persist(barcodeInnerNumber);
         return barcodeInnerNumber;
     }
-    
-
-//    private String getNextInnerNumber(long postcodeId) {
-//        try (CallableStatement call = con.prepareCall(BARCODE_INNER_CALL)) {
-//            call.setLong(1, postcodeId);
-//            call.registerOutParameter(2, Types.VARCHAR);
-//            call.registerOutParameter(3, Types.INTEGER);
-//            call.execute();
-//            String barcode = call.getString(2);
-//            return barcode;
-//        } catch (SQLException e) {
-//            log.error("barcode inner number generation thrrough the stored procedure.", e);
-//            throw new RuntimeException("cannot get barcode inner number.");
-//        }
-//    }
 }

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opinta.dto.ShipmentDto;
 import com.opinta.entity.Client;
 import com.opinta.entity.Shipment;
+import com.opinta.entity.ShipmentGroup;
 import com.opinta.entity.User;
 import com.opinta.mapper.ShipmentMapper;
 import com.opinta.service.ShipmentService;
@@ -95,10 +96,12 @@ public class ShipmentControllerIT extends BaseControllerIT {
     @SuppressWarnings("unchecked")
     public void createShipment() throws Exception {
         Client sender = testHelper.createClient();
+        ShipmentGroup shipmentGroup = testHelper.createShipmentGroup();
         // create
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
         jsonObject.put("senderUuid", sender.getUuid().toString());
         jsonObject.put("recipientUuid", testHelper.createClient().getUuid().toString());
+        jsonObject.put("shipmentGroupUuid", shipmentGroup.getUuid().toString());
         String expectedJson = jsonObject.toString();
 
         MockMvcResponse response =
@@ -118,6 +121,44 @@ public class ShipmentControllerIT extends BaseControllerIT {
 
         UUID newShipmentId = UUID.fromString(newShipmentIdString);
         
+        // check created data
+        Shipment createdShipment = shipmentService.getEntityByUuid(newShipmentId, sender.getCounterparty().getUser());
+        ObjectMapper mapper = new ObjectMapper();
+        String actualJson = mapper.writeValueAsString(shipmentMapper.toDto(createdShipment));
+
+        JSONAssert.assertEquals(expectedJson, actualJson, false);
+
+        // delete
+        testHelper.deleteShipment(createdShipment);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void createShipmentWithoutGroup() throws Exception {
+        Client sender = testHelper.createClient();
+        // create
+        JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
+        jsonObject.put("senderUuid", sender.getUuid().toString());
+        jsonObject.put("recipientUuid", testHelper.createClient().getUuid().toString());
+        String expectedJson = jsonObject.toString();
+
+        MockMvcResponse response =
+                given().
+                        contentType("application/json;charset=UTF-8").
+                        queryParam("token", sender.getCounterparty().getUser().getToken()).
+                        body(expectedJson).
+                when().
+                        post("/shipments").
+                then().
+                        statusCode(SC_OK).
+                        extract().response();
+
+        String newShipmentIdString = response.path("uuid");
+        String generatedBarcode = response.path("barcode");
+        assertEquals(13, generatedBarcode.length());
+
+        UUID newShipmentId = UUID.fromString(newShipmentIdString);
+
         // check created data
         Shipment createdShipment = shipmentService.getEntityByUuid(newShipmentId, sender.getCounterparty().getUser());
         ObjectMapper mapper = new ObjectMapper();

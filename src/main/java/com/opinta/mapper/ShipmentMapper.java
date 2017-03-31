@@ -8,6 +8,7 @@ import com.opinta.entity.Client;
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.PostcodePool;
 import com.opinta.entity.Shipment;
+import com.opinta.entity.ShipmentGroup;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -19,10 +20,27 @@ public interface ShipmentMapper extends BaseMapper<ShipmentDto, Shipment> {
     @Mappings({
             @Mapping(expression = "java(stringifyBarcode(shipment))", target = "barcode"),
             @Mapping(source = "sender.uuid", target = "senderUuid"),
-            @Mapping(source = "recipient.uuid", target = "recipientUuid")
+            @Mapping(source = "recipient.uuid", target = "recipientUuid"),
+            @Mapping(source = "shipmentGroup.uuid", target = "shipmentGroupUuid")
     })
     ShipmentDto toDto(Shipment shipment);
-    
+
+    @Override
+    @Mappings({
+            @Mapping(expression = "java(barcodeStringToBarcodeEntity(shipmentDto.getBarcode()))", target = "barcode"),
+            @Mapping(target = "sender", expression = "java(createClientById(shipmentDto.getSenderUuid()))"),
+            @Mapping(target = "recipient", expression = "java(createClientById(shipmentDto.getRecipientUuid()))"),
+            @Mapping(target = "shipmentGroup",
+                    expression = "java(ShipmentGroupUuidToShipmentGroupEntity(shipmentDto.getShipmentGroupUuid()))")
+    })
+    Shipment toEntity(ShipmentDto shipmentDto);
+
+    default Client createClientById(UUID id) {
+        Client client = new Client();
+        client.setUuid(id);
+        return client;
+    }
+
     default String stringifyBarcode(Shipment shipment) {
         Client sender = shipment.getSender();
         if (sender == null) {
@@ -55,21 +73,16 @@ public interface ShipmentMapper extends BaseMapper<ShipmentDto, Shipment> {
         return fullBarcode;
     }
 
-    @Override
-    @Mappings({
-            @Mapping(expression = "java(barcodeStringToBarcodeEntity(shipmentDto.getBarcode()))", target = "barcode"),
-            @Mapping(target = "sender", expression = "java(createClientById(shipmentDto.getSenderUuid()))"),
-            @Mapping(target = "recipient", expression = "java(createClientById(shipmentDto.getRecipientUuid()))")
-    })
-    Shipment toEntity(ShipmentDto shipmentDto);
-
-    default Client createClientById(UUID id) {
-        Client client = new Client();
-        client.setUuid(id);
-        return client;
-    }
-    
     default BarcodeInnerNumber barcodeStringToBarcodeEntity(String barcode) {
         return null;
+    }
+
+    default ShipmentGroup ShipmentGroupUuidToShipmentGroupEntity(UUID uuid) {
+        if (uuid == null) {
+            return null;
+        }
+        ShipmentGroup shipmentGroup = new ShipmentGroup();
+        shipmentGroup.setUuid(uuid);
+        return shipmentGroup;
     }
 }
