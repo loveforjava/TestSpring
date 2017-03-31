@@ -120,7 +120,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             acroForm.setDefaultResources(res);
 
             //Populating clients data
-            generateClientsData(shipment, acroForm);
+            generateClientsData(shipment, acroForm, true);
 
             //Splitting price to hryvnas and kopiykas
             BigDecimal postPay = shipment.getPostPay();
@@ -178,7 +178,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             acroForm.setDefaultResources(res);
 
             //Populating client data
-            generateClientsData(shipment, acroForm);
+            generateClientsData(shipment, acroForm, false);
             setCheckBoxes(shipment, acroForm);
 
             //Populating rest of the fields
@@ -263,8 +263,17 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         }
     }
 
-    private void generateClientsData(Shipment shipment, PDAcroForm acroForm) throws IOException {
-        Client sender = shipment.getSender();
+    private void generateClientsData(Shipment shipment, PDAcroForm acroForm, boolean swapSenderWithRecipient) throws IOException {
+        Client sender;
+        Client recipient;
+        if (swapSenderWithRecipient) {
+            sender = shipment.getRecipient();
+            recipient = shipment.getSender();
+        } else {
+            sender = shipment.getSender();
+            recipient = shipment.getRecipient();
+        }
+
 
         populateField(acroForm, field, "senderName", sender.getName());
         populateField(acroForm, field, "senderAddress", processAddress(sender.getAddress()));
@@ -273,8 +282,6 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         if (phone != null) {
             populateField(acroForm, field, "senderPhone", phone.getPhoneNumber());
         }
-
-        Client recipient = shipment.getRecipient();
 
         populateField(acroForm, field, "recipientName", recipient.getName());
         populateField(acroForm, field, "recipientAddress", processAddress(recipient.getAddress()));
