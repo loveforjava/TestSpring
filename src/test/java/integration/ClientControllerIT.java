@@ -10,6 +10,7 @@ import com.opinta.entity.User;
 import com.opinta.mapper.ClientMapper;
 import com.opinta.service.ClientService;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -112,11 +113,9 @@ public class ClientControllerIT extends BaseControllerIT {
                         extract().
                         path("uuid");
     
-        JSONObject expectedJson = testHelper.getJsonObjectFromFile("json/client.json");
-        expectedJson.put("counterpartyUuid", newCounterparty.getUuid().toString());
-        expectedJson.put("addressId", (int) newAddress.getId());
+        JSONParser parser = new JSONParser();
+        JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
         expectedJson.put("name", expectedFullName);
-        expectedJson.put("individual", true);
         
         UUID newClientUuid = UUID.fromString(newUuid);
 
@@ -153,13 +152,11 @@ public class ClientControllerIT extends BaseControllerIT {
         then().
                 statusCode(SC_OK);
     
+        JSONParser parser = new JSONParser();
+        JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
         String expectedFullName = join(" ", lastName, firstName, middleName);
-        JSONObject expectedJson = testHelper.getJsonObjectFromFile("json/client.json");
-        expectedJson.put("counterpartyUuid", client.getCounterparty().getUuid().toString());
-        expectedJson.put("addressId", (int) client.getAddress().getId());
         expectedJson.put("name", expectedFullName);
         expectedJson.put("middleName", "Jakson [edited]");
-        expectedJson.put("individual", true);
 
         // check updated data
         Client updatedClient = clientService.getEntityByUuid(clientUuid, user);
@@ -198,10 +195,8 @@ public class ClientControllerIT extends BaseControllerIT {
                         extract().
                         path("uuid");
     
-        JSONObject expectedJson = testHelper.getJsonObjectFromFile("json/client.json");
-        expectedJson.put("counterpartyUuid", newCounterparty.getUuid().toString());
-        expectedJson.put("addressId", (int) newAddress.getId());
-        expectedJson.put("individual", false);
+        JSONParser parser = new JSONParser();
+        JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
         expectedJson.put("firstName", "");
         expectedJson.put("middleName", "");
         expectedJson.put("lastName", "");
@@ -237,10 +232,8 @@ public class ClientControllerIT extends BaseControllerIT {
         then().
                 statusCode(SC_OK);
     
-        JSONObject expectedJson = testHelper.getJsonObjectFromFile("json/client.json");
-        expectedJson.put("counterpartyUuid", client.getCounterparty().getUuid().toString());
-        expectedJson.put("addressId", (int) client.getAddress().getId());
-        expectedJson.put("individual", false);
+        JSONParser parser = new JSONParser();
+        JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
         expectedJson.put("name", "Rozetka & Roga & Kopyta [edited]");
         expectedJson.put("firstName", "");
         expectedJson.put("middleName", "");
