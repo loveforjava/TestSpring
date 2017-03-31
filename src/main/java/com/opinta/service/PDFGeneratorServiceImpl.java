@@ -298,6 +298,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         String region = address.getRegion();
         String postcode = address.getPostcode();
 
+        //PDF has problems with encodings on Linux, converting to bytes and formatting help dealing with the problem
         String output = (street == null ? "" : String.format("вул. %s, ", street)) +
                 (houseNumber == null ? "" : String.format("%s, ", houseNumber)) +
                 (apartmentNumber == null ? "" : String.format("кв. %s, ", apartmentNumber)) +
