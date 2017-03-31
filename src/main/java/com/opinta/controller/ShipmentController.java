@@ -2,11 +2,12 @@ package com.opinta.controller;
 
 import com.opinta.entity.User;
 import com.opinta.service.UserService;
+import java.util.UUID;
 
 import com.opinta.dto.ShipmentDto;
 import com.opinta.service.PDFGeneratorService;
 import com.opinta.service.ShipmentService;
-import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import javax.naming.AuthenticationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -27,6 +28,7 @@ import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 import static org.springframework.http.MediaType.parseMediaType;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
+@Slf4j
 @RestController
 @RequestMapping("/shipments")
 public class ShipmentController {
@@ -53,17 +55,17 @@ public class ShipmentController {
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<?> getShipment(@PathVariable("id") long id, @RequestParam(value = "token") UUID token) {
+    public ResponseEntity<?> getShipment(@PathVariable("id") UUID id, @RequestParam(value = "token") UUID token) {
         try {
             User user = userService.authenticate(token);
-            return new ResponseEntity<>(shipmentService.getById(id, user), OK);
+            return new ResponseEntity<>(shipmentService.getByUuid(id, user), OK);
         } catch (AuthenticationException e) {
             return new ResponseEntity<>(e.getMessage(), UNAUTHORIZED);
         }
     }
 
     @GetMapping("{id}/form")
-    public ResponseEntity<?> getShipmentForm(@PathVariable("id") long id,
+    public ResponseEntity<?> getShipmentForm(@PathVariable("id") UUID id,
                                                   @RequestParam(value = "token") UUID token) {
         try {
             User user = userService.authenticate(token);
@@ -94,7 +96,7 @@ public class ShipmentController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<?> updateShipment(@PathVariable long id, @RequestBody ShipmentDto shipmentDto,
+    public ResponseEntity<?> updateShipment(@PathVariable UUID id, @RequestBody ShipmentDto shipmentDto,
                                             @RequestParam(value = "token") UUID token) {
         try {
             User user = userService.authenticate(token);
@@ -107,7 +109,7 @@ public class ShipmentController {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<?> deleteShipment(@PathVariable long id,
+    public ResponseEntity<?> deleteShipment(@PathVariable UUID id,
                                             @RequestParam(value = "token") UUID token) {
         try {
             User user = userService.authenticate(token);

@@ -38,6 +38,7 @@ import java.math.BigDecimal;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.rightPad;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -65,8 +66,8 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
     }
 
     @Override
-    public byte[] generate(long shipmentId, User user) throws AuthenticationException, Exception {
-        Shipment shipment = shipmentService.getEntityById(shipmentId, user);
+    public byte[] generate(UUID shipmentId, User user) throws AuthenticationException, Exception {
+        Shipment shipment = shipmentService.getEntityByUuid(shipmentId, user);
 
         userService.authorizeForAction(shipment, user);
 

@@ -3,6 +3,7 @@ package com.opinta.dao;
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.User;
 import java.util.List;
+import java.util.UUID;
 
 import com.opinta.entity.Client;
 import org.hibernate.Criteria;
@@ -43,9 +44,9 @@ public class ClientDaoImpl implements ClientDao {
     }
 
     @Override
-    public Client getById(long id) {
+    public Client getByUuid(UUID uuid) {
         Session session = sessionFactory.getCurrentSession();
-        return (Client) session.get(Client.class, id);
+        return (Client) session.get(Client.class, uuid);
     }
 
     @Override

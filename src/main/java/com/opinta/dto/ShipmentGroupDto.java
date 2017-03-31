@@ -12,5 +12,5 @@ import java.util.UUID;
 public class ShipmentGroupDto {
     private UUID uuid;
     private String name;
-    private String counterpartyId;
+    private UUID counterpartyUuid;
 }

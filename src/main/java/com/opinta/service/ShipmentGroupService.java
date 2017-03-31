@@ -17,7 +17,7 @@ public interface ShipmentGroupService {
 
     ShipmentGroupDto getById(UUID uuid, User user) throws Exception;
 
-    List<ShipmentGroupDto> getAllByCounterpartyId(long counterpartyId);
+    List<ShipmentGroupDto> getAllByCounterpartyId(UUID counterpartyUuid);
 
     ShipmentGroup saveEntity(ShipmentGroup shipmentGroup, User user) throws Exception;
 

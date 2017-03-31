@@ -9,10 +9,10 @@ import org.mapstruct.Mapping;
 public interface ShipmentGroupMapper extends BaseMapper<ShipmentGroupDto, ShipmentGroup> {
 
     @Override
-    @Mapping(source = "counterparty.id", target = "counterpartyId")
+    @Mapping(source = "counterparty.uuid", target = "counterpartyUuid")
     ShipmentGroupDto toDto(ShipmentGroup shipmentGroup);
 
     @Override
-    @Mapping(source = "counterpartyId", target = "counterparty.id")
+    @Mapping(source = "counterpartyUuid", target = "counterparty.uuid")
     ShipmentGroup toEntity(ShipmentGroupDto shipmentGroupDto);
 }

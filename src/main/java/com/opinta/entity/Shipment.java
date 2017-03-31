@@ -1,6 +1,7 @@
 package com.opinta.entity;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -13,19 +14,21 @@ import javax.persistence.OneToOne;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 @Data
 @NoArgsConstructor
 public class Shipment {
     @Id
-    @GeneratedValue
-    private long id;
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    private UUID uuid;
     @ManyToOne
-    @JoinColumn(name = "sender_id")
+    @JoinColumn(name = "sender_uuid")
     private Client sender;
     @ManyToOne
-    @JoinColumn(name = "recipient_id")
+    @JoinColumn(name = "recipient_uuid")
     private Client recipient;
     @ManyToOne
     @JoinColumn(name = "shipment_group_uuid")

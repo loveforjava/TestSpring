@@ -1,6 +1,6 @@
 {
   "name": "John Doe",
   "uniqueRegistrationNumber": "007",
-  "counterpartyId": [],
+  "counterpartyUuid": [],
   "addressId": []
 }

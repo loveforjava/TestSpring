@@ -6,6 +6,7 @@ import com.opinta.entity.Shipment;
 import com.opinta.entity.ShipmentGroup;
 import com.opinta.entity.User;
 import java.util.List;
+import java.util.UUID;
 
 public interface ShipmentDao {
 
@@ -15,7 +16,7 @@ public interface ShipmentDao {
 
     List<Shipment> getAllByShipmentGroup(ShipmentGroup shipmentGroup, User user);
 
-    Shipment getById(long id);
+    Shipment getByUuid(UUID uuid);
 
     Shipment save(Shipment shipment);
 

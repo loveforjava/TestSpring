@@ -1,5 +1,7 @@
 package integration;
 
+import java.util.UUID;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opinta.dto.ShipmentDto;
 import com.opinta.entity.Client;
@@ -7,6 +9,7 @@ import com.opinta.entity.Shipment;
 import com.opinta.entity.User;
 import com.opinta.mapper.ShipmentMapper;
 import com.opinta.service.ShipmentService;
+import io.restassured.module.mockmvc.response.MockMvcResponse;
 import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -14,22 +17,19 @@ import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import integration.helper.TestHelper;
-import org.springframework.http.MediaType;
 
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
-import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
-import static java.lang.Integer.MIN_VALUE;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
+import static org.junit.Assert.assertEquals;
 
 public class ShipmentControllerIT extends BaseControllerIT {
     private Shipment shipment;
-    private int shipmentId = MIN_VALUE;
+    private UUID shipmentUuid;
     private User user;
-
     @Autowired
     private ShipmentMapper shipmentMapper;
     @Autowired
@@ -40,7 +40,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
     @Before
     public void setUp() throws Exception {
         shipment = testHelper.createShipment();
-        shipmentId = (int) shipment.getId();
+        shipmentUuid = shipment.getUuid();
         user = shipment.getSender().getCounterparty().getUser();
     }
 
@@ -64,10 +64,10 @@ public class ShipmentControllerIT extends BaseControllerIT {
         given().
                 queryParam("token", user.getToken()).
         when().
-                get("shipments/{id}", shipmentId).
+                get("shipments/{uuid}", shipmentUuid.toString()).
         then().
                 statusCode(SC_OK).
-                body("id", equalTo(shipmentId));
+                body("uuid", equalTo(shipmentUuid.toString()));
     }
 
     @Test
@@ -75,7 +75,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         given().
                 queryParam("token", user.getToken()).
         when().
-                get("shipments/{id}/form", shipmentId).
+                get("shipments/{id}/form", shipmentUuid).
         then().
                 statusCode(SC_OK).
                 contentType(APPLICATION_PDF_VALUE);
@@ -86,7 +86,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         given().
                 queryParam("token", user.getToken()).
         when().
-                get("/shipments/{id}", shipmentId + 1).
+                get("/shipments/{uuid}", UUID.randomUUID().toString()).
         then().
                 statusCode(SC_UNAUTHORIZED);
     }
@@ -95,14 +95,13 @@ public class ShipmentControllerIT extends BaseControllerIT {
     @SuppressWarnings("unchecked")
     public void createShipment() throws Exception {
         Client sender = testHelper.createClient();
-
         // create
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
-        jsonObject.put("senderId", (int) sender.getId());
-        jsonObject.put("recipientId", (int) testHelper.createClient().getId());
+        jsonObject.put("senderUuid", sender.getUuid().toString());
+        jsonObject.put("recipientUuid", testHelper.createClient().getUuid().toString());
         String expectedJson = jsonObject.toString();
 
-        int newShipmentId =
+        MockMvcResponse response =
                 given().
                         contentType("application/json;charset=UTF-8").
                         queryParam("token", sender.getCounterparty().getUser().getToken()).
@@ -111,11 +110,16 @@ public class ShipmentControllerIT extends BaseControllerIT {
                         post("/shipments").
                 then().
                         statusCode(SC_OK).
-                        extract().
-                        path("id");
+                        extract().response();
+        
+        String newShipmentIdString = response.path("uuid");
+        String generatedBarcode = response.path("barcode");
+        assertEquals(13, generatedBarcode.length());
 
+        UUID newShipmentId = UUID.fromString(newShipmentIdString);
+        
         // check created data
-        Shipment createdShipment = shipmentService.getEntityById(newShipmentId, sender.getCounterparty().getUser());
+        Shipment createdShipment = shipmentService.getEntityByUuid(newShipmentId, sender.getCounterparty().getUser());
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(shipmentMapper.toDto(createdShipment));
 
@@ -124,14 +128,14 @@ public class ShipmentControllerIT extends BaseControllerIT {
         // delete
         testHelper.deleteShipment(createdShipment);
     }
-
+    
     @Test
     @SuppressWarnings("unchecked")
     public void updateShipment() throws Exception {
         // update
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
-        jsonObject.put("senderId", (int) shipment.getSender().getId());
-        jsonObject.put("recipientId", (int) shipment.getRecipient().getId());
+        jsonObject.put("senderUuid", shipment.getSender().getUuid().toString());
+        jsonObject.put("recipientUuid", shipment.getRecipient().getUuid().toString());
         String expectedJson = jsonObject.toString();
 
         given().
@@ -139,12 +143,12 @@ public class ShipmentControllerIT extends BaseControllerIT {
                 queryParam("token", user.getToken()).
                 body(expectedJson).
         when().
-                put("/shipments/{id}", shipmentId).
+                put("/shipments/{uuid}", shipmentUuid.toString()).
         then().
                 statusCode(SC_OK);
 
         // check updated data
-        ShipmentDto shipmentDto = shipmentMapper.toDto(shipmentService.getEntityById(shipmentId, user));
+        ShipmentDto shipmentDto = shipmentMapper.toDto(shipmentService.getEntityByUuid(shipmentUuid, user));
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(shipmentDto);
 
@@ -156,7 +160,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         given().
                 queryParam("token", user.getToken()).
         when().
-                delete("/shipments/{id}", shipmentId).
+                delete("/shipments/{uuid}", shipmentUuid.toString()).
         then().
                 statusCode(SC_OK);
     }
@@ -166,7 +170,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         given().
                 queryParam("token", user.getToken()).
         when().
-                delete("/shipments/{id}", shipmentId + 1).
+                delete("/shipments/{uuid}", UUID.randomUUID().toString()).
         then().
                 statusCode(SC_NOT_FOUND);
     }

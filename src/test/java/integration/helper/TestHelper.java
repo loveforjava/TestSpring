@@ -14,6 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.opinta.entity.BarcodeStatus.RESERVED;
 
@@ -27,12 +30,14 @@ public class TestHelper {
     private final ShipmentService shipmentService;
     private final PostOfficeService postOfficeService;
     private final PhoneService phoneService;
+    private final TariffGridService tariffGridService;
     private final BarcodeInnerNumberService barcodeInnerNumberService;
 
     @Autowired
     public TestHelper(ClientService clientService, AddressService addressService,
                       CounterpartyService counterpartyService, PostcodePoolService postcodePoolService,
-                      ShipmentService shipmentService, PostOfficeService postOfficeService, PhoneService phoneService,
+                      ShipmentService shipmentService, PostOfficeService postOfficeService,
+                      PhoneService phoneService, TariffGridService tariffGridService,
                       BarcodeInnerNumberService barcodeInnerNumberService) {
         this.clientService = clientService;
         this.addressService = addressService;
@@ -42,6 +47,7 @@ public class TestHelper {
         this.postOfficeService = postOfficeService;
         this.phoneService = phoneService;
         this.barcodeInnerNumberService = barcodeInnerNumberService;
+        this.tariffGridService = tariffGridService;
     }
 
     public PostOffice createPostOffice() {
@@ -57,23 +63,22 @@ public class TestHelper {
     public Shipment createShipment() throws Exception {
         Shipment shipment = new Shipment(createClient(), createClient(),
                 DeliveryType.D2D, 4.0F, 3.8F, new BigDecimal(200), new BigDecimal(30), new BigDecimal(35.2));
-        shipment.setBarcode(barcodeInnerNumberService.saveEntity(new BarcodeInnerNumber("12345678", RESERVED)));
         return shipmentService.saveEntity(shipment);
     }
 
     public void deleteShipment(Shipment shipment) throws Exception {
         try {
-            shipmentService.delete(shipment.getId(), shipment.getSender().getCounterparty().getUser());
+            shipmentService.delete(shipment.getUuid(), shipment.getSender().getCounterparty().getUser());
         } catch (Exception e) {
             log.debug(e.getMessage());
         }
         try {
-            clientService.delete(shipment.getSender().getId(), shipment.getSender().getCounterparty().getUser());
+            clientService.delete(shipment.getSender().getUuid(), shipment.getSender().getCounterparty().getUser());
         } catch (Exception e) {
             log.debug(e.getMessage());
         }
         try {
-            clientService.delete(shipment.getRecipient().getId(), shipment.getRecipient().getCounterparty().getUser());
+            clientService.delete(shipment.getRecipient().getUuid(), shipment.getRecipient().getCounterparty().getUser());
         } catch (Exception e) {
             log.debug(e.getMessage());
         }
@@ -87,7 +92,7 @@ public class TestHelper {
 
     public void deleteClient(Client client) throws Exception {
         try {
-            clientService.delete(client.getId(), client.getCounterparty().getUser());
+            clientService.delete(client.getUuid(), client.getCounterparty().getUser());
         } catch (Exception e) {
             log.debug(e.getMessage());
         }
@@ -124,12 +129,7 @@ public class TestHelper {
 
     public void deleteCounterpartyWithPostcodePool(Counterparty counterparty) throws Exception{
         try {
-            counterpartyService.delete(counterparty.getId(), counterparty.getUser());
-        } catch (Exception e) {
-            log.debug(e.getMessage());
-        }
-        try {
-            counterpartyService.delete(counterparty.getId(), counterparty.getUser());
+            counterpartyService.delete(counterparty.getUuid(), counterparty.getUser());
         } catch (Exception e) {
             log.debug(e.getMessage());
         }
@@ -146,5 +146,56 @@ public class TestHelper {
 
     public File getFileFromResources(String path) {
         return new File(getClass().getClassLoader().getResource(path).getFile());
+    }
+    
+    public List<TariffGrid> populateTariffGrid() {
+        List<TariffGrid> tariffGrids = new ArrayList<>();
+        
+        tariffGrids.add(new TariffGrid(0.25f, 30f, W2wVariation.TOWN, 12f));
+        tariffGrids.add(new TariffGrid(0.25f, 30f, W2wVariation.REGION, 15f));
+        tariffGrids.add(new TariffGrid(0.25f, 30f, W2wVariation.COUNTRY, 21f));
+        
+        tariffGrids.add(new TariffGrid(0.5f, 30f, W2wVariation.TOWN, 15f));
+        tariffGrids.add(new TariffGrid(0.5f, 30f, W2wVariation.REGION, 18f));
+        tariffGrids.add(new TariffGrid(0.5f, 30f, W2wVariation.COUNTRY, 24f));
+        
+        tariffGrids.add(new TariffGrid(1f, 30f, W2wVariation.TOWN, 18f));
+        tariffGrids.add(new TariffGrid(1f, 30f, W2wVariation.REGION, 21f));
+        tariffGrids.add(new TariffGrid(1f, 30f, W2wVariation.COUNTRY, 27f));
+        
+        tariffGrids.add(new TariffGrid(2f, 30f, W2wVariation.TOWN, 21f));
+        tariffGrids.add(new TariffGrid(2f, 30f, W2wVariation.REGION, 24f));
+        tariffGrids.add(new TariffGrid(2f, 30f, W2wVariation.COUNTRY, 30f));
+        
+        tariffGrids.add(new TariffGrid(5f, 70f, W2wVariation.TOWN, 24f));
+        tariffGrids.add(new TariffGrid(5f, 70f, W2wVariation.REGION, 27f));
+        tariffGrids.add(new TariffGrid(5f, 70f, W2wVariation.COUNTRY, 36f));
+        
+        tariffGrids.add(new TariffGrid(10f, 70f, W2wVariation.TOWN, 27f));
+        tariffGrids.add(new TariffGrid(10f, 70f, W2wVariation.REGION, 30f));
+        tariffGrids.add(new TariffGrid(10f, 70f, W2wVariation.COUNTRY, 42f));
+        
+        tariffGrids.add(new TariffGrid(15f, 70f, W2wVariation.TOWN, 30f));
+        tariffGrids.add(new TariffGrid(15f, 70f, W2wVariation.REGION, 36f));
+        tariffGrids.add(new TariffGrid(15f, 70f, W2wVariation.COUNTRY, 48f));
+        
+        tariffGrids.add(new TariffGrid(20f, 70f, W2wVariation.TOWN, 36f));
+        tariffGrids.add(new TariffGrid(20f, 70f, W2wVariation.REGION, 42f));
+        tariffGrids.add(new TariffGrid(20f, 70f, W2wVariation.COUNTRY, 54f));
+        
+        tariffGrids.add(new TariffGrid(30f, 70f, W2wVariation.TOWN, 42f));
+        tariffGrids.add(new TariffGrid(30f, 70f, W2wVariation.REGION, 48f));
+        tariffGrids.add(new TariffGrid(30f, 70f, W2wVariation.COUNTRY, 60f));
+        
+        tariffGrids = tariffGrids
+                .stream()
+                .map(unsavedGrid -> tariffGridService.save(unsavedGrid))
+                .collect(Collectors.toList());
+        
+        return tariffGrids;
+    }
+    
+    public void deleteTariffGrids(List<TariffGrid> tariffGrids) {
+        tariffGridService.deleteGrids(tariffGrids);
     }
 }

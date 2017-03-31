@@ -1,6 +1,6 @@
 {
-  "senderId": [],
-  "recipientId": [],
+  "senderUuid": [],
+  "recipientUuid": [],
   "deliveryType": "D2W",
   "weight": 5,
   "length": 4,

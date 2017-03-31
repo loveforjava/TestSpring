@@ -54,10 +54,10 @@ public class ShipmentGroupServiceImpl implements ShipmentGroupService {
 
     @Override
     @Transactional
-    public List<ShipmentGroupDto> getAllByCounterpartyId(long counterpartyId) {
-        Counterparty counterparty = counterpartyService.getEntityById(counterpartyId);
+    public List<ShipmentGroupDto> getAllByCounterpartyId(UUID counterpartyUuid) {
+        Counterparty counterparty = counterpartyService.getEntityByUuid(counterpartyUuid);
         if (counterparty == null) {
-            log.debug("Can't get client list by counterparty. Counterparty {} doesn't exist", counterpartyId);
+            log.debug("Can't get client list by counterparty. Counterparty {} doesn't exist", counterpartyUuid);
             return null;
         }
         log.info("Getting all clients by counterparty {}", counterparty);
@@ -135,10 +135,10 @@ public class ShipmentGroupServiceImpl implements ShipmentGroupService {
     }
 
     private void validateInnerReferenceAndFillObjectFromDB(ShipmentGroup source) throws Exception {
-        Counterparty counterparty = counterpartyService.getEntityById(source.getCounterparty().getId());
+        Counterparty counterparty = counterpartyService.getEntityByUuid(source.getCounterparty().getUuid());
         if (counterparty == null) {
-            log.error(getOnErrorLogEndpoint(Counterparty.class, source.getCounterparty().getId()));
-            throw new Exception(getOnErrorLogEndpoint(Counterparty.class, source.getCounterparty().getId()));
+            log.error(getOnErrorLogEndpoint(Counterparty.class, source.getCounterparty().getUser()));
+            throw new Exception(getOnErrorLogEndpoint(Counterparty.class, source.getCounterparty().getUuid()));
         }
         source.setCounterparty(counterparty);
     }

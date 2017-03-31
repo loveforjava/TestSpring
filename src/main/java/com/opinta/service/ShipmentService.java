@@ -12,21 +12,21 @@ public interface ShipmentService {
 
     List<Shipment> getAllEntities(User user);
 
-    Shipment getEntityById(long id, User user) throws AuthenticationException;
+    Shipment getEntityByUuid(UUID uuid, User user)  throws AuthenticationException;
 
     Shipment saveEntity(Shipment shipment);
     
     List<ShipmentDto> getAll(User user);
 
-    List<ShipmentDto> getAllByClientId(long clientId, User user) throws AuthenticationException;
+    List<ShipmentDto> getAllByClientUuid(UUID clientUuid, User user)  throws AuthenticationException;
 
     List<ShipmentDto> getAllByShipmentGroupId(UUID uuid, User user) throws Exception;
 
-    ShipmentDto getById(long id, User user) throws AuthenticationException;
+    ShipmentDto getByUuid(UUID uuid, User user)  throws AuthenticationException;
     
     ShipmentDto save(ShipmentDto shipmentDto, User user) throws AuthenticationException;
     
-    ShipmentDto update(long id, ShipmentDto shipmentDto, User user) throws Exception;
+    ShipmentDto update(UUID uuid, ShipmentDto shipmentDto, User user) throws Exception;
     
-    void delete(long id, User user) throws Exception;
+    void delete(UUID uuid, User user) throws Exception;
 }

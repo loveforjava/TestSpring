@@ -1,9 +1,9 @@
 package com.opinta.service;
 
-import java.util.HashMap;
+import com.opinta.entity.BarcodeStatus;
 import java.util.List;
-import java.util.Map;
 
+import java.util.Random;
 import javax.transaction.Transactional;
 
 import com.opinta.dao.BarcodeInnerNumberDao;
@@ -16,15 +16,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.opinta.entity.BarcodeStatus.USED;
-import static java.lang.String.format;
 import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 
 @Service
 @Slf4j
 public class BarcodeInnerNumberServiceImpl implements BarcodeInnerNumberService {
-    // TODO delete after implementation stored procedure that generates innerNumbers
-    private static final Map<String, Integer> POSTCODE_COUNTERS = new HashMap<>();
     
     private final BarcodeInnerNumberDao barcodeInnerNumberDao;
     private final PostcodePoolDao postcodePoolDao;
@@ -66,7 +62,7 @@ public class BarcodeInnerNumberServiceImpl implements BarcodeInnerNumberService 
     @Override
     @Transactional
     public BarcodeInnerNumberDto getById(long id) {
-        log.info("Getting barcodeInnerNumber by id {}", id);
+        log.info("Getting barcodeInnerNumber by uuid {}", id);
         return barcodeInnerNumberMapper.toDto(barcodeInnerNumberDao.getById(id));
     }
     
@@ -120,22 +116,22 @@ public class BarcodeInnerNumberServiceImpl implements BarcodeInnerNumberService 
         barcodeInnerNumberDao.delete(barcodeInnerNumber);
         return true;
     }
-
+    
     @Override
+    @Transactional
     public BarcodeInnerNumber generateBarcodeInnerNumber(PostcodePool postcodePool) {
-        BarcodeInnerNumber barcodeInnerNumber = new BarcodeInnerNumber();
-        barcodeInnerNumber.setStatus(USED);
-        barcodeInnerNumber.setInnerNumber(getNextInnerNumber(postcodePool.getPostcode()));
-        return barcodeInnerNumberDao.save(barcodeInnerNumber);
-    }
+//        BarcodeInnerNumber barcode = barcodeInnerNumberDao.generateForPostcodePool(postcodePool);
+//        log.info("generated barcode: " + barcode.toString());
+//        return barcode;
 
-    private String getNextInnerNumber(String postcode) {
-        POSTCODE_COUNTERS.putIfAbsent(postcode, 0);
-        int innerNumberCounter = POSTCODE_COUNTERS.get(postcode);
-        POSTCODE_COUNTERS.put(postcode, innerNumberCounter + 1);
-        if (innerNumberCounter > 99999999) {
-            throw new RuntimeException(format("Barcode %d is too large", innerNumberCounter));
-        }
-        return String.format("%08d", innerNumberCounter);
+        // TODO
+        Random random = new Random();
+        int min = 11111111;
+        int max = 99999999;
+        Integer randomNum = random.nextInt((max - min) + 1) + min;
+        BarcodeInnerNumber barcodeInnerNumber = new BarcodeInnerNumber(randomNum.toString(), BarcodeStatus.RESERVED);
+        barcodeInnerNumber = barcodeInnerNumberDao.save(barcodeInnerNumber);
+        log.info("generated barcode: {}", randomNum);
+        return barcodeInnerNumber;
     }
 }

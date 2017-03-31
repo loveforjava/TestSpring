@@ -2,8 +2,11 @@ package com.opinta.controller;
 
 import com.opinta.entity.User;
 import com.opinta.service.UserService;
+import java.util.List;
+import java.util.UUID;
 
 import com.opinta.dto.ClientDto;
+import com.opinta.dto.ShipmentDto;
 import com.opinta.service.ClientService;
 import com.opinta.service.ShipmentService;
 import java.util.UUID;
@@ -52,23 +55,23 @@ public class ClientController {
     }
     
     @GetMapping("{id}")
-    public ResponseEntity<?> getClient(@PathVariable("id") long id, @RequestParam(value = "token") UUID token) {
+    public ResponseEntity<?> getClient(@PathVariable("id") UUID id, @RequestParam(value = "token") UUID token) {
         try {
             User user = userService.authenticate(token);
-            return new ResponseEntity<>(clientService.getById(id, user), OK);
+            return new ResponseEntity<>(clientService.getByUuid(id, user), OK);
         } catch (AuthenticationException e) {
             return new ResponseEntity<>(e.getMessage(), UNAUTHORIZED);
         }
     }
 
     @GetMapping("{id}/shipments")
-    public ResponseEntity<?> getShipmentsByClientId(@PathVariable long id,
+    public ResponseEntity<?> getShipmentsByClientId(@PathVariable UUID id,
                                                     @RequestParam(value = "token") UUID token) {
         try {
             User user = userService.authenticate(token);
-            return new ResponseEntity<>(shipmentService.getAllByClientId(id, user), OK);
+            return new ResponseEntity<>(shipmentService.getAllByClientUuid(id, user), OK);
         } catch (AuthenticationException e) {
-            return new ResponseEntity<>(format("Client %d doesn't exist. " + e.getMessage(), id), UNAUTHORIZED);
+            return new ResponseEntity<>(format("Client %s doesn't exist. " + e.getMessage(), id), UNAUTHORIZED);
         }
     }
     
@@ -85,32 +88,32 @@ public class ClientController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<?> updateClient(@PathVariable long id, @RequestBody ClientDto clientDto,
+    public ResponseEntity<?> updateClient(@PathVariable UUID id, @RequestBody ClientDto clientDto,
                                           @RequestParam(value = "token") UUID token) {
         try {
             User user = userService.authenticate(token);
             return new ResponseEntity<>(clientService.update(id, clientDto, user), OK);
         } catch (AuthenticationException e) {
-            return new ResponseEntity<>(format("Client %d has not been updated. ", id)
+            return new ResponseEntity<>(format("Client %s has not been updated. ", id)
                     + ". " + e.getMessage(), UNAUTHORIZED);
         } catch (Exception e) {
-            return new ResponseEntity<>(format("Client %d has not been updated. ", id)
+            return new ResponseEntity<>(format("Client %s has not been updated. ", id)
                     + ". " + e.getMessage(), NOT_FOUND);
         }
     }
     
     @DeleteMapping("{id}")
-    public ResponseEntity<?> deleteClient(@PathVariable long id,
+    public ResponseEntity<?> deleteClient(@PathVariable UUID id,
                                           @RequestParam(value = "token") UUID token) {
         try {
             User user = userService.authenticate(token);
             clientService.delete(id, user);
             return new ResponseEntity<>(OK);
         } catch (AuthenticationException e) {
-            return new ResponseEntity<>(format("Client %d has not been deleted. ", id)
+            return new ResponseEntity<>(format("Client %s has not been deleted. ", id)
                     + ". " + e.getMessage(), UNAUTHORIZED);
         } catch (Exception e) {
-            return new ResponseEntity<>(format("Client %d has not been deleted. ", id)
+            return new ResponseEntity<>(format("Client %s has not been deleted. ", id)
                     + ". " + e.getMessage(), NOT_FOUND);
         }
     }

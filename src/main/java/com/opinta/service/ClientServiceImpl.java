@@ -4,6 +4,7 @@ import com.opinta.entity.Address;
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.User;
 import java.util.List;
+import java.util.UUID;
 
 import javax.naming.AuthenticationException;
 import javax.transaction.Transactional;
@@ -50,9 +51,9 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public Client getEntityById(long id, User user) throws AuthenticationException {
-        log.info("Getting client by id {}", id);
-        Client client = clientDao.getById(id);
+    public Client getEntityByUuid(UUID uuid, User user) throws AuthenticationException {
+        log.info("Getting client by uuid: ", uuid);
+        Client client = clientDao.getByUuid(uuid);
 
         userService.authorizeForAction(client, user);
 
@@ -61,9 +62,9 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public Client getEntityByIdAnonymous(long id) {
-        log.info("Getting client by id without token check {}", id);
-        return clientDao.getById(id);
+    public Client getEntityByUuidAnonymous(UUID uuid) {
+        log.info("Getting client by uuid without token check ", uuid);
+        return clientDao.getByUuid(uuid);
     }
 
     @Override
@@ -88,10 +89,10 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public List<ClientDto> getAllByCounterpartyId(long counterpartyId) {
-        Counterparty counterparty = counterpartyService.getEntityById(counterpartyId);
+    public List<ClientDto> getAllByCounterpartyUuid(UUID counterpartyUuid) {
+        Counterparty counterparty = counterpartyService.getEntityByUuid(counterpartyUuid);
         if (counterparty == null) {
-            log.debug("Can't get client list by counterparty. Counterparty {} doesn't exist", counterpartyId);
+            log.debug("Can't get client list by counterparty. Counterparty {} doesn't exist", counterpartyUuid);
             return null;
         }
         log.info("Getting all clients by counterparty {}", counterparty);
@@ -100,8 +101,8 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public ClientDto getById(long id, User user) throws AuthenticationException {
-        return clientMapper.toDto(getEntityById(id, user));
+    public ClientDto getByUuid(UUID uuid, User user) throws AuthenticationException {
+        return clientMapper.toDto(getEntityByUuid(uuid, user));
     }
 
     @Override
@@ -112,9 +113,9 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public ClientDto update(long id, ClientDto clientDto, User user) throws Exception {
+    public ClientDto update(UUID uuid, ClientDto clientDto, User user) throws Exception {
         Client source = clientMapper.toEntity(clientDto);
-        Client target = clientDao.getById(id);
+        Client target = clientDao.getByUuid(uuid);
 
         userService.authorizeForAction(target, user);
 
@@ -127,11 +128,10 @@ public class ClientServiceImpl implements ClientService {
             throw new Exception("Can't get properties from object to updatable object for client", e);
         }
 
-        target.setId(id);
+        target.setUuid(uuid);
         target.setCounterparty(source.getCounterparty());
         target.setPhone(phoneService.getOrCreateEntityByPhoneNumber(clientDto.getPhoneNumber()));
         target.setAddress(source.getAddress());
-
         log.info("Updating client {}", target);
         clientDao.update(target);
         return clientMapper.toDto(target);
@@ -139,24 +139,24 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public void delete(long id, User user) throws AuthenticationException {
-        Client client = clientDao.getById(id);
+    public void delete(UUID uuid, User user) throws AuthenticationException {
+        Client client = clientDao.getByUuid(uuid);
 
         userService.authorizeForAction(client, user);
 
         if (client == null) {
-            log.error("Can't delete client. Client {} doesn't exist ", id);
-            throw new AuthenticationException(format("Can't delete client. Client %d doesn't exist ", id));
+            log.error("Can't delete client. Client {} doesn't exist ", uuid);
+            throw new AuthenticationException(format("Can't delete client. Client %s doesn't exist ", uuid));
         }
         log.info("Deleting client {}", client);
         clientDao.delete(client);
     }
 
     private void validateInnerReferenceAndFillObjectFromDB(Client source) throws Exception {
-        Counterparty counterparty = counterpartyService.getEntityById(source.getCounterparty().getId());
+        Counterparty counterparty = counterpartyService.getEntityByUuid(source.getCounterparty().getUuid());
         if (counterparty == null) {
-            log.error("Counterparty %s doesn't exist ", source.getCounterparty().getId());
-            throw new Exception(format("Counterparty %s doesn't exist ", source.getCounterparty().getId()));
+            log.error("Counterparty %s doesn't exist ", source.getCounterparty().getUuid());
+            throw new Exception(format("Counterparty %s doesn't exist ", source.getCounterparty().getUuid()));
         }
         Address address = addressService.getEntityById(source.getAddress().getId());
         if (address == null) {

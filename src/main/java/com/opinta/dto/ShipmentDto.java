@@ -14,12 +14,14 @@ import lombok.ToString;
 @Setter
 @ToString
 public class ShipmentDto {
-    private long id;
-    private long senderId;
-    private long recipientId;
+    private UUID uuid;
+    private UUID senderUuid;
+    private UUID recipientUuid;
     private UUID shipmentGroupUuid;
     @EnumString(source = DeliveryType.class)
     private DeliveryType deliveryType;
+    @Size(min = 13, max = 13)
+    private String barcode;
     private float weight;
     private float length;
     private float width;

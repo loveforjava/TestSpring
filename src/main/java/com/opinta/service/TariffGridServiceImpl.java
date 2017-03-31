@@ -31,7 +31,7 @@ public class TariffGridServiceImpl implements TariffGridService {
     @Override
     @Transactional
     public TariffGrid getById(long id) {
-        log.info("Getting tariffGrid by id {}", id);
+        log.info("Getting tariffGrid by uuid {}", id);
         return tariffGridDao.getById(id);
     }
 
@@ -71,6 +71,13 @@ public class TariffGridServiceImpl implements TariffGridService {
         }
         log.info("Deleting tariffGrid {}", tariffGrid);
         tariffGridDao.delete(tariffGrid);
+        return true;
+    }
+    
+    @Override
+    @Transactional
+    public boolean deleteGrids(List<TariffGrid> tariffGrids) {
+        tariffGrids.forEach(tariffGridDao::delete);
         return true;
     }
 

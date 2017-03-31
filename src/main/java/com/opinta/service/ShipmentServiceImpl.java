@@ -64,19 +64,23 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public Shipment getEntityById(long id, User user) throws AuthenticationException {
-        log.info("Getting postcodePool by id {}", id);
-        Shipment shipment = shipmentDao.getById(id);
+    public Shipment getEntityByUuid(UUID uuid, User user) throws AuthenticationException {
+        log.info("Getting postcodePool by uuid {}", uuid);
+        Shipment shipment = shipmentDao.getByUuid(uuid);
 
         userService.authorizeForAction(shipment, user);
 
-        return shipment;
+        return shipmentDao.getByUuid(uuid);
     }
 
     @Override
     @Transactional
     public Shipment saveEntity(Shipment shipment) {
         log.info("Saving shipment {}", shipment);
+        PostcodePool postcodePool = shipment.getSender().getCounterparty().getPostcodePool();
+        BarcodeInnerNumber newBarcode = barcodeInnerNumberService.generateBarcodeInnerNumber(postcodePool);
+        postcodePool.getBarcodeInnerNumbers().add(newBarcode);
+        shipment.setBarcode(newBarcode);
         return shipmentDao.save(shipment);
     }
 
@@ -88,8 +92,8 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public List<ShipmentDto> getAllByClientId(long id, User user) throws AuthenticationException {
-        Client client = clientService.getEntityById(id, user);
+    public List<ShipmentDto> getAllByClientUuid(UUID clientUuid, User user) throws AuthenticationException {
+        Client client = clientService.getEntityByUuid(clientUuid, user);
         log.info("Getting all shipments by client {}", client);
         return shipmentMapper.toDto(shipmentDao.getAllByClient(client, user));
     }
@@ -104,14 +108,14 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public ShipmentDto getById(long id, User user) throws AuthenticationException {
-        return shipmentMapper.toDto(getEntityById(id, user));
+    public ShipmentDto getByUuid(UUID uuid, User user) throws AuthenticationException {
+        return shipmentMapper.toDto(getEntityByUuid(uuid, user));
     }
 
     @Override
     @Transactional
     public ShipmentDto save(ShipmentDto shipmentDto, User user) throws AuthenticationException {
-        Client existingClient = clientService.getEntityById(shipmentDto.getSenderId(), user);
+        Client existingClient = clientService.getEntityByUuid(shipmentDto.getSenderUuid(), user);
         Counterparty counterparty = existingClient.getCounterparty();
         PostcodePool postcodePool = counterparty.getPostcodePool();
         BarcodeInnerNumber newBarcode = barcodeInnerNumberService.generateBarcodeInnerNumber(postcodePool);
@@ -119,12 +123,12 @@ public class ShipmentServiceImpl implements ShipmentService {
         Shipment shipment = shipmentMapper.toEntity(shipmentDto);
         shipment.setBarcode(newBarcode);
 
-        Client sender = clientService.getEntityById(shipment.getSender().getId(), user);
+        Client sender = clientService.getEntityByUuid(shipment.getSender().getUuid(), user);
 
         userService.authorizeForAction(sender, user);
 
         shipment.setSender(sender);
-        shipment.setRecipient(clientService.getEntityByIdAnonymous(shipment.getRecipient().getId()));
+        shipment.setRecipient(clientService.getEntityByUuidAnonymous(shipment.getRecipient().getUuid()));
         shipment.setPrice(calculatePrice(shipment));
 
         log.info("Saving shipment with assigned barcode", shipmentMapper.toDto(shipment));
@@ -133,13 +137,12 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public ShipmentDto update(long id, ShipmentDto shipmentDto, User user) throws Exception {
+    public ShipmentDto update(UUID uuid, ShipmentDto shipmentDto, User user) throws Exception {
         Shipment source = shipmentMapper.toEntity(shipmentDto);
-        Shipment target = shipmentDao.getById(id);
-
+        Shipment target = shipmentDao.getByUuid(uuid);
         if (target == null) {
-            log.debug("Can't update shipment. Shipment doesn't exist {}", id);
-            throw new Exception(format("Can't update shipment. Shipment doesn't exist %d", id));
+            log.debug("Can't update shipment. Shipment doesn't exist {}", uuid);
+            throw new Exception(format("Can't update shipment. Shipment doesn't exist %s", uuid));
         }
 
         userService.authorizeForAction(target, user);
@@ -150,7 +153,7 @@ public class ShipmentServiceImpl implements ShipmentService {
             log.error("Can't get properties from object to updatable object for shipment", e);
             throw new Exception("Can't get properties from object to updatable object for shipment", e);
         }
-        target.setId(id);
+        target.setUuid(uuid);
         try {
             fillSenderAndRecipient(target, user);
         } catch (IllegalArgumentException e) {
@@ -165,23 +168,23 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public void delete(long id, User user) throws Exception {
-        Shipment shipment = shipmentDao.getById(id);
+    public void delete(UUID uuid, User user) throws Exception {
+        Shipment shipment = shipmentDao.getByUuid(uuid);
         if (shipment == null) {
-            log.debug("Can't delete shipment. Shipment doesn't exist {}", id);
-            throw new Exception(format("Can't delete shipment. Shipment doesn't exist {}", id));
+            log.debug("Can't delete shipment. Shipment doesn't exist {}", uuid);
+            throw new Exception(format("Can't delete shipment. Shipment doesn't exist %s", uuid));
         }
 
         userService.authorizeForAction(shipment, user);
 
-        shipment.setId(id);
+        shipment.setUuid(uuid);
         log.info("Deleting shipment {}", shipment);
         shipmentDao.delete(shipment);
     }
 
     private void fillSenderAndRecipient(Shipment target, User user) throws Exception {
-        target.setSender(clientService.getEntityById(target.getSender().getId(), user));
-        target.setRecipient(clientService.getEntityByIdAnonymous(target.getRecipient().getId()));
+        target.setSender(clientService.getEntityByUuid(target.getSender().getUuid(), user));
+        target.setRecipient(clientService.getEntityByUuidAnonymous(target.getRecipient().getUuid()));
         if (target.getSender() == null) {
             throw new IllegalArgumentException(
                     format("Can't calculate price for shipment %s. Sender doesn't exist", target));

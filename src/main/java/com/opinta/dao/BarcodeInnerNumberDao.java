@@ -3,10 +3,13 @@ package com.opinta.dao;
 import java.util.List;
 
 import com.opinta.entity.BarcodeInnerNumber;
+import com.opinta.entity.PostcodePool;
 
 public interface BarcodeInnerNumberDao {
     
     List<BarcodeInnerNumber> getAll(long postcodeId);
+    
+    BarcodeInnerNumber generateForPostcodePool(PostcodePool postcodePool);
     
     BarcodeInnerNumber getById(long id);
     

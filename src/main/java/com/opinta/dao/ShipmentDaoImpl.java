@@ -4,7 +4,6 @@ import com.opinta.entity.Client;
 import com.opinta.entity.Shipment;
 import com.opinta.entity.ShipmentGroup;
 import com.opinta.entity.User;
-import javax.naming.AuthenticationException;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -13,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 public class ShipmentDaoImpl implements ShipmentDao {
@@ -61,10 +61,9 @@ public class ShipmentDaoImpl implements ShipmentDao {
                 .list();
     }
 
-    @Override
-    public Shipment getById(long id) {
+    public Shipment getByUuid(UUID uuid) {
         Session session = sessionFactory.getCurrentSession();
-        return (Shipment) session.get(Shipment.class, id);
+        return (Shipment) session.get(Shipment.class, uuid);
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.opinta.entity.Counterparty;
 import com.opinta.entity.PostcodePool;
 import com.opinta.entity.User;
 import java.util.List;
+import java.util.UUID;
 
 import com.opinta.dto.CounterpartyDto;
 
@@ -11,7 +12,7 @@ public interface CounterpartyService {
 
     List<Counterparty> getAllEntities();
 
-    Counterparty getEntityById(long id);
+    Counterparty getEntityByUuid(UUID uuid);
 
     List<Counterparty> getEntityByPostcodePool(PostcodePool postcodePool);
 
@@ -19,11 +20,11 @@ public interface CounterpartyService {
     
     List<CounterpartyDto> getAll();
     
-    CounterpartyDto getById(long id);
+    CounterpartyDto getByUuid(UUID uuid);
     
-    CounterpartyDto update(long id, CounterpartyDto source, User user) throws Exception;
+    CounterpartyDto update(UUID uuid, CounterpartyDto source, User user) throws Exception;
     
-    CounterpartyDto save(CounterpartyDto counterparty) throws Exception;
-
-    void delete(long id, User user) throws Exception;
+    CounterpartyDto save(CounterpartyDto counterpartyDto) throws Exception;
+    
+    void delete(UUID uuid, User user) throws Exception;
 }

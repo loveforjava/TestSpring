@@ -22,6 +22,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 import static com.opinta.entity.BarcodeStatus.RESERVED;
 import static org.junit.Assert.assertEquals;
@@ -39,6 +40,7 @@ public class PDFGeneratorServiceTest {
     private PDFGeneratorService pdfGeneratorService;
 
     private Shipment shipment;
+    private UUID shipmentId;
 
     @Before
     public void setUp() throws Exception {
@@ -53,6 +55,7 @@ public class PDFGeneratorServiceTest {
         Client recipient = new Client("Petrov PP", "002", recipientAddress, counterparty);
         shipment = new Shipment(sender, recipient, DeliveryType.W2W, 1, 1,
                 new BigDecimal("12.5"), new BigDecimal("2.5"), new BigDecimal("15.25"));
+        shipmentId = UUID.randomUUID();
         shipment.setBarcode(new BarcodeInnerNumber("12345678", RESERVED));
     }
 
@@ -61,9 +64,9 @@ public class PDFGeneratorServiceTest {
         // TODO
         User user = new User();
 
-        when(shipmentService.getEntityById(1L, user)).thenReturn(shipment);
+        when(shipmentService.getEntityByUuid(shipmentId, user)).thenReturn(shipment);
         assertNotEquals("PDFGenerator returned an empty label",
-                pdfGeneratorService.generate(1L, user).length, 0);
-        verify(shipmentService, atLeast(1)).getEntityById(1L, user);
+                pdfGeneratorService.generate(shipmentId, user).length, 0);
+        verify(shipmentService, atLeast(1)).getEntityByUuid(shipmentId, user);
     }
 }

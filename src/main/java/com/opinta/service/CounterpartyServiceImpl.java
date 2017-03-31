@@ -4,6 +4,7 @@ import com.opinta.entity.Counterparty;
 import com.opinta.entity.PostcodePool;
 import com.opinta.entity.User;
 import java.util.List;
+import java.util.UUID;
 
 import java.util.UUID;
 import javax.transaction.Transactional;
@@ -44,9 +45,9 @@ public class CounterpartyServiceImpl implements CounterpartyService {
 
     @Override
     @Transactional
-    public Counterparty getEntityById(long id) {
-        log.info("Getting counterparty {}", id);
-        return counterpartyDao.getById(id);
+    public Counterparty getEntityByUuid(UUID uuid) {
+        log.info("Getting counterparty {}", uuid);
+        return counterpartyDao.getByUuid(uuid);
     }
 
     @Override
@@ -62,7 +63,7 @@ public class CounterpartyServiceImpl implements CounterpartyService {
         PostcodePool postcodePool = postcodePoolService.getEntityById(counterparty.getPostcodePool().getId());
         if (postcodePool == null) {
             log.error("PostcodePool {} doesn't exist", counterparty.getPostcodePool().getId());
-            throw new Exception(format("PostcodePool %d doesn't exist", counterparty.getPostcodePool().getId()));
+            throw new Exception(format("PostcodePool %s doesn't exist", counterparty.getPostcodePool().getId()));
         }
         List<Counterparty> counterpartiesByPostcodePool = getEntityByPostcodePool(postcodePool);
         if (counterpartiesByPostcodePool.size() != 0) {
@@ -91,9 +92,9 @@ public class CounterpartyServiceImpl implements CounterpartyService {
 
     @Override
     @Transactional
-    public CounterpartyDto getById(long id) {
-        log.info("Getting counterparty by id " + id);
-        Counterparty counterparty = counterpartyDao.getById(id);
+    public CounterpartyDto getByUuid(UUID uuid) {
+        log.info("Getting counterparty by uuid " + uuid);
+        Counterparty counterparty = counterpartyDao.getByUuid(uuid);
         return counterpartyMapper.toDto(counterparty);
     }
 
@@ -107,12 +108,12 @@ public class CounterpartyServiceImpl implements CounterpartyService {
 
     @Override
     @Transactional
-    public CounterpartyDto update(long id, CounterpartyDto counterpartyDto, User user) throws Exception {
+    public CounterpartyDto update(UUID uuid, CounterpartyDto counterpartyDto, User user) throws Exception {
         Counterparty source = counterpartyMapper.toEntity(counterpartyDto);
-        Counterparty target = counterpartyDao.getById(id);
+        Counterparty target = counterpartyDao.getByUuid(uuid);
         if (target == null) {
-            log.error("Can't update counterparty. Counterparty doesn't exist {}", id);
-            throw new Exception(format("Can't update counterparty. Counterparty doesn't exist %d", id));
+            log.error("Can't update counterparty. Counterparty doesn't exist {}", uuid);
+            throw new Exception(format("Can't update counterparty. Counterparty doesn't exist %s", uuid));
         }
 
         userService.authorizeForAction(target, user);
@@ -126,7 +127,7 @@ public class CounterpartyServiceImpl implements CounterpartyService {
             log.error("Can't get properties from object to updatable object for counterparty", e);
             throw new Exception("Can't get properties from object to updatable object for counterparty", e);
         }
-        target.setId(id);
+        target.setUuid(uuid);
         log.info("Updating counterparty {}", target);
         counterpartyDao.update(target);
         return counterpartyMapper.toDto(target);
@@ -134,11 +135,11 @@ public class CounterpartyServiceImpl implements CounterpartyService {
 
     @Override
     @Transactional
-    public void delete(long id, User user) throws Exception {
-        Counterparty counterparty = counterpartyDao.getById(id);
+    public void delete(UUID uuid, User user) throws Exception {
+        Counterparty counterparty = counterpartyDao.getByUuid(uuid);
         if (counterparty == null) {
-            log.error("Can't delete counterparty. Counterparty doesn't exist {}", id);
-            throw new Exception(format("Can't delete counterparty. Counterparty doesn't exist %d", id));
+            log.error("Can't delete counterparty. Counterparty doesn't exist {}", uuid);
+            throw new Exception(format("Can't delete counterparty. Counterparty doesn't exist %s", uuid));
         }
 
         userService.authorizeForAction(counterparty, user);

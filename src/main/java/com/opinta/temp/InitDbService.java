@@ -2,7 +2,6 @@ package com.opinta.temp;
 
 import com.opinta.dto.AddressDto;
 import com.opinta.dto.BarcodeInnerNumberDto;
-import com.opinta.dto.ClientDto;
 import com.opinta.dto.CounterpartyDto;
 import com.opinta.dto.PostOfficeDto;
 import com.opinta.dto.PostcodePoolDto;
@@ -20,7 +19,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
+import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 
 import com.opinta.mapper.AddressMapper;
@@ -44,6 +44,7 @@ import com.opinta.service.PostOfficeService;
 import com.opinta.service.PostcodePoolService;
 import com.opinta.service.ShipmentService;
 import com.opinta.service.CounterpartyService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,6 +52,7 @@ import static com.opinta.entity.BarcodeStatus.RESERVED;
 import static com.opinta.entity.BarcodeStatus.USED;
 
 @Service
+@Slf4j
 public class InitDbService {
     private BarcodeInnerNumberService barcodeInnerNumberService;
     private PostcodePoolService postcodePoolService;
@@ -102,7 +104,7 @@ public class InitDbService {
 
     @PostConstruct
     public void init() throws Exception {
-//        populateDb();
+        //populateDb();
     }
 
     private void populateDb() throws Exception {
@@ -141,21 +143,26 @@ public class InitDbService {
         counterpartyDto = counterpartyService.save(counterpartyDto);
         counterparty = counterpartyMapper.toEntity(counterpartyDto);
         List<Client> clients = new ArrayList<>();
-        List<Client> clientsSaved = new ArrayList<>();
         clients.add(new Client("FOP Ivanov", "001",
                 addressMapper.toEntity(addressesSaved.get(0)), phone, counterparty));
         clients.add(new Client("Petrov PP", "002",
                 addressMapper.toEntity(addressesSaved.get(1)), phoneReserved, counterparty));
-        clients.forEach((Client client) -> {
+        clients.forEach((client) -> {
+            log.info("saving client: " + client);
+        });
+        List<Client> clientsSaved = clients
+                .stream()
+                .map(client -> {
                     try {
-                        ClientDto save = clientService.save(clientMapper.toDto(client), client.getCounterparty().getUser());
-                        clientsSaved.add(this.clientMapper.toEntity(
-                                save));
+                        return clientService.save(clientMapper.toDto(client), client.getCounterparty().getUser());
                     } catch (Exception e) {
                         e.printStackTrace();
+                        return null;
                     }
-                }
-        );
+                })
+                .filter(Objects::nonNull)
+                .map(clientDto -> clientMapper.toEntity(clientDto))
+                .collect(Collectors.toList());
 
         // create Shipment
         List<ShipmentDto> shipmentsSaved = new ArrayList<>();

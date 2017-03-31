@@ -1,5 +1,7 @@
 package com.opinta.entity;
 
+import java.util.UUID;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,6 +12,7 @@ import javax.persistence.ManyToOne;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 @Data
@@ -17,8 +20,9 @@ import lombok.ToString;
 @ToString(exclude = {"address", "counterparty"})
 public class Client {
     @Id
-    @GeneratedValue
-    private long id;
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    private UUID uuid;
     private String name;
     private String uniqueRegistrationNumber;
     @ManyToOne
@@ -28,7 +32,7 @@ public class Client {
     @JoinColumn(name = "phone_id")
     private Phone phone;
     @ManyToOne
-    @JoinColumn(name = "counterparty_id")
+    @JoinColumn(name = "counterparty_uuid")
     private Counterparty counterparty;
     private boolean individual;
 
