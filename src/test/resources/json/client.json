@@ -1,10 +1,11 @@
 {
-  "name": "",
+  "name": "Rozetka LTD.",
   "firstName": "John",
   "middleName": "Johnson",
   "lastName": "Doe",
   "uniqueRegistrationNumber": "007",
   "counterpartyUuid": [],
+  "phoneNumber":null,
   "addressId": [],
-  "individual": true
+  "individual": []
 }
