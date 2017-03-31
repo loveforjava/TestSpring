@@ -3,6 +3,7 @@ package com.opinta.service;
 import com.opinta.dao.TariffGridDao;
 import com.opinta.entity.Address;
 import com.opinta.entity.DeliveryType;
+import com.opinta.entity.ShipmentGroup;
 import com.opinta.entity.TariffGrid;
 import com.opinta.entity.User;
 import com.opinta.entity.W2wVariation;
@@ -14,7 +15,6 @@ import java.util.UUID;
 import javax.naming.AuthenticationException;
 import javax.transaction.Transactional;
 
-import com.opinta.dao.ClientDao;
 import com.opinta.dao.ShipmentDao;
 import com.opinta.dto.ShipmentDto;
 import com.opinta.mapper.ShipmentMapper;
@@ -39,17 +39,20 @@ public class ShipmentServiceImpl implements ShipmentService {
     private final TariffGridDao tariffGridDao;
     private final ShipmentMapper shipmentMapper;
     private final BarcodeInnerNumberService barcodeInnerNumberService;
+    private final ShipmentGroupService shipmentGroupService;
 
     @Autowired
     public ShipmentServiceImpl(ShipmentDao shipmentDao, ClientService clientService, UserService userService,
                                TariffGridDao tariffGridDao, ShipmentMapper shipmentMapper,
-                               BarcodeInnerNumberService barcodeInnerNumberService) {
+                               BarcodeInnerNumberService barcodeInnerNumberService,
+                               ShipmentGroupService shipmentGroupService) {
         this.shipmentDao = shipmentDao;
         this.clientService = clientService;
         this.userService = userService;
         this.tariffGridDao = tariffGridDao;
         this.shipmentMapper = shipmentMapper;
         this.barcodeInnerNumberService = barcodeInnerNumberService;
+        this.shipmentGroupService = shipmentGroupService;
     }
 
     @Override
@@ -64,9 +67,9 @@ public class ShipmentServiceImpl implements ShipmentService {
     public Shipment getEntityByUuid(UUID uuid, User user) throws AuthenticationException {
         log.info("Getting postcodePool by uuid {}", uuid);
         Shipment shipment = shipmentDao.getByUuid(uuid);
-    
+
         userService.authorizeForAction(shipment, user);
-        
+
         return shipmentDao.getByUuid(uuid);
     }
 
@@ -93,6 +96,14 @@ public class ShipmentServiceImpl implements ShipmentService {
         Client client = clientService.getEntityByUuid(clientUuid, user);
         log.info("Getting all shipments by client {}", client);
         return shipmentMapper.toDto(shipmentDao.getAllByClient(client, user));
+    }
+
+    @Override
+    @Transactional
+    public List<ShipmentDto> getAllByShipmentGroupId(UUID uuid, User user) throws Exception {
+        ShipmentGroup shipmentGroup = shipmentGroupService.getEntityById(uuid, user);
+        log.info("Getting all shipments by shipmentGroup {}", shipmentGroup);
+        return shipmentMapper.toDto(shipmentDao.getAllByShipmentGroup(shipmentGroup, user));
     }
 
     @Override

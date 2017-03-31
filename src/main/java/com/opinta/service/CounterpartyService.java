@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.UUID;
 
 import com.opinta.dto.CounterpartyDto;
-import javax.transaction.Transactional;
 
 public interface CounterpartyService {
 

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.UUID;
 
 import com.opinta.entity.Client;
-import com.opinta.entity.Counterparty;
 
 public interface ClientDao {
 

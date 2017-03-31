@@ -4,8 +4,8 @@ import com.opinta.dao.UserDao;
 import com.opinta.entity.Client;
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.Shipment;
+import com.opinta.entity.ShipmentGroup;
 import com.opinta.entity.User;
-import com.opinta.mapper.CounterpartyMapper;
 import java.util.UUID;
 import javax.naming.AuthenticationException;
 import javax.transaction.Transactional;
@@ -19,12 +19,10 @@ import static java.lang.String.format;
 @Slf4j
 public class UserServiceImpl implements UserService {
     private final UserDao userDao;
-    private final CounterpartyMapper counterpartyMapper;
 
     @Autowired
-    public UserServiceImpl(UserDao userDao, CounterpartyMapper counterpartyMapper) {
+    public UserServiceImpl(UserDao userDao) {
         this.userDao = userDao;
-        this.counterpartyMapper = counterpartyMapper;
     }
 
     @Override
@@ -71,6 +69,17 @@ public class UserServiceImpl implements UserService {
         if (user == null || shipment == null || shipment.getSender().getCounterparty() == null
                 || shipment.getSender().getCounterparty().getUser().getToken() == null || user.getToken() == null
                 || !shipment.getSender().getCounterparty().getUser().getToken().equals(user.getToken())) {
+            assert user != null;
+            throw new AuthenticationException(format("You are not authorized to perform this action (token: %s)!",
+                    user.getToken()));
+        }
+    }
+
+    @Override
+    public void authorizeForAction(ShipmentGroup shipmentGroup, User user) throws AuthenticationException {
+        if (user == null || shipmentGroup == null || shipmentGroup.getCounterparty() == null
+                || shipmentGroup.getCounterparty().getUser().getToken() == null || user.getToken() == null
+                || !shipmentGroup.getCounterparty().getUser().getToken().equals(user.getToken())) {
             assert user != null;
             throw new AuthenticationException(format("You are not authorized to perform this action (token: %s)!",
                     user.getToken()));

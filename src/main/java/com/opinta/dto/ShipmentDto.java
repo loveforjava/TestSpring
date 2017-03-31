@@ -17,6 +17,7 @@ public class ShipmentDto {
     private UUID uuid;
     private UUID senderUuid;
     private UUID recipientUuid;
+    private UUID shipmentGroupUuid;
     @EnumString(source = DeliveryType.class)
     private DeliveryType deliveryType;
     @Size(min = 13, max = 13)

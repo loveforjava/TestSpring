@@ -19,7 +19,9 @@ public interface ShipmentService {
     List<ShipmentDto> getAll(User user);
 
     List<ShipmentDto> getAllByClientUuid(UUID clientUuid, User user)  throws AuthenticationException;
-    
+
+    List<ShipmentDto> getAllByShipmentGroupId(UUID uuid, User user) throws Exception;
+
     ShipmentDto getByUuid(UUID uuid, User user)  throws AuthenticationException;
     
     ShipmentDto save(ShipmentDto shipmentDto, User user) throws AuthenticationException;
