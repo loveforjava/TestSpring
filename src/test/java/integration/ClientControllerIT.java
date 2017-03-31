@@ -124,7 +124,6 @@ public class ClientControllerIT extends BaseControllerIT {
         Client createdClient = clientService.getEntityByUuid(newClientUuid, newCounterparty.getUser());
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientMapper.toDto(createdClient));
-    
         JSONAssert.assertEquals(expectedJson.toJSONString(), actualJson, false);
 
         // delete
@@ -166,7 +165,6 @@ public class ClientControllerIT extends BaseControllerIT {
         Client updatedClient = clientService.getEntityByUuid(clientUuid, user);
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientMapper.toDto(updatedClient));
-    
         JSONAssert.assertEquals(expectedJson.toJSONString(), actualJson, false);
     }
     
@@ -214,7 +212,6 @@ public class ClientControllerIT extends BaseControllerIT {
         Client createdClient = clientService.getEntityByUuid(newClientUuid, newCounterparty.getUser());
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientMapper.toDto(createdClient));
-    
         JSONAssert.assertEquals(expectedJson.toJSONString(), actualJson, false);
         
         // delete
@@ -253,7 +250,6 @@ public class ClientControllerIT extends BaseControllerIT {
         Client updatedClient = clientService.getEntityByUuid(clientUuid, user);
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientMapper.toDto(updatedClient));
-    
         JSONAssert.assertEquals(expectedJson.toJSONString(), actualJson, false);
     }
     
