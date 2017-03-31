@@ -24,7 +24,6 @@ import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertEquals;
 
 public class ClientControllerIT extends BaseControllerIT {
     private Client client;
@@ -156,7 +155,7 @@ public class ClientControllerIT extends BaseControllerIT {
         JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
         String expectedFullName = join(" ", lastName, firstName, middleName);
         expectedJson.put("name", expectedFullName);
-        expectedJson.put("middleName", "Jakson [edited]");
+        expectedJson.put("middleName", inputJson.get("middleName"));
 
         // check updated data
         Client updatedClient = clientService.getEntityByUuid(clientUuid, user);
@@ -197,9 +196,9 @@ public class ClientControllerIT extends BaseControllerIT {
     
         JSONParser parser = new JSONParser();
         JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
-        expectedJson.put("firstName", "");
-        expectedJson.put("middleName", "");
-        expectedJson.put("lastName", "");
+        expectedJson.put("firstName", null);
+        expectedJson.put("middleName", null);
+        expectedJson.put("lastName", null);
         
         UUID newClientUuid = UUID.fromString(newUuid);
         
@@ -234,10 +233,10 @@ public class ClientControllerIT extends BaseControllerIT {
     
         JSONParser parser = new JSONParser();
         JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
-        expectedJson.put("name", "Rozetka & Roga & Kopyta [edited]");
-        expectedJson.put("firstName", "");
-        expectedJson.put("middleName", "");
-        expectedJson.put("lastName", "");
+        expectedJson.put("name", inputJson.get("name"));
+        expectedJson.put("firstName", null);
+        expectedJson.put("middleName", null);
+        expectedJson.put("lastName", null);
         
         // check updated data
         Client updatedClient = clientService.getEntityByUuid(clientUuid, user);

@@ -121,7 +121,6 @@ public class ShipmentServiceImpl implements ShipmentService {
         BarcodeInnerNumber newBarcode = barcodeInnerNumberService.generateBarcodeInnerNumber(postcodePool);
         postcodePool.getBarcodeInnerNumbers().add(newBarcode);
         Shipment shipment = shipmentMapper.toEntity(shipmentDto);
-        shipment.setBarcode(newBarcode);
 
         Client sender = clientService.getEntityByUuid(shipment.getSender().getUuid(), user);
 
@@ -129,6 +128,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         shipment.setSender(sender);
         shipment.setRecipient(clientService.getEntityByUuidAnonymous(shipment.getRecipient().getUuid()));
+        shipment.setBarcode(newBarcode);
         shipment.setPrice(calculatePrice(shipment));
 
         log.info("Saving shipment with assigned barcode", shipmentMapper.toDto(shipment));

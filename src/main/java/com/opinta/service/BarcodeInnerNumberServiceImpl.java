@@ -120,18 +120,18 @@ public class BarcodeInnerNumberServiceImpl implements BarcodeInnerNumberService 
     @Override
     @Transactional
     public BarcodeInnerNumber generateBarcodeInnerNumber(PostcodePool postcodePool) {
-//        BarcodeInnerNumber barcode = barcodeInnerNumberDao.generateForPostcodePool(postcodePool);
-//        log.info("generated barcode: " + barcode.toString());
-//        return barcode;
+        BarcodeInnerNumber barcode = barcodeInnerNumberDao.generateForPostcodePool(postcodePool);
+        log.info("generated barcode: " + barcode.toString());
+        return barcode;
 
-        // TODO
-        Random random = new Random();
-        int min = 11111111;
-        int max = 99999999;
-        Integer randomNum = random.nextInt((max - min) + 1) + min;
-        BarcodeInnerNumber barcodeInnerNumber = new BarcodeInnerNumber(randomNum.toString(), BarcodeStatus.RESERVED);
-        barcodeInnerNumber = barcodeInnerNumberDao.save(barcodeInnerNumber);
-        log.info("generated barcode: {}", randomNum);
-        return barcodeInnerNumber;
+//        // for inmemory DB
+//        Random random = new Random();
+//        int min = 11111111;
+//        int max = 99999999;
+//        Integer randomNum = random.nextInt((max - min) + 1) + min;
+//        BarcodeInnerNumber barcodeInnerNumber = new BarcodeInnerNumber(randomNum.toString(), BarcodeStatus.RESERVED);
+//        barcodeInnerNumber = barcodeInnerNumberDao.save(barcodeInnerNumber);
+//        log.info("generated barcode: {}", randomNum);
+//        return barcodeInnerNumber;
     }
 }

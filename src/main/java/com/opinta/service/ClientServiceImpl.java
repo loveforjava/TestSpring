@@ -72,11 +72,8 @@ public class ClientServiceImpl implements ClientService {
     @Override
     @Transactional
     public Client saveEntity(Client client, User user) throws Exception {
-        try {
-            validateInnerReferenceAndFillObjectFromDB(client);
-        } catch (Exception e) {
-            throw new Exception(e);
-        }
+        validateInnerReferenceAndFillObjectFromDB(client);
+
         client.setPhone(phoneService.getOrCreateEntityByPhoneNumber(client.getPhone().getPhoneNumber()));
         userService.authorizeForAction(client, user);
         log.info("Saving client {}", client);
