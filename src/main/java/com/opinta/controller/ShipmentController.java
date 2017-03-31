@@ -66,7 +66,7 @@ public class ShipmentController {
 
     @GetMapping("{id}/form")
     public ResponseEntity<?> getShipmentForm(@PathVariable("id") UUID id,
-                                                  @RequestParam(value = "token") UUID token) {
+                                             @RequestParam(value = "token") UUID token) {
         try {
             User user = userService.authenticate(token);
 
