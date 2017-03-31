@@ -24,6 +24,9 @@ public class Client {
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     private UUID uuid;
     private String name;
+    private String firstName;
+    private String middleName;
+    private String lastName;
     private String uniqueRegistrationNumber;
     @ManyToOne
     @JoinColumn(name = "address_id")
