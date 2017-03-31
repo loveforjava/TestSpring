@@ -5,6 +5,7 @@
   "lastName": "Doe",
   "uniqueRegistrationNumber": "007",
   "counterpartyUuid": [],
+  "phoneNumber":null,
   "addressId": [],
   "individual": []
 }

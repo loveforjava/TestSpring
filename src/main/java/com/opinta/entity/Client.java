@@ -62,9 +62,9 @@ public class Client {
     private void generateName() {
         if (individual) {
             name = join(" ",
+                    StringUtils.isEmpty(lastName) ? "" : lastName,
                     StringUtils.isEmpty(firstName) ? "" : firstName,
-                    StringUtils.isEmpty(middleName) ? "" : middleName,
-                    StringUtils.isEmpty(lastName) ? "" : lastName)
+                    StringUtils.isEmpty(middleName) ? "" : middleName)
                     // regular expression to replace possible multiple spaces with exactly one space
                     .replaceAll("\\s+", " ");
         }
@@ -86,7 +86,7 @@ public class Client {
     }
     
     public void setName(String name) {
-        if (individual) {
+        if (this.individual) {
             generateName();
         } else {
             this.name = name;
@@ -98,9 +98,9 @@ public class Client {
         if (this.individual) {
             generateName();
         } else {
-            firstName = "";
-            middleName = "";
-            lastName = "";
+            this.firstName = "";
+            this.middleName = "";
+            this.lastName = "";
         }
     }
 }
