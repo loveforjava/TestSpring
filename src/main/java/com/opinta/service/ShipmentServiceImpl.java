@@ -36,20 +36,20 @@ public class ShipmentServiceImpl implements ShipmentService {
     private final ShipmentDao shipmentDao;
     private final ClientService clientService;
     private final UserService userService;
-    private final TariffGridDao tariffGridDao;
+    private final TariffGridService tariffGridService;
     private final ShipmentMapper shipmentMapper;
     private final BarcodeInnerNumberService barcodeInnerNumberService;
     private final ShipmentGroupService shipmentGroupService;
 
     @Autowired
     public ShipmentServiceImpl(ShipmentDao shipmentDao, ClientService clientService, UserService userService,
-                               TariffGridDao tariffGridDao, ShipmentMapper shipmentMapper,
+                               TariffGridService tariffGridService, ShipmentMapper shipmentMapper,
                                BarcodeInnerNumberService barcodeInnerNumberService,
                                ShipmentGroupService shipmentGroupService) {
         this.shipmentDao = shipmentDao;
         this.clientService = clientService;
         this.userService = userService;
-        this.tariffGridDao = tariffGridDao;
+        this.tariffGridService = tariffGridService;
         this.shipmentMapper = shipmentMapper;
         this.barcodeInnerNumberService = barcodeInnerNumberService;
         this.shipmentGroupService = shipmentGroupService;
@@ -207,14 +207,14 @@ public class ShipmentServiceImpl implements ShipmentService {
             w2wVariation = W2wVariation.REGION;
         }
 
-        TariffGrid tariffGrid = tariffGridDao.getLast(w2wVariation);
+        TariffGrid tariffGrid = tariffGridService.getLast(w2wVariation);
         if (tariffGrid == null) {
             return BigDecimal.ZERO;
         }
 
         if (shipment.getWeight() < tariffGrid.getWeight() &&
                 shipment.getLength() < tariffGrid.getLength()) {
-            tariffGrid = tariffGridDao.getByDimension(shipment.getWeight(), shipment.getLength(), w2wVariation);
+            tariffGrid = tariffGridService.getByDimension(shipment.getWeight(), shipment.getLength(), w2wVariation);
         }
 
         log.info("TariffGrid for weight {} per length {} and type {}: {}",

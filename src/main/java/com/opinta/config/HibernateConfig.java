@@ -1,14 +1,20 @@
 package com.opinta.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.jdbc.datasource.init.DataSourceInitializer;
+import org.springframework.jdbc.datasource.init.DatabasePopulator;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -20,8 +26,13 @@ import java.util.Properties;
 @EnableTransactionManagement
 @ComponentScan({"com.opinta"})
 @PropertySource(value = {"classpath:application.properties"})
+@Slf4j
 public class HibernateConfig {
     private Environment environment;
+    @Value("classpath:sql/db-data-countryside-postcode.sql")
+    private Resource dataScript_countryside_postcode;
+    @Value("classpath:sql/db-data-tariff-grid.sql")
+    private Resource dataScript_tariff_grid;
 
     @Autowired
     public HibernateConfig(Environment environment) {
@@ -33,7 +44,7 @@ public class HibernateConfig {
     public LocalSessionFactoryBean sessionFactory() {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(dataSource());
-        sessionFactory.setPackagesToScan(new String[]{"com.opinta.entity"});
+        sessionFactory.setPackagesToScan("com.opinta.entity");
         sessionFactory.setHibernateProperties(hibernateProperties());
         return sessionFactory;
     }
@@ -41,10 +52,10 @@ public class HibernateConfig {
     @Bean(name = "sessionFactory")
     @Profile("dev")
     public LocalSessionFactoryBean sessionFactoryDevelopment() {
-        System.out.println("dev");
+        log.info("ACTIVE SPRING PROFILE: dev");
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(dataSource());
-        sessionFactory.setPackagesToScan(new String[]{"com.opinta.entity"});
+        sessionFactory.setPackagesToScan("com.opinta.entity");
         sessionFactory.setHibernateProperties(hibernatePropertiesDevelopment());
         return sessionFactory;
     }
@@ -52,7 +63,7 @@ public class HibernateConfig {
     @Bean(name = "dataSource")
     @Profile("prod")
     public DataSource dataSource() {
-        System.out.println("prod");
+        log.info("ACTIVE SPRING PROFILE: prod");
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(environment.getRequiredProperty("prod.jdbc.driverClassName"));
         dataSource.setUrl(environment.getRequiredProperty("prod.jdbc.url"));
@@ -96,5 +107,20 @@ public class HibernateConfig {
         HibernateTransactionManager txManager = new HibernateTransactionManager();
         txManager.setSessionFactory(s);
         return txManager;
+    }
+
+    @Bean
+    public DataSourceInitializer dataSourceInitializer(final DataSource dataSource) {
+        final DataSourceInitializer initializer = new DataSourceInitializer();
+        initializer.setDataSource(dataSource);
+        initializer.setDatabasePopulator(databasePopulator());
+        return initializer;
+    }
+
+    private DatabasePopulator databasePopulator() {
+        final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
+        populator.addScript(dataScript_countryside_postcode);
+        populator.addScript(dataScript_tariff_grid);
+        return populator;
     }
 }

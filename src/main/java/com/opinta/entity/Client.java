@@ -86,18 +86,14 @@ public class Client {
     }
     
     public void setName(String name) {
-        if (this.individual) {
-            generateName();
-        } else {
-            this.name = name;
-        }
+        this.name = name;
+        generateName();
     }
     
     public void setIndividual(boolean individual) {
         this.individual = individual;
-        if (this.individual) {
-            generateName();
-        } else {
+        generateName();
+        if (!this.individual) {
             this.firstName = "";
             this.middleName = "";
             this.lastName = "";
