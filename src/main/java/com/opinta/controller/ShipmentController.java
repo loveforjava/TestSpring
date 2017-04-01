@@ -92,6 +92,8 @@ public class ShipmentController {
             return new ResponseEntity<>(shipmentService.save(shipmentDto, user), OK);
         } catch (AuthenticationException e) {
             return new ResponseEntity<>("New Shipment has not been saved. " + e.getMessage(), UNAUTHORIZED);
+        } catch (Exception e) {
+            return new ResponseEntity<>("New Shipment has not been saved. " + e.getMessage(), NOT_FOUND);
         }
     }
 

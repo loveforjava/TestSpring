@@ -22,6 +22,7 @@ public class BarcodeInnerNumberGeneratorImpl implements BarcodeInnerNumberGenera
     @Override
     public BarcodeInnerNumber generate(PostcodePool postcodePool) {
         BarcodeInnerNumber barcode = barcodeInnerNumberDao.generateForPostcodePool(postcodePool);
-        log.info("generated barcode: " + barcode.toString());
-        return barcode;    }
+        log.info("generated barcodeInnerNumber: " + barcode.toString());
+        return barcode;
+    }
 }

@@ -7,8 +7,10 @@ import java.util.List;
 
 import com.opinta.entity.BarcodeInnerNumber;
 import com.opinta.entity.PostcodePool;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -25,14 +27,12 @@ public class BarcodeInnerNumberDaoImpl implements BarcodeInnerNumberDao {
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<BarcodeInnerNumber> getAll(long postcodeId) {
-        // TODO think about getting directly table BarcodeInnerNumber
+    public List<BarcodeInnerNumber> getAll(PostcodePool postcodePool) {
         Session session = sessionFactory.getCurrentSession();
-        PostcodePool postcodePool = (PostcodePool) session.get(PostcodePool.class, postcodeId);
-        if (postcodePool == null) {
-            return null;
-        }
-        return postcodePool.getBarcodeInnerNumbers();
+        return session.createCriteria(BarcodeInnerNumber.class, "barcodeInnerNumber")
+                .add(Restrictions.eq("barcodeInnerNumber.postcodePool", postcodePool))
+                .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
+                .list();
     }
 
     @Override

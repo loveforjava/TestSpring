@@ -92,18 +92,6 @@ public class PostcodePoolController {
         return new ResponseEntity<>(barcodeInnerNumberDto, OK);
     }
 
-    @PostMapping("{postcodeId}/inner-numbers")
-    @ResponseStatus(OK)
-    public ResponseEntity<?> createBarcodeInnerNumber(@PathVariable("postcodeId") long postcodeId,
-                                                      @RequestBody BarcodeInnerNumberDto barcodeInnerNumberDto) {
-        barcodeInnerNumberDto =
-                barcodeInnerNumberService.save(postcodeId, barcodeInnerNumberDto);
-        if (barcodeInnerNumberDto == null) {
-            return new ResponseEntity<>(format("PostcodePool %s doesn't exist", postcodeId), NOT_FOUND);
-        }
-        return new ResponseEntity<>(barcodeInnerNumberDto, OK);
-    }
-
     @DeleteMapping("inner-numbers/{id}")
     public ResponseEntity<?> deleteBarcodeInnerNumber(@PathVariable long id) {
         if (!barcodeInnerNumberService.delete(id)) {

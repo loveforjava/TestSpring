@@ -195,17 +195,17 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             PDPageContentStream contentStream =
                     new PDPageContentStream(template, page, PDPageContentStream.AppendMode.APPEND, true);
 
-            //Constructing 13 digits of the barcode
-            String barcode = shipment.getSender().getCounterparty().getPostcodePool().getPostcode() +
-                    shipment.getBarcode().getInnerNumber();
+            //Constructing 13 digits of the barcodeInnerNumber
+            String barcode = shipment.getBarcodeInnerNumber().getPostcodePool().getPostcode() +
+                    shipment.getBarcodeInnerNumber().getInnerNumber();
 
-            //Generating first barcode
+            //Generating first barcodeInnerNumber
             bitMatrix = new Code128Writer().encode(barcode, BarcodeFormat.CODE_128, 170, 32, null);
             BufferedImage buffImg = MatrixToImageWriter.toBufferedImage(bitMatrix);
             PDImageXObject ximage = JPEGFactory.createFromImage(template, buffImg);
             contentStream.drawImage(ximage, 242, 790);
 
-            //Generating second barcode
+            //Generating second barcodeInnerNumber
             bitMatrix = new Code128Writer().encode(barcode, BarcodeFormat.CODE_128, 170, 32, null);
             buffImg = MatrixToImageWriter.toBufferedImage(bitMatrix);
             ximage = JPEGFactory.createFromImage(template, buffImg);
@@ -213,7 +213,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
 
             contentStream.close();
 
-            //Generating barcode digits
+            //Generating barcodeInnerNumber digits
             field = (PDTextField) acroForm.getField("barcodeText");
             field.setDefaultAppearance(format("/%s 14 Tf 0 g", fontName));
             field.setValue(barcode);
@@ -230,8 +230,8 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             log.error("Error while parsing and populating PDF template: {}", e);
             throw new IOException("Error while parsing and populating PDF template");
         } catch (WriterException e) {
-            log.error("Error while generating barcode: {}", e);
-            throw new IOException("Error during barcode generating.");
+            log.error("Error while generating barcodeInnerNumber: {}", e);
+            throw new IOException("Error during barcodeInnerNumber generating.");
         }
         return data;
     }

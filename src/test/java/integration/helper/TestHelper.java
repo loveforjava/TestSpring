@@ -59,7 +59,7 @@ public class TestHelper {
     public Shipment createShipment() throws Exception {
         Shipment shipment = new Shipment(createClient(), createClient(),
                 DeliveryType.D2D, 4.0F, 3.8F, new BigDecimal(200), new BigDecimal(30), new BigDecimal(35.2));
-        return shipmentService.saveEntity(shipment);
+        return shipmentService.saveEntity(shipment, shipment.getSender().getCounterparty().getUser());
     }
 
     public void deleteShipment(Shipment shipment) throws Exception {

@@ -14,7 +14,7 @@ public interface ShipmentService {
 
     Shipment getEntityByUuid(UUID uuid, User user)  throws AuthenticationException;
 
-    Shipment saveEntity(Shipment shipment);
+    Shipment saveEntity(Shipment shipment, User user) throws Exception;
     
     List<ShipmentDto> getAll(User user);
 
@@ -24,7 +24,7 @@ public interface ShipmentService {
 
     ShipmentDto getByUuid(UUID uuid, User user)  throws AuthenticationException;
     
-    ShipmentDto save(ShipmentDto shipmentDto, User user) throws AuthenticationException;
+    ShipmentDto save(ShipmentDto shipmentDto, User user) throws Exception;
     
     ShipmentDto update(UUID uuid, ShipmentDto shipmentDto, User user) throws Exception;
     

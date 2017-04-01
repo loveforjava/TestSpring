@@ -10,15 +10,9 @@ public interface BarcodeInnerNumberService {
 
     BarcodeInnerNumber getEntityById(long id);
 
-    BarcodeInnerNumber saveEntity(BarcodeInnerNumber barcodeInnerNumber);
-    
     List<BarcodeInnerNumberDto> getAll(long postcodeId);
     
     BarcodeInnerNumberDto getById(long id);
-    
-    BarcodeInnerNumberDto save(long postcodeId, BarcodeInnerNumberDto barcodeInnerNumberDto);
-    
-    BarcodeInnerNumberDto update(long id, BarcodeInnerNumberDto barcodeInnerNumberDto);
     
     boolean delete(long id);
 

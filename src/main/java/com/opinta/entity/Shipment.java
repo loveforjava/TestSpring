@@ -34,7 +34,7 @@ public class Shipment {
     @JoinColumn(name = "shipment_group_uuid")
     private ShipmentGroup shipmentGroup;
     @OneToOne
-    private BarcodeInnerNumber barcode;
+    private BarcodeInnerNumber barcodeInnerNumber;
     @Enumerated(EnumType.STRING)
     private DeliveryType deliveryType;
     private float weight;

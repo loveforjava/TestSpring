@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import static com.opinta.constraint.RegexPattern.BARCODE_LENGTH;
+
 @Getter
 @Setter
 @ToString
@@ -20,7 +22,7 @@ public class ShipmentDto {
     private UUID shipmentGroupUuid;
     @EnumString(source = DeliveryType.class)
     private DeliveryType deliveryType;
-    @Size(min = 13, max = 13)
+    @Size(min = BARCODE_LENGTH, max = BARCODE_LENGTH)
     private String barcode;
     private float weight;
     private float length;
