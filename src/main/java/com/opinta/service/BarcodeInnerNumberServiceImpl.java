@@ -1,9 +1,7 @@
 package com.opinta.service;
 
-import com.opinta.entity.BarcodeStatus;
 import java.util.List;
 
-import java.util.Random;
 import javax.transaction.Transactional;
 
 import com.opinta.dao.BarcodeInnerNumberDao;
@@ -21,18 +19,20 @@ import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 @Service
 @Slf4j
 public class BarcodeInnerNumberServiceImpl implements BarcodeInnerNumberService {
-    
     private final BarcodeInnerNumberDao barcodeInnerNumberDao;
     private final PostcodePoolDao postcodePoolDao;
     private final BarcodeInnerNumberMapper barcodeInnerNumberMapper;
+    private final BarcodeInnerNumberGenerator barcodeInnerNumberGenerator;
 
     @Autowired
     public BarcodeInnerNumberServiceImpl(BarcodeInnerNumberDao barcodeInnerNumberDao,
                                          BarcodeInnerNumberMapper barcodeInnerNumberMapper,
-                                         PostcodePoolDao postcodePoolDao) {
+                                         PostcodePoolDao postcodePoolDao,
+                                         BarcodeInnerNumberGenerator barcodeInnerNumberGenerator) {
         this.barcodeInnerNumberDao = barcodeInnerNumberDao;
         this.barcodeInnerNumberMapper = barcodeInnerNumberMapper;
         this.postcodePoolDao = postcodePoolDao;
+        this.barcodeInnerNumberGenerator = barcodeInnerNumberGenerator;
     }
 
     @Override
@@ -120,18 +120,6 @@ public class BarcodeInnerNumberServiceImpl implements BarcodeInnerNumberService 
     @Override
     @Transactional
     public BarcodeInnerNumber generateBarcodeInnerNumber(PostcodePool postcodePool) {
-        BarcodeInnerNumber barcode = barcodeInnerNumberDao.generateForPostcodePool(postcodePool);
-        log.info("generated barcode: " + barcode.toString());
-        return barcode;
-
-//        // for inmemory DB
-//        Random random = new Random();
-//        int min = 11111111;
-//        int max = 99999999;
-//        Integer randomNum = random.nextInt((max - min) + 1) + min;
-//        BarcodeInnerNumber barcodeInnerNumber = new BarcodeInnerNumber(randomNum.toString(), BarcodeStatus.RESERVED);
-//        barcodeInnerNumber = barcodeInnerNumberDao.save(barcodeInnerNumber);
-//        log.info("generated barcode: {}", randomNum);
-//        return barcodeInnerNumber;
+        return barcodeInnerNumberGenerator.generate(postcodePool);
     }
 }

@@ -14,7 +14,6 @@ import org.json.simple.parser.JSONParser;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import integration.helper.TestHelper;
 
@@ -23,7 +22,10 @@ import static java.lang.String.join;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
+import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
+import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 public class ClientControllerIT extends BaseControllerIT {
     private Client client;
@@ -122,7 +124,7 @@ public class ClientControllerIT extends BaseControllerIT {
         Client createdClient = clientService.getEntityByUuid(newClientUuid, newCounterparty.getUser());
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientMapper.toDto(createdClient));
-        JSONAssert.assertEquals(expectedJson.toJSONString(), actualJson, false);
+        assertEquals(expectedJson.toJSONString(), actualJson, false);
 
         // delete
         testHelper.deleteClient(createdClient);
@@ -161,7 +163,7 @@ public class ClientControllerIT extends BaseControllerIT {
         Client updatedClient = clientService.getEntityByUuid(clientUuid, user);
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientMapper.toDto(updatedClient));
-        JSONAssert.assertEquals(expectedJson.toJSONString(), actualJson, false);
+        assertEquals(expectedJson.toJSONString(), actualJson, false);
     }
     
     @Test
@@ -196,17 +198,21 @@ public class ClientControllerIT extends BaseControllerIT {
     
         JSONParser parser = new JSONParser();
         JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
-        expectedJson.put("firstName", null);
-        expectedJson.put("middleName", null);
-        expectedJson.put("lastName", null);
-        
+        // should use hamcrest to check, cuz oracle returns empty string as null, and other db as ""
+        assertThat(expectedJson.get("firstName"), anyOf(equalTo(""), equalTo(null)));
+        assertThat(expectedJson.get("middleName"), anyOf(equalTo(""), equalTo(null)));
+        assertThat(expectedJson.get("lastName"), anyOf(equalTo(""), equalTo(null)));
+        expectedJson.remove("firstName");
+        expectedJson.remove("middleName");
+        expectedJson.remove("lastName");
+
         UUID newClientUuid = UUID.fromString(newUuid);
         
         // check created data
         Client createdClient = clientService.getEntityByUuid(newClientUuid, newCounterparty.getUser());
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientMapper.toDto(createdClient));
-        JSONAssert.assertEquals(expectedJson.toJSONString(), actualJson, false);
+        assertEquals(expectedJson.toJSONString(), actualJson, false);
         
         // delete
         testHelper.deleteClient(createdClient);
@@ -234,15 +240,19 @@ public class ClientControllerIT extends BaseControllerIT {
         JSONParser parser = new JSONParser();
         JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
         expectedJson.put("name", inputJson.get("name"));
-        expectedJson.put("firstName", null);
-        expectedJson.put("middleName", null);
-        expectedJson.put("lastName", null);
+        // should use hamcrest to check, cuz oracle returns empty string as null, and other dbs as ""
+        assertThat(expectedJson.get("firstName"), anyOf(equalTo(""), equalTo(null)));
+        assertThat(expectedJson.get("middleName"), anyOf(equalTo(""), equalTo(null)));
+        assertThat(expectedJson.get("lastName"), anyOf(equalTo(""), equalTo(null)));
+        expectedJson.remove("firstName");
+        expectedJson.remove("middleName");
+        expectedJson.remove("lastName");
         
         // check updated data
         Client updatedClient = clientService.getEntityByUuid(clientUuid, user);
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientMapper.toDto(updatedClient));
-        JSONAssert.assertEquals(expectedJson.toJSONString(), actualJson, false);
+        assertEquals(expectedJson.toJSONString(), actualJson, false);
     }
     
     @Test

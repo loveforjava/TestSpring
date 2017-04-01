@@ -11,8 +11,6 @@ import com.opinta.entity.Phone;
 import com.opinta.mapper.ShipmentTrackingDetailMapper;
 import com.opinta.entity.ShipmentStatus;
 import com.opinta.entity.ShipmentTrackingDetail;
-import com.opinta.entity.TariffGrid;
-import com.opinta.entity.W2wVariation;
 import com.opinta.service.ShipmentTrackingDetailService;
 import com.opinta.service.TariffGridService;
 import java.math.BigDecimal;
@@ -62,7 +60,6 @@ public class InitDbService {
     private CounterpartyService counterpartyService;
     private PostOfficeService postOfficeService;
     private ShipmentTrackingDetailService shipmentTrackingDetailService;
-    private TariffGridService tariffGridService;
 
     private ClientMapper clientMapper;
     private AddressMapper addressMapper;
@@ -91,7 +88,6 @@ public class InitDbService {
         this.counterpartyService = counterpartyService;
         this.postOfficeService = postOfficeService;
         this.shipmentTrackingDetailService = shipmentTrackingDetailService;
-        this.tariffGridService = tariffGridService;
         this.clientMapper = clientMapper;
         this.addressMapper = addressMapper;
         this.postcodePoolMapper = postcodePoolMapper;
@@ -105,13 +101,9 @@ public class InitDbService {
     @PostConstruct
     public void init() throws Exception {
         //populateDb();
-//        populateTariffGrid();
     }
 
     private void populateDb() throws Exception {
-        // populate TariffGrid
-        populateTariffGrid();
-
         // create PostcodePool with BarcodeInnerNumber
         PostcodePoolDto postcodePoolDto = postcodePoolMapper.toDto(new PostcodePool("00001", false));
         final long postcodePoolId = postcodePoolService.save(postcodePoolDto).getId();
@@ -189,47 +181,5 @@ public class InitDbService {
                 new ShipmentTrackingDetail(shipmentMapper.toEntity(shipmentsSaved.get(0)),
                         postOfficeMapper.toEntity(postOfficeSaved), ShipmentStatus.PREPARED, new Date());
         shipmentTrackingDetailService.save(shipmentTrackingDetailMapper.toDto(shipmentTrackingDetail));
-    }
-
-    private void populateTariffGrid() {
-        List<TariffGrid> tariffGrids = new ArrayList<>();
-
-        tariffGrids.add(new TariffGrid(250f, 30f, W2wVariation.TOWN, 12f));
-        tariffGrids.add(new TariffGrid(250f, 30f, W2wVariation.REGION, 15f));
-        tariffGrids.add(new TariffGrid(250f, 30f, W2wVariation.COUNTRY, 21f));
-
-        tariffGrids.add(new TariffGrid(500f, 30f, W2wVariation.TOWN, 15f));
-        tariffGrids.add(new TariffGrid(500f, 30f, W2wVariation.REGION, 18f));
-        tariffGrids.add(new TariffGrid(500f, 30f, W2wVariation.COUNTRY, 24f));
-
-        tariffGrids.add(new TariffGrid(1000f, 30f, W2wVariation.TOWN, 18f));
-        tariffGrids.add(new TariffGrid(1000f, 30f, W2wVariation.REGION, 21f));
-        tariffGrids.add(new TariffGrid(1000f, 30f, W2wVariation.COUNTRY, 27f));
-
-        tariffGrids.add(new TariffGrid(2000f, 30f, W2wVariation.TOWN, 21f));
-        tariffGrids.add(new TariffGrid(2000f, 30f, W2wVariation.REGION, 24f));
-        tariffGrids.add(new TariffGrid(2000f, 30f, W2wVariation.COUNTRY, 30f));
-
-        tariffGrids.add(new TariffGrid(5000f, 70f, W2wVariation.TOWN, 24f));
-        tariffGrids.add(new TariffGrid(5000f, 70f, W2wVariation.REGION, 27f));
-        tariffGrids.add(new TariffGrid(5000f, 70f, W2wVariation.COUNTRY, 36f));
-
-        tariffGrids.add(new TariffGrid(10000f, 70f, W2wVariation.TOWN, 27f));
-        tariffGrids.add(new TariffGrid(10000f, 70f, W2wVariation.REGION, 30f));
-        tariffGrids.add(new TariffGrid(10000f, 70f, W2wVariation.COUNTRY, 42f));
-
-        tariffGrids.add(new TariffGrid(15000f, 70f, W2wVariation.TOWN, 30f));
-        tariffGrids.add(new TariffGrid(15000f, 70f, W2wVariation.REGION, 36f));
-        tariffGrids.add(new TariffGrid(15000f, 70f, W2wVariation.COUNTRY, 48f));
-
-        tariffGrids.add(new TariffGrid(20000f, 70f, W2wVariation.TOWN, 36f));
-        tariffGrids.add(new TariffGrid(20000f, 70f, W2wVariation.REGION, 42f));
-        tariffGrids.add(new TariffGrid(20000f, 70f, W2wVariation.COUNTRY, 54f));
-
-        tariffGrids.add(new TariffGrid(30000f, 70f, W2wVariation.TOWN, 42f));
-        tariffGrids.add(new TariffGrid(30000f, 70f, W2wVariation.REGION, 48f));
-        tariffGrids.add(new TariffGrid(30000f, 70f, W2wVariation.COUNTRY, 60f));
-
-        tariffGrids.forEach(tariffGridService::save);
     }
 }
