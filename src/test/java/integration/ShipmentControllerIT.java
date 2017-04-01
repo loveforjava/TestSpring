@@ -1,5 +1,6 @@
 package integration;
 
+import com.opinta.constraint.RegexMatcher;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,7 +11,6 @@ import com.opinta.entity.ShipmentGroup;
 import com.opinta.entity.User;
 import com.opinta.mapper.ShipmentMapper;
 import com.opinta.service.ShipmentService;
-import io.restassured.module.mockmvc.response.MockMvcResponse;
 import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -19,13 +19,13 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import integration.helper.TestHelper;
 
+import static com.opinta.constraint.RegexPattern.BARCODE_REGEX;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
-import static org.junit.Assert.assertEquals;
 
 public class ShipmentControllerIT extends BaseControllerIT {
     private Shipment shipment;
@@ -104,7 +104,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         jsonObject.put("shipmentGroupUuid", shipmentGroup.getUuid().toString());
         String expectedJson = jsonObject.toString();
 
-        MockMvcResponse response =
+        String newShipmentUuid =
                 given().
                         contentType("application/json;charset=UTF-8").
                         queryParam("token", sender.getCounterparty().getUser().getToken()).
@@ -113,16 +113,13 @@ public class ShipmentControllerIT extends BaseControllerIT {
                         post("/shipments").
                 then().
                         statusCode(SC_OK).
-                        extract().response();
-        
-        String newShipmentIdString = response.path("uuid");
-        String generatedBarcode = response.path("barcode");
-        assertEquals(13, generatedBarcode.length());
+                        body("barcode", RegexMatcher.matches(BARCODE_REGEX)).
+                extract().
+                        path("uuid");
 
-        UUID newShipmentId = UUID.fromString(newShipmentIdString);
-        
         // check created data
-        Shipment createdShipment = shipmentService.getEntityByUuid(newShipmentId, sender.getCounterparty().getUser());
+        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
+                sender.getCounterparty().getUser());
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(shipmentMapper.toDto(createdShipment));
 
@@ -142,7 +139,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         jsonObject.put("recipientUuid", testHelper.createClient().getUuid().toString());
         String expectedJson = jsonObject.toString();
 
-        MockMvcResponse response =
+        String newShipmentUuid =
                 given().
                         contentType("application/json;charset=UTF-8").
                         queryParam("token", sender.getCounterparty().getUser().getToken()).
@@ -151,16 +148,13 @@ public class ShipmentControllerIT extends BaseControllerIT {
                         post("/shipments").
                 then().
                         statusCode(SC_OK).
-                        extract().response();
-
-        String newShipmentIdString = response.path("uuid");
-        String generatedBarcode = response.path("barcode");
-        assertEquals(13, generatedBarcode.length());
-
-        UUID newShipmentId = UUID.fromString(newShipmentIdString);
+                        body("barcode", RegexMatcher.matches(BARCODE_REGEX)).
+                extract().
+                        path("uuid");
 
         // check created data
-        Shipment createdShipment = shipmentService.getEntityByUuid(newShipmentId, sender.getCounterparty().getUser());
+        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
+                sender.getCounterparty().getUser());
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(shipmentMapper.toDto(createdShipment));
 

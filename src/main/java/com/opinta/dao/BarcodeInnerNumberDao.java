@@ -7,7 +7,7 @@ import com.opinta.entity.PostcodePool;
 
 public interface BarcodeInnerNumberDao {
     
-    List<BarcodeInnerNumber> getAll(long postcodeId);
+    List<BarcodeInnerNumber> getAll(PostcodePool postcodePool);
     
     BarcodeInnerNumber generateForPostcodePool(PostcodePool postcodePool);
     

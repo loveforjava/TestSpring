@@ -111,7 +111,7 @@ public class ClientControllerIT extends BaseControllerIT {
                         body("firstName", equalTo(firstName)).
                         body("middleName", equalTo(middleName)).
                         body("lastName", equalTo(lastName)).
-                        extract().
+                extract().
                         path("uuid");
     
         JSONParser parser = new JSONParser();

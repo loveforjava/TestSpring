@@ -1,6 +1,5 @@
 package com.opinta.service;
 
-import com.opinta.dao.TariffGridDao;
 import com.opinta.entity.Address;
 import com.opinta.entity.DeliveryType;
 import com.opinta.entity.ShipmentGroup;
@@ -18,11 +17,9 @@ import javax.transaction.Transactional;
 import com.opinta.dao.ShipmentDao;
 import com.opinta.dto.ShipmentDto;
 import com.opinta.mapper.ShipmentMapper;
-import com.opinta.entity.BarcodeInnerNumber;
 import com.opinta.entity.Client;
 import com.opinta.entity.PostcodePool;
 import com.opinta.entity.Shipment;
-import com.opinta.entity.Counterparty;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -75,12 +72,16 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public Shipment saveEntity(Shipment shipment) {
+    public Shipment saveEntity(Shipment shipment, User user) throws Exception {
+        Client sender = clientService.getEntityByUuid(shipment.getSender().getUuid(), user);
+        PostcodePool postcodePool = sender.getCounterparty().getPostcodePool();
+
+        shipment.setSender(sender);
+        shipment.setRecipient(clientService.getEntityByUuidAnonymous(shipment.getRecipient().getUuid()));
+        shipment.setBarcodeInnerNumber(barcodeInnerNumberService.generateBarcodeInnerNumber(postcodePool));
+        shipment.setPrice(calculatePrice(shipment));
+
         log.info("Saving shipment {}", shipment);
-        PostcodePool postcodePool = shipment.getSender().getCounterparty().getPostcodePool();
-        BarcodeInnerNumber newBarcode = barcodeInnerNumberService.generateBarcodeInnerNumber(postcodePool);
-        postcodePool.getBarcodeInnerNumbers().add(newBarcode);
-        shipment.setBarcode(newBarcode);
         return shipmentDao.save(shipment);
     }
 
@@ -114,25 +115,8 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public ShipmentDto save(ShipmentDto shipmentDto, User user) throws AuthenticationException {
-        Client existingClient = clientService.getEntityByUuid(shipmentDto.getSenderUuid(), user);
-        Counterparty counterparty = existingClient.getCounterparty();
-        PostcodePool postcodePool = counterparty.getPostcodePool();
-        BarcodeInnerNumber newBarcode = barcodeInnerNumberService.generateBarcodeInnerNumber(postcodePool);
-        postcodePool.getBarcodeInnerNumbers().add(newBarcode);
-        Shipment shipment = shipmentMapper.toEntity(shipmentDto);
-
-        Client sender = clientService.getEntityByUuid(shipment.getSender().getUuid(), user);
-
-        userService.authorizeForAction(sender, user);
-
-        shipment.setSender(sender);
-        shipment.setRecipient(clientService.getEntityByUuidAnonymous(shipment.getRecipient().getUuid()));
-        shipment.setBarcode(newBarcode);
-        shipment.setPrice(calculatePrice(shipment));
-
-        log.info("Saving shipment with assigned barcode", shipmentMapper.toDto(shipment));
-        return shipmentMapper.toDto(shipmentDao.save(shipment));
+    public ShipmentDto save(ShipmentDto shipmentDto, User user) throws Exception {
+        return shipmentMapper.toDto(saveEntity(shipmentMapper.toEntity(shipmentDto), user));
     }
 
     @Override
@@ -141,7 +125,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         Shipment source = shipmentMapper.toEntity(shipmentDto);
         Shipment target = shipmentDao.getByUuid(uuid);
         if (target == null) {
-            log.debug("Can't update shipment. Shipment doesn't exist {}", uuid);
+            log.error("Can't update shipment. Shipment doesn't exist {}", uuid);
             throw new Exception(format("Can't update shipment. Shipment doesn't exist %s", uuid));
         }
 

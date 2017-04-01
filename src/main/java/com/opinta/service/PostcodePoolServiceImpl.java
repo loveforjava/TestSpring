@@ -1,7 +1,6 @@
 package com.opinta.service;
 
 import com.opinta.dao.PostcodePoolDao;
-import com.opinta.dto.BarcodeInnerNumberDto;
 import com.opinta.dto.PostcodePoolDto;
 import com.opinta.mapper.BarcodeInnerNumberMapper;
 import com.opinta.mapper.PostcodePoolMapper;
@@ -97,20 +96,6 @@ public class PostcodePoolServiceImpl implements PostcodePoolService {
         postcodePool.setId(id);
         log.info("Deleting postcodePool {}", postcodePool);
         postcodePoolDao.delete(postcodePool);
-        return true;
-    }
-
-    @Override
-    @Transactional
-    public boolean addBarcodeInnerNumbers(long postcodeId, List<BarcodeInnerNumberDto> barcodeInnerNumberDtos) {
-        PostcodePool postcodePool = postcodePoolDao.getById(postcodeId);
-        if (postcodePool == null) {
-            log.debug("Can't add barcodeInnerNumberDto list to postcodePool. PostCodePool doesn't exist {}", postcodeId);
-            return false;
-        }
-        postcodePool.setBarcodeInnerNumbers(barcodeInnerNumberMapper.toEntity(barcodeInnerNumberDtos));
-        log.info("Adding barcodeInnerNumberDto list to postcodePool {}", postcodePool);
-        postcodePoolDao.update(postcodePool);
         return true;
     }
 }
