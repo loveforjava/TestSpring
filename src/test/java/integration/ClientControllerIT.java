@@ -199,9 +199,6 @@ public class ClientControllerIT extends BaseControllerIT {
         JSONParser parser = new JSONParser();
         JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
         // should use hamcrest to check, cuz oracle returns empty string as null, and other db as ""
-        assertThat(expectedJson.get("firstName"), anyOf(equalTo(""), equalTo(null)));
-        assertThat(expectedJson.get("middleName"), anyOf(equalTo(""), equalTo(null)));
-        assertThat(expectedJson.get("lastName"), anyOf(equalTo(""), equalTo(null)));
         expectedJson.remove("firstName");
         expectedJson.remove("middleName");
         expectedJson.remove("lastName");
@@ -213,6 +210,9 @@ public class ClientControllerIT extends BaseControllerIT {
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientMapper.toDto(createdClient));
         assertEquals(expectedJson.toJSONString(), actualJson, false);
+        assertThat(createdClient.getFirstName(), anyOf(equalTo(""), equalTo(null)));
+        assertThat(createdClient.getMiddleName(), anyOf(equalTo(""), equalTo(null)));
+        assertThat(createdClient.getLastName(), anyOf(equalTo(""), equalTo(null)));
         
         // delete
         testHelper.deleteClient(createdClient);
@@ -241,9 +241,6 @@ public class ClientControllerIT extends BaseControllerIT {
         JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
         expectedJson.put("name", inputJson.get("name"));
         // should use hamcrest to check, cuz oracle returns empty string as null, and other dbs as ""
-        assertThat(expectedJson.get("firstName"), anyOf(equalTo(""), equalTo(null)));
-        assertThat(expectedJson.get("middleName"), anyOf(equalTo(""), equalTo(null)));
-        assertThat(expectedJson.get("lastName"), anyOf(equalTo(""), equalTo(null)));
         expectedJson.remove("firstName");
         expectedJson.remove("middleName");
         expectedJson.remove("lastName");
@@ -253,6 +250,9 @@ public class ClientControllerIT extends BaseControllerIT {
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientMapper.toDto(updatedClient));
         assertEquals(expectedJson.toJSONString(), actualJson, false);
+        assertThat(updatedClient.getFirstName(), anyOf(equalTo(""), equalTo(null)));
+        assertThat(updatedClient.getMiddleName(), anyOf(equalTo(""), equalTo(null)));
+        assertThat(updatedClient.getLastName(), anyOf(equalTo(""), equalTo(null)));
     }
     
     @Test

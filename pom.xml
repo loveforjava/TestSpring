@@ -9,6 +9,7 @@
     <name>Test Spring</name>
     <url>http://maven.apache.org</url>
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven-compiler-plugin.version>3.6.0</maven-compiler-plugin.version>
         <maven-war-plugin.version>3.0.0</maven-war-plugin.version>
         <jdk.version>1.8</jdk.version>
