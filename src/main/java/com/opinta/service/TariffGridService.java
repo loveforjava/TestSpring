@@ -2,6 +2,7 @@ package com.opinta.service;
 
 import com.opinta.entity.TariffGrid;
 import com.opinta.entity.W2wVariation;
+import com.opinta.exception.PerformProcessFailedException;
 import java.util.List;
 
 public interface TariffGridService {
@@ -12,7 +13,7 @@ public interface TariffGridService {
 
     TariffGrid save(TariffGrid tariffGrid);
 
-    TariffGrid update(long id, TariffGrid tariffGrid);
+    TariffGrid update(long id, TariffGrid tariffGrid) throws PerformProcessFailedException;
     
     boolean delete(long id);
     

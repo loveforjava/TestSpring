@@ -3,12 +3,21 @@ package com.opinta.service;
 import com.opinta.dao.TariffGridDao;
 import com.opinta.entity.TariffGrid;
 import com.opinta.entity.W2wVariation;
+import com.opinta.exception.PerformProcessFailedException;
+import com.opinta.util.LogMessageUtil;
 import java.util.List;
 import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getAllLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getByIdLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.saveLogEndpoint;
+import static com.opinta.util.LogMessageUtil.updateLogEndpoint;
 import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 
 @Service
@@ -24,39 +33,41 @@ public class TariffGridServiceImpl implements TariffGridService {
     @Override
     @Transactional
     public List<TariffGrid> getAll() {
-        log.info("Getting all tariffGrids");
+        log.info(getAllLogEndpoint(TariffGrid.class));
         return tariffGridDao.getAll();
     }
 
     @Override
     @Transactional
     public TariffGrid getById(long id) {
-        log.info("Getting tariffGrid by uuid {}", id);
+        log.info(getByIdLogEndpoint(TariffGrid.class, id));
         return tariffGridDao.getById(id);
     }
 
     @Override
     @Transactional
     public TariffGrid save(TariffGrid tariffGrid) {
-        log.info("Saving tariffGrid {}", tariffGrid);
+        log.info(saveLogEndpoint(TariffGrid.class, tariffGrid));
         return tariffGridDao.save(tariffGrid);
     }
 
     @Override
     @Transactional
-    public TariffGrid update(long id, TariffGrid source) {
+    public TariffGrid update(long id, TariffGrid source) throws PerformProcessFailedException {
         TariffGrid target = tariffGridDao.getById(id);
         if (target == null) {
-            log.info("Can't update tariffGrid. TariffGrid doesn't exist {}", id);
+            log.info(getByIdOnErrorLogEndpoint(TariffGrid.class, id));
             return null;
         }
         try {
             copyProperties(target, source);
         } catch (Exception e) {
-            log.error("Can't get properties from object to updatable object for tariffGrid", e);
+            log.error(copyPropertiesOnErrorLogEndpoint(TariffGrid.class, source, target, e));
+            throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(
+                    TariffGrid.class, source, target, e));
         }
         target.setId(id);
-        log.info("Updating tariffGrid {}", target);
+        log.info(updateLogEndpoint(TariffGrid.class, target));
         tariffGridDao.update(target);
         return target;
     }
@@ -66,10 +77,10 @@ public class TariffGridServiceImpl implements TariffGridService {
     public boolean delete(long id) {
         TariffGrid tariffGrid = tariffGridDao.getById(id);
         if (tariffGrid == null) {
-            log.debug("Can't delete tariffGrid. TariffGrid doesn't exist {}", id);
+            log.debug(getByIdOnErrorLogEndpoint(TariffGrid.class, id));
             return false;
         }
-        log.info("Deleting tariffGrid {}", tariffGrid);
+        log.info(deleteLogEndpoint(TariffGrid.class, id));
         tariffGridDao.delete(tariffGrid);
         return true;
     }

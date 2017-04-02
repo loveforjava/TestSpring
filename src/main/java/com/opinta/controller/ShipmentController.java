@@ -1,14 +1,18 @@
 package com.opinta.controller;
 
+import com.opinta.entity.Shipment;
 import com.opinta.entity.User;
+import com.opinta.exception.AuthException;
+import com.opinta.exception.IncorrectInputDataException;
+import com.opinta.exception.PerformProcessFailedException;
 import com.opinta.service.UserService;
+import java.io.IOException;
 import java.util.UUID;
 
 import com.opinta.dto.ShipmentDto;
 import com.opinta.service.PDFGeneratorService;
 import com.opinta.service.ShipmentService;
 import lombok.extern.slf4j.Slf4j;
-import javax.naming.AuthenticationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +26,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.opinta.util.LogMessageUtil.deleteOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.generatePdfFormOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.saveOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.updateOnErrorLogEndpoint;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
@@ -49,38 +59,42 @@ public class ShipmentController {
         try {
             User user = userService.authenticate(token);
             return new ResponseEntity<>(shipmentService.getAll(user), OK);
-        } catch (AuthenticationException e) {
+        } catch (AuthException e) {
             return new ResponseEntity<>(e.getMessage(), UNAUTHORIZED);
         }
     }
 
-    @GetMapping("{id}")
-    public ResponseEntity<?> getShipment(@PathVariable("id") UUID id, @RequestParam(value = "token") UUID token) {
+    @GetMapping("{uuid}")
+    public ResponseEntity<?> getShipment(@PathVariable UUID uuid, @RequestParam(value = "token") UUID token) {
         try {
             User user = userService.authenticate(token);
-            return new ResponseEntity<>(shipmentService.getByUuid(id, user), OK);
-        } catch (AuthenticationException e) {
-            return new ResponseEntity<>(e.getMessage(), UNAUTHORIZED);
+            return new ResponseEntity<>(shipmentService.getByUuid(uuid, user), OK);
+        } catch (AuthException e) {
+            return new ResponseEntity<>(getByIdOnErrorLogEndpoint(Shipment.class, uuid, e), UNAUTHORIZED);
+        } catch (IncorrectInputDataException e) {
+            return new ResponseEntity<>(getByIdOnErrorLogEndpoint(Shipment.class, uuid, e), NOT_FOUND);
         }
     }
 
-    @GetMapping("{id}/form")
-    public ResponseEntity<?> getShipmentForm(@PathVariable("id") UUID id,
+    @GetMapping("{uuid}/form")
+    public ResponseEntity<?> getShipmentForm(@PathVariable UUID uuid,
                                              @RequestParam(value = "token") UUID token) {
         try {
             User user = userService.authenticate(token);
 
-            byte[] data = pdfGeneratorService.generate(id, user);
+            byte[] data = pdfGeneratorService.generate(uuid, user);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(parseMediaType(APPLICATION_PDF_VALUE));
-            String filename = id + ".pdf";
+            String filename = uuid + ".pdf";
             headers.setContentDispositionFormData(filename, filename);
             headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
             return new ResponseEntity<>(data, headers, OK);
-        } catch (AuthenticationException e) {
-            return new ResponseEntity<>(e.getMessage(), UNAUTHORIZED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), NOT_FOUND);
+        } catch (AuthException e) {
+            return new ResponseEntity<>(generatePdfFormOnErrorLogEndpoint(Shipment.class, uuid, e), UNAUTHORIZED);
+        } catch (IncorrectInputDataException e) {
+            return new ResponseEntity<>(generatePdfFormOnErrorLogEndpoint(Shipment.class, uuid, e), NOT_FOUND);
+        } catch (IOException e) {
+            return new ResponseEntity<>(generatePdfFormOnErrorLogEndpoint(Shipment.class, uuid, e), BAD_REQUEST);
         }
     }
 
@@ -90,37 +104,39 @@ public class ShipmentController {
         try {
             User user = userService.authenticate(token);
             return new ResponseEntity<>(shipmentService.save(shipmentDto, user), OK);
-        } catch (AuthenticationException e) {
-            return new ResponseEntity<>("New Shipment has not been saved. " + e.getMessage(), UNAUTHORIZED);
-        } catch (Exception e) {
-            return new ResponseEntity<>("New Shipment has not been saved. " + e.getMessage(), NOT_FOUND);
+        } catch (AuthException e) {
+            return new ResponseEntity<>(saveOnErrorLogEndpoint(Shipment.class, shipmentDto, e), UNAUTHORIZED);
+        } catch (IncorrectInputDataException e) {
+            return new ResponseEntity<>(saveOnErrorLogEndpoint(Shipment.class, shipmentDto, e), NOT_FOUND);
         }
     }
 
-    @PutMapping("{id}")
-    public ResponseEntity<?> updateShipment(@PathVariable UUID id, @RequestBody ShipmentDto shipmentDto,
+    @PutMapping("{uuid}")
+    public ResponseEntity<?> updateShipment(@PathVariable UUID uuid, @RequestBody ShipmentDto shipmentDto,
                                             @RequestParam(value = "token") UUID token) {
         try {
             User user = userService.authenticate(token);
-            return new ResponseEntity<>(shipmentService.update(id, shipmentDto, user), OK);
-        } catch (AuthenticationException e) {
-            return new ResponseEntity<>("Shipment has not been updated. " + e.getMessage(), UNAUTHORIZED);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Shipment has not been updated. " + e.getMessage(), NOT_FOUND);
+            return new ResponseEntity<>(shipmentService.update(uuid, shipmentDto, user), OK);
+        } catch (AuthException e) {
+            return new ResponseEntity<>(updateOnErrorLogEndpoint(Shipment.class, uuid, e), UNAUTHORIZED);
+        } catch (IncorrectInputDataException e) {
+            return new ResponseEntity<>(updateOnErrorLogEndpoint(Shipment.class, uuid, e), NOT_FOUND);
+        } catch (PerformProcessFailedException e) {
+            return new ResponseEntity<>(updateOnErrorLogEndpoint(Shipment.class, uuid, e), BAD_REQUEST);
         }
     }
 
-    @DeleteMapping("{id}")
-    public ResponseEntity<?> deleteShipment(@PathVariable UUID id,
+    @DeleteMapping("{uuid}")
+    public ResponseEntity<?> deleteShipment(@PathVariable UUID uuid,
                                             @RequestParam(value = "token") UUID token) {
         try {
             User user = userService.authenticate(token);
-            shipmentService.delete(id, user);
+            shipmentService.delete(uuid, user);
             return new ResponseEntity<>(OK);
-        } catch (AuthenticationException e) {
-            return new ResponseEntity<>(e.getMessage(), UNAUTHORIZED);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Shipment has not been deleted. " + e.getMessage(), NOT_FOUND);
+        } catch (AuthException e) {
+            return new ResponseEntity<>(deleteOnErrorLogEndpoint(Shipment.class, uuid, e), UNAUTHORIZED);
+        } catch (IncorrectInputDataException e) {
+            return new ResponseEntity<>(deleteOnErrorLogEndpoint(Shipment.class, uuid, e), NOT_FOUND);
         }
     }
 }

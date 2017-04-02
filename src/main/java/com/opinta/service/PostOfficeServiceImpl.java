@@ -2,14 +2,23 @@ package com.opinta.service;
 
 import com.opinta.dao.PostOfficeDao;
 import com.opinta.dto.PostOfficeDto;
+import com.opinta.exception.IncorrectInputDataException;
+import com.opinta.exception.PerformProcessFailedException;
 import com.opinta.mapper.PostOfficeMapper;
 import com.opinta.entity.PostOffice;
+import com.opinta.util.LogMessageUtil;
 import java.util.List;
 import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getByIdLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.saveLogEndpoint;
+import static com.opinta.util.LogMessageUtil.updateLogEndpoint;
 import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 
 @Service
@@ -27,21 +36,26 @@ public class PostOfficeServiceImpl implements PostOfficeService {
     @Override
     @Transactional
     public List<PostOffice> getAllEntities() {
-        log.info("Getting all post offices");
+        log.info(LogMessageUtil.getAllLogEndpoint(PostOffice.class));
         return postOfficeDao.getAll();
     }
 
     @Override
     @Transactional
-    public PostOffice getEntityById(long id) {
-        log.info("Getting client by uuid {}", id);
-        return postOfficeDao.getById(id);
+    public PostOffice getEntityById(long id) throws IncorrectInputDataException {
+        log.info(getByIdLogEndpoint(PostOffice.class, id));
+        PostOffice postOffice = postOfficeDao.getById(id);
+        if (postOffice == null) {
+            log.error(getByIdOnErrorLogEndpoint(PostOffice.class, id));
+            throw new IncorrectInputDataException(getByIdOnErrorLogEndpoint(PostOffice.class, id));
+        }
+        return postOffice;
     }
 
     @Override
     @Transactional
     public PostOffice saveEntity(PostOffice postOffice) {
-        log.info("Saving client {}", postOffice);
+        log.info(saveLogEndpoint(PostOffice.class, postOffice));
         return postOfficeDao.save(postOffice);
     }
 
@@ -53,7 +67,7 @@ public class PostOfficeServiceImpl implements PostOfficeService {
 
     @Override
     @Transactional
-    public PostOfficeDto getById(long id) {
+    public PostOfficeDto getById(long id) throws IncorrectInputDataException {
         return postOfficeMapper.toDto(getEntityById(id));
     }
 
@@ -65,34 +79,28 @@ public class PostOfficeServiceImpl implements PostOfficeService {
 
     @Override
     @Transactional
-    public PostOfficeDto update(long id, PostOfficeDto postOfficeDto) {
+    public PostOfficeDto update(long id, PostOfficeDto postOfficeDto) throws IncorrectInputDataException,
+            PerformProcessFailedException {
         PostOffice source = postOfficeMapper.toEntity(postOfficeDto);
-        PostOffice target = postOfficeDao.getById(id);
-        if (target == null) {
-            log.info("Can't update postOffice. PostOffice doesn't exist {}", id);
-            return null;
-        }
+        PostOffice target = getEntityById(id);
         try {
             copyProperties(target, source);
         } catch (Exception e) {
-            log.error("Can't get properties from object to updatable object for postOffice", e);
+            log.error(copyPropertiesOnErrorLogEndpoint(PostOffice.class, source, target, e));
+            throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(
+                    PostOffice.class, source, target, e));
         }
         target.setId(id);
-        log.info("Updating postOffice {}", target);
+        log.info(updateLogEndpoint(PostOffice.class, target));
         postOfficeDao.update(target);
         return postOfficeMapper.toDto(target);
     }
 
     @Override
     @Transactional
-    public boolean delete(long id) {
-        PostOffice postOffice = postOfficeDao.getById(id);
-        if (postOffice == null) {
-            log.debug("Can't delete postOffice. PostOffice doesn't exist {}", id);
-            return false;
-        }
-        log.info("Deleting postOffice {}", postOffice);
+    public void delete(long id) throws IncorrectInputDataException {
+        log.info(deleteLogEndpoint(PostOffice.class, id));
+        PostOffice postOffice = getEntityById(id);
         postOfficeDao.delete(postOffice);
-        return true;
     }
 }

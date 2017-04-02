@@ -2,6 +2,8 @@ package com.opinta.service;
 
 import com.opinta.dao.PostcodePoolDao;
 import com.opinta.dto.PostcodePoolDto;
+import com.opinta.exception.IncorrectInputDataException;
+import com.opinta.exception.PerformProcessFailedException;
 import com.opinta.mapper.BarcodeInnerNumberMapper;
 import com.opinta.mapper.PostcodePoolMapper;
 import com.opinta.entity.PostcodePool;
@@ -12,6 +14,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getAllLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getByIdLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.saveLogEndpoint;
+import static com.opinta.util.LogMessageUtil.updateLogEndpoint;
 import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 
 @Service
@@ -31,20 +40,25 @@ public class PostcodePoolServiceImpl implements PostcodePoolService {
 
     @Override
     public List<PostcodePool> getAllEntities() {
-        log.info("Getting all postcodePools");
+        log.info(getAllLogEndpoint(PostcodePool.class));
         return postcodePoolDao.getAll();
     }
 
     @Override
-    public PostcodePool getEntityByUuid(UUID uuid) {
-        log.info("Getting postcodePool by uuid {}", uuid);
-        return postcodePoolDao.getByUuid(uuid);
+    public PostcodePool getEntityByUuid(UUID uuid) throws IncorrectInputDataException {
+        log.info(getByIdLogEndpoint(PostcodePool.class, uuid));
+        PostcodePool postcodePool = postcodePoolDao.getByUuid(uuid);
+        if (postcodePool == null) {
+            log.error(getByIdOnErrorLogEndpoint(PostcodePool.class, uuid));
+            throw new IncorrectInputDataException(getByIdOnErrorLogEndpoint(PostcodePool.class, uuid));
+        }
+        return postcodePool;
     }
 
     @Override
     @Transactional
     public PostcodePool saveEntity(PostcodePool postcodePool) {
-        log.info("Saving postcodePool {}", postcodePool);
+        log.info(saveLogEndpoint(PostcodePool.class, postcodePool));
         return postcodePoolDao.save(postcodePool);
     }
 
@@ -56,7 +70,7 @@ public class PostcodePoolServiceImpl implements PostcodePoolService {
 
     @Override
     @Transactional
-    public PostcodePoolDto getByUuid(UUID uuid) {
+    public PostcodePoolDto getByUuid(UUID uuid) throws IncorrectInputDataException {
         return postcodePoolMapper.toDto(getEntityByUuid(uuid));
     }
 
@@ -68,35 +82,28 @@ public class PostcodePoolServiceImpl implements PostcodePoolService {
 
     @Override
     @Transactional
-    public PostcodePoolDto update(UUID uuid, PostcodePoolDto postcodePoolDto) {
+    public PostcodePoolDto update(UUID uuid, PostcodePoolDto postcodePoolDto) throws IncorrectInputDataException,
+            PerformProcessFailedException {
         PostcodePool source = postcodePoolMapper.toEntity(postcodePoolDto);
-        PostcodePool target = postcodePoolDao.getByUuid(uuid);
-        if (target == null) {
-            log.debug("Can't update postcodePool. PostCodePool doesn't exist {}", uuid);
-            return null;
-        }
+        PostcodePool target = getEntityByUuid(uuid);
         try {
             copyProperties(target, source);
         } catch (Exception e) {
-            log.error("Can't get properties from object to updatable object for postcodePool", e);
+            log.error(copyPropertiesOnErrorLogEndpoint(PostcodePool.class, source, target, e));
+            throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(
+                    PostcodePool.class, source, target, e));
         }
         target.setUuid(uuid);
-        log.info("Updating postcodePool {}", target);
+        log.info(updateLogEndpoint(PostcodePool.class, target));
         postcodePoolDao.update(target);
         return postcodePoolMapper.toDto(target);
     }
 
     @Override
     @Transactional
-    public boolean delete(UUID uuid) {
-        PostcodePool postcodePool = postcodePoolDao.getByUuid(uuid);
-        if (postcodePool == null) {
-            log.debug("Can't delete postcodePool. PostCodePool doesn't exist {}", uuid);
-            return false;
-        }
-        postcodePool.setUuid(uuid);
-        log.info("Deleting postcodePool {}", postcodePool);
+    public void delete(UUID uuid) throws IncorrectInputDataException {
+        log.info(deleteLogEndpoint(PostcodePool.class, uuid));
+        PostcodePool postcodePool = getEntityByUuid(uuid);
         postcodePoolDao.delete(postcodePool);
-        return true;
     }
 }

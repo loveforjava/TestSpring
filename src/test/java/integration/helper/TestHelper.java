@@ -8,6 +8,7 @@ import com.opinta.entity.PostOffice;
 import com.opinta.entity.PostcodePool;
 import com.opinta.entity.Shipment;
 import com.opinta.entity.ShipmentGroup;
+import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.service.AddressService;
 import com.opinta.service.ClientService;
 import com.opinta.service.CounterpartyService;
@@ -16,6 +17,7 @@ import com.opinta.service.PostOfficeService;
 import com.opinta.service.PostcodePoolService;
 import com.opinta.service.ShipmentGroupService;
 import com.opinta.service.ShipmentService;
+import com.opinta.util.LogMessageUtil;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -65,8 +67,17 @@ public class TestHelper {
     }
 
     public void deletePostOffice(PostOffice postOffice) {
-        postOfficeService.delete(postOffice.getId());
-        postcodePoolService.delete(postOffice.getPostcodePool().getUuid());
+        try {
+            postOfficeService.delete(postOffice.getId());
+        } catch (IncorrectInputDataException e) {
+            log.error(LogMessageUtil.deleteOnErrorLogEndpoint(PostOffice.class, postOffice.getId()));
+        }
+        try {
+            postcodePoolService.delete(postOffice.getPostcodePool().getUuid());
+        } catch (IncorrectInputDataException e) {
+            log.error(LogMessageUtil.deleteOnErrorLogEndpoint(PostcodePool.class,
+                    postOffice.getPostcodePool().getUuid()));
+        }
     }
 
     public Shipment createShipment() throws Exception {

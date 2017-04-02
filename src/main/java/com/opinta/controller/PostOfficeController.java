@@ -1,5 +1,8 @@
 package com.opinta.controller;
 
+import com.opinta.entity.PostOffice;
+import com.opinta.exception.IncorrectInputDataException;
+import com.opinta.exception.PerformProcessFailedException;
 import java.util.List;
 
 import com.opinta.dto.PostOfficeDto;
@@ -16,7 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import static java.lang.String.format;
+import static com.opinta.util.LogMessageUtil.deleteOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.updateOnErrorLogEndpoint;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -40,37 +45,37 @@ public class PostOfficeController {
 
     @GetMapping("{id}")
     public ResponseEntity<?> getPostOffice(@PathVariable("id") long id) {
-        PostOfficeDto postOfficeDto = postOfficeService.getById(id);
-        if (postOfficeDto == null) {
-            return new ResponseEntity<>(format("No PostOffice found for ID %s", id), NOT_FOUND);
+        try {
+            return new ResponseEntity<>(postOfficeService.getById(id), OK);
+        } catch (IncorrectInputDataException e) {
+            return new ResponseEntity<>(getByIdOnErrorLogEndpoint(PostOffice.class, id, e), NOT_FOUND);
         }
-        return new ResponseEntity<>(postOfficeDto, OK);
     }
 
     @PostMapping
     @ResponseStatus(OK)
     public ResponseEntity<?> createPostOffice(@RequestBody PostOfficeDto postOfficeDto) {
-        postOfficeDto = postOfficeService.save(postOfficeDto);
-        if (postOfficeDto == null) {
-            return new ResponseEntity<>("Failed to create new PostOffice using given data.", BAD_REQUEST);
-        }
-        return new ResponseEntity<>(postOfficeDto, OK);
+        return new ResponseEntity<>(postOfficeService.save(postOfficeDto), OK);
     }
 
     @PutMapping("{id}")
     public ResponseEntity<?> updatePostOffice(@PathVariable long id, @RequestBody PostOfficeDto postOfficeDto) {
-        postOfficeDto = postOfficeService.update(id, postOfficeDto);
-        if (postOfficeDto == null) {
-            return new ResponseEntity<>(format("No PostOffice found for ID %s", id), NOT_FOUND);
+        try {
+            return new ResponseEntity<>(postOfficeService.update(id, postOfficeDto), OK);
+        } catch (IncorrectInputDataException e) {
+            return new ResponseEntity<>(updateOnErrorLogEndpoint(PostOffice.class, id, e), NOT_FOUND);
+        } catch (PerformProcessFailedException e) {
+            return new ResponseEntity<>(updateOnErrorLogEndpoint(PostOffice.class, id, e), BAD_REQUEST);
         }
-        return new ResponseEntity<>(postOfficeDto, OK);
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<?> deletePostOffice(@PathVariable long id) {
-        if (!postOfficeService.delete(id)) {
-            return new ResponseEntity<>(format("No PostOffice found for ID %s", id), NOT_FOUND);
+        try {
+            postOfficeService.delete(id);
+            return new ResponseEntity<>(OK);
+        } catch (IncorrectInputDataException e) {
+            return new ResponseEntity<>(deleteOnErrorLogEndpoint(PostOffice.class, id, e), NOT_FOUND);
         }
-        return new ResponseEntity<>(OK);
     }
 }

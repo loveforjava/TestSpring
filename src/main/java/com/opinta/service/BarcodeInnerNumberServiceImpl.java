@@ -1,12 +1,12 @@
 package com.opinta.service;
 
+import com.opinta.exception.IncorrectInputDataException;
 import java.util.List;
 
 import java.util.UUID;
 import javax.transaction.Transactional;
 
 import com.opinta.dao.BarcodeInnerNumberDao;
-import com.opinta.dao.PostcodePoolDao;
 import com.opinta.dto.BarcodeInnerNumberDto;
 import com.opinta.mapper.BarcodeInnerNumberMapper;
 import com.opinta.entity.BarcodeInnerNumber;
@@ -15,62 +15,62 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getAllByFieldLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getByIdLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
+
 @Service
 @Slf4j
 public class BarcodeInnerNumberServiceImpl implements BarcodeInnerNumberService {
     private final BarcodeInnerNumberDao barcodeInnerNumberDao;
-    private final PostcodePoolDao postcodePoolDao;
+    private final PostcodePoolService postcodePoolService;
     private final BarcodeInnerNumberMapper barcodeInnerNumberMapper;
     private final BarcodeInnerNumberGenerator barcodeInnerNumberGenerator;
 
     @Autowired
     public BarcodeInnerNumberServiceImpl(BarcodeInnerNumberDao barcodeInnerNumberDao,
                                          BarcodeInnerNumberMapper barcodeInnerNumberMapper,
-                                         PostcodePoolDao postcodePoolDao,
+                                         PostcodePoolService postcodePoolService,
                                          BarcodeInnerNumberGenerator barcodeInnerNumberGenerator) {
         this.barcodeInnerNumberDao = barcodeInnerNumberDao;
         this.barcodeInnerNumberMapper = barcodeInnerNumberMapper;
-        this.postcodePoolDao = postcodePoolDao;
+        this.postcodePoolService = postcodePoolService;
         this.barcodeInnerNumberGenerator = barcodeInnerNumberGenerator;
     }
 
     @Override
     @Transactional
-    public BarcodeInnerNumber getEntityById(long id) {
-        return barcodeInnerNumberDao.getById(id);
+    public BarcodeInnerNumber getEntityById(long id) throws IncorrectInputDataException {
+        log.info(getByIdLogEndpoint(BarcodeInnerNumber.class, id));
+        BarcodeInnerNumber barcodeInnerNumber = barcodeInnerNumberDao.getById(id);
+        if (barcodeInnerNumber == null) {
+            log.error(getByIdOnErrorLogEndpoint(BarcodeInnerNumber.class, id));
+            throw new IncorrectInputDataException(getByIdOnErrorLogEndpoint(BarcodeInnerNumber.class, id));
+        }
+        return barcodeInnerNumber;
     }
 
     @Override
     @Transactional
-    public List<BarcodeInnerNumberDto> getAll(UUID postcodePoolUuid) {
-        PostcodePool postcodePool = postcodePoolDao.getByUuid(postcodePoolUuid);
-        if (postcodePool == null) {
-            log.debug("Can't get barcodeInnerNumberDto list by postcodePool. PostCodePool {} doesn't exist",
-                    postcodePoolUuid);
-            return null;
-        }
-        log.info("Getting all barcodeInnerNumbers by postcodePoolUuid {}", postcodePoolUuid);
+    public List<BarcodeInnerNumberDto> getAll(UUID postcodePoolUuid) throws IncorrectInputDataException {
+        log.info(getAllByFieldLogEndpoint(BarcodeInnerNumber.class, PostcodePool.class, postcodePoolUuid));
+        PostcodePool postcodePool = postcodePoolService.getEntityByUuid(postcodePoolUuid);
         return barcodeInnerNumberMapper.toDto(barcodeInnerNumberDao.getAll(postcodePool));
     }
 
     @Override
     @Transactional
-    public BarcodeInnerNumberDto getById(long id) {
-        log.info("Getting barcodeInnerNumber by uuid {}", id);
-        return barcodeInnerNumberMapper.toDto(barcodeInnerNumberDao.getById(id));
+    public BarcodeInnerNumberDto getById(long id) throws IncorrectInputDataException {
+        return barcodeInnerNumberMapper.toDto(getEntityById(id));
     }
     
     @Override
     @Transactional
-    public boolean delete(long id) {
-        BarcodeInnerNumber barcodeInnerNumber = barcodeInnerNumberDao.getById(id);
-        if (barcodeInnerNumber == null) {
-            log.debug("Can't delete barcodeInnerNumber. BarcodeInnerNumber doesn't exist {}", id);
-            return false;
-        }
-        log.info("Deleting barcodeInnerNumber {}", barcodeInnerNumber);
+    public void delete(long id) throws IncorrectInputDataException {
+        log.info(deleteLogEndpoint(BarcodeInnerNumber.class, id));
+        BarcodeInnerNumber barcodeInnerNumber = getEntityById(id);
         barcodeInnerNumberDao.delete(barcodeInnerNumber);
-        return true;
     }
     
     @Override

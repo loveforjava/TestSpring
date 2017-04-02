@@ -1,5 +1,7 @@
 package com.opinta.service;
 
+import com.opinta.exception.IncorrectInputDataException;
+import com.opinta.exception.PerformProcessFailedException;
 import java.util.List;
 
 import com.opinta.dto.PostOfficeDto;
@@ -9,17 +11,18 @@ public interface PostOfficeService {
 
     List<PostOffice> getAllEntities();
 
-    PostOffice getEntityById(long id);
+    PostOffice getEntityById(long id) throws IncorrectInputDataException;
 
     PostOffice saveEntity(PostOffice postOffice);
     
     List<PostOfficeDto> getAll();
     
-    PostOfficeDto getById(long id);
+    PostOfficeDto getById(long id) throws IncorrectInputDataException;
     
     PostOfficeDto save(PostOfficeDto postOfficeDto);
     
-    PostOfficeDto update(long id, PostOfficeDto postOfficeDto);
+    PostOfficeDto update(long id, PostOfficeDto postOfficeDto) throws IncorrectInputDataException,
+            PerformProcessFailedException;
     
-    boolean delete(long id);
+    void delete(long id) throws IncorrectInputDataException;
 }

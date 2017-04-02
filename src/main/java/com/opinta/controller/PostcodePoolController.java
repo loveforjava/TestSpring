@@ -1,8 +1,11 @@
 package com.opinta.controller;
 
+import com.opinta.entity.BarcodeInnerNumber;
+import com.opinta.entity.PostcodePool;
+import com.opinta.exception.IncorrectInputDataException;
+import com.opinta.exception.PerformProcessFailedException;
 import java.util.List;
 
-import com.opinta.dto.BarcodeInnerNumberDto;
 import com.opinta.dto.PostcodePoolDto;
 import com.opinta.service.BarcodeInnerNumberService;
 import com.opinta.service.PostcodePoolService;
@@ -19,8 +22,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import static java.lang.String.format;
+import static com.opinta.util.LogMessageUtil.deleteOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getAllOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.updateOnErrorLogEndpoint;
 
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -43,13 +50,13 @@ public class PostcodePoolController {
         return postcodePoolService.getAll();
     }
 
-    @GetMapping("{id}")
-    public ResponseEntity<?> getPostcodePool(@PathVariable("id") UUID uuid) {
-        PostcodePoolDto postcodePoolDto = postcodePoolService.getByUuid(uuid);
-        if (postcodePoolDto == null) {
-            return new ResponseEntity<>(format("No PostcodePool found for uuid %s", uuid), NOT_FOUND);
+    @GetMapping("{uuid}")
+    public ResponseEntity<?> getPostcodePool(@PathVariable UUID uuid) {
+        try {
+            return new ResponseEntity<>(postcodePoolService.getByUuid(uuid), OK);
+        } catch (IncorrectInputDataException e) {
+            return new ResponseEntity<>(getByIdOnErrorLogEndpoint(PostcodePool.class, uuid, e), NOT_FOUND);
         }
-        return new ResponseEntity<>(postcodePoolDto, OK);
     }
 
     @PostMapping
@@ -58,46 +65,52 @@ public class PostcodePoolController {
         return postcodePoolService.save(postcodePoolDto);
     }
 
-    @PutMapping("{id}")
+    @PutMapping("{uuid}")
     public ResponseEntity<?> updatePostcodePool(@PathVariable UUID uuid, @RequestBody PostcodePoolDto postcodePoolDto) {
-        postcodePoolDto = postcodePoolService.update(uuid, postcodePoolDto);
-        if (postcodePoolDto == null) {
-            return new ResponseEntity<>(format("No PostcodePool found for uuid %s", uuid), NOT_FOUND);
+        try {
+            return new ResponseEntity<>(postcodePoolService.update(uuid, postcodePoolDto), OK);
+        } catch (IncorrectInputDataException e) {
+            return new ResponseEntity<>(updateOnErrorLogEndpoint(PostcodePool.class, uuid, e), NOT_FOUND);
+        } catch (PerformProcessFailedException e) {
+            return new ResponseEntity<>(updateOnErrorLogEndpoint(PostcodePool.class, uuid, e), BAD_REQUEST);
         }
-        return new ResponseEntity<>(postcodePoolDto, OK);
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("{uuid}")
     public ResponseEntity<?> deletePostcodePool(@PathVariable UUID uuid) {
-        if (!postcodePoolService.delete(uuid)) {
-            return new ResponseEntity<>(format("No PostcodePool found for uuid %s", uuid), NOT_FOUND);
+        try {
+            postcodePoolService.delete(uuid);
+            return new ResponseEntity<>(OK);
+        } catch (IncorrectInputDataException e) {
+            return new ResponseEntity<>(deleteOnErrorLogEndpoint(PostcodePool.class, uuid, e), NOT_FOUND);
         }
-        return new ResponseEntity<>(OK);
     }
 
-    @GetMapping("{postcodeId}/inner-numbers")
-    public ResponseEntity<?> getBarcodeInnerNumbers(@PathVariable UUID postcodeUuid) {
-        List<BarcodeInnerNumberDto> barcodeInnerNumberDtos = barcodeInnerNumberService.getAll(postcodeUuid);
-        if (barcodeInnerNumberDtos == null) {
-            return new ResponseEntity<>(format("PostcodePool %s doesn't exist", postcodeUuid), NOT_FOUND);
+    @GetMapping("{postcodePoolUuid}/inner-numbers")
+    public ResponseEntity<?> getBarcodeInnerNumbers(@PathVariable UUID postcodePoolUuid) {
+        try {
+            return new ResponseEntity<>(barcodeInnerNumberService.getAll(postcodePoolUuid), OK);
+        } catch (IncorrectInputDataException e) {
+            return new ResponseEntity<>(getAllOnErrorLogEndpoint(BarcodeInnerNumber.class, e), NOT_FOUND);
         }
-        return new ResponseEntity<>(barcodeInnerNumberDtos, OK);
     }
 
     @GetMapping("inner-numbers/{id}")
     public ResponseEntity<?> getBarcodeInnerNumber(@PathVariable("id") long id) {
-        BarcodeInnerNumberDto barcodeInnerNumberDto = barcodeInnerNumberService.getById(id);
-        if (barcodeInnerNumberDto == null) {
-            return new ResponseEntity<>(format("No barcodeInnerNumber found for ID %s", id), NOT_FOUND);
+        try {
+            return new ResponseEntity<>(barcodeInnerNumberService.getById(id), OK);
+        } catch (IncorrectInputDataException e) {
+            return new ResponseEntity<>(getByIdOnErrorLogEndpoint(BarcodeInnerNumber.class, id, e), NOT_FOUND);
         }
-        return new ResponseEntity<>(barcodeInnerNumberDto, OK);
     }
 
     @DeleteMapping("inner-numbers/{id}")
     public ResponseEntity<?> deleteBarcodeInnerNumber(@PathVariable long id) {
-        if (!barcodeInnerNumberService.delete(id)) {
-            return new ResponseEntity<>(format("No barcodeInnerNumber found for ID %s", id), NOT_FOUND);
+        try {
+            barcodeInnerNumberService.delete(id);
+            return new ResponseEntity<>(OK);
+        } catch (IncorrectInputDataException e) {
+            return new ResponseEntity<>(deleteOnErrorLogEndpoint(BarcodeInnerNumber.class, id, e), NOT_FOUND);
         }
-        return new ResponseEntity<>(OK);
     }
 }
