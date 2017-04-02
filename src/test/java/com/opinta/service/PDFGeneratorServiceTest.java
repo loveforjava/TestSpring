@@ -2,19 +2,12 @@ package com.opinta.service;
 
 import com.opinta.entity.Address;
 import com.opinta.entity.BarcodeInnerNumber;
-import com.opinta.entity.BarcodeStatus;
 import com.opinta.entity.Client;
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.DeliveryType;
-import com.opinta.entity.Phone;
 import com.opinta.entity.PostcodePool;
 import com.opinta.entity.Shipment;
-import com.opinta.entity.Client;
-import com.opinta.entity.DeliveryType;
 import com.opinta.entity.User;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
-import org.apache.pdfbox.pdmodel.interactive.form.PDTextField;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,7 +18,6 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 import static com.opinta.entity.BarcodeStatus.RESERVED;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.atLeast;
@@ -56,7 +48,11 @@ public class PDFGeneratorServiceTest {
         shipment = new Shipment(sender, recipient, DeliveryType.W2W, 1, 1,
                 new BigDecimal("12.5"), new BigDecimal("2.5"), new BigDecimal("15.25"));
         shipmentId = UUID.randomUUID();
-        shipment.setBarcode(new BarcodeInnerNumber("12345678", RESERVED));
+        BarcodeInnerNumber barcodeInnerNumber = new BarcodeInnerNumber();
+        barcodeInnerNumber.setPostcodePool(counterparty.getPostcodePool());
+        barcodeInnerNumber.setInnerNumber("12345678");
+        barcodeInnerNumber.setStatus(RESERVED);
+        shipment.setBarcodeInnerNumber(barcodeInnerNumber);
     }
 
     @Test

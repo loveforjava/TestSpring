@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 
 import static java.lang.Math.round;
@@ -119,7 +120,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             acroForm.setDefaultResources(res);
 
             //Populating clients data
-            generateClientsData(shipment, acroForm);
+            generateClientsData(shipment, acroForm, true);
 
             //Splitting price to hryvnas and kopiykas
             BigDecimal postPay = shipment.getPostPay();
@@ -177,7 +178,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             acroForm.setDefaultResources(res);
 
             //Populating client data
-            generateClientsData(shipment, acroForm);
+            generateClientsData(shipment, acroForm, false);
             setCheckBoxes(shipment, acroForm);
 
             //Populating rest of the fields
@@ -194,17 +195,17 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             PDPageContentStream contentStream =
                     new PDPageContentStream(template, page, PDPageContentStream.AppendMode.APPEND, true);
 
-            //Constructing 13 digits of the barcode
-            String barcode = shipment.getSender().getCounterparty().getPostcodePool().getPostcode() +
-                    shipment.getBarcode().getInnerNumber();
+            //Constructing 13 digits of the barcodeInnerNumber
+            String barcode = shipment.getBarcodeInnerNumber().getPostcodePool().getPostcode() +
+                    shipment.getBarcodeInnerNumber().getInnerNumber();
 
-            //Generating first barcode
+            //Generating first barcodeInnerNumber
             bitMatrix = new Code128Writer().encode(barcode, BarcodeFormat.CODE_128, 170, 32, null);
             BufferedImage buffImg = MatrixToImageWriter.toBufferedImage(bitMatrix);
             PDImageXObject ximage = JPEGFactory.createFromImage(template, buffImg);
             contentStream.drawImage(ximage, 242, 790);
 
-            //Generating second barcode
+            //Generating second barcodeInnerNumber
             bitMatrix = new Code128Writer().encode(barcode, BarcodeFormat.CODE_128, 170, 32, null);
             buffImg = MatrixToImageWriter.toBufferedImage(bitMatrix);
             ximage = JPEGFactory.createFromImage(template, buffImg);
@@ -212,7 +213,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
 
             contentStream.close();
 
-            //Generating barcode digits
+            //Generating barcodeInnerNumber digits
             field = (PDTextField) acroForm.getField("barcodeText");
             field.setDefaultAppearance(format("/%s 14 Tf 0 g", fontName));
             field.setValue(barcode);
@@ -229,8 +230,8 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             log.error("Error while parsing and populating PDF template: {}", e);
             throw new IOException("Error while parsing and populating PDF template");
         } catch (WriterException e) {
-            log.error("Error while generating barcode: {}", e);
-            throw new IOException("Error during barcode generating.");
+            log.error("Error while generating barcodeInnerNumber: {}", e);
+            throw new IOException("Error during barcodeInnerNumber generating.");
         }
         return data;
     }
@@ -262,8 +263,17 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         }
     }
 
-    private void generateClientsData(Shipment shipment, PDAcroForm acroForm) throws IOException {
-        Client sender = shipment.getSender();
+    private void generateClientsData(Shipment shipment, PDAcroForm acroForm, boolean swapSenderWithRecipient) throws IOException {
+        Client sender;
+        Client recipient;
+        if (swapSenderWithRecipient) {
+            sender = shipment.getRecipient();
+            recipient = shipment.getSender();
+        } else {
+            sender = shipment.getSender();
+            recipient = shipment.getRecipient();
+        }
+
 
         populateField(acroForm, field, "senderName", sender.getName());
         populateField(acroForm, field, "senderAddress", processAddress(sender.getAddress()));
@@ -272,8 +282,6 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         if (phone != null) {
             populateField(acroForm, field, "senderPhone", phone.getPhoneNumber());
         }
-
-        Client recipient = shipment.getRecipient();
 
         populateField(acroForm, field, "recipientName", recipient.getName());
         populateField(acroForm, field, "recipientAddress", processAddress(recipient.getAddress()));
@@ -297,13 +305,20 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         String region = address.getRegion();
         String postcode = address.getPostcode();
 
-        String output = (street == null ? "" : "вул. " + street + ", ") +
-                (houseNumber == null ? "" : houseNumber + ", ") +
-                (apartmentNumber == null ? "" : "кв. " + apartmentNumber + ", ") +
-                (city == null ? "" : city + ", ") +
-                (district == null ? "" : district + " р-н ") +
-                (region == null ? "" : region + " обл.") +
+        //PDF has problems with encodings on Linux, converting to bytes and formatting help dealing with the problem
+        String output = (street == null ? "" : String.format("вул. %s, ", street)) +
+                (houseNumber == null ? "" : String.format("%s, ", houseNumber)) +
+                (apartmentNumber == null ? "" : String.format("кв. %s, ", apartmentNumber)) +
+                (city == null ? "" : String.format("%s, ", city)) +
+                (district == null ? "" : String.format("%s р-н ", district)) +
+                (region == null ? "" : String.format("%s обл.", region)) +
                 (postcode == null ? "" : " " + postcode);
+        try {
+            byte[] outputBytes = output.getBytes("UTF-8");
+            output = new String(outputBytes, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
         return output;
     }

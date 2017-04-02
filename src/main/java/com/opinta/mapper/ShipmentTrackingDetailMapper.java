@@ -11,14 +11,14 @@ public interface ShipmentTrackingDetailMapper extends BaseMapper<ShipmentTrackin
 
     @Override
     @Mappings({
-            @Mapping(source = "shipment.uuid", target = "shipmentId"),
+            @Mapping(source = "shipment.uuid", target = "shipmentUuid"),
             @Mapping(source = "postOffice.id", target = "postOfficeId")
     })
     ShipmentTrackingDetailDto toDto(ShipmentTrackingDetail shipmentTrackingDetail);
 
     @Override
     @Mappings({
-            @Mapping(source = "shipmentId", target = "shipment.uuid"),
+            @Mapping(source = "shipmentUuid", target = "shipment.uuid"),
             @Mapping(source = "postOfficeId", target = "postOffice.id")
     })
     ShipmentTrackingDetail toEntity(ShipmentTrackingDetailDto shipmentTrackingDetailDto);

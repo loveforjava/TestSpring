@@ -72,7 +72,7 @@ public class PostOfficeControllerIT extends BaseControllerIT {
         // create
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/post-office.json");
         jsonObject.put("addressId", (int) testHelper.createAddress().getId());
-        jsonObject.put("postcodePoolId", (int) testHelper.createPostcodePool().getId());
+        jsonObject.put("postcodePoolUuid", testHelper.createPostcodePool().getUuid().toString());
         String expectedJson = jsonObject.toString();
 
         int newPostOfficeId =
@@ -102,7 +102,7 @@ public class PostOfficeControllerIT extends BaseControllerIT {
         // update
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/post-office.json");
         jsonObject.put("addressId", (int) testHelper.createAddress().getId());
-        jsonObject.put("postcodePoolId", (int) testHelper.createPostcodePool().getId());
+        jsonObject.put("postcodePoolUuid", testHelper.createPostcodePool().getUuid().toString());
         String expectedJson = jsonObject.toString();
 
         given().

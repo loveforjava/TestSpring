@@ -1,9 +1,8 @@
 package com.opinta.service;
 
-import com.opinta.entity.BarcodeStatus;
 import java.util.List;
 
-import java.util.Random;
+import java.util.UUID;
 import javax.transaction.Transactional;
 
 import com.opinta.dao.BarcodeInnerNumberDao;
@@ -16,23 +15,23 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static org.apache.commons.beanutils.BeanUtils.copyProperties;
-
 @Service
 @Slf4j
 public class BarcodeInnerNumberServiceImpl implements BarcodeInnerNumberService {
-    
     private final BarcodeInnerNumberDao barcodeInnerNumberDao;
     private final PostcodePoolDao postcodePoolDao;
     private final BarcodeInnerNumberMapper barcodeInnerNumberMapper;
+    private final BarcodeInnerNumberGenerator barcodeInnerNumberGenerator;
 
     @Autowired
     public BarcodeInnerNumberServiceImpl(BarcodeInnerNumberDao barcodeInnerNumberDao,
                                          BarcodeInnerNumberMapper barcodeInnerNumberMapper,
-                                         PostcodePoolDao postcodePoolDao) {
+                                         PostcodePoolDao postcodePoolDao,
+                                         BarcodeInnerNumberGenerator barcodeInnerNumberGenerator) {
         this.barcodeInnerNumberDao = barcodeInnerNumberDao;
         this.barcodeInnerNumberMapper = barcodeInnerNumberMapper;
         this.postcodePoolDao = postcodePoolDao;
+        this.barcodeInnerNumberGenerator = barcodeInnerNumberGenerator;
     }
 
     @Override
@@ -43,20 +42,15 @@ public class BarcodeInnerNumberServiceImpl implements BarcodeInnerNumberService 
 
     @Override
     @Transactional
-    public BarcodeInnerNumber saveEntity(BarcodeInnerNumber barcodeInnerNumber) {
-        return barcodeInnerNumberDao.save(barcodeInnerNumber);
-    }
-
-    @Override
-    @Transactional
-    public List<BarcodeInnerNumberDto> getAll(long postcodeId) {
-        PostcodePool postcodePool = postcodePoolDao.getById(postcodeId);
+    public List<BarcodeInnerNumberDto> getAll(UUID postcodePoolUuid) {
+        PostcodePool postcodePool = postcodePoolDao.getByUuid(postcodePoolUuid);
         if (postcodePool == null) {
-            log.debug("Can't get barcodeInnerNumberDto list by postcodePool. PostCodePool {} doesn't exist", postcodeId);
+            log.debug("Can't get barcodeInnerNumberDto list by postcodePool. PostCodePool {} doesn't exist",
+                    postcodePoolUuid);
             return null;
         }
-        log.info("Getting all barcodeInnerNumbers by postcodeId {}", postcodeId);
-        return barcodeInnerNumberMapper.toDto(barcodeInnerNumberDao.getAll(postcodeId));
+        log.info("Getting all barcodeInnerNumbers by postcodePoolUuid {}", postcodePoolUuid);
+        return barcodeInnerNumberMapper.toDto(barcodeInnerNumberDao.getAll(postcodePool));
     }
 
     @Override
@@ -66,44 +60,6 @@ public class BarcodeInnerNumberServiceImpl implements BarcodeInnerNumberService 
         return barcodeInnerNumberMapper.toDto(barcodeInnerNumberDao.getById(id));
     }
     
-    @Override
-    @Transactional
-    public BarcodeInnerNumberDto save(long postcodeId, BarcodeInnerNumberDto barcodeInnerNumberDto) {
-        PostcodePool postcodePool = postcodePoolDao.getById(postcodeId);
-        if (postcodePool == null) {
-            log.debug("Can't add barcodeInnerNumberDto to postcodePool. PostCodePool {} doesn't exist", postcodeId);
-            return null;
-        }
-        BarcodeInnerNumber barcodeInnerNumber = barcodeInnerNumberMapper.toEntity(barcodeInnerNumberDto);
-        BarcodeInnerNumber barcodeInnerNumberSaved = barcodeInnerNumberDao.save(barcodeInnerNumber);
-        // TODO not to get, but set previously created list and check in db if previous values not erased
-        postcodePool.getBarcodeInnerNumbers().add(barcodeInnerNumberSaved);
-        log.info("Adding barcodeInnerNumber {} to postcodePool {}", barcodeInnerNumber, postcodePool);
-        postcodePoolDao.update(postcodePool);
-        return barcodeInnerNumberMapper.toDto(barcodeInnerNumberSaved);
-    }
-
-    @Override
-    @Transactional
-    public BarcodeInnerNumberDto update(long id, BarcodeInnerNumberDto barcodeInnerNumberDto) {
-        BarcodeInnerNumber source = barcodeInnerNumberMapper.toEntity(barcodeInnerNumberDto);
-        BarcodeInnerNumber target = barcodeInnerNumberDao.getById(id);
-        if (target == null) {
-            log.info("Can't update barcodeInnerNumber. BarcodeInnerNumber doesn't exist {}", id);
-            return null;
-        }
-        try {
-            copyProperties(target, source);
-        } catch (Exception e) {
-            log.error("Can't get properties from object to updatable object for barcodeInnerNumber", e);
-            return null;
-        }
-        target.setId(id);
-        log.info("Updating barcodeInnerNumber {}", target);
-        barcodeInnerNumberDao.update(target);
-        return barcodeInnerNumberMapper.toDto(target);
-    }
-
     @Override
     @Transactional
     public boolean delete(long id) {
@@ -120,18 +76,6 @@ public class BarcodeInnerNumberServiceImpl implements BarcodeInnerNumberService 
     @Override
     @Transactional
     public BarcodeInnerNumber generateBarcodeInnerNumber(PostcodePool postcodePool) {
-//        BarcodeInnerNumber barcode = barcodeInnerNumberDao.generateForPostcodePool(postcodePool);
-//        log.info("generated barcode: " + barcode.toString());
-//        return barcode;
-
-        // TODO
-        Random random = new Random();
-        int min = 11111111;
-        int max = 99999999;
-        Integer randomNum = random.nextInt((max - min) + 1) + min;
-        BarcodeInnerNumber barcodeInnerNumber = new BarcodeInnerNumber(randomNum.toString(), BarcodeStatus.RESERVED);
-        barcodeInnerNumber = barcodeInnerNumberDao.save(barcodeInnerNumber);
-        log.info("generated barcode: {}", randomNum);
-        return barcodeInnerNumber;
+        return barcodeInnerNumberGenerator.generate(postcodePool);
     }
 }

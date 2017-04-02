@@ -2,14 +2,11 @@ package com.opinta.controller;
 
 import com.opinta.entity.User;
 import com.opinta.service.UserService;
-import java.util.List;
 import java.util.UUID;
 
 import com.opinta.dto.ClientDto;
-import com.opinta.dto.ShipmentDto;
 import com.opinta.service.ClientService;
 import com.opinta.service.ShipmentService;
-import java.util.UUID;
 import javax.naming.AuthenticationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

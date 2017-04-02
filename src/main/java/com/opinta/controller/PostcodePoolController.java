@@ -6,6 +6,7 @@ import com.opinta.dto.BarcodeInnerNumberDto;
 import com.opinta.dto.PostcodePoolDto;
 import com.opinta.service.BarcodeInnerNumberService;
 import com.opinta.service.PostcodePoolService;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -43,10 +44,10 @@ public class PostcodePoolController {
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<?> getPostcodePool(@PathVariable("id") long id) {
-        PostcodePoolDto postcodePoolDto = postcodePoolService.getById(id);
+    public ResponseEntity<?> getPostcodePool(@PathVariable("id") UUID uuid) {
+        PostcodePoolDto postcodePoolDto = postcodePoolService.getByUuid(uuid);
         if (postcodePoolDto == null) {
-            return new ResponseEntity<>(format("No PostcodePool found for ID %s", id), NOT_FOUND);
+            return new ResponseEntity<>(format("No PostcodePool found for uuid %s", uuid), NOT_FOUND);
         }
         return new ResponseEntity<>(postcodePoolDto, OK);
     }
@@ -58,27 +59,27 @@ public class PostcodePoolController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<?> updatePostcodePool(@PathVariable long id, @RequestBody PostcodePoolDto postcodePoolDto) {
-        postcodePoolDto = postcodePoolService.update(id, postcodePoolDto);
+    public ResponseEntity<?> updatePostcodePool(@PathVariable UUID uuid, @RequestBody PostcodePoolDto postcodePoolDto) {
+        postcodePoolDto = postcodePoolService.update(uuid, postcodePoolDto);
         if (postcodePoolDto == null) {
-            return new ResponseEntity<>(format("No PostcodePool found for ID %s", id), NOT_FOUND);
+            return new ResponseEntity<>(format("No PostcodePool found for uuid %s", uuid), NOT_FOUND);
         }
         return new ResponseEntity<>(postcodePoolDto, OK);
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<?> deletePostcodePool(@PathVariable long id) {
-        if (!postcodePoolService.delete(id)) {
-            return new ResponseEntity<>(format("No PostcodePool found for ID %s", id), NOT_FOUND);
+    public ResponseEntity<?> deletePostcodePool(@PathVariable UUID uuid) {
+        if (!postcodePoolService.delete(uuid)) {
+            return new ResponseEntity<>(format("No PostcodePool found for uuid %s", uuid), NOT_FOUND);
         }
         return new ResponseEntity<>(OK);
     }
 
     @GetMapping("{postcodeId}/inner-numbers")
-    public ResponseEntity<?> getBarcodeInnerNumbers(@PathVariable long postcodeId) {
-        List<BarcodeInnerNumberDto> barcodeInnerNumberDtos = barcodeInnerNumberService.getAll(postcodeId);
+    public ResponseEntity<?> getBarcodeInnerNumbers(@PathVariable UUID postcodeUuid) {
+        List<BarcodeInnerNumberDto> barcodeInnerNumberDtos = barcodeInnerNumberService.getAll(postcodeUuid);
         if (barcodeInnerNumberDtos == null) {
-            return new ResponseEntity<>(format("PostcodePool %s doesn't exist", postcodeId), NOT_FOUND);
+            return new ResponseEntity<>(format("PostcodePool %s doesn't exist", postcodeUuid), NOT_FOUND);
         }
         return new ResponseEntity<>(barcodeInnerNumberDtos, OK);
     }
@@ -88,18 +89,6 @@ public class PostcodePoolController {
         BarcodeInnerNumberDto barcodeInnerNumberDto = barcodeInnerNumberService.getById(id);
         if (barcodeInnerNumberDto == null) {
             return new ResponseEntity<>(format("No barcodeInnerNumber found for ID %s", id), NOT_FOUND);
-        }
-        return new ResponseEntity<>(barcodeInnerNumberDto, OK);
-    }
-
-    @PostMapping("{postcodeId}/inner-numbers")
-    @ResponseStatus(OK)
-    public ResponseEntity<?> createBarcodeInnerNumber(@PathVariable("postcodeId") long postcodeId,
-                                                      @RequestBody BarcodeInnerNumberDto barcodeInnerNumberDto) {
-        barcodeInnerNumberDto =
-                barcodeInnerNumberService.save(postcodeId, barcodeInnerNumberDto);
-        if (barcodeInnerNumberDto == null) {
-            return new ResponseEntity<>(format("PostcodePool %s doesn't exist", postcodeId), NOT_FOUND);
         }
         return new ResponseEntity<>(barcodeInnerNumberDto, OK);
     }

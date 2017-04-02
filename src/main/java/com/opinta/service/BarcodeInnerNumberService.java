@@ -5,20 +5,15 @@ import java.util.List;
 import com.opinta.dto.BarcodeInnerNumberDto;
 import com.opinta.entity.BarcodeInnerNumber;
 import com.opinta.entity.PostcodePool;
+import java.util.UUID;
 
 public interface BarcodeInnerNumberService {
 
     BarcodeInnerNumber getEntityById(long id);
 
-    BarcodeInnerNumber saveEntity(BarcodeInnerNumber barcodeInnerNumber);
-    
-    List<BarcodeInnerNumberDto> getAll(long postcodeId);
+    List<BarcodeInnerNumberDto> getAll(UUID postcodePoolUuid);
     
     BarcodeInnerNumberDto getById(long id);
-    
-    BarcodeInnerNumberDto save(long postcodeId, BarcodeInnerNumberDto barcodeInnerNumberDto);
-    
-    BarcodeInnerNumberDto update(long id, BarcodeInnerNumberDto barcodeInnerNumberDto);
     
     boolean delete(long id);
 

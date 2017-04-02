@@ -30,6 +30,7 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 
 @RestController
@@ -49,59 +50,59 @@ public class CounterpartyController {
     
     @GetMapping
     @ResponseStatus(OK)
-    public List<CounterpartyDto> getAllPostOffices() {
+    public List<CounterpartyDto> getAllCounterparties() {
         return counterpartyService.getAll();
     }
 
-    @GetMapping("{id}")
-    public ResponseEntity<?> getPostOffice(@PathVariable("id") UUID id) {
-        CounterpartyDto counterpartyDto = counterpartyService.getByUuid(id);
+    @GetMapping(value = "{uuid}", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getCounterparty(@PathVariable("uuid") UUID uuid) {
+        CounterpartyDto counterpartyDto = counterpartyService.getByUuid(uuid);
         if (counterpartyDto == null) {
-            return new ResponseEntity<>(format("No Counterparty found for ID %s", id), NOT_FOUND);
+            return new ResponseEntity<>(format("No Counterparty found for uuid %s", uuid), NOT_FOUND);
         }
         return new ResponseEntity<>(counterpartyDto, OK);
     }
 
-    @GetMapping("{counterpartyId}/clients")
-    public ResponseEntity<?> getClientsByCounterpartyId(@PathVariable UUID counterpartyId) {
-        List<ClientDto> clientDtos = clientService.getAllByCounterpartyUuid(counterpartyId);
+    @GetMapping(value = "{counterpartyUuid}/clients", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getClientsByCounterpartyId(@PathVariable UUID counterpartyUuid) {
+        List<ClientDto> clientDtos = clientService.getAllByCounterpartyUuid(counterpartyUuid);
         if (clientDtos == null) {
-            return new ResponseEntity<>(format("No Counterparty found for ID %s", counterpartyId), NOT_FOUND);
+            return new ResponseEntity<>(format("No Counterparty found for uuid %s", counterpartyUuid), NOT_FOUND);
         }
         return new ResponseEntity<>(clientDtos, OK);
     }
-    
-    @PostMapping
+
+    @PostMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createCounterparty(@RequestBody CounterpartyDto counterpartyDto) {
         try {
             counterpartyDto = counterpartyService.save(counterpartyDto);
         } catch (Exception e) {
-            return new ResponseEntity<>("New Counterparty has not been saved. " + e.getMessage(), BAD_REQUEST);
+            return new ResponseEntity<>(format("New Counterparty has not been saved. %s", e.getMessage()), BAD_REQUEST);
         }
         return new ResponseEntity<>(counterpartyDto, OK);
     }
-    
-    @PutMapping("{id}")
-    public ResponseEntity<?> updateCounterpartyById(@PathVariable("id") UUID id,
+
+    @PutMapping(value = "{uuid}", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> updateCounterpartyByUuid(@PathVariable("uuid") UUID uuid,
                                                   @RequestBody CounterpartyDto counterpartyDto,
                                                   @RequestParam(value = "token") UUID token) {
         try {
             User user = userService.authenticate(token);
-            counterpartyDto = counterpartyService.update(id, counterpartyDto, user);
+            counterpartyDto = counterpartyService.update(uuid, counterpartyDto, user);
         } catch (AuthenticationException e) {
-            return new ResponseEntity<>(e.getMessage(), UNAUTHORIZED);
+            return new ResponseEntity<>(format("New Counterparty has not been updated. %s", e.getMessage()), UNAUTHORIZED);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), NOT_FOUND);
+            return new ResponseEntity<>(format("New Counterparty has not been updated. %s", e.getMessage()), NOT_FOUND);
         }
         return new ResponseEntity<>(counterpartyDto, OK);
     }
-    
-    @DeleteMapping("{id}")
-    public ResponseEntity<?> deletePostOfficeById(@PathVariable("id") UUID id,
+
+    @DeleteMapping("{uuid}")
+    public ResponseEntity<?> deletePostOfficeById(@PathVariable("uuid") UUID uuid,
                                                   @RequestParam(value = "token") UUID token) {
         try {
             User user = userService.authenticate(token);
-            counterpartyService.delete(id, user);
+            counterpartyService.delete(uuid, user);
         } catch (AuthenticationException e) {
             return new ResponseEntity<>(e.getMessage(), UNAUTHORIZED);
         } catch (Exception e) {
