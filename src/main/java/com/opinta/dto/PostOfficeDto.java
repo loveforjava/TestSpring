@@ -1,5 +1,6 @@
 package com.opinta.dto;
 
+import java.util.UUID;
 import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,5 +14,5 @@ public class PostOfficeDto {
     @Size(max = 255)
     private String name;
     private long addressId;
-    private long postcodePoolId;
+    private UUID postcodePoolUuid;
 }

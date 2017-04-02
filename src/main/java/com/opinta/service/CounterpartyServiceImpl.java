@@ -6,7 +6,6 @@ import com.opinta.entity.User;
 import java.util.List;
 import java.util.UUID;
 
-import java.util.UUID;
 import javax.transaction.Transactional;
 
 import com.opinta.dao.CounterpartyDao;
@@ -60,10 +59,10 @@ public class CounterpartyServiceImpl implements CounterpartyService {
     @Override
     @Transactional
     public Counterparty saveEntity(Counterparty counterparty) throws Exception {
-        PostcodePool postcodePool = postcodePoolService.getEntityById(counterparty.getPostcodePool().getId());
+        PostcodePool postcodePool = postcodePoolService.getEntityByUuid(counterparty.getPostcodePool().getUuid());
         if (postcodePool == null) {
-            log.error("PostcodePool {} doesn't exist", counterparty.getPostcodePool().getId());
-            throw new Exception(format("PostcodePool %s doesn't exist", counterparty.getPostcodePool().getId()));
+            log.error("PostcodePool {} doesn't exist", counterparty.getPostcodePool().getUuid());
+            throw new Exception(format("PostcodePool %s doesn't exist", counterparty.getPostcodePool().getUuid()));
         }
         List<Counterparty> counterpartiesByPostcodePool = getEntityByPostcodePool(postcodePool);
         if (counterpartiesByPostcodePool.size() != 0) {

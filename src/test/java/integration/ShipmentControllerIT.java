@@ -76,7 +76,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         given().
                 queryParam("token", user.getToken()).
         when().
-                get("shipments/{id}/form", shipmentUuid).
+                get("shipments/{uuid}/form", shipmentUuid).
         then().
                 statusCode(SC_OK).
                 contentType(APPLICATION_PDF_VALUE);

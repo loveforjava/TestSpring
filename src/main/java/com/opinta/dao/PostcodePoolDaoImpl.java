@@ -3,6 +3,7 @@ package com.opinta.dao;
 import java.util.List;
 
 import com.opinta.entity.PostcodePool;
+import java.util.UUID;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -17,6 +18,7 @@ public class PostcodePoolDaoImpl implements PostcodePoolDao {
     public PostcodePoolDaoImpl(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
+
     @Override
     @SuppressWarnings("unchecked")
     public List<PostcodePool> getAll() {
@@ -27,9 +29,9 @@ public class PostcodePoolDaoImpl implements PostcodePoolDao {
     }
 
     @Override
-    public PostcodePool getById(long id) {
+    public PostcodePool getByUuid(UUID uuid) {
         Session session = sessionFactory.getCurrentSession();
-        return (PostcodePool) session.get(PostcodePool.class, id);
+        return (PostcodePool) session.get(PostcodePool.class, uuid);
     }
 
     @Override

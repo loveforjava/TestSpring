@@ -1,5 +1,6 @@
 package com.opinta.entity;
 
+import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -7,6 +8,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.GenericGenerator;
 
 import static com.opinta.constraint.RegexPattern.POSTCODE_LENGTH;
 
@@ -20,8 +22,9 @@ import static com.opinta.constraint.RegexPattern.POSTCODE_LENGTH;
 @NoArgsConstructor
 public class PostcodePool {
     @Id
-    @GeneratedValue
-    private long id;
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    private UUID uuid;
     @NotNull
     @Size(min = POSTCODE_LENGTH, max = POSTCODE_LENGTH)
     private String postcode;

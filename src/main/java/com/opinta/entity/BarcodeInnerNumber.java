@@ -25,6 +25,6 @@ public class BarcodeInnerNumber {
     @Enumerated(EnumType.STRING)
     private BarcodeStatus status;
     @ManyToOne
-    @JoinColumn(name = "postcode_pool_id")
+    @JoinColumn(name = "postcode_pool_uuid")
     private PostcodePool postcodePool;
 }
