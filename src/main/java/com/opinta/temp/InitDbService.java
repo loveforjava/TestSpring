@@ -106,14 +106,14 @@
 //    private void populateDb() throws Exception {
 //        // create PostcodePool with BarcodeInnerNumber
 //        PostcodePoolDto postcodePoolDto = postcodePoolMapper.toDto(new PostcodePool("00001", false));
-//        final long postcodePoolId = postcodePoolService.save(postcodePoolDto).getId();
+//        final long postcodePoolUuid = postcodePoolService.save(postcodePoolDto).getUuid();
 //
 //        List<BarcodeInnerNumberDto> barcodeInnerNumbers = new ArrayList<>();
 //        barcodeInnerNumbers.add(barcodeInnerNumberMapper.toDto(new BarcodeInnerNumber("0000001", USED)));
 //        barcodeInnerNumbers.add(barcodeInnerNumberMapper.toDto(new BarcodeInnerNumber("0000002", RESERVED)));
 //        barcodeInnerNumbers.add(barcodeInnerNumberMapper.toDto(new BarcodeInnerNumber("0000003", RESERVED)));
 //
-//        postcodePoolService.addBarcodeInnerNumbers(postcodePoolId, barcodeInnerNumbers);
+//        postcodePoolService.addBarcodeInnerNumbers(postcodePoolUuid, barcodeInnerNumbers);
 //
 //        // create Address
 //        List<AddressDto> addresses = new ArrayList<>();

@@ -60,23 +60,23 @@ public class BarcodeInnerNumberDaoImpl implements BarcodeInnerNumberDao {
     }
     
     private static final String BARCODE_INNER_CALL =
-            "BEGIN GET_NEXT_BARCODE(?, ?, ?); " +
+            "BEGIN" +
+                    "GET_NEXT_BARCODE(?, ?, ?); " +
             "END;";
     @Override
     public BarcodeInnerNumber generateForPostcodePool(PostcodePool postcodePool) {
         Session session = sessionFactory.getCurrentSession();
         BarcodeInnerNumber barcodeInnerNumber = new BarcodeInnerNumber();
         barcodeInnerNumber.setStatus(USED);
-        String barcode = session.doReturningWork((con) -> {
-            try (CallableStatement call = con.prepareCall(BARCODE_INNER_CALL)) {
-                call.setLong(1, postcodePool.getId());
+        String barcode = session.doReturningWork((connection) -> {
+            try (CallableStatement call = connection.prepareCall(BARCODE_INNER_CALL)) {
+                call.setString(1, postcodePool.getUuid().toString());
                 call.registerOutParameter(2, Types.VARCHAR);
                 call.registerOutParameter(3, Types.INTEGER);
                 call.execute();
-                String obtainedBarcode = call.getString(2);
-                return obtainedBarcode;
+                return call.getString(2);
             } catch (SQLException e) {
-                throw new RuntimeException("cannot get barcode inner number.", e);
+                throw new RuntimeException("Can't generate barcode inner number from stored procedure.", e);
             }
         });
         barcodeInnerNumber.setInnerNumber(barcode);

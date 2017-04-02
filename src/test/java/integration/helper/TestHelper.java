@@ -1,7 +1,21 @@
 package integration.helper;
 
-import com.opinta.entity.*;
-import com.opinta.service.*;
+import com.opinta.entity.Address;
+import com.opinta.entity.Client;
+import com.opinta.entity.Counterparty;
+import com.opinta.entity.Phone;
+import com.opinta.entity.PostOffice;
+import com.opinta.entity.PostcodePool;
+import com.opinta.entity.Shipment;
+import com.opinta.entity.ShipmentGroup;
+import com.opinta.service.AddressService;
+import com.opinta.service.ClientService;
+import com.opinta.service.CounterpartyService;
+import com.opinta.service.PhoneService;
+import com.opinta.service.PostOfficeService;
+import com.opinta.service.PostcodePoolService;
+import com.opinta.service.ShipmentGroupService;
+import com.opinta.service.ShipmentService;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -14,9 +28,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+
+import static com.opinta.entity.DeliveryType.D2D;
 
 @Component
 @Slf4j
@@ -53,12 +66,12 @@ public class TestHelper {
 
     public void deletePostOffice(PostOffice postOffice) {
         postOfficeService.delete(postOffice.getId());
-        postcodePoolService.delete(postOffice.getPostcodePool().getId());
+        postcodePoolService.delete(postOffice.getPostcodePool().getUuid());
     }
 
     public Shipment createShipment() throws Exception {
         Shipment shipment = new Shipment(createClient(), createClient(),
-                DeliveryType.D2D, 4.0F, 3.8F, new BigDecimal(200), new BigDecimal(30), new BigDecimal(35.2));
+                D2D, 4.0F, 3.8F, new BigDecimal(200), new BigDecimal(30), new BigDecimal(35.2));
         return shipmentService.saveEntity(shipment, shipment.getSender().getCounterparty().getUser());
     }
 

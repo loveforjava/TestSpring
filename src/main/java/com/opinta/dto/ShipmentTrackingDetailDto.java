@@ -14,7 +14,7 @@ import lombok.ToString;
 @ToString
 public class ShipmentTrackingDetailDto {
     private long id;
-    private UUID shipmentId;
+    private UUID shipmentUuid;
     private long postOfficeId;
     @EnumString(source = ShipmentStatus.class)
     private ShipmentStatus shipmentStatus;

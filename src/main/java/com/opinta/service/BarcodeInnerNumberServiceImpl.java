@@ -2,6 +2,7 @@ package com.opinta.service;
 
 import java.util.List;
 
+import java.util.UUID;
 import javax.transaction.Transactional;
 
 import com.opinta.dao.BarcodeInnerNumberDao;
@@ -13,8 +14,6 @@ import com.opinta.entity.PostcodePool;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 
 @Service
 @Slf4j
@@ -43,14 +42,14 @@ public class BarcodeInnerNumberServiceImpl implements BarcodeInnerNumberService 
 
     @Override
     @Transactional
-    public List<BarcodeInnerNumberDto> getAll(long postcodePoolId) {
-        PostcodePool postcodePool = postcodePoolDao.getById(postcodePoolId);
+    public List<BarcodeInnerNumberDto> getAll(UUID postcodePoolUuid) {
+        PostcodePool postcodePool = postcodePoolDao.getByUuid(postcodePoolUuid);
         if (postcodePool == null) {
             log.debug("Can't get barcodeInnerNumberDto list by postcodePool. PostCodePool {} doesn't exist",
-                    postcodePoolId);
+                    postcodePoolUuid);
             return null;
         }
-        log.info("Getting all barcodeInnerNumbers by postcodePoolId {}", postcodePoolId);
+        log.info("Getting all barcodeInnerNumbers by postcodePoolUuid {}", postcodePoolUuid);
         return barcodeInnerNumberMapper.toDto(barcodeInnerNumberDao.getAll(postcodePool));
     }
 

@@ -6,6 +6,7 @@ import com.opinta.mapper.BarcodeInnerNumberMapper;
 import com.opinta.mapper.PostcodePoolMapper;
 import com.opinta.entity.PostcodePool;
 import java.util.List;
+import java.util.UUID;
 import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +36,9 @@ public class PostcodePoolServiceImpl implements PostcodePoolService {
     }
 
     @Override
-    public PostcodePool getEntityById(long id) {
-        log.info("Getting postcodePool by id {}", id);
-        return postcodePoolDao.getById(id);
+    public PostcodePool getEntityByUuid(UUID uuid) {
+        log.info("Getting postcodePool by uuid {}", uuid);
+        return postcodePoolDao.getByUuid(uuid);
     }
 
     @Override
@@ -55,8 +56,8 @@ public class PostcodePoolServiceImpl implements PostcodePoolService {
 
     @Override
     @Transactional
-    public PostcodePoolDto getById(long id) {
-        return postcodePoolMapper.toDto(getEntityById(id));
+    public PostcodePoolDto getByUuid(UUID uuid) {
+        return postcodePoolMapper.toDto(getEntityByUuid(uuid));
     }
 
     @Override
@@ -67,11 +68,11 @@ public class PostcodePoolServiceImpl implements PostcodePoolService {
 
     @Override
     @Transactional
-    public PostcodePoolDto update(long id, PostcodePoolDto postcodePoolDto) {
+    public PostcodePoolDto update(UUID uuid, PostcodePoolDto postcodePoolDto) {
         PostcodePool source = postcodePoolMapper.toEntity(postcodePoolDto);
-        PostcodePool target = postcodePoolDao.getById(id);
+        PostcodePool target = postcodePoolDao.getByUuid(uuid);
         if (target == null) {
-            log.debug("Can't update postcodePool. PostCodePool doesn't exist {}", id);
+            log.debug("Can't update postcodePool. PostCodePool doesn't exist {}", uuid);
             return null;
         }
         try {
@@ -79,7 +80,7 @@ public class PostcodePoolServiceImpl implements PostcodePoolService {
         } catch (Exception e) {
             log.error("Can't get properties from object to updatable object for postcodePool", e);
         }
-        target.setId(id);
+        target.setUuid(uuid);
         log.info("Updating postcodePool {}", target);
         postcodePoolDao.update(target);
         return postcodePoolMapper.toDto(target);
@@ -87,13 +88,13 @@ public class PostcodePoolServiceImpl implements PostcodePoolService {
 
     @Override
     @Transactional
-    public boolean delete(long id) {
-        PostcodePool postcodePool = postcodePoolDao.getById(id);
+    public boolean delete(UUID uuid) {
+        PostcodePool postcodePool = postcodePoolDao.getByUuid(uuid);
         if (postcodePool == null) {
-            log.debug("Can't delete postcodePool. PostCodePool doesn't exist {}", id);
+            log.debug("Can't delete postcodePool. PostCodePool doesn't exist {}", uuid);
             return false;
         }
-        postcodePool.setId(id);
+        postcodePool.setUuid(uuid);
         log.info("Deleting postcodePool {}", postcodePool);
         postcodePoolDao.delete(postcodePool);
         return true;
