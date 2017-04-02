@@ -1,5 +1,7 @@
 package com.opinta.service;
 
+import com.opinta.exception.IncorrectInputDataException;
+import com.opinta.exception.PerformProcessFailedException;
 import java.util.List;
 
 import com.opinta.dto.PostcodePoolDto;
@@ -10,17 +12,18 @@ public interface PostcodePoolService {
 
     List<PostcodePool> getAllEntities();
 
-    PostcodePool getEntityByUuid(UUID uuid);
+    PostcodePool getEntityByUuid(UUID uuid) throws IncorrectInputDataException;
 
     PostcodePool saveEntity(PostcodePool postcodePool);
 
     List<PostcodePoolDto> getAll();
 
-    PostcodePoolDto getByUuid(UUID uuid);
+    PostcodePoolDto getByUuid(UUID uuid) throws IncorrectInputDataException;
     
     PostcodePoolDto save(PostcodePoolDto postcodePoolDto);
     
-    PostcodePoolDto update(UUID uuid, PostcodePoolDto postcodePoolDto);
+    PostcodePoolDto update(UUID uuid, PostcodePoolDto postcodePoolDto) throws IncorrectInputDataException,
+            PerformProcessFailedException;
     
-    boolean delete(UUID uuid);
+    void delete(UUID uuid) throws IncorrectInputDataException;
 }

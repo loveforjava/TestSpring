@@ -5,6 +5,9 @@ import com.opinta.dto.ShipmentGroupDto;
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.ShipmentGroup;
 import com.opinta.entity.User;
+import com.opinta.exception.AuthException;
+import com.opinta.exception.IncorrectInputDataException;
+import com.opinta.exception.PerformProcessFailedException;
 import com.opinta.mapper.ShipmentGroupMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +17,12 @@ import javax.transaction.Transactional;
 import java.util.List;
 import java.util.UUID;
 
+import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
-import static com.opinta.util.LogMessageUtil.getAllByIdLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getAllByFieldLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getByIdLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getAllLogEndpoint;
-import static com.opinta.util.LogMessageUtil.getOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.saveLogEndpoint;
 import static com.opinta.util.LogMessageUtil.updateOnErrorLogEndpoint;
 import static org.apache.commons.beanutils.PropertyUtils.copyProperties;
@@ -48,27 +53,13 @@ public class ShipmentGroupServiceImpl implements ShipmentGroupService {
 
     @Override
     @Transactional
-    public List<ShipmentGroupDto> getAll(User user) {
-        return shipmentGroupMapper.toDto(getAllEntities(user));
-    }
-
-    @Override
-    @Transactional
-    public List<ShipmentGroupDto> getAllByCounterpartyId(UUID counterpartyUuid) {
-        Counterparty counterparty = counterpartyService.getEntityByUuid(counterpartyUuid);
-        if (counterparty == null) {
-            log.debug("Can't get client list by counterparty. Counterparty {} doesn't exist", counterpartyUuid);
-            return null;
-        }
-        log.info("Getting all clients by counterparty {}", counterparty);
-        return shipmentGroupMapper.toDto(shipmentGroupDao.getAllByCounterparty(counterparty));
-    }
-
-    @Override
-    @Transactional
-    public ShipmentGroup getEntityById(UUID uuid, User user) throws Exception {
-        log.info(getAllByIdLogEndpoint(ShipmentGroup.class, uuid));
+    public ShipmentGroup getEntityById(UUID uuid, User user) throws IncorrectInputDataException, AuthException {
+        log.info(getByIdLogEndpoint(ShipmentGroup.class, uuid));
         ShipmentGroup shipmentGroup = shipmentGroupDao.getById(uuid);
+        if (shipmentGroup == null) {
+            log.error(getByIdOnErrorLogEndpoint(ShipmentGroup.class, uuid));
+            throw new IncorrectInputDataException(getByIdOnErrorLogEndpoint(ShipmentGroup.class, uuid));
+        }
 
         userService.authorizeForAction(shipmentGroup, user);
 
@@ -77,14 +68,9 @@ public class ShipmentGroupServiceImpl implements ShipmentGroupService {
 
     @Override
     @Transactional
-    public ShipmentGroupDto getById(UUID uuid, User user) throws Exception {
-        return shipmentGroupMapper.toDto(getEntityById(uuid, user));
-    }
-
-    @Override
-    @Transactional
-    public ShipmentGroup saveEntity(ShipmentGroup shipmentGroup, User user) throws Exception {
-        validateInnerReferenceAndFillObjectFromDB(shipmentGroup);
+    public ShipmentGroup saveEntity(ShipmentGroup shipmentGroup, User user) throws AuthException,
+            IncorrectInputDataException {
+        validateInnerReferenceAndFillObjectFromDB(shipmentGroup, user);
 
         userService.authorizeForAction(shipmentGroup, user);
         log.info(saveLogEndpoint(ShipmentGroup.class, shipmentGroup));
@@ -93,24 +79,18 @@ public class ShipmentGroupServiceImpl implements ShipmentGroupService {
 
     @Override
     @Transactional
-    public ShipmentGroupDto save(ShipmentGroupDto shipmentGroupDto, User user) throws Exception {
-        return shipmentGroupMapper.toDto(saveEntity(shipmentGroupMapper.toEntity(shipmentGroupDto), user));
-    }
+    public ShipmentGroup updateEntity(UUID uuid, ShipmentGroup source, User user) throws AuthException,
+            IncorrectInputDataException, PerformProcessFailedException {
+        ShipmentGroup target = getEntityById(uuid, user);
 
-    @Override
-    @Transactional
-    public ShipmentGroup updateEntity(UUID uuid, ShipmentGroup source, User user) throws Exception {
-        ShipmentGroup target = shipmentGroupDao.getById(uuid);
-
-        userService.authorizeForAction(target, user);
-
-        validateInnerReferenceAndFillObjectFromDB(source);
+        validateInnerReferenceAndFillObjectFromDB(source, user);
 
         try {
             copyProperties(target, source);
         } catch (Exception e) {
-            log.error("Can't get properties from object to updatable object for client", e);
-            throw new Exception("Can't get properties from object to updatable object for client", e);
+            log.error(copyPropertiesOnErrorLogEndpoint(ShipmentGroup.class, source, target, e));
+            throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(
+                    ShipmentGroup.class, source, target, e));
         }
 
         target.setUuid(uuid);
@@ -123,23 +103,49 @@ public class ShipmentGroupServiceImpl implements ShipmentGroupService {
 
     @Override
     @Transactional
-    public ShipmentGroupDto update(UUID uuid, ShipmentGroupDto shipmentGroupDto, User user) throws Exception {
+    public List<ShipmentGroupDto> getAll(User user) {
+        return shipmentGroupMapper.toDto(getAllEntities(user));
+    }
+
+    @Override
+    @Transactional
+    public List<ShipmentGroupDto> getAllByCounterpartyId(UUID counterpartyUuid, User user) throws AuthException,
+            IncorrectInputDataException {
+        Counterparty counterparty = counterpartyService.getEntityByUuid(counterpartyUuid, user);
+        log.info(getAllByFieldLogEndpoint(ShipmentGroup.class, Counterparty.class, counterpartyUuid));
+        return shipmentGroupMapper.toDto(shipmentGroupDao.getAllByCounterparty(counterparty));
+    }
+
+    @Override
+    @Transactional
+    public ShipmentGroupDto getById(UUID uuid, User user) throws AuthException, IncorrectInputDataException {
+        return shipmentGroupMapper.toDto(getEntityById(uuid, user));
+    }
+
+    @Override
+    @Transactional
+    public ShipmentGroupDto save(ShipmentGroupDto shipmentGroupDto, User user) throws AuthException,
+            IncorrectInputDataException {
+        return shipmentGroupMapper.toDto(saveEntity(shipmentGroupMapper.toEntity(shipmentGroupDto), user));
+    }
+
+    @Override
+    @Transactional
+    public ShipmentGroupDto update(UUID uuid, ShipmentGroupDto shipmentGroupDto, User user)
+            throws IncorrectInputDataException, AuthException, PerformProcessFailedException {
         return shipmentGroupMapper.toDto(updateEntity(uuid, shipmentGroupMapper.toEntity(shipmentGroupDto), user));
     }
 
     @Override
     @Transactional
-    public void delete(UUID uuid, User user) throws Exception{
+    public void delete(UUID uuid, User user) throws AuthException, IncorrectInputDataException {
         log.info(deleteLogEndpoint(ShipmentGroup.class, uuid));
         shipmentGroupDao.delete(getEntityById(uuid, user));
     }
 
-    private void validateInnerReferenceAndFillObjectFromDB(ShipmentGroup source) throws Exception {
-        Counterparty counterparty = counterpartyService.getEntityByUuid(source.getCounterparty().getUuid());
-        if (counterparty == null) {
-            log.error(getOnErrorLogEndpoint(Counterparty.class, source.getCounterparty().getUser()));
-            throw new Exception(getOnErrorLogEndpoint(Counterparty.class, source.getCounterparty().getUuid()));
-        }
+    private void validateInnerReferenceAndFillObjectFromDB(ShipmentGroup source, User user) throws AuthException,
+            IncorrectInputDataException {
+        Counterparty counterparty = counterpartyService.getEntityByUuid(source.getCounterparty().getUuid(), user);
         source.setCounterparty(counterparty);
     }
 }

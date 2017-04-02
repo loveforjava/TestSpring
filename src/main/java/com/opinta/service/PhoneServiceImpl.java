@@ -8,6 +8,7 @@ import com.opinta.entity.Address;
 import com.opinta.entity.Phone;
 import com.opinta.mapper.AddressMapper;
 import com.opinta.mapper.PhoneMapper;
+import com.opinta.util.LogMessageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,14 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.List;
 
+import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
+import static com.opinta.util.LogMessageUtil.deleteOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getByIdLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.saveLogEndpoint;
+import static com.opinta.util.LogMessageUtil.updateLogEndpoint;
+import static com.opinta.util.LogMessageUtil.updateOnErrorLogEndpoint;
 import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 
 @Service
@@ -33,21 +42,21 @@ public class PhoneServiceImpl implements PhoneService {
     @Override
     @Transactional
     public List<Phone> getAllEntities() {
-        log.info("Getting all phones");
+        log.info(LogMessageUtil.getAllLogEndpoint(Phone.class));
         return phoneDao.getAll();
     }
 
     @Override
     @Transactional
     public Phone getEntityById(long id) {
-        log.info("Getting phone by id {}", id);
+        log.info(getByIdLogEndpoint(Phone.class, id));
         return phoneDao.getById(id);
     }
 
     @Override
     @Transactional
     public Phone getEntityByPhoneNumber(String phoneNumber) {
-        log.info("Getting phone by phoneNumber {}", phoneNumber);
+        log.info(getByIdLogEndpoint(Phone.class, phoneNumber));
         return phoneDao.getByPhoneNumber(phoneNumber);
     }
 
@@ -68,7 +77,7 @@ public class PhoneServiceImpl implements PhoneService {
     @Override
     @Transactional
     public Phone saveEntity(Phone phone) {
-        log.info("Saving phone {}", phone);
+        log.info(saveLogEndpoint(Phone.class, phone));
         return phoneDao.save(phone);
     }
 
@@ -77,16 +86,16 @@ public class PhoneServiceImpl implements PhoneService {
     public Phone updateEntity(long id, Phone source) {
         Phone target = phoneDao.getById(id);
         if (target == null) {
-            log.debug("Can't update phone. Phone doesn't exist {}", id);
+            log.error(getByIdOnErrorLogEndpoint(Phone.class, id));
             return null;
         }
         try {
             copyProperties(target, source);
         } catch (Exception e) {
-            log.error("Can't get properties from object to updatable object for phone", e);
+            log.error(copyPropertiesOnErrorLogEndpoint(Phone.class, source, target, e));
         }
         target.setId(id);
-        log.info("Updating phone {}", target);
+        log.info(updateLogEndpoint(Phone.class, target));
         phoneDao.update(target);
         return target;
     }
@@ -121,10 +130,10 @@ public class PhoneServiceImpl implements PhoneService {
     public boolean delete(long id) {
         Phone phone = phoneDao.getById(id);
         if (phone == null) {
-            log.debug("Can't delete phone. Phone doesn't exist {}", id);
+            log.error(deleteOnErrorLogEndpoint(Phone.class, id));
             return false;
         }
-        log.info("Deleting phone {}", phone);
+        log.info(deleteLogEndpoint(Phone.class, id));
         phoneDao.delete(phone);
         return true;
     }

@@ -1,5 +1,8 @@
 package com.opinta.controller;
 
+import com.opinta.entity.Address;
+import com.opinta.exception.IncorrectInputDataException;
+import com.opinta.exception.PerformProcessFailedException;
 import java.util.List;
 
 import com.opinta.dto.AddressDto;
@@ -16,7 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import static java.lang.String.format;
+import static com.opinta.util.LogMessageUtil.deleteOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.updateOnErrorLogEndpoint;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -40,37 +45,37 @@ public class AddressController {
 
     @GetMapping("{id}")
     public ResponseEntity<?> getAddress(@PathVariable("id") long id) {
-        AddressDto addressDto = addressService.getById(id);
-        if (addressDto == null) {
-            return new ResponseEntity<>(format("No Address found for ID %s", id), NOT_FOUND);
+        try {
+            return new ResponseEntity<>(addressService.getById(id), OK);
+        } catch (IncorrectInputDataException e) {
+            return new ResponseEntity<>(getByIdOnErrorLogEndpoint(Address.class, id, e), NOT_FOUND);
         }
-        return new ResponseEntity<>(addressDto, OK);
     }
 
     @PostMapping
     @ResponseStatus(OK)
     public ResponseEntity<?> createAddress(@RequestBody AddressDto addressDto) {
-        addressDto = addressService.save(addressDto);
-        if (addressDto == null) {
-            return new ResponseEntity<>("Failed to create new Address using given data.", BAD_REQUEST);
-        }
-        return new ResponseEntity<>(addressDto, OK);
+        return new ResponseEntity<>(addressService.save(addressDto), OK);
     }
 
     @PutMapping("{id}")
     public ResponseEntity<?> updateAddress(@PathVariable long id, @RequestBody AddressDto addressDto) {
-        addressDto = addressService.update(id, addressDto);
-        if (addressDto == null) {
-            return new ResponseEntity<>(format("No Address found for ID %s", id), NOT_FOUND);
+        try {
+            return new ResponseEntity<>(addressService.update(id, addressDto), OK);
+        } catch (IncorrectInputDataException e) {
+            return new ResponseEntity<>(updateOnErrorLogEndpoint(Address.class, addressDto, e), NOT_FOUND);
+        } catch (PerformProcessFailedException e) {
+            return new ResponseEntity<>(updateOnErrorLogEndpoint(Address.class, addressDto, e), BAD_REQUEST);
         }
-        return new ResponseEntity<>(addressDto, OK);
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<?> deleteAddress(@PathVariable long id) {
-        if (!addressService.delete(id)) {
-            return new ResponseEntity<>(format("No Address found for ID %s", id), NOT_FOUND);
+        try {
+            addressService.delete(id);
+            return new ResponseEntity<>(OK);
+        } catch (IncorrectInputDataException e) {
+            return new ResponseEntity<>(deleteOnErrorLogEndpoint(Address.class, id, e), NOT_FOUND);
         }
-        return new ResponseEntity<>(OK);
     }
 }

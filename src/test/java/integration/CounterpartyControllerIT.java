@@ -1,5 +1,7 @@
 package integration;
 
+import com.opinta.service.UserService;
+import io.restassured.module.mockmvc.response.MockMvcResponse;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,6 +35,8 @@ public class CounterpartyControllerIT extends BaseControllerIT {
     @Autowired
     private CounterpartyMapper counterpartyMapper;
     @Autowired
+    private UserService userService;
+    @Autowired
     private TestHelper testHelper;
 
     @Before
@@ -58,6 +62,8 @@ public class CounterpartyControllerIT extends BaseControllerIT {
 
     @Test
     public void getCounterparty() throws Exception {
+        given().
+                queryParam("token", user.getToken()).
         when().
                 get("counterparties/{uuid}", counterpartyUuid.toString()).
         then().
@@ -68,6 +74,8 @@ public class CounterpartyControllerIT extends BaseControllerIT {
 
     @Test
     public void getCounterparty_notFound() throws Exception {
+        given().
+                queryParam("token", user.getToken()).
         when().
                 get("/counterparties/{uuid}", UUID.randomUUID().toString()).
         then().
@@ -83,7 +91,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
         jsonObject.put("postcodePoolUuid", testHelper.createPostcodePool().getUuid().toString());
         String expectedJson = jsonObject.toString();
 
-        String newCounterpartyUuid =
+        MockMvcResponse response =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
                         body(expectedJson).
@@ -92,11 +100,12 @@ public class CounterpartyControllerIT extends BaseControllerIT {
                 then().
                         contentType(APPLICATION_JSON_VALUE).
                         statusCode(SC_OK).
-                extract().
-                        path("uuid");
+                extract().response();
 
         // check created data
-        Counterparty createdCounterparty = counterpartyService.getEntityByUuid(UUID.fromString(newCounterpartyUuid));
+        User user = userService.authenticate(UUID.fromString(response.path("token")));
+        Counterparty createdCounterparty = counterpartyService.getEntityByUuid(UUID.fromString(response.path("uuid")),
+                user);
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(counterpartyMapper.toDto(createdCounterparty));
         JSONAssert.assertEquals(expectedJson, actualJson, false);
@@ -124,8 +133,8 @@ public class CounterpartyControllerIT extends BaseControllerIT {
                 statusCode(SC_OK);
 
         // check updated data
-        CounterpartyDto counterpartyDto =
-                counterpartyMapper.toDto(counterpartyService.getEntityByUuid(counterpartyUuid));
+        CounterpartyDto counterpartyDto = counterpartyMapper.toDto(counterpartyService.getEntityByUuid(
+                counterpartyUuid, user));
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(counterpartyDto);
 

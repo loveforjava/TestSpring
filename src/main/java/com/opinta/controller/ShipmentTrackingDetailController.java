@@ -1,5 +1,9 @@
 package com.opinta.controller;
 
+import com.opinta.entity.ShipmentTrackingDetail;
+import com.opinta.exception.IncorrectInputDataException;
+import com.opinta.exception.PerformProcessFailedException;
+import com.opinta.util.LogMessageUtil;
 import java.util.List;
 
 import com.opinta.dto.ShipmentTrackingDetailDto;
@@ -16,8 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import static java.lang.String.format;
-
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -37,36 +40,44 @@ public class ShipmentTrackingDetailController {
         return shipmentTrackingDetailService.getAll();
     }
 
-	@GetMapping("{id}")
-	public ResponseEntity<?> getShipmentTrackingDetail(@PathVariable("id") long id) {
-		ShipmentTrackingDetailDto shipmentTrackingDetailDto = shipmentTrackingDetailService.getById(id);
-		if (shipmentTrackingDetailDto == null) {
-			return new ResponseEntity<>(format("No ShipmentTrackingDetail found for ID %s", id), NOT_FOUND);
-		}
-		return new ResponseEntity<>(shipmentTrackingDetailDto, OK);
-	}
+    @GetMapping("{id}")
+    public ResponseEntity<?> getShipmentTrackingDetail(@PathVariable long id) {
+        try {
+            return new ResponseEntity<>(shipmentTrackingDetailService.getById(id), OK);
+        } catch (IncorrectInputDataException e) {
+            return new ResponseEntity<>(LogMessageUtil.getByIdOnErrorLogEndpoint(ShipmentTrackingDetail.class, id),
+                    NOT_FOUND);
+        }
+    }
 
-	@PostMapping
+    @PostMapping
     @ResponseStatus(OK)
-	public void createShipmentTrackingDetail(@RequestBody ShipmentTrackingDetailDto shipmentTrackingDetailDto) {
-		shipmentTrackingDetailService.save(shipmentTrackingDetailDto);
-	}
+    public void createShipmentTrackingDetail(@RequestBody ShipmentTrackingDetailDto shipmentTrackingDetailDto) {
+        shipmentTrackingDetailService.save(shipmentTrackingDetailDto);
+    }
 
-	@PutMapping("{id}")
-	public ResponseEntity<?> updateShipmentTrackingDetail(
-			@PathVariable long id, @RequestBody ShipmentTrackingDetailDto shipmentTrackingDetailDto) {
-		shipmentTrackingDetailDto = shipmentTrackingDetailService.update(id, shipmentTrackingDetailDto);
-		if (shipmentTrackingDetailDto == null) {
-			return new ResponseEntity<>(format("No ShipmentTrackingDetail found for ID %s", id), NOT_FOUND);
-		}
-		return new ResponseEntity<>(shipmentTrackingDetailDto, OK);
-	}
+    @PutMapping("{id}")
+    public ResponseEntity<?> updateShipmentTrackingDetail(
+            @PathVariable long id, @RequestBody ShipmentTrackingDetailDto shipmentTrackingDetailDto) {
+        try {
+            return new ResponseEntity<>(shipmentTrackingDetailService.update(id, shipmentTrackingDetailDto), OK);
+        } catch (IncorrectInputDataException e) {
+            return new ResponseEntity<>(LogMessageUtil.getByIdOnErrorLogEndpoint(ShipmentTrackingDetail.class, id),
+                    NOT_FOUND);
+        } catch (PerformProcessFailedException e) {
+            return new ResponseEntity<>(LogMessageUtil.getByIdOnErrorLogEndpoint(ShipmentTrackingDetail.class, id),
+                    BAD_REQUEST);
+        }
+    }
 
     @DeleteMapping("{id}")
     public ResponseEntity<?> deleteShipmentTrackingDetail(@PathVariable long id) {
-        if (!shipmentTrackingDetailService.delete(id)) {
-            return new ResponseEntity<>(format("No ShipmentTrackingDetail found for ID %s", id), NOT_FOUND);
+        try {
+            shipmentTrackingDetailService.delete(id);
+            return new ResponseEntity<>(OK);
+        } catch (IncorrectInputDataException e) {
+            return new ResponseEntity<>(LogMessageUtil.getByIdOnErrorLogEndpoint(ShipmentTrackingDetail.class, id),
+                    NOT_FOUND);
         }
-        return new ResponseEntity<>(OK);
     }
 }

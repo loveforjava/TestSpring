@@ -2,8 +2,10 @@ package integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opinta.entity.Address;
+import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.service.AddressService;
 import integration.helper.TestHelper;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,6 +21,7 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 
+@Slf4j
 public class AddressControllerIT extends BaseControllerIT {
     private int addressId = MIN_VALUE;
     @Autowired
@@ -34,7 +37,13 @@ public class AddressControllerIT extends BaseControllerIT {
     
     @After
     public void tearDown() {
-        addressService.delete(addressId);
+        if (addressId != -1) {
+            try {
+                addressService.delete(addressId);
+            } catch (IncorrectInputDataException e) {
+                log.debug(e.getMessage());
+            }
+        }
     }
     
     @Test
@@ -115,12 +124,13 @@ public class AddressControllerIT extends BaseControllerIT {
                 .delete("/addresses/{id}", addressId).
         then().
                 statusCode(SC_OK);
+        addressId = -1;
     }
 
     @Test
     public void deleteAddress_notFound() throws Exception {
         when()
-                .delete("/addresses/{id}", addressId+1).
+                .delete("/addresses/{id}", addressId + 1).
         then().
                 statusCode(SC_NOT_FOUND);
     }

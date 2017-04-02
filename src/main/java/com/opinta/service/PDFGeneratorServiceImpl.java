@@ -9,9 +9,10 @@ import com.opinta.entity.Address;
 import com.opinta.entity.Client;
 import com.opinta.entity.Phone;
 import com.opinta.entity.Shipment;
+import com.opinta.exception.AuthException;
+import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.util.MoneyToTextConverter;
 import com.opinta.entity.User;
-import javax.naming.AuthenticationException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -68,7 +69,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
     }
 
     @Override
-    public byte[] generate(UUID shipmentId, User user) throws AuthenticationException, Exception {
+    public byte[] generate(UUID shipmentId, User user) throws AuthException, IncorrectInputDataException, IOException {
         Shipment shipment = shipmentService.getEntityByUuid(shipmentId, user);
 
         userService.authorizeForAction(shipment, user);

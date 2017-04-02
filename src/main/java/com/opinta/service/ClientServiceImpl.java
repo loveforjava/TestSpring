@@ -3,10 +3,12 @@ package com.opinta.service;
 import com.opinta.entity.Address;
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.User;
+import com.opinta.exception.AuthException;
+import com.opinta.exception.IncorrectInputDataException;
+import com.opinta.exception.PerformProcessFailedException;
 import java.util.List;
 import java.util.UUID;
 
-import javax.naming.AuthenticationException;
 import javax.transaction.Transactional;
 
 import com.opinta.dao.ClientDao;
@@ -17,8 +19,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static java.lang.String.format;
-import static java.lang.String.join;
+import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getAllByFieldLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getAllLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getByIdLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.saveLogEndpoint;
+import static com.opinta.util.LogMessageUtil.updateLogEndpoint;
 
 import static org.apache.commons.beanutils.PropertyUtils.copyProperties;
 
@@ -47,15 +55,19 @@ public class ClientServiceImpl implements ClientService {
     @Override
     @Transactional
     public List<Client> getAllEntities(User user) {
-        log.info("Getting all clients");
+        log.info(getAllLogEndpoint(Client.class));
         return clientDao.getAll(user);
     }
 
     @Override
     @Transactional
-    public Client getEntityByUuid(UUID uuid, User user) throws AuthenticationException {
-        log.info("Getting client by uuid: ", uuid);
+    public Client getEntityByUuid(UUID uuid, User user) throws AuthException, IncorrectInputDataException {
+        log.info(getByIdLogEndpoint(Client.class, uuid));
         Client client = clientDao.getByUuid(uuid);
+        if (client == null) {
+            log.error(getByIdOnErrorLogEndpoint(Client.class, uuid));
+            throw new IncorrectInputDataException(getByIdOnErrorLogEndpoint(Client.class, uuid));
+        }
 
         userService.authorizeForAction(client, user);
 
@@ -64,19 +76,24 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public Client getEntityByUuidAnonymous(UUID uuid) {
+    public Client getEntityByUuidAnonymous(UUID uuid) throws IncorrectInputDataException {
         log.info("Getting client by uuid without token check ", uuid);
-        return clientDao.getByUuid(uuid);
+        Client client = clientDao.getByUuid(uuid);
+        if (client == null) {
+            log.error(getByIdOnErrorLogEndpoint(Client.class, uuid));
+            throw new IncorrectInputDataException(getByIdOnErrorLogEndpoint(Client.class, uuid));
+        }
+        return client;
     }
 
     @Override
     @Transactional
-    public Client saveEntity(Client client, User user) throws Exception {
-        validateInnerReferenceAndFillObjectFromDB(client);
+    public Client saveEntity(Client client, User user) throws IncorrectInputDataException, AuthException {
+        validateInnerReferenceAndFillObjectFromDB(client, user);
 
         client.setPhone(phoneService.getOrCreateEntityByPhoneNumber(client.getPhone().getPhoneNumber()));
         userService.authorizeForAction(client, user);
-        log.info("Saving client {}", client);
+        log.info(saveLogEndpoint(Client.class, client));
         return clientDao.save(client);
     }
 
@@ -88,19 +105,16 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public List<ClientDto> getAllByCounterpartyUuid(UUID counterpartyUuid) {
-        Counterparty counterparty = counterpartyService.getEntityByUuid(counterpartyUuid);
-        if (counterparty == null) {
-            log.debug("Can't get client list by counterparty. Counterparty {} doesn't exist", counterpartyUuid);
-            return null;
-        }
-        log.info("Getting all clients by counterparty {}", counterparty);
+    public List<ClientDto> getAllByCounterpartyUuid(UUID counterpartyUuid, User user)
+            throws IncorrectInputDataException, AuthException {
+        log.info(getAllByFieldLogEndpoint(Client.class, Counterparty.class, counterpartyUuid));
+        Counterparty counterparty = counterpartyService.getEntityByUuid(counterpartyUuid, user);
         return clientMapper.toDto(clientDao.getAllByCounterparty(counterparty));
     }
 
     @Override
     @Transactional
-    public ClientDto getByUuid(UUID uuid, User user) throws AuthenticationException {
+    public ClientDto getByUuid(UUID uuid, User user) throws AuthException, IncorrectInputDataException {
         return clientMapper.toDto(getEntityByUuid(uuid, user));
     }
 
@@ -112,55 +126,40 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public ClientDto update(UUID uuid, ClientDto clientDto, User user) throws Exception {
+    public ClientDto update(UUID uuid, ClientDto clientDto, User user) throws AuthException,
+            IncorrectInputDataException, PerformProcessFailedException {
         Client source = clientMapper.toEntity(clientDto);
-        Client target = clientDao.getByUuid(uuid);
+        Client target = getEntityByUuid(uuid, user);
 
-        userService.authorizeForAction(target, user);
-
-        validateInnerReferenceAndFillObjectFromDB(source);
+        validateInnerReferenceAndFillObjectFromDB(source, user);
 
         try {
             copyProperties(target, source);
         } catch (Exception e) {
-            log.error("Can't get properties from object to updatable object for client", e);
-            throw new Exception("Can't get properties from object to updatable object for client", e);
+            log.error(copyPropertiesOnErrorLogEndpoint(Client.class, source, target, e));
+            throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(Client.class, source, target, e));
         }
         target.setUuid(uuid);
         target.setCounterparty(source.getCounterparty());
         target.setPhone(phoneService.getOrCreateEntityByPhoneNumber(clientDto.getPhoneNumber()));
         target.setAddress(source.getAddress());
-        log.info("Updating client {}", target);
+        log.info(updateLogEndpoint(Client.class, target));
         clientDao.update(target);
         return clientMapper.toDto(target);
     }
 
     @Override
     @Transactional
-    public void delete(UUID uuid, User user) throws AuthenticationException {
-        Client client = clientDao.getByUuid(uuid);
-
-        userService.authorizeForAction(client, user);
-
-        if (client == null) {
-            log.error("Can't delete client. Client {} doesn't exist ", uuid);
-            throw new AuthenticationException(format("Can't delete client. Client %s doesn't exist ", uuid));
-        }
-        log.info("Deleting client {}", client);
+    public void delete(UUID uuid, User user) throws AuthException, IncorrectInputDataException {
+        log.info(deleteLogEndpoint(Client.class, uuid));
+        Client client = getEntityByUuid(uuid, user);
         clientDao.delete(client);
     }
 
-    private void validateInnerReferenceAndFillObjectFromDB(Client source) throws Exception {
-        Counterparty counterparty = counterpartyService.getEntityByUuid(source.getCounterparty().getUuid());
-        if (counterparty == null) {
-            log.error("Counterparty %s doesn't exist ", source.getCounterparty().getUuid());
-            throw new Exception(format("Counterparty %s doesn't exist ", source.getCounterparty().getUuid()));
-        }
+    private void validateInnerReferenceAndFillObjectFromDB(Client source, User user) throws IncorrectInputDataException,
+            AuthException {
+        Counterparty counterparty = counterpartyService.getEntityByUuid(source.getCounterparty().getUuid(), user);
         Address address = addressService.getEntityById(source.getAddress().getId());
-        if (address == null) {
-            log.error("Given client address doesn't exist {}", source.getAddress().getId());
-            throw new Exception(format("Given client address doesn't exist %s", source.getAddress().getId()));
-        }
         source.setCounterparty(counterparty);
         source.setAddress(address);
     }

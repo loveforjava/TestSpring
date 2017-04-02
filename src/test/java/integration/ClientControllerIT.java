@@ -20,8 +20,8 @@ import integration.helper.TestHelper;
 import static java.lang.String.join;
 
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -78,7 +78,7 @@ public class ClientControllerIT extends BaseControllerIT {
         when().
                 get("/clients/{uuid}", UUID.randomUUID().toString()).
         then().
-                statusCode(SC_UNAUTHORIZED);
+                statusCode(SC_NOT_FOUND);
     }
     
     @Test
@@ -193,7 +193,7 @@ public class ClientControllerIT extends BaseControllerIT {
                         body("firstName", equalTo("")).
                         body("middleName", equalTo("")).
                         body("lastName", equalTo("")).
-                        extract().
+                extract().
                         path("uuid");
     
         JSONParser parser = new JSONParser();
@@ -272,6 +272,6 @@ public class ClientControllerIT extends BaseControllerIT {
         when().
                 delete("/clients/{uuid}", UUID.randomUUID().toString()).
         then().
-                statusCode(SC_UNAUTHORIZED);
+                statusCode(SC_NOT_FOUND);
     }
 }

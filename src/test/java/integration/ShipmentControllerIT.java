@@ -89,7 +89,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         when().
                 get("/shipments/{uuid}", UUID.randomUUID().toString()).
         then().
-                statusCode(SC_UNAUTHORIZED);
+                statusCode(SC_NOT_FOUND);
     }
 
     @Test

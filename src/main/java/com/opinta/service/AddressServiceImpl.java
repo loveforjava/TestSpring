@@ -1,5 +1,8 @@
 package com.opinta.service;
 
+import com.opinta.exception.IncorrectInputDataException;
+import com.opinta.exception.PerformProcessFailedException;
+import com.opinta.util.LogMessageUtil;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -12,6 +15,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getAllLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getByIdLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.saveLogEndpoint;
+import static com.opinta.util.LogMessageUtil.updateLogEndpoint;
 import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 
 @Service
@@ -29,55 +39,52 @@ public class AddressServiceImpl implements AddressService {
     @Override
     @Transactional
     public List<Address> getAllEntities() {
-        log.info("Getting all addresses");
+        log.info(getAllLogEndpoint(Address.class));
         return addressDao.getAll();
     }
 
     @Override
     @Transactional
-    public Address getEntityById(long id) {
-        log.info("Getting address by uuid {}", id);
-        return addressDao.getById(id);
+    public Address getEntityById(long id) throws IncorrectInputDataException {
+        log.info(getByIdLogEndpoint(Address.class, id));
+        Address address = addressDao.getById(id);
+        if (address == null) {
+            log.error(getByIdOnErrorLogEndpoint(Address.class, id));
+            throw new IncorrectInputDataException(getByIdOnErrorLogEndpoint(Address.class, id));
+        }
+        return address;
     }
 
     @Override
     @Transactional
     public Address saveEntity(Address address) {
-        log.info("Saving address {}", address);
+        log.info(saveLogEndpoint(Address.class, address));
         return addressDao.save(address);
     }
 
     @Override
     @Transactional
-    public Address updateEntity(long id, Address source) {
-        Address target = addressDao.getById(id);
-        if (target == null) {
-            log.debug("Can't update address. Address doesn't exist {}", id);
-            return null;
-        }
+    public Address updateEntity(long id, Address source) throws IncorrectInputDataException,
+            PerformProcessFailedException {
+        Address target = getEntityById(id);
         try {
             copyProperties(target, source);
         } catch (Exception e) {
-            log.error("Can't get properties from object to updatable object for address", e);
-            return null;
+            log.error(copyPropertiesOnErrorLogEndpoint(Address.class, source, target, e));
+            throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(Address.class, source, target, e));
         }
         target.setId(id);
-        log.info("Updating address {}", target);
+        log.info(updateLogEndpoint(Address.class, target));
         addressDao.update(target);
         return target;
     }
 
     @Override
     @Transactional
-    public boolean delete(long id) {
-        Address address = addressDao.getById(id);
-        if (address == null) {
-            log.debug("Can't delete address. Address doesn't exist {}", id);
-            return false;
-        }
-        log.info("Deleting address {}", address);
+    public void delete(long id) throws IncorrectInputDataException {
+        log.info(deleteLogEndpoint(Address.class, id));
+        Address address = getEntityById(id);
         addressDao.delete(address);
-        return true;
     }
 
     @Override
@@ -88,7 +95,7 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     @Transactional
-    public AddressDto getById(long id) {
+    public AddressDto getById(long id) throws IncorrectInputDataException {
         return addressMapper.toDto(getEntityById(id));
     }
 
@@ -100,8 +107,8 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     @Transactional
-    public AddressDto update(long id, AddressDto addressDto) {
-        Address address = updateEntity(id, addressMapper.toEntity(addressDto));
-        return (address == null ? null : addressMapper.toDto(address));
+    public AddressDto update(long id, AddressDto addressDto) throws PerformProcessFailedException,
+            IncorrectInputDataException {
+        return addressMapper.toDto(updateEntity(id, addressMapper.toEntity(addressDto)));
     }
 }
