@@ -203,12 +203,24 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     private float getSurcharges(Shipment shipment) {
         float surcharges = 0;
+        // address delivery surcharges
         if (shipment.getDeliveryType().equals(DeliveryType.D2W) ||
                 shipment.getDeliveryType().equals(DeliveryType.W2D)) {
             surcharges += 9;
         } else if (shipment.getDeliveryType().equals(DeliveryType.D2D)) {
             surcharges += 12;
         }
+
+        // countryside surcharges
+        if (shipment.getRecipient().getAddress().isCountryside()) {
+            if (AddressUtil.isSameRegion(shipment.getSender().getAddress(), shipment.getRecipient().getAddress())) {
+                surcharges += 9;
+            } else {
+                surcharges += 30;
+            }
+        }
+
+        // declared price more that 500 surcharges
         BigDecimal declaredPrice = shipment.getDeclaredPrice();
         BigDecimal topBound = new BigDecimal("500");
         if (declaredPrice.compareTo(topBound) == 1) {

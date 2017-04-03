@@ -1,7 +1,7 @@
 {
   "senderUuid": [],
   "recipientUuid": [],
-  "deliveryType": "D2W",
+  "deliveryType": "W2W",
   "weight": 5,
   "length": 4,
   "width": 0,

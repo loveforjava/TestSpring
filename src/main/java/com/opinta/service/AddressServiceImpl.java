@@ -1,8 +1,9 @@
 package com.opinta.service;
 
+import com.opinta.dao.CountrysidePostcodeDao;
+import com.opinta.entity.CountrysidePostcode;
 import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.exception.PerformProcessFailedException;
-import com.opinta.util.LogMessageUtil;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -29,11 +30,14 @@ import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 public class AddressServiceImpl implements AddressService {
     private final AddressDao addressDao;
     private final AddressMapper addressMapper;
+    private final CountrysidePostcodeDao countrysidePostcodeDao;
 
     @Autowired
-    public AddressServiceImpl(AddressDao addressDao, AddressMapper addressMapper) {
+    public AddressServiceImpl(AddressDao addressDao, AddressMapper addressMapper,
+                              CountrysidePostcodeDao countrysidePostcodeDao) {
         this.addressDao = addressDao;
         this.addressMapper = addressMapper;
+        this.countrysidePostcodeDao = countrysidePostcodeDao;
     }
 
     @Override
@@ -59,6 +63,8 @@ public class AddressServiceImpl implements AddressService {
     @Transactional
     public Address saveEntity(Address address) {
         log.info(saveLogEndpoint(Address.class, address));
+        CountrysidePostcode countrysidePostcode = countrysidePostcodeDao.getByPostcode(address.getPostcode());
+        address.setCountryside(countrysidePostcode != null);
         return addressDao.save(address);
     }
 
@@ -74,6 +80,8 @@ public class AddressServiceImpl implements AddressService {
             throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(Address.class, source, target, e));
         }
         target.setId(id);
+        CountrysidePostcode countrysidePostcode = countrysidePostcodeDao.getByPostcode(target.getPostcode());
+        target.setCountryside(countrysidePostcode != null);
         log.info(updateLogEndpoint(Address.class, target));
         addressDao.update(target);
         return target;

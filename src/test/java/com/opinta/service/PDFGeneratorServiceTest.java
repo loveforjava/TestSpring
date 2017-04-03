@@ -38,11 +38,9 @@ public class PDFGeneratorServiceTest {
     public void setUp() throws Exception {
         pdfGeneratorService = new PDFGeneratorServiceImpl(shipmentService, userService);
 
-        Address senderAddress = new Address("00001", "Ternopil", "Monastiriska",
-                        "Monastiriska", "Sadova", "51", "");
+        Address senderAddress = new Address("00001", "Ternopil", "Monastiriska", "Monastiriska", "Sadova", "51", "");
         Address recipientAddress = new Address("00002", "Kiev", "", "Kiev", "Khreschatik", "121", "37");
-        Counterparty counterparty = new Counterparty("Modna kasta",
-                new PostcodePool("00003", false));
+        Counterparty counterparty = new Counterparty("Modna kasta", new PostcodePool("00003", false));
         Client sender = new Client("FOP Ivanov", "001", senderAddress, counterparty);
         Client recipient = new Client("Petrov PP", "002", recipientAddress, counterparty);
         shipment = new Shipment(sender, recipient, DeliveryType.W2W, 1, 1,

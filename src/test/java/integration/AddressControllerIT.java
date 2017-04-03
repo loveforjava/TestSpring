@@ -6,6 +6,7 @@ import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.service.AddressService;
 import integration.helper.TestHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -72,26 +73,61 @@ public class AddressControllerIT extends BaseControllerIT {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void createAddress() throws Exception {
         // create
-        String expectedJson = testHelper.getJsonFromFile("json/address.json");
+        JSONObject expectedJson = testHelper.getJsonObjectFromFile("json/address.json");
 
         int newAddressId =
                 given().
                         contentType("application/json;charset=UTF-8").
-                        body(expectedJson).
+                        body(expectedJson.toString()).
                 when().
                         post("/addresses").
                 then().
-                        extract().
+                        statusCode(SC_OK).
+                        body("countryside", equalTo(false)).
+                extract().
                         path("id");
 
         // check created data
         Address address = addressService.getEntityById(newAddressId);
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(address);
+        expectedJson.put("countryside", false);
 
-        JSONAssert.assertEquals(expectedJson, actualJson, false);
+        JSONAssert.assertEquals(expectedJson.toString(), actualJson, false);
+
+        // delete
+        addressService.delete(newAddressId);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void createAddress_countryside() throws Exception {
+        // create
+        JSONObject expectedJson = testHelper.getJsonObjectFromFile("json/address.json");
+        expectedJson.put("postcode", "08001");
+
+        int newAddressId =
+                given().
+                        contentType("application/json;charset=UTF-8").
+                        body(expectedJson.toString()).
+                when().
+                        post("/addresses").
+                then().
+                        statusCode(SC_OK).
+                        body("countryside", equalTo(true)).
+                extract().
+                        path("id");
+
+        // check created data
+        Address address = addressService.getEntityById(newAddressId);
+        ObjectMapper mapper = new ObjectMapper();
+        String actualJson = mapper.writeValueAsString(address);
+        expectedJson.put("countryside", true);
+
+        JSONAssert.assertEquals(expectedJson.toString(), actualJson, false);
 
         // delete
         addressService.delete(newAddressId);
@@ -100,11 +136,11 @@ public class AddressControllerIT extends BaseControllerIT {
     @Test
     public void updateAddress() throws Exception {
         // update data
-        String expectedJson = testHelper.getJsonFromFile("json/address.json");
+        JSONObject expectedJson = testHelper.getJsonObjectFromFile("json/address.json");
 
         given().
                 contentType("application/json;charset=UTF-8").
-                body(expectedJson).
+                body(expectedJson.toString()).
         when().
                 put("/addresses/{id}", addressId).
         then().
@@ -115,7 +151,7 @@ public class AddressControllerIT extends BaseControllerIT {
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(address);
 
-        JSONAssert.assertEquals(expectedJson, actualJson, false);
+        JSONAssert.assertEquals(expectedJson.toString(), actualJson, false);
     }
 
     @Test

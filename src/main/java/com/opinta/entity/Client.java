@@ -34,7 +34,7 @@ public class Client {
     @ManyToOne
     @JoinColumn(name = "address_id")
     private Address address;
-    @ManyToOne(cascade = CascadeType.MERGE)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "phone_id")
     private Phone phone;
     @ManyToOne

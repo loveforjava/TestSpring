@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+import java.util.Random;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -93,12 +94,12 @@ public class TestHelper {
             log.debug(e.getMessage());
         }
         try {
-            clientService.delete(shipment.getSender().getUuid(), shipment.getSender().getCounterparty().getUser());
+            deleteClient(shipment.getSender());
         } catch (Exception e) {
             log.debug(e.getMessage());
         }
         try {
-            clientService.delete(shipment.getRecipient().getUuid(), shipment.getRecipient().getCounterparty().getUser());
+            deleteClient(shipment.getRecipient());
         } catch (Exception e) {
             log.debug(e.getMessage());
         }
@@ -106,6 +107,30 @@ public class TestHelper {
 
     public Client createClient() throws Exception {
         Client client = new Client("FOP Ivanov", "001", createAddress(), createPhone(),
+                createCounterparty());
+        return clientService.saveEntity(client, client.getCounterparty().getUser());
+    }
+
+    public Client createClientSameRegion() throws Exception {
+        Client client = new Client("FOP Ivanov", "001", createAddressSameRegion(), createPhone(),
+                createCounterparty());
+        return clientService.saveEntity(client, client.getCounterparty().getUser());
+    }
+
+    public Client createClientOtherRegion() throws Exception {
+        Client client = new Client("FOP Ivanov", "001", createAddressOtherRegion(), createPhone(),
+                createCounterparty());
+        return clientService.saveEntity(client, client.getCounterparty().getUser());
+    }
+
+    public Client createClientSameRegionCountryside() throws Exception {
+        Client client = new Client("FOP Ivanov", "001", createAddressSameRegionCountryside(), createPhone(),
+                createCounterparty());
+        return clientService.saveEntity(client, client.getCounterparty().getUser());
+    }
+
+    public Client createClientOtherRegionCountryside() throws Exception {
+        Client client = new Client("FOP Ivanov", "001", createAddressOtherRegionCountryside(), createPhone(),
                 createCounterparty());
         return clientService.saveEntity(client, client.getCounterparty().getUser());
     }
@@ -149,12 +174,44 @@ public class TestHelper {
     }
 
     private Phone createPhone() {
-        return phoneService.saveEntity(new Phone("0934314522"));
+        Random random = new Random();
+        int min = 100000000;
+        int max = 999999999;
+        Integer randomNum = random.nextInt((max - min) + 1) + min;
+        return phoneService.saveEntity(new Phone(randomNum.toString()));
+    }
+
+    public Phone createCustomPhone(String phoneNumber) {
+        return phoneService.saveEntity(new Phone(phoneNumber));
     }
 
     public Address createAddress() {
         Address address = new Address("00001", "Ternopil", "Monastiriska",
                 "Monastiriska", "Sadova", "51", "");
+        return addressService.saveEntity(address);
+    }
+
+    public Address createAddressSameRegion() {
+        Address address = new Address("00002", "Ternopil", "Berezhany",
+                "Berezhany", "Rogatynska", "107", "");
+        return addressService.saveEntity(address);
+    }
+
+    public Address createAddressOtherRegion() {
+        Address address = new Address("01001", "Kiev", "Kiev",
+                "Kiev", "Khreschatik", "21", "7");
+        return addressService.saveEntity(address);
+    }
+
+    public Address createAddressSameRegionCountryside() {
+        Address address = new Address("08001", "Ternopil", "Monastiriska",
+                "Goryglyady", "Shevchenka", "8", "");
+        return addressService.saveEntity(address);
+    }
+
+    public Address createAddressOtherRegionCountryside() {
+        Address address = new Address("08002", "Kiev", "Boyarka",
+                "Vesele", "Franka", "21", "");
         return addressService.saveEntity(address);
     }
 
