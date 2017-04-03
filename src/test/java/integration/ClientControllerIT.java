@@ -138,6 +138,7 @@ public class ClientControllerIT extends BaseControllerIT {
         inputJson.put("counterpartyUuid", client.getCounterparty().getUuid().toString());
         inputJson.put("addressId", (int) client.getAddress().getId());
         inputJson.put("middleName", "Jakson [edited]");
+        inputJson.put("phoneNumber", "0934314522");
         inputJson.put("individual", true);
 
         String firstName = (String) inputJson.get("firstName");
