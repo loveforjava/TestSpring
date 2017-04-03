@@ -23,8 +23,8 @@ import static com.opinta.constraint.RegexPattern.BARCODE_REGEX;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.hamcrest.Matchers.equalTo;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 
 public class ShipmentControllerIT extends BaseControllerIT {
@@ -100,13 +100,13 @@ public class ShipmentControllerIT extends BaseControllerIT {
         // create
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
         jsonObject.put("senderUuid", sender.getUuid().toString());
-        jsonObject.put("recipientUuid", testHelper.createClient().getUuid().toString());
+        jsonObject.put("recipientUuid", testHelper.createClientOtherRegion().getUuid().toString());
         jsonObject.put("shipmentGroupUuid", shipmentGroup.getUuid().toString());
         String expectedJson = jsonObject.toString();
 
         String newShipmentUuid =
                 given().
-                        contentType("application/json;charset=UTF-8").
+                        contentType(APPLICATION_JSON_VALUE).
                         queryParam("token", sender.getCounterparty().getUser().getToken()).
                         body(expectedJson).
                 when().
@@ -136,12 +136,12 @@ public class ShipmentControllerIT extends BaseControllerIT {
         // create
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
         jsonObject.put("senderUuid", sender.getUuid().toString());
-        jsonObject.put("recipientUuid", testHelper.createClient().getUuid().toString());
+        jsonObject.put("recipientUuid", testHelper.createClientOtherRegion().getUuid().toString());
         String expectedJson = jsonObject.toString();
 
         String newShipmentUuid =
                 given().
-                        contentType("application/json;charset=UTF-8").
+                        contentType(APPLICATION_JSON_VALUE).
                         queryParam("token", sender.getCounterparty().getUser().getToken()).
                         body(expectedJson).
                 when().
@@ -174,7 +174,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         String expectedJson = jsonObject.toString();
 
         given().
-                contentType("application/json;charset=UTF-8").
+                contentType(APPLICATION_JSON_VALUE).
                 queryParam("token", user.getToken()).
                 body(expectedJson).
         when().

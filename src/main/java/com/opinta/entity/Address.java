@@ -25,6 +25,7 @@ public class Address {
     private String description;
     private BigDecimal latitude;
     private BigDecimal longitude;
+    private boolean countryside;
 
     public Address(String postcode, String region, String district, String city, String street, String houseNumber,
                    String apartmentNumber) {
