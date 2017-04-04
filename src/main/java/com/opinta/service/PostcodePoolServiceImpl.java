@@ -39,12 +39,14 @@ public class PostcodePoolServiceImpl implements PostcodePoolService {
     }
 
     @Override
+    @Transactional
     public List<PostcodePool> getAllEntities() {
         log.info(getAllLogEndpoint(PostcodePool.class));
         return postcodePoolDao.getAll();
     }
 
     @Override
+    @Transactional
     public PostcodePool getEntityByUuid(UUID uuid) throws IncorrectInputDataException {
         log.info(getByIdLogEndpoint(PostcodePool.class, uuid));
         PostcodePool postcodePool = postcodePoolDao.getByUuid(uuid);
