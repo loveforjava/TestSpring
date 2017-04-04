@@ -81,6 +81,15 @@ public class TestHelper {
         }
     }
 
+    public void deletePostcodePool(PostcodePool postcodePool) {
+        try {
+            postcodePoolService.delete(postcodePool.getUuid());
+        } catch (IncorrectInputDataException e) {
+            log.error(LogMessageUtil.deleteOnErrorLogEndpoint(PostcodePool.class,
+                    postcodePool.getUuid()));
+        }
+    }
+
     public Shipment createShipment() throws Exception {
         Shipment shipment = new Shipment(createClient(), createClient(),
                 D2D, 4.0F, 3.8F, new BigDecimal(200), new BigDecimal(30), new BigDecimal(35.2));
