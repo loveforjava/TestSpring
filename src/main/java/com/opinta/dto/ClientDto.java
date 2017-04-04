@@ -32,4 +32,5 @@ public class ClientDto {
     private long addressId;
     private String phoneNumber;
     private boolean individual;
+    private boolean sender;
 }

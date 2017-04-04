@@ -91,6 +91,19 @@ public class ClientServiceImpl implements ClientService {
     public Client saveEntity(Client client, User user) throws IncorrectInputDataException, AuthException {
         validateInnerReferenceAndFillObjectFromDB(client, user);
 
+        client.setSender(false);
+        client.setPhone(phoneService.getOrCreateEntityByPhoneNumber(client.getPhone().getPhoneNumber()));
+        userService.authorizeForAction(client, user);
+        log.info(saveLogEndpoint(Client.class, client));
+        return clientDao.save(client);
+    }
+
+    @Override
+    @Transactional
+    public Client saveEntityAsSender(Client client, User user) throws IncorrectInputDataException, AuthException {
+        validateInnerReferenceAndFillObjectFromDB(client, user);
+
+        client.setSender(true);
         client.setPhone(phoneService.getOrCreateEntityByPhoneNumber(client.getPhone().getPhoneNumber()));
         userService.authorizeForAction(client, user);
         log.info(saveLogEndpoint(Client.class, client));
@@ -120,8 +133,14 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public ClientDto save(ClientDto clientDto, User user) throws Exception {
+    public ClientDto save(ClientDto clientDto, User user) throws AuthException, IncorrectInputDataException {
         return clientMapper.toDto(saveEntity(clientMapper.toEntity(clientDto), user));
+    }
+
+    @Override
+    @Transactional
+    public ClientDto saveAsSender(ClientDto clientDto, User user) throws AuthException, IncorrectInputDataException {
+        return clientMapper.toDto(saveEntityAsSender(clientMapper.toEntity(clientDto), user));
     }
 
     @Override
@@ -130,6 +149,7 @@ public class ClientServiceImpl implements ClientService {
             IncorrectInputDataException, PerformProcessFailedException {
         Client source = clientMapper.toEntity(clientDto);
         Client target = getEntityByUuid(uuid, user);
+        boolean isSender = target.isSender();
 
         validateInnerReferenceAndFillObjectFromDB(source, user);
 
@@ -140,6 +160,7 @@ public class ClientServiceImpl implements ClientService {
             throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(Client.class, source, target, e));
         }
         target.setUuid(uuid);
+        target.setSender(isSender);
         target.setCounterparty(source.getCounterparty());
         target.setPhone(phoneService.getOrCreateEntityByPhoneNumber(clientDto.getPhoneNumber()));
         target.setAddress(source.getAddress());

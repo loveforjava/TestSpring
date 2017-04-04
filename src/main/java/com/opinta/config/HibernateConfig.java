@@ -25,9 +25,7 @@ import java.util.Properties;
 @Configuration
 @EnableTransactionManagement
 @ComponentScan({"com.opinta"})
-@PropertySource(value = {
-        "classpath:application.properties",
-        "classpath:application-dev.properties"})
+@PropertySource(value = "classpath:application.properties")
 @Slf4j
 public class HibernateConfig {
     private Environment environment;
@@ -59,9 +57,19 @@ public class HibernateConfig {
     @Profile("dev")
     public LocalSessionFactoryBean sessionFactoryDevelopment() {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
-        sessionFactory.setDataSource(dataSource());
+        sessionFactory.setDataSource(dataSourceDevelopment());
         sessionFactory.setPackagesToScan("com.opinta.entity");
         sessionFactory.setHibernateProperties(hibernatePropertiesDevelopment());
+        return sessionFactory;
+    }
+
+    @Bean(name = "sessionFactory")
+    @Profile("memory")
+    public LocalSessionFactoryBean sessionFactoryInMemory() {
+        LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
+        sessionFactory.setDataSource(dataSourceInMemory());
+        sessionFactory.setPackagesToScan("com.opinta.entity");
+        sessionFactory.setHibernateProperties(hibernatePropertiesInMemory());
         return sessionFactory;
     }
 
@@ -95,6 +103,21 @@ public class HibernateConfig {
         return dataSource;
     }
 
+    @Bean(name = "dataSource")
+    @Profile("memory")
+    public DataSource dataSourceInMemory() {
+        log.info("-----------------------------------------");
+        log.info("----------ACTIVE SPRING PROFILE----------");
+        log.info("------------------MEMORY-----------------");
+        log.info("-----------------------------------------");
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        dataSource.setDriverClassName(environment.getRequiredProperty("memory.jdbc.driverClassName"));
+        dataSource.setUrl(environment.getRequiredProperty("memory.jdbc.url"));
+        dataSource.setUsername(environment.getRequiredProperty("memory.jdbc.username"));
+        dataSource.setPassword(environment.getRequiredProperty("memory.jdbc.password"));
+        return dataSource;
+    }
+
     private Properties hibernatePropertiesProduction() {
         Properties properties = new Properties();
         properties.put("hibernate.dialect", environment.getRequiredProperty("prod.hibernate.dialect"));
@@ -110,6 +133,15 @@ public class HibernateConfig {
         properties.put("hibernate.format_sql", environment.getRequiredProperty("dev.hibernate.format_sql"));
         properties.put("hibernate.show_sql", environment.getRequiredProperty("dev.hibernate.show_sql"));
         properties.put("hibernate.hbm2ddl.auto", environment.getRequiredProperty("dev.hibernate.hbm2ddl.auto"));
+        return properties;
+    }
+
+    private Properties hibernatePropertiesInMemory() {
+        Properties properties = new Properties();
+        properties.put("hibernate.dialect", environment.getRequiredProperty("memory.hibernate.dialect"));
+        properties.put("hibernate.format_sql", environment.getRequiredProperty("memory.hibernate.format_sql"));
+        properties.put("hibernate.show_sql", environment.getRequiredProperty("memory.hibernate.show_sql"));
+        properties.put("hibernate.hbm2ddl.auto", environment.getRequiredProperty("memory.hibernate.hbm2ddl.auto"));
         return properties;
     }
 
@@ -131,7 +163,7 @@ public class HibernateConfig {
     }
     
     @Bean(name = "databasePopulator")
-    @Profile("prod")
+    @Profile({"prod", "memory"})
     public DatabasePopulator databasePopulatorProduction() {
         log.info("DATABASE POPULATOR: prod");
         final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
