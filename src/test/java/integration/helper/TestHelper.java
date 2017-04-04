@@ -77,8 +77,7 @@ public class TestHelper {
         try {
             postcodePoolService.delete(postOffice.getPostcodePool().getUuid());
         } catch (IncorrectInputDataException e) {
-            log.error(deleteOnErrorLogEndpoint(PostcodePool.class,
-                    postOffice.getPostcodePool().getUuid()));
+            log.error(deleteOnErrorLogEndpoint(PostcodePool.class, postOffice.getPostcodePool().getUuid()));
         }
     }
 
