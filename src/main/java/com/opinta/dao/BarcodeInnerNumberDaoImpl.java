@@ -60,7 +60,7 @@ public class BarcodeInnerNumberDaoImpl implements BarcodeInnerNumberDao {
     }
     
     private static final String BARCODE_INNER_CALL =
-            "BEGIN" +
+            "BEGIN " +
                     "GET_NEXT_BARCODE(?, ?, ?); " +
             "END;";
     @Override

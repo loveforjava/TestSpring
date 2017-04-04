@@ -31,10 +31,14 @@ import java.util.Properties;
 @Slf4j
 public class HibernateConfig {
     private Environment environment;
-    @Value("classpath:sql/db-data-countryside-postcode.sql")
-    private Resource dataScript_countryside_postcode;
-    @Value("classpath:sql/db-data-tariff-grid.sql")
-    private Resource dataScript_tariff_grid;
+    @Value("classpath:sql/prod/db-data-countryside-postcode.sql")
+    private Resource dataScriptProductionCountrysidePostcode;
+    @Value("classpath:sql/prod/db-data-tariff-grid.sql")
+    private Resource dataScriptProductionTariffGrid;
+    @Value("classpath:sql/dev/db-data-countryside-postcode.sql")
+    private Resource dataScriptDevelopmentCountrysidePostcode;
+    @Value("classpath:sql/dev/db-data-tariff-grid.sql")
+    private Resource dataScriptDevelopmentTariffGrid;
 
     @Autowired
     public HibernateConfig(Environment environment) {
@@ -112,17 +116,31 @@ public class HibernateConfig {
     }
 
     @Bean
-    public DataSourceInitializer dataSourceInitializer(final DataSource dataSource) {
+    @Autowired
+    public DataSourceInitializer dataSourceInitializer(final DataSource dataSource, DatabasePopulator databasePopulator) {
         final DataSourceInitializer initializer = new DataSourceInitializer();
         initializer.setDataSource(dataSource);
-        initializer.setDatabasePopulator(databasePopulator());
+        initializer.setDatabasePopulator(databasePopulator);
         return initializer;
     }
-
-    private DatabasePopulator databasePopulator() {
+    
+    @Bean(name = "databasePopulator")
+    @Profile("prod")
+    public DatabasePopulator databasePopulatorProduction() {
+        log.info("DATABASE POPULATOR: prod");
         final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
-        populator.addScript(dataScript_countryside_postcode);
-        populator.addScript(dataScript_tariff_grid);
+        populator.addScript(dataScriptProductionCountrysidePostcode);
+        populator.addScript(dataScriptProductionTariffGrid);
+        return populator;
+    }
+    
+    @Bean(name = "databasePopulator")
+    @Profile("dev")
+    public DatabasePopulator databasePopulatorDevelopment() {
+        log.info("DATABASE POPULATOR: dev");
+        final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
+        populator.addScript(dataScriptDevelopmentCountrysidePostcode);
+        populator.addScript(dataScriptDevelopmentTariffGrid);
         return populator;
     }
 }
