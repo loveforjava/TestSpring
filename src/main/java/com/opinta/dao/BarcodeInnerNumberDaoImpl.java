@@ -14,7 +14,8 @@ import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import static com.opinta.entity.BarcodeStatus.USED;
+import static com.opinta.entity.BarcodeStatus.RESERVED;
+import static java.lang.String.format;
 
 @Repository
 public class BarcodeInnerNumberDaoImpl implements BarcodeInnerNumberDao {
@@ -66,21 +67,24 @@ public class BarcodeInnerNumberDaoImpl implements BarcodeInnerNumberDao {
     @Override
     public BarcodeInnerNumber generateForPostcodePool(PostcodePool postcodePool) {
         Session session = sessionFactory.getCurrentSession();
-        BarcodeInnerNumber barcodeInnerNumber = new BarcodeInnerNumber();
-        barcodeInnerNumber.setStatus(USED);
         String barcode = session.doReturningWork((connection) -> {
             try (CallableStatement call = connection.prepareCall(BARCODE_INNER_CALL)) {
-                call.setString(1, postcodePool.getUuid().toString());
+                call.setString(1, postcodePool.getUuid().toString().replaceAll("-", ""));
                 call.registerOutParameter(2, Types.VARCHAR);
                 call.registerOutParameter(3, Types.INTEGER);
                 call.execute();
                 return call.getString(2);
             } catch (SQLException e) {
-                throw new RuntimeException("Can't generate barcode inner number from stored procedure.", e);
+                throw new RuntimeException(format("Can't generate barcode inner number from stored procedure: " +
+                        "PostcodePool: %s", postcodePool.getUuid().toString().replaceAll("-", "")), e);
             }
         });
+        BarcodeInnerNumber barcodeInnerNumber = new BarcodeInnerNumber();
+        barcodeInnerNumber.setStatus(RESERVED);
         barcodeInnerNumber.setInnerNumber(barcode);
+        barcodeInnerNumber.setPostcodePool(postcodePool);
         session.persist(barcodeInnerNumber);
+
         return barcodeInnerNumber;
     }
 }

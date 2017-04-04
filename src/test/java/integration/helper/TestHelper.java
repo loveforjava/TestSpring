@@ -33,10 +33,14 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 
 import static com.opinta.entity.DeliveryType.D2D;
+import static com.opinta.util.LogMessageUtil.deleteOnErrorLogEndpoint;
 
 @Component
 @Slf4j
 public class TestHelper {
+    public static final String SAME_REGION_COUNTRYSIDE = "03027";
+    public static final String OTHER_REGION_COUNTRYSIDE = "07024";
+
     private final ClientService clientService;
     private final AddressService addressService;
     private final CounterpartyService counterpartyService;
@@ -71,13 +75,20 @@ public class TestHelper {
         try {
             postOfficeService.delete(postOffice.getId());
         } catch (IncorrectInputDataException e) {
-            log.error(LogMessageUtil.deleteOnErrorLogEndpoint(PostOffice.class, postOffice.getId()));
+            log.error(deleteOnErrorLogEndpoint(PostOffice.class, postOffice.getId()));
         }
         try {
             postcodePoolService.delete(postOffice.getPostcodePool().getUuid());
         } catch (IncorrectInputDataException e) {
-            log.error(LogMessageUtil.deleteOnErrorLogEndpoint(PostcodePool.class,
-                    postOffice.getPostcodePool().getUuid()));
+            log.error(deleteOnErrorLogEndpoint(PostcodePool.class, postOffice.getPostcodePool().getUuid()));
+        }
+    }
+
+    public void deletePostcodePool(PostcodePool postcodePool) {
+        try {
+            postcodePoolService.delete(postcodePool.getUuid());
+        } catch (IncorrectInputDataException e) {
+            log.error(deleteOnErrorLogEndpoint(PostcodePool.class, postcodePool.getUuid()));
         }
     }
 
@@ -204,13 +215,13 @@ public class TestHelper {
     }
 
     public Address createAddressSameRegionCountryside() {
-        Address address = new Address("08001", "Ternopil", "Monastiriska",
+        Address address = new Address(SAME_REGION_COUNTRYSIDE, "Ternopil", "Monastiriska",
                 "Goryglyady", "Shevchenka", "8", "");
         return addressService.saveEntity(address);
     }
 
     public Address createAddressOtherRegionCountryside() {
-        Address address = new Address("08002", "Kiev", "Boyarka",
+        Address address = new Address(OTHER_REGION_COUNTRYSIDE, "Kiev", "Boyarka",
                 "Vesele", "Franka", "21", "");
         return addressService.saveEntity(address);
     }

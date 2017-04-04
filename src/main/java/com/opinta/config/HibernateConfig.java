@@ -58,7 +58,10 @@ public class HibernateConfig {
     @Bean(name = "sessionFactory")
     @Profile("dev")
     public LocalSessionFactoryBean sessionFactoryDevelopment() {
-        log.info("ACTIVE SPRING PROFILE: dev");
+        log.info("-----------------------------------------");
+        log.info("----------ACTIVE SPRING PROFILE----------");
+        log.info("-------------------DEV-------------------");
+        log.info("-----------------------------------------");
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(dataSource());
         sessionFactory.setPackagesToScan("com.opinta.entity");
@@ -69,7 +72,10 @@ public class HibernateConfig {
     @Bean(name = "dataSource")
     @Profile("prod")
     public DataSource dataSource() {
-        log.info("ACTIVE SPRING PROFILE: prod");
+        log.info("-----------------------------------------");
+        log.info("----------ACTIVE SPRING PROFILE----------");
+        log.info("-------------------PROD------------------");
+        log.info("-----------------------------------------");
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(environment.getRequiredProperty("prod.jdbc.driverClassName"));
         dataSource.setUrl(environment.getRequiredProperty("prod.jdbc.url"));

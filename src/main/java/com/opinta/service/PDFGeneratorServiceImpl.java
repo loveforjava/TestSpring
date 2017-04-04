@@ -307,19 +307,13 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         String postcode = address.getPostcode();
 
         //PDF has problems with encodings on Linux, converting to bytes and formatting help dealing with the problem
-        String output = (street == null ? "" : String.format("вул. %s, ", street)) +
-                (houseNumber == null ? "" : String.format("%s, ", houseNumber)) +
-                (apartmentNumber == null ? "" : String.format("кв. %s, ", apartmentNumber)) +
-                (city == null ? "" : String.format("%s, ", city)) +
-                (district == null ? "" : String.format("%s р-н ", district)) +
-                (region == null ? "" : String.format("%s обл.", region)) +
+        String output = (street == null ? "" : "вул. " + street + ", ") +
+                (houseNumber == null ? "" : houseNumber + ", ") +
+                (apartmentNumber == null ? "" : "кв. " + apartmentNumber + ", ") +
+                (city == null ? "" : city + ", ") +
+                (district == null ? "" : district + " р-н ") +
+                (region == null ? "" : region + " обл.") +
                 (postcode == null ? "" : " " + postcode);
-        try {
-            byte[] outputBytes = output.getBytes("UTF-8");
-            output = new String(outputBytes, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
 
         return output;
     }
