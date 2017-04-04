@@ -6,14 +6,10 @@ import com.opinta.entity.PostcodePool;
 import java.util.Random;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Service;
 
 import static com.opinta.entity.BarcodeStatus.RESERVED;
 
 @Slf4j
-@Service
-@Profile("dev")
 public class BarcodeInnerNumberGeneratorImplForInMemoryDd implements BarcodeInnerNumberGenerator {
     private BarcodeInnerNumberDao barcodeInnerNumberDao;
 

@@ -25,18 +25,20 @@ import java.util.Properties;
 @Configuration
 @EnableTransactionManagement
 @ComponentScan({"com.opinta"})
-@PropertySource(value = {"classpath:application.properties"})
+@PropertySource(value = {
+        "classpath:application.properties",
+        "classpath:application-dev.properties"})
 @Slf4j
 public class HibernateConfig {
     private Environment environment;
-    @Value("classpath:sql/db-stored-proc_calc_core.sql")
-    private Resource schemaScript_stored_proc_calc_core;
-    @Value("classpath:sql/db-stored-proc_generate_barcode.sql")
-    private Resource schemaScript_stored_proc_gen_barcode;
-    @Value("classpath:sql/db-data-countryside-postcode.sql")
-    private Resource dataScript_countryside_postcode;
-    @Value("classpath:sql/db-data-tariff-grid.sql")
-    private Resource dataScript_tariff_grid;
+    @Value("classpath:sql/prod/db-data-countryside-postcode.sql")
+    private Resource dataScriptProductionCountrysidePostcode;
+    @Value("classpath:sql/prod/db-data-tariff-grid.sql")
+    private Resource dataScriptProductionTariffGrid;
+    @Value("classpath:sql/dev/db-data-countryside-postcode.sql")
+    private Resource dataScriptDevelopmentCountrysidePostcode;
+    @Value("classpath:sql/dev/db-data-tariff-grid.sql")
+    private Resource dataScriptDevelopmentTariffGrid;
 
     @Autowired
     public HibernateConfig(Environment environment) {
@@ -49,17 +51,13 @@ public class HibernateConfig {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(dataSource());
         sessionFactory.setPackagesToScan("com.opinta.entity");
-        sessionFactory.setHibernateProperties(hibernateProperties());
+        sessionFactory.setHibernateProperties(hibernatePropertiesProduction());
         return sessionFactory;
     }
 
     @Bean(name = "sessionFactory")
     @Profile("dev")
     public LocalSessionFactoryBean sessionFactoryDevelopment() {
-        log.info("-----------------------------------------");
-        log.info("----------ACTIVE SPRING PROFILE----------");
-        log.info("-------------------DEV-------------------");
-        log.info("-----------------------------------------");
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(dataSource());
         sessionFactory.setPackagesToScan("com.opinta.entity");
@@ -85,6 +83,10 @@ public class HibernateConfig {
     @Bean(name = "dataSource")
     @Profile("dev")
     public DataSource dataSourceDevelopment() {
+        log.info("-----------------------------------------");
+        log.info("----------ACTIVE SPRING PROFILE----------");
+        log.info("-------------------DEV-------------------");
+        log.info("-----------------------------------------");
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(environment.getRequiredProperty("dev.jdbc.driverClassName"));
         dataSource.setUrl(environment.getRequiredProperty("dev.jdbc.url"));
@@ -93,7 +95,7 @@ public class HibernateConfig {
         return dataSource;
     }
 
-    private Properties hibernateProperties() {
+    private Properties hibernatePropertiesProduction() {
         Properties properties = new Properties();
         properties.put("hibernate.dialect", environment.getRequiredProperty("prod.hibernate.dialect"));
         properties.put("hibernate.format_sql", environment.getRequiredProperty("prod.hibernate.format_sql"));
@@ -101,7 +103,7 @@ public class HibernateConfig {
         properties.put("hibernate.hbm2ddl.auto", environment.getRequiredProperty("prod.hibernate.hbm2ddl.auto"));
         return properties;
     }
-
+    
     private Properties hibernatePropertiesDevelopment() {
         Properties properties = new Properties();
         properties.put("hibernate.dialect", environment.getRequiredProperty("dev.hibernate.dialect"));
@@ -120,19 +122,31 @@ public class HibernateConfig {
     }
 
     @Bean
-    public DataSourceInitializer dataSourceInitializer(final DataSource dataSource) {
+    @Autowired
+    public DataSourceInitializer dataSourceInitializer(final DataSource dataSource, DatabasePopulator databasePopulator) {
         final DataSourceInitializer initializer = new DataSourceInitializer();
         initializer.setDataSource(dataSource);
-        initializer.setDatabasePopulator(databasePopulator());
+        initializer.setDatabasePopulator(databasePopulator);
         return initializer;
     }
-
-    private DatabasePopulator databasePopulator() {
+    
+    @Bean(name = "databasePopulator")
+    @Profile("prod")
+    public DatabasePopulator databasePopulatorProduction() {
+        log.info("DATABASE POPULATOR: prod");
         final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
-//        populator.addScript(schemaScript_stored_proc_calc_core);
-//        populator.addScript(schemaScript_stored_proc_gen_barcode);
-        populator.addScript(dataScript_countryside_postcode);
-        populator.addScript(dataScript_tariff_grid);
+        populator.addScript(dataScriptProductionCountrysidePostcode);
+        populator.addScript(dataScriptProductionTariffGrid);
+        return populator;
+    }
+    
+    @Bean(name = "databasePopulator")
+    @Profile("dev")
+    public DatabasePopulator databasePopulatorDevelopment() {
+        log.info("DATABASE POPULATOR: dev");
+        final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
+        populator.addScript(dataScriptDevelopmentCountrysidePostcode);
+        populator.addScript(dataScriptDevelopmentTariffGrid);
         return populator;
     }
 }
