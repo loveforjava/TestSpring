@@ -17,7 +17,6 @@ import com.opinta.service.PostOfficeService;
 import com.opinta.service.PostcodePoolService;
 import com.opinta.service.ShipmentGroupService;
 import com.opinta.service.ShipmentService;
-import com.opinta.util.LogMessageUtil;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -119,7 +118,14 @@ public class TestHelper {
     public Client createClient() throws Exception {
         Client client = new Client("FOP Ivanov", "001", createAddress(), createPhone(),
                 createCounterparty());
-        return clientService.saveEntity(client, client.getCounterparty().getUser());
+        return clientService.saveEntityAsRecipient(client, client.getCounterparty().getUser());
+    }
+
+    public Client createClientWithDiscount() throws Exception {
+        Client client = new Client("FOP Ivanov", "001", createAddress(), createPhone(),
+                createCounterparty());
+        client.setDiscount(10f);
+        return clientService.saveEntityAsRecipient(client, client.getCounterparty().getUser());
     }
 
     public Client createClientAsSender() throws Exception {
@@ -131,25 +137,25 @@ public class TestHelper {
     public Client createClientSameRegion() throws Exception {
         Client client = new Client("FOP Ivanov", "001", createAddressSameRegion(), createPhone(),
                 createCounterparty());
-        return clientService.saveEntity(client, client.getCounterparty().getUser());
+        return clientService.saveEntityAsRecipient(client, client.getCounterparty().getUser());
     }
 
     public Client createClientOtherRegion() throws Exception {
         Client client = new Client("FOP Ivanov", "001", createAddressOtherRegion(), createPhone(),
                 createCounterparty());
-        return clientService.saveEntity(client, client.getCounterparty().getUser());
+        return clientService.saveEntityAsRecipient(client, client.getCounterparty().getUser());
     }
 
     public Client createClientSameRegionCountryside() throws Exception {
         Client client = new Client("FOP Ivanov", "001", createAddressSameRegionCountryside(), createPhone(),
                 createCounterparty());
-        return clientService.saveEntity(client, client.getCounterparty().getUser());
+        return clientService.saveEntityAsRecipient(client, client.getCounterparty().getUser());
     }
 
     public Client createClientOtherRegionCountryside() throws Exception {
         Client client = new Client("FOP Ivanov", "001", createAddressOtherRegionCountryside(), createPhone(),
                 createCounterparty());
-        return clientService.saveEntity(client, client.getCounterparty().getUser());
+        return clientService.saveEntityAsRecipient(client, client.getCounterparty().getUser());
     }
 
     public void deleteClient(Client client) throws Exception {

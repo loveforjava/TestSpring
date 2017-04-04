@@ -193,6 +193,7 @@ public class ClientControllerIT extends BaseControllerIT {
     @Test
     @SuppressWarnings("unchecked")
     public void createClientAsSender_senderShouldBeCreatedDoesNotMetterWhichSenderMarkPassed() throws Exception {
+        float discount = 24.5f;
         // create
         Counterparty newCounterparty = testHelper.createCounterparty();
         Address newAddress = testHelper.createAddress();
@@ -201,6 +202,7 @@ public class ClientControllerIT extends BaseControllerIT {
         inputJson.put("counterpartyUuid", newCounterparty.getUuid().toString());
         inputJson.put("addressId", (int) newAddress.getId());
         inputJson.put("individual", false);
+        inputJson.put("discount", discount);
 
         String newUuid =
                 given().
@@ -212,12 +214,14 @@ public class ClientControllerIT extends BaseControllerIT {
                 then().
                         statusCode(SC_OK).
                         body("sender", equalTo(true)).
+                        body("discount", equalTo(discount)).
                 extract().
                         path("uuid");
 
         // check created data
         Client createdClient = clientService.getEntityByUuid(UUID.fromString(newUuid), newCounterparty.getUser());
         assertTrue(createdClient.isSender());
+        assertTrue((discount == createdClient.getDiscount()));
 
         // delete
         testHelper.deleteClient(createdClient);

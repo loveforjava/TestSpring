@@ -33,4 +33,5 @@ public class ClientDto {
     private String phoneNumber;
     private boolean individual;
     private boolean sender;
+    private float discount;
 }

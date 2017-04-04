@@ -42,6 +42,7 @@ public class Client {
     private Counterparty counterparty;
     private boolean individual;
     private boolean sender;
+    private float discount;
 
     public Client(String name, String uniqueRegistrationNumber, Address address,
                   Counterparty counterparty) {

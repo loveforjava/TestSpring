@@ -198,6 +198,9 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         float price = tariffGrid.getPrice() + getSurcharges(shipment);
 
+        float sumOfDiscount = price * shipment.getSender().getDiscount() / 100;
+        price -= sumOfDiscount;
+
         return new BigDecimal(Float.toString(price));
     }
 

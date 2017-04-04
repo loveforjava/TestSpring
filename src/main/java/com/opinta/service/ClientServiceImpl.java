@@ -86,12 +86,11 @@ public class ClientServiceImpl implements ClientService {
         return client;
     }
 
-    @Override
     @Transactional
-    public Client saveEntity(Client client, User user) throws IncorrectInputDataException, AuthException {
+    private Client saveEntity(Client client, User user, boolean sender) throws IncorrectInputDataException, AuthException {
         validateInnerReferenceAndFillObjectFromDB(client, user);
 
-        client.setSender(false);
+        client.setSender(sender);
         client.setPhone(phoneService.getOrCreateEntityByPhoneNumber(client.getPhone().getPhoneNumber()));
         userService.authorizeForAction(client, user);
         log.info(saveLogEndpoint(Client.class, client));
@@ -100,14 +99,14 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public Client saveEntityAsSender(Client client, User user) throws IncorrectInputDataException, AuthException {
-        validateInnerReferenceAndFillObjectFromDB(client, user);
+    public Client saveEntityAsRecipient(Client client, User user) throws IncorrectInputDataException, AuthException {
+        return saveEntity(client, user, false);
+    }
 
-        client.setSender(true);
-        client.setPhone(phoneService.getOrCreateEntityByPhoneNumber(client.getPhone().getPhoneNumber()));
-        userService.authorizeForAction(client, user);
-        log.info(saveLogEndpoint(Client.class, client));
-        return clientDao.save(client);
+    @Override
+    @Transactional
+    public Client saveEntityAsSender(Client client, User user) throws IncorrectInputDataException, AuthException {
+        return saveEntity(client, user, true);
     }
 
     @Override
@@ -134,7 +133,7 @@ public class ClientServiceImpl implements ClientService {
     @Override
     @Transactional
     public ClientDto save(ClientDto clientDto, User user) throws AuthException, IncorrectInputDataException {
-        return clientMapper.toDto(saveEntity(clientMapper.toEntity(clientDto), user));
+        return clientMapper.toDto(saveEntityAsRecipient(clientMapper.toEntity(clientDto), user));
     }
 
     @Override
