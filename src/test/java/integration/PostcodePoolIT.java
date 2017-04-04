@@ -9,6 +9,7 @@ import integration.helper.TestHelper;
 import io.restassured.module.mockmvc.response.MockMvcResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -76,16 +77,18 @@ public class PostcodePoolIT extends BaseControllerIT {
     @SuppressWarnings("unchecked")
     public void createPostcodePool() throws Exception {
         // create
-        JSONObject expectedJson = testHelper.getJsonObjectFromFile("json/postcode-pool.json");
+        JSONObject inputJson = testHelper.getJsonObjectFromFile("json/postcode-pool.json");
+        String postCode = (String) inputJson.get("postcode");
 
         MockMvcResponse response =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
-                        body(expectedJson.toString()).
+                        body(inputJson.toString()).
                 when().
                         post("/postcodes").
                 then().
                         statusCode(SC_OK).
+                        body("postcode", equalTo(postCode)).
                 extract().
                         response();
 
@@ -94,7 +97,7 @@ public class PostcodePoolIT extends BaseControllerIT {
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(postcodePoolMapper.toDto(createdPostcodePool));
 
-        JSONAssert.assertEquals(expectedJson.toString(), actualJson, false);
+        JSONAssert.assertEquals(inputJson.toString(), actualJson, false);
 
         // delete
         testHelper.deletePostcodePool(createdPostcodePool);
@@ -104,17 +107,23 @@ public class PostcodePoolIT extends BaseControllerIT {
     @SuppressWarnings("unchecked")
     public void updatePostcodePool() throws Exception {
         // update
-        JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/postcode-pool.json");
-        String expectedJson = jsonObject.toString();
+        JSONObject inputJson = testHelper.getJsonObjectFromFile("json/postcode-pool.json");
+        inputJson.put("postcode", "99999");
+
+        String postCode = (String) inputJson.get("postcode");
 
         given().
                 contentType(APPLICATION_JSON_VALUE).
-                body(expectedJson).
+                body(inputJson).
         when().
                 put("/postcodes/{uuid}", postcodePoolUuid.toString()).
         then().
                 contentType(APPLICATION_JSON_VALUE).
                 statusCode(SC_OK);
+
+        JSONParser parser = new JSONParser();
+        JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
+        expectedJson.put("postcode", postCode);
 
         // check updated data
         PostcodePoolDto postcodePoolDto = postcodePoolMapper.toDto(postcodePoolService.getEntityByUuid(
@@ -122,7 +131,7 @@ public class PostcodePoolIT extends BaseControllerIT {
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(postcodePoolDto);
 
-        JSONAssert.assertEquals(expectedJson, actualJson, false);
+        JSONAssert.assertEquals(expectedJson.toJSONString(), actualJson, false);
     }
 
     @Test
