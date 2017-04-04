@@ -37,6 +37,9 @@ import static com.opinta.entity.DeliveryType.D2D;
 @Component
 @Slf4j
 public class TestHelper {
+    public static final String SAME_REGION_COUNTRYSIDE = "03027";
+    public static final String OTHER_REGION_COUNTRYSIDE = "07024";
+
     private final ClientService clientService;
     private final AddressService addressService;
     private final CounterpartyService counterpartyService;
@@ -204,13 +207,13 @@ public class TestHelper {
     }
 
     public Address createAddressSameRegionCountryside() {
-        Address address = new Address("08001", "Ternopil", "Monastiriska",
+        Address address = new Address(SAME_REGION_COUNTRYSIDE, "Ternopil", "Monastiriska",
                 "Goryglyady", "Shevchenka", "8", "");
         return addressService.saveEntity(address);
     }
 
     public Address createAddressOtherRegionCountryside() {
-        Address address = new Address("08002", "Kiev", "Boyarka",
+        Address address = new Address(OTHER_REGION_COUNTRYSIDE, "Kiev", "Boyarka",
                 "Vesele", "Franka", "21", "");
         return addressService.saveEntity(address);
     }
