@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 
 @Service
-@Profile("dev")
+@Profile("beta")
 public class StartHsqlDbManager {
     @PostConstruct
     public void startDBManager() {

@@ -8,6 +8,6 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @Configuration
 @EnableWebMvc
 @ComponentScan(basePackages = {"com.opinta", "integration.helper"})
-@PropertySource(value = {"classpath:application_test.properties"})
+@PropertySource(value = {"classpath:application.test.properties"})
 public class ApplicationConfigTest {
 }

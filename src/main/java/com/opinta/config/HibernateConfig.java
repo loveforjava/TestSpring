@@ -25,7 +25,9 @@ import java.util.Properties;
 @Configuration
 @EnableTransactionManagement
 @ComponentScan({"com.opinta"})
-@PropertySource(value = {"classpath:application.properties"})
+@PropertySource(value = {
+        "classpath:application.properties",
+        "classpath:application.dev.properties"})
 @Slf4j
 public class HibernateConfig {
     private Environment environment;
@@ -45,7 +47,7 @@ public class HibernateConfig {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(dataSource());
         sessionFactory.setPackagesToScan("com.opinta.entity");
-        sessionFactory.setHibernateProperties(hibernateProperties());
+        sessionFactory.setHibernateProperties(hibernatePropertiesProduction());
         return sessionFactory;
     }
 
@@ -83,15 +85,15 @@ public class HibernateConfig {
         return dataSource;
     }
 
-    private Properties hibernateProperties() {
+    private Properties hibernatePropertiesProduction() {
         Properties properties = new Properties();
         properties.put("hibernate.dialect", environment.getRequiredProperty("prod.hibernate.dialect"));
         properties.put("hibernate.format_sql", environment.getRequiredProperty("prod.hibernate.format_sql"));
         properties.put("hibernate.show_sql", environment.getRequiredProperty("prod.hibernate.show_sql"));
-        properties.put(".hibernate.hbm2ddl.auto", environment.getRequiredProperty("prod.hibernate.hbm2ddl.auto"));
+        properties.put("hibernate.hbm2ddl.auto", environment.getRequiredProperty("prod.hibernate.hbm2ddl.auto"));
         return properties;
     }
-
+    
     private Properties hibernatePropertiesDevelopment() {
         Properties properties = new Properties();
         properties.put("hibernate.dialect", environment.getRequiredProperty("dev.hibernate.dialect"));
