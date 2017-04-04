@@ -27,7 +27,7 @@ import java.util.Properties;
 @ComponentScan({"com.opinta"})
 @PropertySource(value = {
         "classpath:application.properties",
-        "classpath:application.dev.properties"})
+        "classpath:application-dev.properties"})
 @Slf4j
 public class HibernateConfig {
     private Environment environment;
