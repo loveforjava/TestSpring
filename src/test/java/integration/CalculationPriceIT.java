@@ -328,4 +328,40 @@ public class CalculationPriceIT extends BaseControllerIT {
         // delete
         testHelper.deleteShipment(createdShipment);
     }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void calcPrice_D2W_weight1_length25_insideRegion_countryside_declaredPriceSurcharges_discount()
+            throws Exception {
+        Client clientWithDiscount = testHelper.createClientWithDiscount();
+        // create
+        JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
+        jsonObject.put("shipmentGroupUuid", shipmentGroup.getUuid().toString());
+        jsonObject.put("senderUuid", clientWithDiscount.getUuid().toString());
+        jsonObject.put("recipientUuid", testHelper.createClientSameRegionCountryside().getUuid().toString());
+        jsonObject.put("weight", 1000);
+        jsonObject.put("length", 25);
+        jsonObject.put("deliveryType", "D2W");
+        jsonObject.put("declaredPrice", 1100);
+        String expectedJson = jsonObject.toString();
+
+        String newShipmentUuid =
+                given().
+                        contentType(APPLICATION_JSON_VALUE).
+                        queryParam("token", clientWithDiscount.getCounterparty().getUser().getToken()).
+                        body(expectedJson).
+                when().
+                        post("/shipments").
+                then().
+                        statusCode(SC_OK).
+                        body("price", equalTo(37.8f)).
+                extract().
+                        path("uuid");
+
+        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
+                clientWithDiscount.getCounterparty().getUser());
+
+        // delete
+        testHelper.deleteShipment(createdShipment);
+    }
 }
