@@ -122,6 +122,12 @@ public class TestHelper {
         return clientService.saveEntity(client, client.getCounterparty().getUser());
     }
 
+    public Client createClientAsSender() throws Exception {
+        Client client = new Client("FOP Ivanov", "001", createAddress(), createPhone(),
+                createCounterparty());
+        return clientService.saveEntityAsSender(client, client.getCounterparty().getUser());
+    }
+
     public Client createClientSameRegion() throws Exception {
         Client client = new Client("FOP Ivanov", "001", createAddressSameRegion(), createPhone(),
                 createCounterparty());

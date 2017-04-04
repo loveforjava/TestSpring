@@ -99,6 +99,19 @@ public class ClientController {
         }
     }
 
+    @PostMapping("/senders")
+    public ResponseEntity<?> createClientAsSender(@RequestBody ClientDto clientDto,
+                                                  @RequestParam(value = "token") UUID token) {
+        try {
+            User user = userService.authenticate(token);
+            return new ResponseEntity<>(clientService.saveAsSender(clientDto, user), OK);
+        } catch (AuthException e) {
+            return new ResponseEntity<>(saveOnErrorLogEndpoint(Client.class, clientDto, e), UNAUTHORIZED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(saveOnErrorLogEndpoint(Client.class, clientDto, e), BAD_REQUEST);
+        }
+    }
+
     @PutMapping("{uuid}")
     public ResponseEntity<?> updateClient(@PathVariable UUID uuid, @RequestBody ClientDto clientDto,
                                           @RequestParam(value = "token") UUID token) {
