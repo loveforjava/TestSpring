@@ -29,6 +29,10 @@ import java.util.Properties;
 @Slf4j
 public class HibernateConfig {
     private Environment environment;
+    @Value("classpath:sql/db-stored-proc_calc_core.sql")
+    private Resource schemaScript_stored_proc_calc_core;
+    @Value("classpath:sql/db-stored-proc_generate_barcode.sql")
+    private Resource schemaScript_stored_proc_gen_barcode;
     @Value("classpath:sql/db-data-countryside-postcode.sql")
     private Resource dataScript_countryside_postcode;
     @Value("classpath:sql/db-data-tariff-grid.sql")
@@ -52,7 +56,10 @@ public class HibernateConfig {
     @Bean(name = "sessionFactory")
     @Profile("dev")
     public LocalSessionFactoryBean sessionFactoryDevelopment() {
-        log.info("ACTIVE SPRING PROFILE: dev");
+        log.info("-----------------------------------------");
+        log.info("----------ACTIVE SPRING PROFILE----------");
+        log.info("-------------------DEV-------------------");
+        log.info("-----------------------------------------");
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(dataSource());
         sessionFactory.setPackagesToScan("com.opinta.entity");
@@ -63,7 +70,10 @@ public class HibernateConfig {
     @Bean(name = "dataSource")
     @Profile("prod")
     public DataSource dataSource() {
-        log.info("ACTIVE SPRING PROFILE: prod");
+        log.info("-----------------------------------------");
+        log.info("----------ACTIVE SPRING PROFILE----------");
+        log.info("-------------------PROD------------------");
+        log.info("-----------------------------------------");
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(environment.getRequiredProperty("prod.jdbc.driverClassName"));
         dataSource.setUrl(environment.getRequiredProperty("prod.jdbc.url"));
@@ -88,7 +98,7 @@ public class HibernateConfig {
         properties.put("hibernate.dialect", environment.getRequiredProperty("prod.hibernate.dialect"));
         properties.put("hibernate.format_sql", environment.getRequiredProperty("prod.hibernate.format_sql"));
         properties.put("hibernate.show_sql", environment.getRequiredProperty("prod.hibernate.show_sql"));
-        properties.put(".hibernate.hbm2ddl.auto", environment.getRequiredProperty("prod.hibernate.hbm2ddl.auto"));
+        properties.put("hibernate.hbm2ddl.auto", environment.getRequiredProperty("prod.hibernate.hbm2ddl.auto"));
         return properties;
     }
 
@@ -119,6 +129,8 @@ public class HibernateConfig {
 
     private DatabasePopulator databasePopulator() {
         final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
+//        populator.addScript(schemaScript_stored_proc_calc_core);
+//        populator.addScript(schemaScript_stored_proc_gen_barcode);
         populator.addScript(dataScript_countryside_postcode);
         populator.addScript(dataScript_tariff_grid);
         return populator;

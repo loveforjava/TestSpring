@@ -12,7 +12,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 
+import static integration.helper.TestHelper.SAME_REGION_COUNTRYSIDE;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
 import static java.lang.Integer.MIN_VALUE;
@@ -21,6 +23,7 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
 public class AddressControllerIT extends BaseControllerIT {
@@ -107,11 +110,11 @@ public class AddressControllerIT extends BaseControllerIT {
     public void createAddress_countryside() throws Exception {
         // create
         JSONObject expectedJson = testHelper.getJsonObjectFromFile("json/address.json");
-        expectedJson.put("postcode", "08001");
+        expectedJson.put("postcode", SAME_REGION_COUNTRYSIDE);
 
         int newAddressId =
                 given().
-                        contentType("application/json;charset=UTF-8").
+                        contentType(APPLICATION_JSON_VALUE).
                         body(expectedJson.toString()).
                 when().
                         post("/addresses").
@@ -139,7 +142,7 @@ public class AddressControllerIT extends BaseControllerIT {
         JSONObject expectedJson = testHelper.getJsonObjectFromFile("json/address.json");
 
         given().
-                contentType("application/json;charset=UTF-8").
+                contentType(APPLICATION_JSON_VALUE).
                 body(expectedJson.toString()).
         when().
                 put("/addresses/{id}", addressId).
