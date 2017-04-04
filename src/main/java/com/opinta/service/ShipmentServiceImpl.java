@@ -84,6 +84,9 @@ public class ShipmentServiceImpl implements ShipmentService {
     @Transactional
     public Shipment saveEntity(Shipment shipment, User user) throws AuthException, IncorrectInputDataException {
         Client sender = clientService.getEntityByUuid(shipment.getSender().getUuid(), user);
+        if (!sender.isSender()) {
+            throw new IncorrectInputDataException("Sender in shipment should be client-sender!");
+        }
         PostcodePool postcodePool = sender.getCounterparty().getPostcodePool();
 
         shipment.setSender(sender);
