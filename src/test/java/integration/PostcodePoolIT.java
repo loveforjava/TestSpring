@@ -65,7 +65,7 @@ public class PostcodePoolIT extends BaseControllerIT {
     }
 
     @Test
-    public void getClient_notFound() throws Exception {
+    public void getPostcode_notFound() throws Exception {
         when().
                 get("/postcodes/{uuid}", UUID.randomUUID().toString()).
         then().

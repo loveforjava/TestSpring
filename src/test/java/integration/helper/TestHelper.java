@@ -33,6 +33,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 
 import static com.opinta.entity.DeliveryType.D2D;
+import static com.opinta.util.LogMessageUtil.deleteOnErrorLogEndpoint;
 
 @Component
 @Slf4j
@@ -71,12 +72,12 @@ public class TestHelper {
         try {
             postOfficeService.delete(postOffice.getId());
         } catch (IncorrectInputDataException e) {
-            log.error(LogMessageUtil.deleteOnErrorLogEndpoint(PostOffice.class, postOffice.getId()));
+            log.error(deleteOnErrorLogEndpoint(PostOffice.class, postOffice.getId()));
         }
         try {
             postcodePoolService.delete(postOffice.getPostcodePool().getUuid());
         } catch (IncorrectInputDataException e) {
-            log.error(LogMessageUtil.deleteOnErrorLogEndpoint(PostcodePool.class,
+            log.error(deleteOnErrorLogEndpoint(PostcodePool.class,
                     postOffice.getPostcodePool().getUuid()));
         }
     }
@@ -85,8 +86,7 @@ public class TestHelper {
         try {
             postcodePoolService.delete(postcodePool.getUuid());
         } catch (IncorrectInputDataException e) {
-            log.error(LogMessageUtil.deleteOnErrorLogEndpoint(PostcodePool.class,
-                    postcodePool.getUuid()));
+            log.error(deleteOnErrorLogEndpoint(PostcodePool.class, postcodePool.getUuid()));
         }
     }
 
