@@ -25,7 +25,9 @@ import java.util.Properties;
 @Configuration
 @EnableTransactionManagement
 @ComponentScan({"com.opinta"})
-@PropertySource(value = "classpath:application.properties")
+@PropertySource(value = {
+        "classpath:application.properties",
+        "classpath:application-dev.properties"})
 @Slf4j
 public class HibernateConfig {
     private Environment environment;
