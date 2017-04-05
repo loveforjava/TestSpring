@@ -1,5 +1,6 @@
 package com.opinta.service;
 
+import com.opinta.entity.Client;
 import com.opinta.entity.Address;
 import com.opinta.entity.DeliveryType;
 import com.opinta.entity.ShipmentGroup;
@@ -20,7 +21,6 @@ import javax.transaction.Transactional;
 import com.opinta.dao.ShipmentDao;
 import com.opinta.dto.ShipmentDto;
 import com.opinta.mapper.ShipmentMapper;
-import com.opinta.entity.Client;
 import com.opinta.entity.PostcodePool;
 import com.opinta.entity.Shipment;
 import lombok.extern.slf4j.Slf4j;

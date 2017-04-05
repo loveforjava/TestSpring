@@ -3,8 +3,8 @@ package com.opinta.mapper;
 import java.util.UUID;
 
 import com.opinta.dto.ShipmentDto;
-import com.opinta.entity.BarcodeInnerNumber;
 import com.opinta.entity.Client;
+import com.opinta.entity.BarcodeInnerNumber;
 import com.opinta.entity.Shipment;
 import com.opinta.entity.ShipmentGroup;
 import org.mapstruct.Mapper;

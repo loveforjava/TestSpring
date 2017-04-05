@@ -1,5 +1,6 @@
 package com.opinta.service;
 
+import com.opinta.entity.Client;
 import com.opinta.entity.Address;
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.User;
@@ -14,7 +15,6 @@ import javax.transaction.Transactional;
 import com.opinta.dao.ClientDao;
 import com.opinta.dto.ClientDto;
 import com.opinta.mapper.ClientMapper;
-import com.opinta.entity.Client;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

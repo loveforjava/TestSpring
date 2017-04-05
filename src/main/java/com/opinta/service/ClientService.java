@@ -1,5 +1,6 @@
 package com.opinta.service;
 
+import com.opinta.entity.Client;
 import com.opinta.entity.User;
 import com.opinta.exception.AuthException;
 import com.opinta.exception.IncorrectInputDataException;
@@ -8,7 +9,6 @@ import java.util.List;
 import java.util.UUID;
 
 import com.opinta.dto.ClientDto;
-import com.opinta.entity.Client;
 
 public interface ClientService {
 

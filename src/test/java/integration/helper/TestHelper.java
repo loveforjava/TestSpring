@@ -1,7 +1,7 @@
 package integration.helper;
 
-import com.opinta.entity.Address;
 import com.opinta.entity.Client;
+import com.opinta.entity.Address;
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.Phone;
 import com.opinta.entity.PostOffice;
@@ -147,13 +147,15 @@ public class TestHelper {
     }
 
     public Client createClientSameRegionCountryside() throws Exception {
-        Client client = new Client("FOP Ivanov", "001", createAddressSameRegionCountryside(), createPhone(),
+        Client
+                client = new Client("FOP Ivanov", "001", createAddressSameRegionCountryside(), createPhone(),
                 createCounterparty());
         return clientService.saveEntityAsRecipient(client, client.getCounterparty().getUser());
     }
 
     public Client createClientOtherRegionCountryside() throws Exception {
-        Client client = new Client("FOP Ivanov", "001", createAddressOtherRegionCountryside(), createPhone(),
+        Client
+                client = new Client("FOP Ivanov", "001", createAddressOtherRegionCountryside(), createPhone(),
                 createCounterparty());
         return clientService.saveEntityAsRecipient(client, client.getCounterparty().getUser());
     }

@@ -3,8 +3,8 @@ package integration;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.opinta.entity.Address;
 import com.opinta.entity.Client;
+import com.opinta.entity.Address;
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.User;
 import com.opinta.mapper.ClientMapper;
