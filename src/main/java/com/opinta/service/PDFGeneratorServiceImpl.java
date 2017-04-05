@@ -121,7 +121,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             acroForm.setDefaultResources(res);
 
             //Populating clients data
-            generateClientsData(shipment, acroForm, true);
+            generateClientsData(shipment, acroForm, true, false);
 
             //Splitting price to hryvnas and kopiykas
             BigDecimal postPay = shipment.getPostPay();
@@ -179,7 +179,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             acroForm.setDefaultResources(res);
 
             //Populating client data
-            generateClientsData(shipment, acroForm, false);
+            generateClientsData(shipment, acroForm, false, true);
             setCheckBoxes(shipment, acroForm);
 
             //Populating rest of the fields
@@ -264,7 +264,8 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         }
     }
 
-    private void generateClientsData(Shipment shipment, PDAcroForm acroForm, boolean swapSenderWithRecipient) throws IOException {
+    private void generateClientsData(Shipment shipment, PDAcroForm acroForm, boolean swapSenderWithRecipient,
+                                     boolean postcodeOnNextLine) throws IOException {
         Client sender;
         Client recipient;
         if (swapSenderWithRecipient) {
@@ -277,7 +278,16 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
 
 
         populateField(acroForm, field, "senderName", sender.getName());
-        populateField(acroForm, field, "senderAddress", processAddress(sender.getAddress()));
+
+        //Format sender's address for the PDF form and check if postcode should be on the new line
+        Address senderAddress = sender.getAddress();
+        String formattedAddress = processAddress(senderAddress);
+        if (postcodeOnNextLine) {
+            formattedAddress += "\n";
+        }
+        formattedAddress += (senderAddress.getPostcode() == null ? "" : senderAddress.getPostcode());
+        populateField(acroForm, field, "senderAddress", formattedAddress);
+
 
         Phone phone = sender.getPhone();
         if (phone != null) {
@@ -285,7 +295,15 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         }
 
         populateField(acroForm, field, "recipientName", recipient.getName());
-        populateField(acroForm, field, "recipientAddress", processAddress(recipient.getAddress()));
+
+        //Format recipient's address for the PDF form and check if postcode should be on the new line
+        Address recipientAddress = recipient.getAddress();
+        formattedAddress = processAddress(recipientAddress);
+        if (postcodeOnNextLine) {
+            formattedAddress += "\n";
+        }
+        formattedAddress += (recipientAddress.getPostcode() == null ? "" : recipientAddress.getPostcode());
+        populateField(acroForm, field, "recipientAddress", formattedAddress);
 
         phone = recipient.getPhone();
         if (phone != null) {
@@ -304,16 +322,13 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         String city = address.getCity();
         String district = address.getDistrict();
         String region = address.getRegion();
-        String postcode = address.getPostcode();
 
-        //PDF has problems with encodings on Linux, converting to bytes and formatting help dealing with the problem
         String output = (street == null ? "" : "вул. " + street + ", ") +
                 (houseNumber == null ? "" : houseNumber + ", ") +
                 (apartmentNumber == null ? "" : "кв. " + apartmentNumber + ", ") +
                 (city == null ? "" : city + ", ") +
                 (district == null ? "" : district + " р-н ") +
-                (region == null ? "" : region + " обл.") +
-                (postcode == null ? "" : " " + postcode);
+                (region == null ? "" : region + " обл. ");
 
         return output;
     }
