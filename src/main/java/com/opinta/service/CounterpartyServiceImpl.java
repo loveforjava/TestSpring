@@ -1,5 +1,7 @@
 package com.opinta.service;
 
+import com.opinta.dao.ClientDao;
+import com.opinta.entity.Client;
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.PostcodePool;
 import com.opinta.entity.User;
@@ -36,14 +38,17 @@ public class CounterpartyServiceImpl implements CounterpartyService {
     private final CounterpartyMapper counterpartyMapper;
     private final PostcodePoolService postcodePoolService;
     private final UserService userService;
+    private final ClientDao clientDao;
 
     @Autowired
     public CounterpartyServiceImpl(CounterpartyDao counterpartyDao, CounterpartyMapper counterpartyMapper,
-                                   PostcodePoolService postcodePoolService, UserService userService) {
+                                   PostcodePoolService postcodePoolService, UserService userService,
+                                   ClientDao clientDao) {
         this.counterpartyDao = counterpartyDao;
         this.counterpartyMapper = counterpartyMapper;
         this.postcodePoolService = postcodePoolService;
         this.userService = userService;
+        this.clientDao = clientDao;
     }
 
     @Override
@@ -135,6 +140,26 @@ public class CounterpartyServiceImpl implements CounterpartyService {
         target.setUuid(uuid);
         log.info(updateLogEndpoint(Counterparty.class, target));
         counterpartyDao.update(target);
+        return counterpartyMapper.toDto(target);
+    }
+
+    @Override
+    @Transactional
+    public CounterpartyDto updateDiscount(UUID uuid, CounterpartyDto counterpartyDto, User user)
+            throws IncorrectInputDataException, AuthException, PerformProcessFailedException {
+        Counterparty source = counterpartyMapper.toEntity(counterpartyDto);
+        Counterparty target = getEntityByUuid(uuid, user);
+
+        target.setDiscount(source.getDiscount());
+        log.info(updateLogEndpoint(Counterparty.class, target));
+        counterpartyDao.update(target);
+
+        List<Client> clients = clientDao.getAllByCounterparty(target);
+        for (Client client : clients) {
+            client.setDiscount(target.getDiscount());
+            clientDao.update(client);
+        }
+
         return counterpartyMapper.toDto(target);
     }
 
