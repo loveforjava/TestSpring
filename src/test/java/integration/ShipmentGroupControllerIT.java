@@ -3,14 +3,12 @@ package integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opinta.dto.ClientDto;
 import com.opinta.dto.ShipmentGroupDto;
-import com.opinta.entity.Client;
-import com.opinta.entity.Counterparty;
-import com.opinta.entity.ShipmentGroup;
-import com.opinta.entity.User;
+import com.opinta.entity.*;
 import com.opinta.mapper.ClientMapper;
 import com.opinta.mapper.ShipmentGroupMapper;
 import com.opinta.service.ClientService;
 import com.opinta.service.ShipmentGroupService;
+import com.opinta.service.ShipmentService;
 import integration.helper.TestHelper;
 import org.json.simple.JSONObject;
 import org.junit.After;
@@ -19,6 +17,7 @@ import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
 import java.util.UUID;
 
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
@@ -26,6 +25,7 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 
 public class ShipmentGroupControllerIT extends BaseControllerIT {
     private ShipmentGroup shipmentGroup;
@@ -70,7 +70,23 @@ public class ShipmentGroupControllerIT extends BaseControllerIT {
                 statusCode(SC_OK).
                 body("uuid", equalTo(shipmentGroupUuid.toString()));
     }
-    
+
+    @Test
+    public void getShipmentGroupForm() throws Exception {
+        Shipment shipment = testHelper.createShipmentWithSameCounterparty(shipmentGroup,
+                shipmentGroup.getCounterparty());
+
+        given().
+                queryParam("token", user.getToken()).
+        when().
+                get("shipment-groups/{uuid}/form", shipmentGroupUuid.toString()).
+        then().
+                statusCode(SC_OK);
+
+        // delete shipment
+        testHelper.deleteShipment(shipment);
+    }
+
     @Test
     public void getShipmentGroup_notFound() throws Exception {
         given().

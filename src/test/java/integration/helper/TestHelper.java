@@ -97,6 +97,22 @@ public class TestHelper {
         return shipmentService.saveEntity(shipment, shipment.getSender().getCounterparty().getUser());
     }
 
+    public Shipment createShipment(ShipmentGroup shipmentGroup) throws Exception {
+        Shipment shipment = new Shipment(createClientAsSender(), createClient(),
+                D2D, 4.0F, 3.8F, new BigDecimal(200), new BigDecimal(30), new BigDecimal(35.2));
+        shipment.setShipmentGroup(shipmentGroup);
+        return shipmentService.saveEntity(shipment, shipment.getSender().getCounterparty().getUser());
+    }
+
+    public Shipment createShipmentWithSameCounterparty(ShipmentGroup shipmentGroup, Counterparty counterparty) throws Exception {
+        Client client = createClientAsSenderWithSameCounterparty(counterparty);
+
+        Shipment shipment = new Shipment(client, client,
+                D2D, 4.0F, 3.8F, new BigDecimal(200), new BigDecimal(30), new BigDecimal(35.2));
+        shipment.setShipmentGroup(shipmentGroup);
+        return shipmentService.saveEntity(shipment, shipment.getSender().getCounterparty().getUser());
+    }
+
     public void deleteShipment(Shipment shipment) throws Exception {
         try {
             shipmentService.delete(shipment.getUuid(), shipment.getSender().getCounterparty().getUser());
@@ -131,6 +147,13 @@ public class TestHelper {
     public Client createClientAsSender() throws Exception {
         Client client = new Client("FOP Ivanov", "001", createAddress(), createPhone(),
                 createCounterparty());
+        return clientService.saveEntityAsSender(client, client.getCounterparty().getUser());
+    }
+
+    public Client createClientAsSenderWithSameCounterparty(Counterparty counterparty) throws Exception {
+        Client client = new Client("FOP Ivanov", "001", createAddress(), createPhone(),
+                null);
+        client.setCounterparty(counterparty);
         return clientService.saveEntityAsSender(client, client.getCounterparty().getUser());
     }
 
@@ -180,7 +203,9 @@ public class TestHelper {
         ShipmentGroup shipmentGroup = new ShipmentGroup();
         shipmentGroup.setName("Group 1");
         shipmentGroup.setCounterparty(createCounterparty());
-        return shipmentGroupService.saveEntity(shipmentGroup, shipmentGroup.getCounterparty().getUser());
+        ShipmentGroup newShipmentGroup = shipmentGroupService.saveEntity(shipmentGroup, shipmentGroup.getCounterparty().getUser());
+//        createShipment(newShipmentGroup);
+        return newShipmentGroup;
     }
 
     public void deleteShipmentGroup(ShipmentGroup shipmentGroup) throws Exception {
