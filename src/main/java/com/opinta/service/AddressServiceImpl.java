@@ -1,7 +1,7 @@
 package com.opinta.service;
 
 import com.opinta.dao.CountrysidePostcodeDao;
-import com.opinta.entity.CountrysidePostcode;
+import com.opinta.entity.classifier.CountrysidePostcode;
 import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.exception.PerformProcessFailedException;
 import java.util.List;

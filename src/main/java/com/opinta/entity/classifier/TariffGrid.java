@@ -1,10 +1,12 @@
-package com.opinta.entity;
+package com.opinta.entity.classifier;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+
+import com.opinta.entity.W2wVariation;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
