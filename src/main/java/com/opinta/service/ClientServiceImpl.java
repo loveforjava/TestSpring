@@ -61,6 +61,14 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
+    public List<Client> getAllEntitiesByCounterpartyUuid(UUID counterpartyUuid, User user)
+            throws IncorrectInputDataException, AuthException {
+        log.info(getAllByFieldLogEndpoint(Client.class, Counterparty.class, counterpartyUuid));
+        return clientDao.getAllByCounterparty(counterpartyService.getEntityByUuid(counterpartyUuid, user));
+    }
+
+    @Override
+    @Transactional
     public Client getEntityByUuid(UUID uuid, User user) throws AuthException, IncorrectInputDataException {
         log.info(getByIdLogEndpoint(Client.class, uuid));
         Client client = clientDao.getByUuid(uuid);
@@ -91,6 +99,7 @@ public class ClientServiceImpl implements ClientService {
         validateInnerReferenceAndFillObjectFromDB(client, user);
 
         client.setSender(sender);
+        setDiscount(client, false);
         client.setPhone(phoneService.getOrCreateEntityByPhoneNumber(client.getPhone().getPhoneNumber()));
         userService.authorizeForAction(client, user);
         log.info(saveLogEndpoint(Client.class, client));
@@ -111,6 +120,15 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
+    public Client updateEntity(Client client, User user) throws IncorrectInputDataException, AuthException {
+        log.info(updateLogEndpoint(Client.class, client));
+        userService.authorizeForAction(client, user);
+        clientDao.update(client);
+        return client;
+    }
+
+    @Override
+    @Transactional
     public List<ClientDto> getAll(User user) {
         return clientMapper.toDto(getAllEntities(user));
     }
@@ -119,9 +137,7 @@ public class ClientServiceImpl implements ClientService {
     @Transactional
     public List<ClientDto> getAllByCounterpartyUuid(UUID counterpartyUuid, User user)
             throws IncorrectInputDataException, AuthException {
-        log.info(getAllByFieldLogEndpoint(Client.class, Counterparty.class, counterpartyUuid));
-        Counterparty counterparty = counterpartyService.getEntityByUuid(counterpartyUuid, user);
-        return clientMapper.toDto(clientDao.getAllByCounterparty(counterparty));
+        return clientMapper.toDto(getAllEntitiesByCounterpartyUuid(counterpartyUuid, user));
     }
 
     @Override
@@ -139,7 +155,11 @@ public class ClientServiceImpl implements ClientService {
     @Override
     @Transactional
     public ClientDto saveAsSender(ClientDto clientDto, User user) throws AuthException, IncorrectInputDataException {
-        return clientMapper.toDto(saveEntityAsSender(clientMapper.toEntity(clientDto), user));
+        Client client = clientMapper.toEntity(clientDto);
+        if (clientDto.getDiscount() == null) {
+            client.setDiscount(-1);
+        }
+        return clientMapper.toDto(saveEntityAsSender(client, user));
     }
 
     @Override
@@ -148,7 +168,7 @@ public class ClientServiceImpl implements ClientService {
             IncorrectInputDataException, PerformProcessFailedException {
         Client source = clientMapper.toEntity(clientDto);
         Client target = getEntityByUuid(uuid, user);
-        boolean isSender = target.isSender();
+        boolean sender = target.isSender();
 
         validateInnerReferenceAndFillObjectFromDB(source, user);
 
@@ -159,12 +179,12 @@ public class ClientServiceImpl implements ClientService {
             throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(Client.class, source, target, e));
         }
         target.setUuid(uuid);
-        target.setSender(isSender);
+        target.setSender(sender);
+        setDiscount(target, false);
         target.setCounterparty(source.getCounterparty());
         target.setPhone(phoneService.getOrCreateEntityByPhoneNumber(clientDto.getPhoneNumber()));
         target.setAddress(source.getAddress());
-        log.info(updateLogEndpoint(Client.class, target));
-        clientDao.update(target);
+        updateEntity(target, user);
         return clientMapper.toDto(target);
     }
 
@@ -182,5 +202,14 @@ public class ClientServiceImpl implements ClientService {
         Address address = addressService.getEntityById(source.getAddress().getId());
         source.setCounterparty(counterparty);
         source.setAddress(address);
+    }
+
+    private void setDiscount(Client client, boolean forceDiscountInheritance) {
+        if (! client.isSender()) {
+            return;
+        }
+        if (forceDiscountInheritance || client.getDiscount() < 0) {
+            client.setDiscount(client.getCounterparty().getDiscount());
+        }
     }
 }

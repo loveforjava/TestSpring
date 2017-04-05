@@ -17,6 +17,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import integration.helper.TestHelper;
 
+import static integration.helper.TestHelper.DISCOUNT;
 import static java.lang.String.join;
 
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
@@ -192,8 +193,7 @@ public class ClientControllerIT extends BaseControllerIT {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void createClientAsSender_senderShouldBeCreatedDoesNotMetterWhichSenderMarkPassed() throws Exception {
-        float discount = 24.5f;
+    public void createClientAsSender_senderShouldBeCreatedDoesNotMeterWhichSenderMarkPassed() throws Exception {
         // create
         Counterparty newCounterparty = testHelper.createCounterparty();
         Address newAddress = testHelper.createAddress();
@@ -202,7 +202,6 @@ public class ClientControllerIT extends BaseControllerIT {
         inputJson.put("counterpartyUuid", newCounterparty.getUuid().toString());
         inputJson.put("addressId", (int) newAddress.getId());
         inputJson.put("individual", false);
-        inputJson.put("discount", discount);
 
         String newUuid =
                 given().
@@ -214,14 +213,81 @@ public class ClientControllerIT extends BaseControllerIT {
                 then().
                         statusCode(SC_OK).
                         body("sender", equalTo(true)).
-                        body("discount", equalTo(discount)).
                 extract().
                         path("uuid");
 
         // check created data
         Client createdClient = clientService.getEntityByUuid(UUID.fromString(newUuid), newCounterparty.getUser());
         assertTrue(createdClient.isSender());
-        assertTrue((discount == createdClient.getDiscount()));
+
+        // delete
+        testHelper.deleteClient(createdClient);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void createClientAsSender_discountShouldBeInheritedFromCounterparty() throws Exception {
+        // create
+        Counterparty newCounterparty = testHelper.createCounterparty();
+        Address newAddress = testHelper.createAddress();
+
+        JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client.json");
+        inputJson.put("counterpartyUuid", newCounterparty.getUuid().toString());
+        inputJson.put("addressId", (int) newAddress.getId());
+        inputJson.put("individual", false);
+
+        String newUuid =
+                given().
+                        contentType(APPLICATION_JSON_VALUE).
+                        queryParam("token", newCounterparty.getUser().getToken()).
+                        body(inputJson.toString()).
+                when().
+                        post("/clients/senders").
+                then().
+                        statusCode(SC_OK).
+                        body("discount", equalTo(DISCOUNT)).
+                extract().
+                        path("uuid");
+
+        // check created data
+        Client createdClient = clientService.getEntityByUuid(UUID.fromString(newUuid), newCounterparty.getUser());
+        assertThat(DISCOUNT, equalTo(createdClient.getDiscount()));
+
+        // delete
+        testHelper.deleteClient(createdClient);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void createClientAsRecipient_discountShouldNotBeInheritedFromCounterparty() throws Exception {
+        float discountClient = 10.0f;
+
+        // create
+        Counterparty newCounterparty = testHelper.createCounterparty();
+        Address newAddress = testHelper.createAddress();
+
+        JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client.json");
+        inputJson.put("counterpartyUuid", newCounterparty.getUuid().toString());
+        inputJson.put("addressId", (int) newAddress.getId());
+        inputJson.put("individual", false);
+        inputJson.put("discount", discountClient);
+
+        String newUuid =
+                given().
+                        contentType(APPLICATION_JSON_VALUE).
+                        queryParam("token", newCounterparty.getUser().getToken()).
+                        body(inputJson.toString()).
+                when().
+                        post("/clients").
+                then().
+                        statusCode(SC_OK).
+                        body("discount", equalTo(discountClient)).
+                extract().
+                        path("uuid");
+
+        // check created data
+        Client createdClient = clientService.getEntityByUuid(UUID.fromString(newUuid), newCounterparty.getUser());
+        assertThat(discountClient, equalTo(createdClient.getDiscount()));
 
         // delete
         testHelper.deleteClient(createdClient);
@@ -230,6 +296,7 @@ public class ClientControllerIT extends BaseControllerIT {
     @Test
     @SuppressWarnings("unchecked")
     public void updateClientAsIndividual() throws Exception {
+        float discountClient = 10.0f;
         // update
         JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client.json");
         inputJson.put("counterpartyUuid", client.getCounterparty().getUuid().toString());
@@ -238,6 +305,7 @@ public class ClientControllerIT extends BaseControllerIT {
         inputJson.put("phoneNumber", "0934314522");
         inputJson.put("individual", true);
         inputJson.put("sender", true);
+        inputJson.put("discount", discountClient);
 
         String firstName = (String) inputJson.get("firstName");
         String middleName = (String) inputJson.get("middleName");
@@ -251,6 +319,7 @@ public class ClientControllerIT extends BaseControllerIT {
                 put("/clients/{uuid}", clientUuid.toString()).
         then().
                 body("sender", equalTo(false)).
+                body("discount", equalTo(discountClient)).
                 statusCode(SC_OK);
 
         JSONParser parser = new JSONParser();
@@ -259,6 +328,7 @@ public class ClientControllerIT extends BaseControllerIT {
         expectedJson.put("name", expectedFullName);
         expectedJson.put("middleName", inputJson.get("middleName"));
         expectedJson.put("sender", false);
+        expectedJson.put("discount", discountClient);
 
         // check updated data
         Client updatedClient = clientService.getEntityByUuid(clientUuid, user);
