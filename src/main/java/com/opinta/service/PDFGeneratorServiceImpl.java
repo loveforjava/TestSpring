@@ -277,15 +277,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
 
 
         populateField(acroForm, field, "senderName", sender.getName());
-
-        //Format sender's address for the PDF form and check if postcode should be on the new line
-        Address senderAddress = sender.getAddress();
-        String formattedAddress = processAddress(senderAddress);
-        if (postcodeOnNextLine) {
-            formattedAddress += "\n";
-        }
-        formattedAddress += (senderAddress.getPostcode() == null ? "" : senderAddress.getPostcode());
-        populateField(acroForm, field, "senderAddress", formattedAddress);
+        populateField(acroForm, field, "senderAddress", processAddress(sender.getAddress(), postcodeOnNextLine));
 
 
         Phone phone = sender.getPhone();
@@ -294,15 +286,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         }
 
         populateField(acroForm, field, "recipientName", recipient.getName());
-
-        //Format recipient's address for the PDF form and check if postcode should be on the new line
-        Address recipientAddress = recipient.getAddress();
-        formattedAddress = processAddress(recipientAddress);
-        if (postcodeOnNextLine) {
-            formattedAddress += "\n";
-        }
-        formattedAddress += (recipientAddress.getPostcode() == null ? "" : recipientAddress.getPostcode());
-        populateField(acroForm, field, "recipientAddress", formattedAddress);
+        populateField(acroForm, field, "recipientAddress", processAddress(recipient.getAddress(), postcodeOnNextLine));
 
         phone = recipient.getPhone();
         if (phone != null) {
@@ -310,7 +294,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         }
     }
 
-    private String processAddress(Address address) {
+    private String processAddress(Address address, boolean postcodeOnNextLine) {
         if (address == null) {
             return "";
         }
@@ -321,13 +305,16 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         String city = address.getCity();
         String district = address.getDistrict();
         String region = address.getRegion();
+        String postcode = address.getPostcode();
 
         String output = (street == null ? "" : "вул. " + street + ", ") +
                 (houseNumber == null ? "" : houseNumber + ", ") +
                 (apartmentNumber == null ? "" : "кв. " + apartmentNumber + ", ") +
                 (city == null ? "" : city + ", ") +
                 (district == null ? "" : district + " р-н ") +
-                (region == null ? "" : region + " обл. ");
+                (region == null ? "" : region + " обл.") +
+                (postcodeOnNextLine ? "\n" : " ") +
+                (postcode == null ? "" : postcode);
 
         return output;
     }
