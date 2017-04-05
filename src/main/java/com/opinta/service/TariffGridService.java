@@ -1,6 +1,6 @@
 package com.opinta.service;
 
-import com.opinta.entity.TariffGrid;
+import com.opinta.entity.classifier.TariffGrid;
 import com.opinta.entity.W2wVariation;
 import com.opinta.exception.PerformProcessFailedException;
 import java.util.List;

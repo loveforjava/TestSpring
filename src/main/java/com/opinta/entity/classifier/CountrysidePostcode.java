@@ -1,4 +1,4 @@
-package com.opinta.entity;
+package com.opinta.entity.classifier;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
