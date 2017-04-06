@@ -85,6 +85,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         List<Shipment> shipments = shipmentService.getAllEntitiesByShipmentGroupUuid(shipmentGroupUuid, user);
 
         if(shipments.isEmpty()) {
+            log.error("Shipment group contains no shipments");
             throw new IncorrectInputDataException("Shipments group contains no shipments");
         }
 
@@ -115,7 +116,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             stamper.setFullCompression();
             stamper.close();
         } catch (DocumentException e) {
-            e.printStackTrace();
+            log.error("Error occurred during compression of the document, {}", e.getMessage());
         }
         return compressedOutput;
     }
