@@ -27,6 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static java.lang.String.format;
+
 import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
@@ -191,6 +193,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         }
 
         TariffGrid tariffGrid = tariffGridService.getLast(w2wVariation);
+        TariffGrid maxTariffGrid = tariffGrid;
         if (tariffGrid == null) {
             return BigDecimal.ZERO;
         }
@@ -208,7 +211,12 @@ public class ShipmentServiceImpl implements ShipmentService {
         }
 
         float price = tariffGrid.getPrice() + getSurcharges(shipment);
-
+        if (shipment.getLength() > 70.0f) {
+            float overpayForLength = shipment.getLength() / 70.0f;
+            price = maxTariffGrid.getPrice() * overpayForLength;
+            log.info("Shipment length exceeds 70 cm - using tariff grid: " + maxTariffGrid);
+            log.info(format("Overpay ratio for exceeding length is: %s, price is: %s ", overpayForLength, price));
+        }
         float sumOfDiscount = price * shipment.getSender().getDiscount() / 100;
         price -= sumOfDiscount;
 
