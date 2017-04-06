@@ -82,7 +82,7 @@ public class ShipmentController {
         try {
             User user = userService.authenticate(token);
 
-            byte[] data = pdfGeneratorService.generate(uuid, user);
+            byte[] data = pdfGeneratorService.generateShipmentForm(uuid, user);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(parseMediaType(APPLICATION_PDF_VALUE));
             String filename = uuid + ".pdf";

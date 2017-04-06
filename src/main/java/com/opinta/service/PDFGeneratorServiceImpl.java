@@ -5,14 +5,17 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.oned.Code128Writer;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.PdfStamper;
 import com.opinta.entity.Address;
 import com.opinta.entity.Client;
 import com.opinta.entity.Phone;
 import com.opinta.entity.Shipment;
+import com.opinta.entity.User;
 import com.opinta.exception.AuthException;
 import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.util.MoneyToTextConverter;
-import com.opinta.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -40,6 +43,8 @@ import java.math.BigDecimal;
 import static java.lang.Math.round;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.rightPad;
+
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -63,12 +68,61 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
     @Autowired
     public PDFGeneratorServiceImpl(ShipmentService shipmentService, UserService userService) {
         this.shipmentService = shipmentService;
-        this.moneyToTextConverter = new MoneyToTextConverter();
         this.userService = userService;
+        this.moneyToTextConverter = new MoneyToTextConverter();
     }
 
     @Override
-    public byte[] generate(UUID shipmentId, User user) throws AuthException, IncorrectInputDataException, IOException {
+    public byte[] generateShipmentForm(UUID shipmentId, User user) throws AuthException, IncorrectInputDataException, IOException {
+        byte[] output = generateLabelAndPostpayForms(shipmentId, user);
+        ByteArrayOutputStream compressedOutput = compress(output);
+        return compressedOutput.toByteArray();
+    }
+
+    @Override
+    public byte[] generateShipmentGroupForms(UUID shipmentGroupUuid, User user) throws AuthException,
+            IncorrectInputDataException, IOException {
+        List<Shipment> shipments = shipmentService.getAllEntitiesByShipmentGroupUuid(shipmentGroupUuid, user);
+
+        if(shipments.isEmpty()) {
+            log.error("Shipment group contains no shipments");
+            throw new IncorrectInputDataException("Shipments group contains no shipments");
+        }
+
+        PDFMergerUtility merger = new PDFMergerUtility();
+        for (Shipment shipment : shipments) {
+            byte[] shipmentForm = generateLabelAndPostpayForms(shipment.getUuid(), user);
+            ByteArrayInputStream source = new ByteArrayInputStream(shipmentForm);
+            merger.addSource(source);
+            source.close();
+        }
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        merger.setDestinationStream(outputStream);
+        try {
+            merger.mergeDocuments(null);
+        } catch (IOException e) {
+            log.error("Got an error while merging the documents for shipment group, {}", e.getMessage());
+            throw e;
+        }
+        ByteArrayOutputStream compressedOutput = compress(outputStream.toByteArray());
+        template.close();
+        return compressedOutput.toByteArray();
+    }
+
+    private ByteArrayOutputStream compress(byte[] pdfToCompress) throws IOException {
+        PdfReader reader = new PdfReader(pdfToCompress);
+        ByteArrayOutputStream compressedOutput = new ByteArrayOutputStream();
+        try {
+            PdfStamper stamper = new PdfStamper(reader, compressedOutput);
+            stamper.setFullCompression();
+            stamper.close();
+        } catch (DocumentException e) {
+            log.error("Error occurred during compression of the document, {}", e.getMessage());
+        }
+        return compressedOutput;
+    }
+
+    private byte[] generateLabelAndPostpayForms(UUID shipmentId, User user) throws AuthException, IncorrectInputDataException, IOException {
         Shipment shipment = shipmentService.getEntityByUuid(shipmentId, user);
 
         userService.authorizeForAction(shipment, user);
@@ -90,11 +144,10 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             }
             output = outputStream.toByteArray();
         }
-        template.close();
         return output;
     }
 
-    public byte[] generatePostpay(Shipment shipment) throws IOException {
+    private byte[] generatePostpay(Shipment shipment) throws IOException {
         byte[] data;
         try {
             //Getting PDF template from the file
@@ -145,14 +198,17 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             template.save(outputStream);
             data = outputStream.toByteArray();
+            outputStream.close();
         } catch (IOException e) {
             log.error("Error while parsing and populating PDF template: {}", e.getMessage());
             throw new IOException("Error while parsing and populating PDF template");
+        } finally {
+            template.close();
         }
         return data;
     }
 
-    public byte[] generateLabel(Shipment shipment) throws IOException {
+    private byte[] generateLabel(Shipment shipment) throws IOException {
         byte[] data;
         try {
             //Getting PDF template from the file
@@ -232,6 +288,8 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         } catch (WriterException e) {
             log.error("Error while generating barcodeInnerNumber: {}", e);
             throw new IOException("Error during barcodeInnerNumber generating.");
+        } finally {
+            template.close();
         }
         return data;
     }

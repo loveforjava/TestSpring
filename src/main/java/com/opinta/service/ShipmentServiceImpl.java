@@ -124,6 +124,14 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
+    public List<Shipment> getAllEntitiesByShipmentGroupUuid(UUID uuid, User user) throws AuthException,
+            IncorrectInputDataException {
+        ShipmentGroup shipmentGroup = shipmentGroupService.getEntityById(uuid, user);
+        return shipmentDao.getAllByShipmentGroup(shipmentGroup, user);
+    }
+
+    @Override
+    @Transactional
     public ShipmentDto getByUuid(UUID uuid, User user) throws AuthException, IncorrectInputDataException {
         return shipmentMapper.toDto(getEntityByUuid(uuid, user));
     }
