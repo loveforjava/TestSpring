@@ -27,7 +27,6 @@ import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.Matchers.hasItems;
 import static org.junit.Assert.assertThat;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
