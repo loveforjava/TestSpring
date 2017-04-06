@@ -161,6 +161,39 @@ public class CalculationPriceIT extends BaseControllerIT {
         // delete
         testHelper.deleteShipment(createdShipment);
     }
+    
+    @Test
+    @SuppressWarnings("unchecked")
+    public void calcPrice_W2W_weight1_length75_insideTown() throws Exception {
+        // create
+        JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
+        jsonObject.put("shipmentGroupUuid", shipmentGroup.getUuid().toString());
+        jsonObject.put("senderUuid", sender.getUuid().toString());
+        jsonObject.put("recipientUuid", testHelper.createClient().getUuid().toString());
+        jsonObject.put("weight", 2500);
+        jsonObject.put("length", 140);
+        jsonObject.put("deliveryType", "W2W");
+        String expectedJson = jsonObject.toString();
+        
+        String newShipmentUuid =
+                given().
+                        contentType(APPLICATION_JSON_VALUE).
+                        queryParam("token", sender.getCounterparty().getUser().getToken()).
+                        body(expectedJson).
+                when().
+                        post("/shipments").
+                then().
+                        statusCode(SC_OK).
+                        body("price", equalTo(84f)).
+                extract().
+                        path("uuid");
+        
+        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
+                sender.getCounterparty().getUser());
+        
+        // delete
+        testHelper.deleteShipment(createdShipment);
+    }
 
     @Test
     @SuppressWarnings("unchecked")
