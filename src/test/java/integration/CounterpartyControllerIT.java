@@ -86,7 +86,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
     }
     
     @Test
-    public void getAllClientsOfCounterparty() {
+    public void getClientsByCounterpartyUuid() {
         given().
                 queryParam("token", user.getToken()).
         when().
@@ -97,7 +97,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
     }
     
     @Test
-    public void getAllSendersOfCounterparty() {
+    public void getClientsByCounterpartyUuidAsSenders() {
         given().
                 queryParam("token", user.getToken()).
                 queryParam("sender", true).
@@ -111,7 +111,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
     }
     
     @Test
-    public void getAllRecipientsOfCounterparty() {
+    public void getClientsByCounterpartyUuidAsRecipients() {
         given().
                 queryParam("token", user.getToken()).
                 queryParam("sender", false).
