@@ -29,8 +29,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
-import static com.opinta.util.LogMessageUtil.*;
+
 import static com.opinta.util.LogMessageUtil.generatePdfFormOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getAllOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.saveOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.updateOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.deleteOnErrorLogEndpoint;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
