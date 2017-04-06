@@ -39,6 +39,7 @@ import static com.opinta.util.LogMessageUtil.deleteOnErrorLogEndpoint;
 public class TestHelper {
     public static final String SAME_REGION_COUNTRYSIDE = "03027";
     public static final String OTHER_REGION_COUNTRYSIDE = "07024";
+    public static final float DISCOUNT = 24.5f;
 
     private final ClientService clientService;
     private final AddressService addressService;
@@ -134,6 +135,12 @@ public class TestHelper {
     public Client createClient() throws Exception {
         Client client = new Client("FOP Ivanov", "001", createAddress(), createPhone(),
                 createCounterparty());
+        return clientService.saveEntityAsRecipient(client, client.getCounterparty().getUser());
+    }
+
+    public Client createClient(Counterparty counterparty) throws Exception {
+        Client client = new Client("FOP Ivanov", "001", createAddress(), createPhone(),
+                counterparty);
         return clientService.saveEntityAsRecipient(client, client.getCounterparty().getUser());
     }
 
@@ -265,6 +272,7 @@ public class TestHelper {
 
     public Counterparty createCounterparty() throws Exception {
         Counterparty counterparty = new Counterparty("Modna kasta", createPostcodePool());
+        counterparty.setDiscount(DISCOUNT);
         return counterpartyService.saveEntity(counterparty);
     }
 

@@ -3,7 +3,7 @@ package com.opinta.service;
 import com.opinta.entity.Address;
 import com.opinta.entity.DeliveryType;
 import com.opinta.entity.ShipmentGroup;
-import com.opinta.entity.TariffGrid;
+import com.opinta.entity.classifier.TariffGrid;
 import com.opinta.entity.User;
 import com.opinta.entity.W2wVariation;
 import com.opinta.exception.AuthException;

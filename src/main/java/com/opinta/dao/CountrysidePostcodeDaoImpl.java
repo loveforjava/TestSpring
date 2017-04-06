@@ -1,7 +1,6 @@
 package com.opinta.dao;
 
-import com.opinta.entity.Address;
-import com.opinta.entity.CountrysidePostcode;
+import com.opinta.entity.classifier.CountrysidePostcode;
 import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.Session;

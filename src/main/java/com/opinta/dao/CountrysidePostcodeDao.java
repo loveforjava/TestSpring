@@ -1,6 +1,6 @@
 package com.opinta.dao;
 
-import com.opinta.entity.CountrysidePostcode;
+import com.opinta.entity.classifier.CountrysidePostcode;
 import java.util.List;
 
 public interface CountrysidePostcodeDao {

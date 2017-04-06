@@ -28,6 +28,9 @@ public interface CounterpartyService {
             AuthException, PerformProcessFailedException;
     
     CounterpartyDto save(CounterpartyDto counterpartyDto) throws IncorrectInputDataException;
-    
+
+    CounterpartyDto updateDiscount(UUID uuid, CounterpartyDto counterpartyDto, User user)
+            throws IncorrectInputDataException, AuthException, PerformProcessFailedException;
+
     void delete(UUID uuid, User user) throws AuthException, IncorrectInputDataException;
 }

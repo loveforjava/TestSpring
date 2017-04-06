@@ -1,10 +1,10 @@
 package com.opinta.service;
 
 import com.opinta.dao.TariffGridDao;
-import com.opinta.entity.TariffGrid;
+import com.opinta.entity.classifier.TariffGrid;
 import com.opinta.entity.W2wVariation;
 import com.opinta.exception.PerformProcessFailedException;
-import com.opinta.util.LogMessageUtil;
+
 import java.util.List;
 import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;

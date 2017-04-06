@@ -25,7 +25,9 @@ import java.util.Properties;
 @Configuration
 @EnableTransactionManagement
 @ComponentScan({"com.opinta"})
-@PropertySource(value = "classpath:application.properties")
+@PropertySource(value = {
+        "classpath:application.properties",
+        "classpath:application-dev.properties"})
 @Slf4j
 public class HibernateConfig {
     private Environment environment;
@@ -33,6 +35,15 @@ public class HibernateConfig {
     private Resource dataScriptProductionCountrysidePostcode;
     @Value("classpath:sql/prod/db-data-tariff-grid.sql")
     private Resource dataScriptProductionTariffGrid;
+    @Value("classpath:sql/prod/db-data-country.sql")
+    private Resource dataScriptProductionCountry;
+    @Value("classpath:sql/prod/db-data-region.sql")
+    private Resource dataScriptProductionRegion;
+    @Value("classpath:sql/prod/db-data-district.sql")
+    private Resource dataScriptProductionDistrict;
+    @Value("classpath:sql/prod/db-data-city.sql")
+    private Resource dataScriptProductionCity;
+
     @Value("classpath:sql/dev/db-data-countryside-postcode.sql")
     private Resource dataScriptDevelopmentCountrysidePostcode;
     @Value("classpath:sql/dev/db-data-tariff-grid.sql")
@@ -169,6 +180,10 @@ public class HibernateConfig {
         final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
         populator.addScript(dataScriptProductionCountrysidePostcode);
         populator.addScript(dataScriptProductionTariffGrid);
+        populator.addScript(dataScriptProductionCountry);
+        populator.addScript(dataScriptProductionRegion);
+        populator.addScript(dataScriptProductionDistrict);
+        populator.addScript(dataScriptProductionCity);
         return populator;
     }
     
