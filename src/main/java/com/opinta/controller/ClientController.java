@@ -51,7 +51,7 @@ public class ClientController {
     }
     
     @GetMapping
-    public ResponseEntity<?> getAllClients(@RequestParam(value = "token") UUID token) {
+    public ResponseEntity<?> getAllClients(@RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
             return new ResponseEntity<>(clientService.getAll(user), OK);
@@ -61,7 +61,7 @@ public class ClientController {
     }
     
     @GetMapping("{uuid}")
-    public ResponseEntity<?> getClient(@PathVariable UUID uuid, @RequestParam(value = "token") UUID token) {
+    public ResponseEntity<?> getClient(@PathVariable UUID uuid, @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
             return new ResponseEntity<>(clientService.getByUuid(uuid, user), OK);
@@ -73,8 +73,7 @@ public class ClientController {
     }
 
     @GetMapping("{uuid}/shipments")
-    public ResponseEntity<?> getShipmentsByClientId(@PathVariable UUID uuid,
-                                                    @RequestParam(value = "token") UUID token) {
+    public ResponseEntity<?> getShipmentsByClientId(@PathVariable UUID uuid, @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
             return new ResponseEntity<>(shipmentService.getAllByClientUuid(uuid, user), OK);
@@ -88,7 +87,7 @@ public class ClientController {
     }
     
     @PostMapping
-    public ResponseEntity<?> createClient(@RequestBody ClientDto clientDto, @RequestParam(value = "token") UUID token) {
+    public ResponseEntity<?> createClient(@RequestBody ClientDto clientDto, @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
             return new ResponseEntity<>(clientService.save(clientDto, user), OK);
@@ -100,8 +99,7 @@ public class ClientController {
     }
 
     @PostMapping("/senders")
-    public ResponseEntity<?> createClientAsSender(@RequestBody ClientDto clientDto,
-                                                  @RequestParam(value = "token") UUID token) {
+    public ResponseEntity<?> createClientAsSender(@RequestBody ClientDto clientDto, @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
             return new ResponseEntity<>(clientService.saveAsSender(clientDto, user), OK);
@@ -113,8 +111,9 @@ public class ClientController {
     }
 
     @PutMapping("{uuid}")
-    public ResponseEntity<?> updateClient(@PathVariable UUID uuid, @RequestBody ClientDto clientDto,
-                                          @RequestParam(value = "token") UUID token) {
+    public ResponseEntity<?> updateClient(@PathVariable UUID uuid,
+                                          @RequestBody ClientDto clientDto,
+                                          @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
             return new ResponseEntity<>(clientService.update(uuid, clientDto, user), OK);
@@ -128,8 +127,7 @@ public class ClientController {
     }
     
     @DeleteMapping("{uuid}")
-    public ResponseEntity<?> deleteClient(@PathVariable UUID uuid,
-                                          @RequestParam(value = "token") UUID token) {
+    public ResponseEntity<?> deleteClient(@PathVariable UUID uuid, @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
             clientService.delete(uuid, user);

@@ -55,7 +55,7 @@ public class ShipmentController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getShipments(@RequestParam(value = "token") UUID token) {
+    public ResponseEntity<?> getShipments(@RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
             return new ResponseEntity<>(shipmentService.getAll(user), OK);
@@ -65,7 +65,7 @@ public class ShipmentController {
     }
 
     @GetMapping("{uuid}")
-    public ResponseEntity<?> getShipment(@PathVariable UUID uuid, @RequestParam(value = "token") UUID token) {
+    public ResponseEntity<?> getShipment(@PathVariable UUID uuid, @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
             return new ResponseEntity<>(shipmentService.getByUuid(uuid, user), OK);
@@ -77,8 +77,7 @@ public class ShipmentController {
     }
 
     @GetMapping("{uuid}/form")
-    public ResponseEntity<?> getShipmentForm(@PathVariable UUID uuid,
-                                             @RequestParam(value = "token") UUID token) {
+    public ResponseEntity<?> getShipmentForm(@PathVariable UUID uuid, @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
 
@@ -99,8 +98,7 @@ public class ShipmentController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createShipment(@RequestBody ShipmentDto shipmentDto,
-                                            @RequestParam(value = "token") UUID token) {
+    public ResponseEntity<?> createShipment(@RequestBody ShipmentDto shipmentDto, @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
             return new ResponseEntity<>(shipmentService.save(shipmentDto, user), OK);
@@ -112,8 +110,9 @@ public class ShipmentController {
     }
 
     @PutMapping("{uuid}")
-    public ResponseEntity<?> updateShipment(@PathVariable UUID uuid, @RequestBody ShipmentDto shipmentDto,
-                                            @RequestParam(value = "token") UUID token) {
+    public ResponseEntity<?> updateShipment(@PathVariable UUID uuid,
+                                            @RequestBody ShipmentDto shipmentDto,
+                                            @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
             return new ResponseEntity<>(shipmentService.update(uuid, shipmentDto, user), OK);
@@ -127,8 +126,7 @@ public class ShipmentController {
     }
 
     @DeleteMapping("{uuid}")
-    public ResponseEntity<?> deleteShipment(@PathVariable UUID uuid,
-                                            @RequestParam(value = "token") UUID token) {
+    public ResponseEntity<?> deleteShipment(@PathVariable UUID uuid, @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
             shipmentService.delete(uuid, user);

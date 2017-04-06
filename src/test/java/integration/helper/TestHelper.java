@@ -137,6 +137,16 @@ public class TestHelper {
                 createCounterparty());
         return clientService.saveEntityAsRecipient(client, client.getCounterparty().getUser());
     }
+    
+    public Client createSenderFor(Counterparty counterparty) throws Exception {
+        Client client = new Client("FOP Sidorov", "456", createAddress(), createPhone(), counterparty);
+        return clientService.saveEntityAsSender(client, client.getCounterparty().getUser());
+    }
+    
+    public Client createRecipientFor(Counterparty counterparty) throws Exception {
+        Client client = new Client("FOP Petrov", "123", createAddress(), createPhone(), counterparty);
+        return clientService.saveEntityAsRecipient(client, client.getCounterparty().getUser());
+    }
 
     public Client createClient(Counterparty counterparty) throws Exception {
         Client client = new Client("FOP Ivanov", "001", createAddress(), createPhone(),
@@ -186,6 +196,19 @@ public class TestHelper {
         Client client = new Client("FOP Ivanov", "001", createAddressOtherRegionCountryside(), createPhone(),
                 createCounterparty());
         return clientService.saveEntityAsRecipient(client, client.getCounterparty().getUser());
+    }
+    
+    public void deleteClientWithoutDeletingCounterparty(Client client) throws Exception {
+        try {
+            clientService.delete(client.getUuid(), client.getCounterparty().getUser());
+        } catch (Exception e) {
+            log.debug(e.getMessage());
+        }
+        try {
+            addressService.delete(client.getAddress().getId());
+        } catch (Exception e) {
+            log.debug(e.getMessage());
+        }
     }
 
     public void deleteClient(Client client) throws Exception {

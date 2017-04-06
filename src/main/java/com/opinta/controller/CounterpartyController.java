@@ -60,8 +60,7 @@ public class CounterpartyController {
     }
 
     @GetMapping(value = "{uuid}", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getCounterparty(@PathVariable UUID uuid,
-                                             @RequestParam(value = "token") UUID token) {
+    public ResponseEntity<?> getCounterparty(@PathVariable UUID uuid, @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
             return new ResponseEntity<>(counterpartyService.getByUuid(uuid, user), OK);
@@ -72,9 +71,8 @@ public class CounterpartyController {
         }
     }
 
-    @GetMapping(value = "{uuid}/clients", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getClientsByCounterpartyUuid(@PathVariable UUID uuid,
-                                                        @RequestParam(value = "token") UUID token) {
+    @GetMapping(value = "{uuid}/clients", produces = APPLICATION_JSON_VALUE, params = "token")
+    public ResponseEntity<?> getClientsByCounterpartyUuid(@PathVariable UUID uuid, @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
             return new ResponseEntity<>(clientService.getAllByCounterpartyUuid(uuid, user), OK);
@@ -87,22 +85,13 @@ public class CounterpartyController {
         }
     }
     
-    @GetMapping(value = "{uuid}/senders", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getSendersByCounterpartyUuid(@PathVariable UUID uuid,
-                                                          @RequestParam(value = "token") UUID token) {
-        return getClientsByCounterpartyUuidAndType(uuid, token, true);
-    }
-    
-    @GetMapping(value = "{uuid}/recipients", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getRecipientsByCounterpartyUuid(@PathVariable UUID uuid,
-                                                             @RequestParam(value = "token") UUID token) {
-        return getClientsByCounterpartyUuidAndType(uuid, token, false);
-    }
-    
-    private ResponseEntity getClientsByCounterpartyUuidAndType(UUID uuid, UUID token, boolean isSender) {
+    @GetMapping(value = "{uuid}/clients", produces = APPLICATION_JSON_VALUE, params = {"token", "sender"})
+    public ResponseEntity<?> getClientsByCounterpartyUuidAndType(@PathVariable UUID uuid,
+                                                                 @RequestParam UUID token,
+                                                                 @RequestParam boolean sender) {
         try {
             User user = userService.authenticate(token);
-            if (isSender) {
+            if (sender) {
                 return new ResponseEntity<>(clientService.getAllSendersByCounterpartyUuid(uuid, user), OK);
             } else {
                 return new ResponseEntity<>(clientService.getAllRecipientsByCounterpartyUuid(uuid, user), OK);
@@ -127,8 +116,8 @@ public class CounterpartyController {
 
     @PutMapping(value = "{uuid}", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<?> updateCounterpartyByUuid(@PathVariable UUID uuid,
-                                                  @RequestBody CounterpartyDto counterpartyDto,
-                                                  @RequestParam(value = "token") UUID token) {
+                                                      @RequestBody CounterpartyDto counterpartyDto,
+                                                      @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
             return new ResponseEntity<>(counterpartyService.update(uuid, counterpartyDto, user), OK);
@@ -141,8 +130,8 @@ public class CounterpartyController {
 
     @PutMapping(value = "{uuid}/discount", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<?> updateCounterpartyDiscountByUuid(@PathVariable UUID uuid,
-                                                      @RequestBody CounterpartyDto counterpartyDto,
-                                                      @RequestParam(value = "token") UUID token) {
+                                                              @RequestBody CounterpartyDto counterpartyDto,
+                                                              @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
             return new ResponseEntity<>(counterpartyService.updateDiscount(uuid, counterpartyDto, user), OK);
@@ -154,7 +143,7 @@ public class CounterpartyController {
     }
 
     @DeleteMapping("{uuid}")
-    public ResponseEntity<?> deletePostOfficeById(@PathVariable UUID uuid, @RequestParam(value = "token") UUID token) {
+    public ResponseEntity<?> deletePostOfficeById(@PathVariable UUID uuid, @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
             counterpartyService.delete(uuid, user);
