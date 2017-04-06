@@ -90,6 +90,6 @@ public class LogMessageUtil {
     }
 
     public static String generatePdfFormOnErrorLogEndpoint(Class clazz, Object value, Exception e) {
-        return format("Can't generateShipmentForm PDF form for %s %s! %s!", clazz.getSimpleName(), value, e);
+        return format("Can't generate PDF form for %s %s! %s!", clazz.getSimpleName(), value, e);
     }
 }

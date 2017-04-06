@@ -75,7 +75,7 @@ public class BarcodeInnerNumberDaoImpl implements BarcodeInnerNumberDao {
                 call.execute();
                 return call.getString(2);
             } catch (SQLException e) {
-                throw new RuntimeException(format("Can't generateShipmentForm barcode inner number from stored procedure: " +
+                throw new RuntimeException(format("Can't generate barcode inner number from stored procedure: " +
                         "PostcodePool: %s", postcodePool.getUuid().toString().replaceAll("-", "")), e);
             }
         });
