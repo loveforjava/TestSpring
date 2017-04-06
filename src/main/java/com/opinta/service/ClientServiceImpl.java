@@ -152,12 +152,14 @@ public class ClientServiceImpl implements ClientService {
     }
     
     @Override
+    @Transactional
     public List<ClientDto> getAllSendersByCounterpartyUuid(UUID counterpartyUuid, User user)
             throws IncorrectInputDataException, AuthException {
         return clientMapper.toDto(getAllClientsByCounterpartyUuidAndType(counterpartyUuid, true, user));
     }
     
     @Override
+    @Transactional
     public List<ClientDto> getAllRecipientsByCounterpartyUuid(UUID counterpartyUuid, User user)
             throws IncorrectInputDataException, AuthException {
         return clientMapper.toDto(getAllClientsByCounterpartyUuidAndType(counterpartyUuid, false, user));
