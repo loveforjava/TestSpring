@@ -31,6 +31,12 @@ public interface ClientService {
 
     List<ClientDto> getAllByCounterpartyUuid(UUID counterpartyUuid, User user)
             throws IncorrectInputDataException, AuthException;
+    
+    List<ClientDto> getAllSendersByCounterpartyUuid(UUID counterpartyUuid, User user)
+            throws IncorrectInputDataException, AuthException;
+    
+    List<ClientDto> getAllRecipientsByCounterpartyUuid(UUID counterpartyUuid, User user)
+            throws IncorrectInputDataException, AuthException;
 
     ClientDto getByUuid(UUID uuid, User user) throws AuthException, IncorrectInputDataException;
     
