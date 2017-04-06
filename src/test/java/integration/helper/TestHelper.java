@@ -137,6 +137,16 @@ public class TestHelper {
                 createCounterparty());
         return clientService.saveEntityAsRecipient(client, client.getCounterparty().getUser());
     }
+    
+    public Client createSenderFor(Counterparty counterparty) throws Exception {
+        Client client = new Client("FOP Sidorov", "456", createAddress(), createPhone(), counterparty);
+        return clientService.saveEntityAsSender(client, client.getCounterparty().getUser());
+    }
+    
+    public Client createRecipientFor(Counterparty counterparty) throws Exception {
+        Client client = new Client("FOP Petrov", "123", createAddress(), createPhone(), counterparty);
+        return clientService.saveEntityAsRecipient(client, client.getCounterparty().getUser());
+    }
 
     public Client createClient(Counterparty counterparty) throws Exception {
         Client client = new Client("FOP Ivanov", "001", createAddress(), createPhone(),

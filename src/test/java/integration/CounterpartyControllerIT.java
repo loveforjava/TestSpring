@@ -27,12 +27,15 @@ import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
 import static org.junit.Assert.assertThat;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 public class CounterpartyControllerIT extends BaseControllerIT {
     private Counterparty counterparty;
     private UUID counterpartyUuid;
+    private Client sender;
+    private Client recipient;
     private User user;
 
     @Autowired
@@ -49,12 +52,16 @@ public class CounterpartyControllerIT extends BaseControllerIT {
     @Before
     public void setUp() throws Exception {
         counterparty = testHelper.createCounterparty();
+        sender = testHelper.createSenderFor(counterparty);
+        recipient = testHelper.createRecipientFor(counterparty);
         counterpartyUuid = counterparty.getUuid();
         user = counterparty.getUser();
     }
 
     @After
     public void tearDown() throws Exception {
+        testHelper.deleteClient(sender);
+        testHelper.deleteClient(recipient);
         testHelper.deleteCounterpartyWithPostcodePool(counterparty);
     }
 
@@ -77,6 +84,43 @@ public class CounterpartyControllerIT extends BaseControllerIT {
                 contentType(APPLICATION_JSON_VALUE).
                 statusCode(SC_OK).
                 body("uuid", equalTo(counterpartyUuid.toString()));
+    }
+    
+    @Test
+    public void getAllClientsOfCounterparty() {
+        given().
+                queryParam("token", user.getToken()).
+        when().
+                get("counterparties/{uuid}/clients", counterpartyUuid.toString()).
+        then().
+                contentType(APPLICATION_JSON_VALUE).
+                statusCode(SC_OK);
+    }
+    
+    @Test
+    public void getAllSendersOfCounterparty() {
+        given().
+                queryParam("token", user.getToken()).
+        when().
+                get("counterparties/{uuid}/senders", counterpartyUuid.toString()).
+        then().
+                contentType(APPLICATION_JSON_VALUE).
+                statusCode(SC_OK).
+                body("[0].sender", equalTo(true)).
+                body("[0].uuid", equalTo(sender.getUuid().toString()));
+    }
+    
+    @Test
+    public void getAllRecipientsOfCounterparty() {
+        given().
+                queryParam("token", user.getToken()).
+        when().
+                get("counterparties/{uuid}/recipients", counterpartyUuid.toString()).
+        then().
+                contentType(APPLICATION_JSON_VALUE).
+                statusCode(SC_OK).
+                body("[0].sender", equalTo(false)).
+                body("[0].uuid", equalTo(recipient.getUuid().toString()));
     }
 
     @Test
