@@ -113,7 +113,6 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         } catch (DocumentException e) {
             e.printStackTrace();
         }
-        template.close();
         return compressedOutput;
     }
 
@@ -139,7 +138,6 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             }
             output = outputStream.toByteArray();
         }
-        template.close();
         return output;
     }
 
@@ -194,9 +192,12 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             template.save(outputStream);
             data = outputStream.toByteArray();
+            outputStream.close();
         } catch (IOException e) {
             log.error("Error while parsing and populating PDF template: {}", e.getMessage());
             throw new IOException("Error while parsing and populating PDF template");
+        } finally {
+            template.close();
         }
         return data;
     }
@@ -281,6 +282,8 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         } catch (WriterException e) {
             log.error("Error while generating barcodeInnerNumber: {}", e);
             throw new IOException("Error during barcodeInnerNumber generating.");
+        } finally {
+            template.close();
         }
         return data;
     }
