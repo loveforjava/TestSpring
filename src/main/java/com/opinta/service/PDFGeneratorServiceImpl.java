@@ -102,6 +102,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             merger.mergeDocuments(null);
         } catch (IOException e) {
             log.error("Got an error while merging the documents for shipment group, {}", e.getMessage());
+            throw e;
         }
         ByteArrayOutputStream compressedOutput = compress(outputStream.toByteArray());
         template.close();
