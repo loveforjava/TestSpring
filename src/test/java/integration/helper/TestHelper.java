@@ -211,7 +211,6 @@ public class TestHelper {
         shipmentGroup.setName("Group 1");
         shipmentGroup.setCounterparty(createCounterparty());
         ShipmentGroup newShipmentGroup = shipmentGroupService.saveEntity(shipmentGroup, shipmentGroup.getCounterparty().getUser());
-//        createShipment(newShipmentGroup);
         return newShipmentGroup;
     }
 
