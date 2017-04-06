@@ -60,7 +60,7 @@ public class PDFGeneratorServiceTest {
 
         when(shipmentService.getEntityByUuid(shipmentId, user)).thenReturn(shipment);
         assertNotEquals("PDFGenerator returned an empty label",
-                pdfGeneratorService.generate(shipmentId, user).length, 0);
+                pdfGeneratorService.generateShipmentForm(shipmentId, user).length, 0);
         verify(shipmentService, atLeast(1)).getEntityByUuid(shipmentId, user);
     }
 }
