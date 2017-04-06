@@ -1,15 +1,12 @@
 package integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.opinta.dto.ClientDto;
 import com.opinta.dto.ShipmentGroupDto;
-import com.opinta.entity.Client;
 import com.opinta.entity.Counterparty;
+import com.opinta.entity.Shipment;
 import com.opinta.entity.ShipmentGroup;
 import com.opinta.entity.User;
-import com.opinta.mapper.ClientMapper;
 import com.opinta.mapper.ShipmentGroupMapper;
-import com.opinta.service.ClientService;
 import com.opinta.service.ShipmentGroupService;
 import integration.helper.TestHelper;
 import org.json.simple.JSONObject;
@@ -24,7 +21,6 @@ import java.util.UUID;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.hamcrest.CoreMatchers.equalTo;
 
 public class ShipmentGroupControllerIT extends BaseControllerIT {
@@ -70,7 +66,23 @@ public class ShipmentGroupControllerIT extends BaseControllerIT {
                 statusCode(SC_OK).
                 body("uuid", equalTo(shipmentGroupUuid.toString()));
     }
-    
+
+    @Test
+    public void getShipmentGroupForm() throws Exception {
+        Shipment shipment = testHelper.createShipmentWithSameCounterparty(shipmentGroup,
+                shipmentGroup.getCounterparty());
+
+        given().
+                queryParam("token", user.getToken()).
+        when().
+                get("shipment-groups/{uuid}/form", shipmentGroupUuid.toString()).
+        then().
+                statusCode(SC_OK);
+
+        // delete shipment
+        testHelper.deleteShipment(shipment);
+    }
+
     @Test
     public void getShipmentGroup_notFound() throws Exception {
         given().

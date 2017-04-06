@@ -24,6 +24,8 @@ public interface ShipmentService {
 
     List<ShipmentDto> getAllByShipmentGroupUuid(UUID uuid, User user) throws AuthException, IncorrectInputDataException;
 
+    List<Shipment> getAllEntitiesByShipmentGroupUuid(UUID uuid, User user) throws AuthException, IncorrectInputDataException;
+
     ShipmentDto getByUuid(UUID uuid, User user) throws AuthException, IncorrectInputDataException;
     
     ShipmentDto save(ShipmentDto shipmentDto, User user) throws AuthException, IncorrectInputDataException;

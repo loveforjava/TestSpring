@@ -42,7 +42,26 @@ public class ClientDaoImpl implements ClientDao {
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                 .list();
     }
-
+    
+    @Override
+    public List<Client> getAllSendersByCounterparty(Counterparty counterparty) {
+        return getAllClientsByCounterpartyAndType(counterparty, true);
+    }
+    
+    @Override
+    public List<Client> getAllRecipientsByCounterparty(Counterparty counterparty) {
+        return getAllClientsByCounterpartyAndType(counterparty, false);
+    }
+    
+    private List<Client> getAllClientsByCounterpartyAndType(Counterparty counterparty, boolean isSender) {
+        Session session = sessionFactory.getCurrentSession();
+        return session.createCriteria(Client.class)
+                .add(Restrictions.eq("counterparty", counterparty))
+                .add(Restrictions.eq("sender", isSender))
+                .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
+                .list();
+    }
+    
     @Override
     public Client getByUuid(UUID uuid) {
         Session session = sessionFactory.getCurrentSession();

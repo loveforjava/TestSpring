@@ -73,11 +73,40 @@ public class CounterpartyController {
     }
 
     @GetMapping(value = "{uuid}/clients", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getClientsByCounterpartyId(@PathVariable UUID uuid,
+    public ResponseEntity<?> getClientsByCounterpartyUuid(@PathVariable UUID uuid,
                                                         @RequestParam(value = "token") UUID token) {
         try {
             User user = userService.authenticate(token);
             return new ResponseEntity<>(clientService.getAllByCounterpartyUuid(uuid, user), OK);
+        } catch (AuthException e) {
+            return new ResponseEntity<>(getAllByFieldOnErrorLogEndpoint(Client.class, Counterparty.class, uuid, e),
+                    UNAUTHORIZED);
+        } catch (IncorrectInputDataException e) {
+            return new ResponseEntity<>(getAllByFieldOnErrorLogEndpoint(Client.class, Counterparty.class, uuid, e),
+                    NOT_FOUND);
+        }
+    }
+    
+    @GetMapping(value = "{uuid}/senders", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getSendersByCounterpartyUuid(@PathVariable UUID uuid,
+                                                          @RequestParam(value = "token") UUID token) {
+        return getClientsByCounterpartyUuidAndType(uuid, token, true);
+    }
+    
+    @GetMapping(value = "{uuid}/recipients", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getRecipientsByCounterpartyUuid(@PathVariable UUID uuid,
+                                                             @RequestParam(value = "token") UUID token) {
+        return getClientsByCounterpartyUuidAndType(uuid, token, false);
+    }
+    
+    private ResponseEntity getClientsByCounterpartyUuidAndType(UUID uuid, UUID token, boolean isSender) {
+        try {
+            User user = userService.authenticate(token);
+            if (isSender) {
+                return new ResponseEntity<>(clientService.getAllSendersByCounterpartyUuid(uuid, user), OK);
+            } else {
+                return new ResponseEntity<>(clientService.getAllRecipientsByCounterpartyUuid(uuid, user), OK);
+            }
         } catch (AuthException e) {
             return new ResponseEntity<>(getAllByFieldOnErrorLogEndpoint(Client.class, Counterparty.class, uuid, e),
                     UNAUTHORIZED);

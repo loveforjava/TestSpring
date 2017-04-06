@@ -8,5 +8,8 @@ import com.opinta.entity.User;
 
 public interface PDFGeneratorService {
 
-    byte[] generate(UUID id, User user) throws AuthException, IncorrectInputDataException, IOException;
+    byte[] generateShipmentGroupForms(UUID shipmentGroupUuid, User user) throws AuthException,
+            IncorrectInputDataException, IOException;
+
+    byte[] generateShipmentForm(UUID id, User user) throws AuthException, IncorrectInputDataException, IOException;
 }
