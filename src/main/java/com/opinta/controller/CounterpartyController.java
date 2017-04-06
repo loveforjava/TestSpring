@@ -87,7 +87,19 @@ public class CounterpartyController {
         }
     }
     
-    private ResponseEntity getClientsOfTypeByCounterpartyUuidAndToken(UUID uuid, UUID token, boolean isSender) {
+    @GetMapping(value = "{uuid}/senders", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getSendersByCounterpartyUuid(@PathVariable UUID uuid,
+                                                          @RequestParam(value = "token") UUID token) {
+        return getClientsByCounterpartyUuidAndType(uuid, token, true);
+    }
+    
+    @GetMapping(value = "{uuid}/recipients", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getRecipientsByCounterpartyUuid(@PathVariable UUID uuid,
+                                                             @RequestParam(value = "token") UUID token) {
+        return getClientsByCounterpartyUuidAndType(uuid, token, false);
+    }
+    
+    private ResponseEntity getClientsByCounterpartyUuidAndType(UUID uuid, UUID token, boolean isSender) {
         try {
             User user = userService.authenticate(token);
             if (isSender) {
@@ -102,18 +114,6 @@ public class CounterpartyController {
             return new ResponseEntity<>(getAllByFieldOnErrorLogEndpoint(Client.class, Counterparty.class, uuid, e),
                     NOT_FOUND);
         }
-    }
-    
-    @GetMapping(value = "{uuid}/senders", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getSendersByCounterpartyUuid(@PathVariable UUID uuid,
-                                                          @RequestParam(value = "token") UUID token) {
-        return getClientsOfTypeByCounterpartyUuidAndToken(uuid, token, true);
-    }
-    
-    @GetMapping(value = "{uuid}/recipients", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getRecipientsByCounterpartyUuid(@PathVariable UUID uuid,
-                                                             @RequestParam(value = "token") UUID token) {
-        return getClientsOfTypeByCounterpartyUuidAndToken(uuid, token, false);
     }
 
     @PostMapping(produces = APPLICATION_JSON_VALUE)

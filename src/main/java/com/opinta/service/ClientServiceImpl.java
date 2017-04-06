@@ -140,17 +140,6 @@ public class ClientServiceImpl implements ClientService {
         return clientMapper.toDto(getAllEntitiesByCounterpartyUuid(counterpartyUuid, user));
     }
     
-    private List<Client> getAllClientsByCounterpartyUuidAndType(UUID counterpartyUuid, boolean isSender, User user)
-            throws IncorrectInputDataException, AuthException {
-        String description = counterpartyUuid.toString() + " and type: " + ( isSender ? "sender" : "recipient" );
-        log.info(getAllByFieldLogEndpoint(Client.class, Counterparty.class, description));
-        if (isSender) {
-            return clientDao.getAllSendersByCounterparty(counterpartyService.getEntityByUuid(counterpartyUuid, user));
-        } else {
-            return clientDao.getAllRecipientsByCounterparty(counterpartyService.getEntityByUuid(counterpartyUuid, user));
-        }
-    }
-    
     @Override
     @Transactional
     public List<ClientDto> getAllSendersByCounterpartyUuid(UUID counterpartyUuid, User user)
@@ -163,6 +152,17 @@ public class ClientServiceImpl implements ClientService {
     public List<ClientDto> getAllRecipientsByCounterpartyUuid(UUID counterpartyUuid, User user)
             throws IncorrectInputDataException, AuthException {
         return clientMapper.toDto(getAllClientsByCounterpartyUuidAndType(counterpartyUuid, false, user));
+    }
+    
+    private List<Client> getAllClientsByCounterpartyUuidAndType(UUID counterpartyUuid, boolean isSender, User user)
+            throws IncorrectInputDataException, AuthException {
+        String description = counterpartyUuid.toString() + " and type: " + ( isSender ? "sender" : "recipient" );
+        log.info(getAllByFieldLogEndpoint(Client.class, Counterparty.class, description));
+        if (isSender) {
+            return clientDao.getAllSendersByCounterparty(counterpartyService.getEntityByUuid(counterpartyUuid, user));
+        } else {
+            return clientDao.getAllRecipientsByCounterparty(counterpartyService.getEntityByUuid(counterpartyUuid, user));
+        }
     }
     
     @Override
