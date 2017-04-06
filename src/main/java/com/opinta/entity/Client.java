@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.Size;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -43,6 +44,10 @@ public class Client {
     private boolean individual;
     private boolean sender;
     private float discount;
+    @Size(min = 6, max = 6)
+    private String bankCode;
+    @Size(max = 255)
+    private String bankAccount;
 
     public Client(String name, String uniqueRegistrationNumber, Address address,
                   Counterparty counterparty) {
