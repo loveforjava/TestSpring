@@ -34,4 +34,8 @@ public class ClientDto {
     private boolean individual;
     private boolean sender;
     private Float discount;
+    @Size(min = 6, max = 6)
+    private String bankCode;
+    @Size(max = 255)
+    private String bankAccount;
 }
