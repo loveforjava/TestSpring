@@ -48,6 +48,15 @@ public class HibernateConfig {
     private Resource dataScriptDevelopmentCountrysidePostcode;
     @Value("classpath:sql/dev/db-data-tariff-grid.sql")
     private Resource dataScriptDevelopmentTariffGrid;
+    @Value("classpath:sql/dev/db-data-country.sql")
+    private Resource dataScriptDevelopmentCountry;
+    @Value("classpath:sql/dev/db-data-region.sql")
+    private Resource dataScriptDevelopmentRegion;
+    @Value("classpath:sql/dev/db-data-district.sql")
+    private Resource dataScriptDevelopmentDistrict;
+    @Value("classpath:sql/dev/db-data-city.sql")
+    private Resource dataScriptDevelopmentCity;
+
 
     @Autowired
     public HibernateConfig(Environment environment) {
@@ -137,7 +146,7 @@ public class HibernateConfig {
         properties.put("hibernate.hbm2ddl.auto", environment.getRequiredProperty("prod.hibernate.hbm2ddl.auto"));
         return properties;
     }
-    
+
     private Properties hibernatePropertiesDevelopment() {
         Properties properties = new Properties();
         properties.put("hibernate.dialect", environment.getRequiredProperty("dev.hibernate.dialect"));
@@ -172,7 +181,7 @@ public class HibernateConfig {
         initializer.setDatabasePopulator(databasePopulator);
         return initializer;
     }
-    
+
     @Bean(name = "databasePopulator")
     @Profile({"prod", "memory"})
     public DatabasePopulator databasePopulatorProduction() {
@@ -186,7 +195,7 @@ public class HibernateConfig {
         populator.addScript(dataScriptProductionCity);
         return populator;
     }
-    
+
     @Bean(name = "databasePopulator")
     @Profile("dev")
     public DatabasePopulator databasePopulatorDevelopment() {
@@ -194,6 +203,10 @@ public class HibernateConfig {
         final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
         populator.addScript(dataScriptDevelopmentCountrysidePostcode);
         populator.addScript(dataScriptDevelopmentTariffGrid);
+        populator.addScript(dataScriptDevelopmentCountry);
+        populator.addScript(dataScriptDevelopmentRegion);
+        populator.addScript(dataScriptDevelopmentDistrict);
+        populator.addScript(dataScriptDevelopmentCity);
         return populator;
     }
 }
