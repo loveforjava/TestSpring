@@ -197,6 +197,19 @@ public class TestHelper {
                 createCounterparty());
         return clientService.saveEntityAsRecipient(client, client.getCounterparty().getUser());
     }
+    
+    public void deleteClientWithoutDeletingCounterparty(Client client) throws Exception {
+        try {
+            clientService.delete(client.getUuid(), client.getCounterparty().getUser());
+        } catch (Exception e) {
+            log.debug(e.getMessage());
+        }
+        try {
+            addressService.delete(client.getAddress().getId());
+        } catch (Exception e) {
+            log.debug(e.getMessage());
+        }
+    }
 
     public void deleteClient(Client client) throws Exception {
         try {

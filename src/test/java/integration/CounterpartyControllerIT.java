@@ -59,8 +59,8 @@ public class CounterpartyControllerIT extends BaseControllerIT {
 
     @After
     public void tearDown() throws Exception {
-        testHelper.deleteClient(sender);
-        testHelper.deleteClient(recipient);
+        testHelper.deleteClientWithoutDeletingCounterparty(sender);
+        testHelper.deleteClientWithoutDeletingCounterparty(recipient);
         testHelper.deleteCounterpartyWithPostcodePool(counterparty);
     }
 
@@ -235,6 +235,8 @@ public class CounterpartyControllerIT extends BaseControllerIT {
 
     @Test
     public void deleteCounterparty() throws Exception {
+        testHelper.deleteClientWithoutDeletingCounterparty(sender);
+        testHelper.deleteClientWithoutDeletingCounterparty(recipient);
         given().
                 queryParam("token", user.getToken()).
         when().
