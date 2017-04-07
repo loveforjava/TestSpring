@@ -1,4 +1,4 @@
-TRUNCATE TABLE Country;
+DELETE FROM Country;
 
 INSERT INTO Country(ISO3166, name) VALUES ('AU','Австралія');
 INSERT INTO Country(ISO3166, name) VALUES ('AT','Австрія');

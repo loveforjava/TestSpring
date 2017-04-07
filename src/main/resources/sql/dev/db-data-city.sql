@@ -1,4 +1,4 @@
-TRUNCATE table City;
+DELETE FROM City;
 
 INSERT INTO City (id, country_id, region_id, district_id, name) VALUES ('33466','UA','1','1','Адамівка');
 INSERT INTO City (id, country_id, region_id, district_id, name) VALUES ('33467','UA','1','1','Антонівка');
@@ -9,6 +9,7 @@ INSERT INTO City (id, country_id, region_id, district_id, name) VALUES ('35385',
 INSERT INTO City (id, country_id, region_id, district_id, name) VALUES ('35386','UA','2','39','Мощена');
 INSERT INTO City (id, country_id, region_id, district_id, name) VALUES ('35387','UA','2','39','Новий Мосир');
 INSERT INTO City (id, country_id, region_id, district_id, name) VALUES ('35388','UA','2','39','Нові Кошари');
+INSERT INTO City (id, country_id, region_id, district_id, name) VALUES ('42309','UA','10','185','Київ');
 INSERT INTO City (id, country_id, region_id, district_id, name) VALUES ('50245','UA','16','352','Портнівка');
 INSERT INTO City (id, country_id, region_id, district_id, name) VALUES ('50246','UA','16','352','Рожаївка');
 INSERT INTO City (id, country_id, region_id, district_id, name) VALUES ('50247','UA','16','352','Розсошенці');

@@ -1,4 +1,4 @@
-TRUNCATE TABLE Region;
+DELETE FROM Region;
 
 INSERT INTO Region (id, name, country_id) VALUES ('1','Вінницька','UA');
 INSERT INTO Region (id, name, country_id) VALUES ('2','Волинська','UA');

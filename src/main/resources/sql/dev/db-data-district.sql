@@ -1,4 +1,4 @@
-TRUNCATE TABLE District;
+DELETE FROM District;
 
 INSERT INTO District (id, country_id, region_id, name) VALUES ('1','UA','1','Бершадський');
 INSERT INTO District (id, country_id, region_id, name) VALUES ('2','UA','1','Вінницька');
@@ -22,6 +22,11 @@ INSERT INTO District (id, country_id, region_id, name) VALUES ('99','UA','4','С
 INSERT INTO District (id, country_id, region_id, name) VALUES ('100','UA','4','Слов’янський');
 INSERT INTO District (id, country_id, region_id, name) VALUES ('101','UA','4','Торецьк');
 INSERT INTO District (id, country_id, region_id, name) VALUES ('102','UA','4','Ясинуватський');
+INSERT INTO District (id, country_id, region_id, name) VALUES ('183','UA','9','Києво-Святошинський');
+INSERT INTO District (id, country_id, region_id, name) VALUES ('184','UA','9','Київ');
+INSERT INTO District (id, country_id, region_id, name) VALUES ('185','UA','10','Баришівський');
+INSERT INTO District (id, country_id, region_id, name) VALUES ('186','UA','10','Березань');
+INSERT INTO District (id, country_id, region_id, name) VALUES ('187','UA','10','Білоцерківський');
 INSERT INTO District (id, country_id, region_id, name) VALUES ('342','UA','16','Кременчуцький');
 INSERT INTO District (id, country_id, region_id, name) VALUES ('343','UA','16','Лохвицький');
 INSERT INTO District (id, country_id, region_id, name) VALUES ('344','UA','16','Лубенський');

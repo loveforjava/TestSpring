@@ -43,6 +43,8 @@ public class HibernateConfig {
     private Resource dataScriptProductionDistrict;
     @Value("classpath:sql/prod/db-data-city.sql")
     private Resource dataScriptProductionCity;
+    @Value("classpath:sql/prod/db-data-city-postcode.sql")
+    private Resource dataScriptProductionCityPostcode;
 
     @Value("classpath:sql/dev/db-data-countryside-postcode.sql")
     private Resource dataScriptDevelopmentCountrysidePostcode;
@@ -56,7 +58,8 @@ public class HibernateConfig {
     private Resource dataScriptDevelopmentDistrict;
     @Value("classpath:sql/dev/db-data-city.sql")
     private Resource dataScriptDevelopmentCity;
-
+    @Value("classpath:sql/dev/db-data-city-postcode.sql")
+    private Resource dataScriptDevelopmentCityPostcode;
 
     @Autowired
     public HibernateConfig(Environment environment) {
@@ -183,7 +186,7 @@ public class HibernateConfig {
     }
 
     @Bean(name = "databasePopulator")
-    @Profile({"prod", "memory"})
+    @Profile({"prod"})
     public DatabasePopulator databasePopulatorProduction() {
         log.info("DATABASE POPULATOR: prod");
         final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
@@ -193,11 +196,12 @@ public class HibernateConfig {
         populator.addScript(dataScriptProductionRegion);
         populator.addScript(dataScriptProductionDistrict);
         populator.addScript(dataScriptProductionCity);
+        populator.addScript(dataScriptProductionCityPostcode);
         return populator;
     }
 
     @Bean(name = "databasePopulator")
-    @Profile("dev")
+    @Profile({"dev", "memory"})
     public DatabasePopulator databasePopulatorDevelopment() {
         log.info("DATABASE POPULATOR: dev");
         final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
@@ -207,6 +211,7 @@ public class HibernateConfig {
         populator.addScript(dataScriptDevelopmentRegion);
         populator.addScript(dataScriptDevelopmentDistrict);
         populator.addScript(dataScriptDevelopmentCity);
+        populator.addScript(dataScriptDevelopmentCityPostcode);
         return populator;
     }
 }

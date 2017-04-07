@@ -14,10 +14,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CityPostcode {
     @Id
-    @GeneratedValue
     private long id;
+    private String postcode;
     @ManyToOne
     @JoinColumn(name = "city_id")
     private City city;
-    private String postcode;
+
 }
