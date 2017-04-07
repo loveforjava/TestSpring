@@ -1,9 +1,8 @@
 package com.opinta.controller;
 
-import com.opinta.dao.CityPostcodeDao;
+import com.opinta.dao.CityDao;
 import com.opinta.entity.Address;
 import com.opinta.entity.classifier.City;
-import com.opinta.entity.classifier.CityPostcode;
 import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.exception.PerformProcessFailedException;
 import java.util.List;
@@ -36,7 +35,7 @@ public class AddressController {
     private AddressService addressService;
 
     @Autowired
-    private CityPostcodeDao cityPostcodeDao;
+    private CityDao cityDao;
 
     @Autowired
     public AddressController(AddressService addressService) {
@@ -51,7 +50,7 @@ public class AddressController {
 
     @GetMapping("/test")
     public ResponseEntity<?> test() {
-        List<City> cities = cityPostcodeDao.getAllCitiesByPostcode("01014");
+        List<City> cities = cityDao.getAllCitiesByPostcode("01014");
         System.out.println(cities);
         return null;
     }

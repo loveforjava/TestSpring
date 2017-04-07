@@ -5,7 +5,7 @@ import com.opinta.entity.classifier.CityPostcode;
 
 import java.util.List;
 
-public interface CityPostcodeDao {
+public interface CityDao {
 
     List<City> getAllCitiesByPostcode(String postcode);
 

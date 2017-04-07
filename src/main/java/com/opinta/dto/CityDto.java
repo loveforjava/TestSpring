@@ -18,5 +18,4 @@ public class CityDto {
     private String region;
     @Size(max = 25)
     private String country;
-
 }
