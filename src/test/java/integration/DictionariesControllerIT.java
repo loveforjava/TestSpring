@@ -55,6 +55,4 @@ public class DictionariesControllerIT extends BaseControllerIT {
                 body("id", equalTo(tariffId)).
                 body("price", equalTo(expectedTariff.getPrice()));
     }
-    
-    
 }
