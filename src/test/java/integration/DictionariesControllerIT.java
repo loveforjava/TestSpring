@@ -5,6 +5,7 @@ import com.opinta.service.TariffGridService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
@@ -54,5 +55,23 @@ public class DictionariesControllerIT extends BaseControllerIT {
                 statusCode(SC_OK).
                 body("id", equalTo(tariffId)).
                 body("price", equalTo(expectedTariff.getPrice()));
+    }
+    
+    @Test
+    public void isPostcodeInCountryside_ok() {
+        String countrysidePostcode = "07230";
+        when().
+                get("/dictionaries/countrysides/{postcode}", countrysidePostcode).
+        then().
+                statusCode(SC_OK);
+    }
+    
+    @Test
+    public void isPostcodeInCountryside_notFound() {
+        String centralKyivPostcode = "01001";
+        when().
+                get("/dictionaries/countrysides/{postcode}", centralKyivPostcode).
+        then().
+                statusCode(SC_NOT_FOUND);
     }
 }
