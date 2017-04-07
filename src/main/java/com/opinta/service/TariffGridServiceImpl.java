@@ -49,47 +49,6 @@ public class TariffGridServiceImpl implements TariffGridService {
         log.info(getByIdLogEndpoint(TariffGrid.class, id));
         return tariffGridDao.getById(id);
     }
-
-    @Override
-    @Transactional
-    public TariffGrid save(TariffGrid tariffGrid) {
-        log.info(saveLogEndpoint(TariffGrid.class, tariffGrid));
-        return tariffGridDao.save(tariffGrid);
-    }
-
-    @Override
-    @Transactional
-    public TariffGrid update(long id, TariffGrid source) throws PerformProcessFailedException {
-        TariffGrid target = tariffGridDao.getById(id);
-        if (target == null) {
-            log.info(getByIdOnErrorLogEndpoint(TariffGrid.class, id));
-            return null;
-        }
-        try {
-            copyProperties(target, source);
-        } catch (Exception e) {
-            log.error(copyPropertiesOnErrorLogEndpoint(TariffGrid.class, source, target, e));
-            throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(
-                    TariffGrid.class, source, target, e));
-        }
-        target.setId(id);
-        log.info(updateLogEndpoint(TariffGrid.class, target));
-        tariffGridDao.update(target);
-        return target;
-    }
-
-    @Override
-    @Transactional
-    public boolean delete(long id) {
-        TariffGrid tariffGrid = tariffGridDao.getById(id);
-        if (tariffGrid == null) {
-            log.debug(getByIdOnErrorLogEndpoint(TariffGrid.class, id));
-            return false;
-        }
-        log.info(deleteLogEndpoint(TariffGrid.class, id));
-        tariffGridDao.delete(tariffGrid);
-        return true;
-    }
     
     @Override
     @Transactional
@@ -99,7 +58,7 @@ public class TariffGridServiceImpl implements TariffGridService {
 
     @Override
     @Transactional
-    public TariffGrid getLast(W2wVariation w2wVariation) {
+    public TariffGrid getMaxTariffEntity(W2wVariation w2wVariation) {
         return tariffGridDao.getLast(w2wVariation);
     }
     
@@ -124,5 +83,46 @@ public class TariffGridServiceImpl implements TariffGridService {
             throw new IncorrectInputDataException(getByIdOnErrorLogEndpoint(TariffGrid.class, id));
         }
         return tariffGridMapper.toDto(tariff);
+    }
+    
+    @Override
+    @Transactional
+    public TariffGrid save(TariffGrid tariffGrid) {
+        log.info(saveLogEndpoint(TariffGrid.class, tariffGrid));
+        return tariffGridDao.save(tariffGrid);
+    }
+    
+    @Override
+    @Transactional
+    public TariffGrid update(long id, TariffGrid source) throws PerformProcessFailedException {
+        TariffGrid target = tariffGridDao.getById(id);
+        if (target == null) {
+            log.info(getByIdOnErrorLogEndpoint(TariffGrid.class, id));
+            return null;
+        }
+        try {
+            copyProperties(target, source);
+        } catch (Exception e) {
+            log.error(copyPropertiesOnErrorLogEndpoint(TariffGrid.class, source, target, e));
+            throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(
+                    TariffGrid.class, source, target, e));
+        }
+        target.setId(id);
+        log.info(updateLogEndpoint(TariffGrid.class, target));
+        tariffGridDao.update(target);
+        return target;
+    }
+    
+    @Override
+    @Transactional
+    public boolean delete(long id) {
+        TariffGrid tariffGrid = tariffGridDao.getById(id);
+        if (tariffGrid == null) {
+            log.debug(getByIdOnErrorLogEndpoint(TariffGrid.class, id));
+            return false;
+        }
+        log.info(deleteLogEndpoint(TariffGrid.class, id));
+        tariffGridDao.delete(tariffGrid);
+        return true;
     }
 }

@@ -12,20 +12,20 @@ public interface TariffGridService {
     List<TariffGrid> getAllEntities();
 
     TariffGrid getEntityById(long id);
-
-    TariffGrid save(TariffGrid tariffGrid);
-
-    TariffGrid update(long id, TariffGrid tariffGrid) throws PerformProcessFailedException;
-    
-    boolean delete(long id);
     
     TariffGrid getEntityByDimension(float weight, float length, W2wVariation w2wVariation);
 
-    TariffGrid getLast(W2wVariation w2wVariation);
+    TariffGrid getMaxTariffEntity(W2wVariation w2wVariation);
     
     List<TariffGridDto> getAll();
     
     TariffGridDto getByDimension(float weight, float length, W2wVariation w2wVariation);
     
     TariffGridDto getById(long id) throws IncorrectInputDataException;
+    
+    TariffGrid save(TariffGrid tariffGrid);
+    
+    TariffGrid update(long id, TariffGrid tariffGrid) throws PerformProcessFailedException;
+    
+    boolean delete(long id);
 }

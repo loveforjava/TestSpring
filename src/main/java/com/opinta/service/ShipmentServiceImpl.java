@@ -192,7 +192,7 @@ public class ShipmentServiceImpl implements ShipmentService {
             w2wVariation = W2wVariation.REGION;
         }
 
-        TariffGrid tariffGrid = tariffGridService.getLast(w2wVariation);
+        TariffGrid tariffGrid = tariffGridService.getMaxTariffEntity(w2wVariation);
         TariffGrid maxTariffGrid = tariffGrid;
         if (tariffGrid == null) {
             return BigDecimal.ZERO;
