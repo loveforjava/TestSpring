@@ -128,17 +128,6 @@ public class ClientServiceImpl implements ClientService {
         return clientMapper.toDto(getAllEntitiesByCounterpartyUuid(counterpartyUuid, user));
     }
     
-    private List<Client> getAllClientsByCounterpartyUuidAndType(UUID counterpartyUuid, boolean isSender, User user)
-            throws IncorrectInputDataException, AuthException {
-        String description = counterpartyUuid.toString() + " and type: " + ( isSender ? "sender" : "recipient" );
-        log.info(getAllByFieldLogEndpoint(Client.class, Counterparty.class, description));
-        if (isSender) {
-            return clientDao.getAllSendersByCounterparty(counterpartyService.getEntityByUuid(counterpartyUuid, user));
-        } else {
-            return clientDao.getAllRecipientsByCounterparty(counterpartyService.getEntityByUuid(counterpartyUuid, user));
-        }
-    }
-    
     @Override
     @Transactional
     public ClientDto getByUuid(UUID uuid, User user) throws AuthException, IncorrectInputDataException {
