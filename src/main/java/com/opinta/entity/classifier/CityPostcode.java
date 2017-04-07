@@ -19,5 +19,4 @@ public class CityPostcode {
     @ManyToOne
     @JoinColumn(name = "city_id")
     private City city;
-
 }
