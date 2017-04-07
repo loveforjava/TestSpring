@@ -13,7 +13,6 @@ import java.util.List;
 @Service
 @Slf4j
 public class CityServiceImpl implements CityService {
-
     private CityDao cityDao;
     private CityMapper cityMapper;
 

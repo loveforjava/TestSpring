@@ -13,7 +13,6 @@ import java.util.List;
 
 @Repository
 public class CityDaoImpl implements CityDao {
-
     private final SessionFactory sessionFactory;
 
     @Autowired
