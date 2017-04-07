@@ -183,7 +183,7 @@ public class HibernateConfig {
     }
 
     @Bean(name = "databasePopulator")
-    @Profile("prod")
+    @Profile({"prod", "memory"})
     public DatabasePopulator databasePopulatorProduction() {
         log.info("DATABASE POPULATOR: prod");
         final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
@@ -197,7 +197,7 @@ public class HibernateConfig {
     }
 
     @Bean(name = "databasePopulator")
-    @Profile({"dev", "memory"})
+    @Profile("dev")
     public DatabasePopulator databasePopulatorDevelopment() {
         log.info("DATABASE POPULATOR: dev");
         final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();

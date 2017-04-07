@@ -18,6 +18,6 @@ public class CountrysidePostcodeServiceImpl implements CountrysidePostcodeServic
     @Override
     @Transactional
     public boolean isPostcodeInCountryside(String postcode) {
-        return countrysidePostcodeDao.getByPostcode(postcode) != null;
+        return (countrysidePostcodeDao.getByPostcode(postcode) != null);
     }
 }

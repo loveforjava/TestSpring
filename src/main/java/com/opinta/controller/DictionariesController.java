@@ -26,8 +26,8 @@ public class DictionariesController {
     private final CountrysidePostcodeService countrysidePostcodeService;
     
     @Autowired
-    public DictionariesController(
-            TariffGridService tariffGridService, CountrysidePostcodeService countrysidePostcodeService) {
+    public DictionariesController(TariffGridService tariffGridService,
+            CountrysidePostcodeService countrysidePostcodeService) {
         this.tariffGridService  = tariffGridService;
         this.countrysidePostcodeService = countrysidePostcodeService;
     }
