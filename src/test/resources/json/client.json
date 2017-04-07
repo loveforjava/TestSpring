@@ -7,5 +7,7 @@
   "counterpartyUuid": [],
   "phoneNumber": "0982004113",
   "addressId": [],
-  "individual": []
+  "individual": [],
+  "bankAccount": "111000222000999",
+  "bankCode": "123000"
 }

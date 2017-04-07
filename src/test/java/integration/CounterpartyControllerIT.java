@@ -33,6 +33,8 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 public class CounterpartyControllerIT extends BaseControllerIT {
     private Counterparty counterparty;
     private UUID counterpartyUuid;
+    private Client sender;
+    private Client recipient;
     private User user;
 
     @Autowired
@@ -49,12 +51,16 @@ public class CounterpartyControllerIT extends BaseControllerIT {
     @Before
     public void setUp() throws Exception {
         counterparty = testHelper.createCounterparty();
+        sender = testHelper.createSenderFor(counterparty);
+        recipient = testHelper.createRecipientFor(counterparty);
         counterpartyUuid = counterparty.getUuid();
         user = counterparty.getUser();
     }
 
     @After
     public void tearDown() throws Exception {
+        testHelper.deleteClientWithoutDeletingCounterparty(sender);
+        testHelper.deleteClientWithoutDeletingCounterparty(recipient);
         testHelper.deleteCounterpartyWithPostcodePool(counterparty);
     }
 
@@ -77,6 +83,45 @@ public class CounterpartyControllerIT extends BaseControllerIT {
                 contentType(APPLICATION_JSON_VALUE).
                 statusCode(SC_OK).
                 body("uuid", equalTo(counterpartyUuid.toString()));
+    }
+    
+    @Test
+    public void getClientsByCounterpartyUuid() {
+        given().
+                queryParam("token", user.getToken()).
+        when().
+                get("counterparties/{uuid}/clients", counterpartyUuid.toString()).
+        then().
+                contentType(APPLICATION_JSON_VALUE).
+                statusCode(SC_OK);
+    }
+    
+    @Test
+    public void getClientsByCounterpartyUuidAsSenders() {
+        given().
+                queryParam("token", user.getToken()).
+                queryParam("sender", true).
+        when().
+                get("counterparties/{uuid}/clients", counterpartyUuid.toString()).
+        then().
+                contentType(APPLICATION_JSON_VALUE).
+                statusCode(SC_OK).
+                body("[0].sender", equalTo(true)).
+                body("[0].uuid", equalTo(sender.getUuid().toString()));
+    }
+    
+    @Test
+    public void getClientsByCounterpartyUuidAsRecipients() {
+        given().
+                queryParam("token", user.getToken()).
+                queryParam("sender", false).
+        when().
+                get("counterparties/{uuid}/clients", counterpartyUuid.toString()).
+        then().
+                contentType(APPLICATION_JSON_VALUE).
+                statusCode(SC_OK).
+                body("[0].sender", equalTo(false)).
+                body("[0].uuid", equalTo(recipient.getUuid().toString()));
     }
 
     @Test
@@ -190,6 +235,8 @@ public class CounterpartyControllerIT extends BaseControllerIT {
 
     @Test
     public void deleteCounterparty() throws Exception {
+        testHelper.deleteClientWithoutDeletingCounterparty(sender);
+        testHelper.deleteClientWithoutDeletingCounterparty(recipient);
         given().
                 queryParam("token", user.getToken()).
         when().

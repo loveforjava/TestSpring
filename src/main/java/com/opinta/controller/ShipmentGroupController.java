@@ -61,7 +61,7 @@ public class ShipmentGroupController {
     }
     
     @GetMapping
-    public ResponseEntity<?> getAllShipmentGroups(@RequestParam(value = "token") UUID token) {
+    public ResponseEntity<?> getAllShipmentGroups(@RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
             return new ResponseEntity<>(shipmentGroupService.getAll(user), OK);
@@ -71,8 +71,7 @@ public class ShipmentGroupController {
     }
 
     @GetMapping("{uuid}/shipments")
-    public ResponseEntity<?> getShipmentsByShipmentGroupUuid(@PathVariable UUID uuid,
-                                                             @RequestParam(value = "token") UUID token) {
+    public ResponseEntity<?> getShipmentsByShipmentGroupUuid(@PathVariable UUID uuid, @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
             List<ShipmentDto> shipmentDtos = shipmentService.getAllByShipmentGroupUuid(uuid, user);
@@ -85,7 +84,7 @@ public class ShipmentGroupController {
     }
 
     @GetMapping("{uuid}/form")
-    public ResponseEntity<?> getShipmentGroupForm(@PathVariable UUID uuid, @RequestParam(value = "token") UUID token) {
+    public ResponseEntity<?> getShipmentGroupForm(@PathVariable UUID uuid, @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
 
@@ -106,7 +105,7 @@ public class ShipmentGroupController {
     }
     
     @GetMapping("{uuid}")
-    public ResponseEntity<?> getShipmentGroup(@PathVariable UUID uuid, @RequestParam(value = "token") UUID token) {
+    public ResponseEntity<?> getShipmentGroup(@PathVariable UUID uuid, @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
             ShipmentGroupDto shipmentGroupDto = shipmentGroupService.getById(uuid, user);
@@ -120,7 +119,7 @@ public class ShipmentGroupController {
     
     @PostMapping
     public ResponseEntity<?> createShipmentGroup(@RequestBody ShipmentGroupDto shipmentGroupDto,
-                                                 @RequestParam(value = "token") UUID token) {
+                                                 @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
             shipmentGroupDto = shipmentGroupService.save(shipmentGroupDto, user);
@@ -135,7 +134,7 @@ public class ShipmentGroupController {
     @PutMapping("{uuid}")
     public ResponseEntity<?> updateShipmentGroup(@PathVariable UUID uuid,
                                                  @RequestBody ShipmentGroupDto shipmentGroupDto,
-                                                 @RequestParam(value = "token") UUID token) {
+                                                 @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
             shipmentGroupDto = shipmentGroupService.update(uuid, shipmentGroupDto, user);
@@ -150,7 +149,7 @@ public class ShipmentGroupController {
     }
     
     @DeleteMapping("{uuid}")
-    public ResponseEntity<?> deleteShipmentGroup(@PathVariable UUID uuid, @RequestParam(value = "token") UUID token) {
+    public ResponseEntity<?> deleteShipmentGroup(@PathVariable UUID uuid, @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
             shipmentGroupService.delete(uuid, user);
