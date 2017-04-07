@@ -32,7 +32,6 @@ public class ClientDto {
     private long addressId;
     private String phoneNumber;
     private boolean individual;
-    private boolean sender;
     private Float discount;
     @Size(min = 6, max = 6)
     private String bankCode;

@@ -95,7 +95,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
     @Test
     @SuppressWarnings("unchecked")
     public void createShipment() throws Exception {
-        Client sender = testHelper.createClientAsSender();
+        Client sender = testHelper.createClientAndCounterparty();
         ShipmentGroup shipmentGroup = testHelper.createShipmentGroup();
         // create
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
@@ -132,7 +132,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
     @Test
     @SuppressWarnings("unchecked")
     public void createShipmentWithoutGroup() throws Exception {
-        Client sender = testHelper.createClientAsSender();
+        Client sender = testHelper.createClientAndCounterparty();
         // create
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
         jsonObject.put("senderUuid", sender.getUuid().toString());
@@ -162,28 +162,6 @@ public class ShipmentControllerIT extends BaseControllerIT {
 
         // delete
         testHelper.deleteShipment(createdShipment);
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void createShipment_recipientAsSenderShouldReturnBadRequest() throws Exception {
-        Client sender = testHelper.createClient();
-        ShipmentGroup shipmentGroup = testHelper.createShipmentGroup();
-        // create
-        JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
-        jsonObject.put("senderUuid", sender.getUuid().toString());
-        jsonObject.put("recipientUuid", testHelper.createClientOtherRegion().getUuid().toString());
-        jsonObject.put("shipmentGroupUuid", shipmentGroup.getUuid().toString());
-        String expectedJson = jsonObject.toString();
-
-        given().
-                contentType(APPLICATION_JSON_VALUE).
-                queryParam("token", sender.getCounterparty().getUser().getToken()).
-                body(expectedJson).
-        when().
-                post("/shipments").
-        then().
-                statusCode(SC_NOT_FOUND);
     }
     
     @Test

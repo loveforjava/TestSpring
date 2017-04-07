@@ -93,20 +93,20 @@ public class TestHelper {
     }
 
     public Shipment createShipment() throws Exception {
-        Shipment shipment = new Shipment(createClientAsSender(), createClient(),
+        Shipment shipment = new Shipment(createClientAndCounterparty(), createClient(),
                 D2D, 4.0F, 3.8F, new BigDecimal(200), new BigDecimal(30), new BigDecimal(35.2));
         return shipmentService.saveEntity(shipment, shipment.getSender().getCounterparty().getUser());
     }
 
     public Shipment createShipment(ShipmentGroup shipmentGroup) throws Exception {
-        Shipment shipment = new Shipment(createClientAsSender(), createClient(),
+        Shipment shipment = new Shipment(createClientAndCounterparty(), createClient(),
                 D2D, 4.0F, 3.8F, new BigDecimal(200), new BigDecimal(30), new BigDecimal(35.2));
         shipment.setShipmentGroup(shipmentGroup);
         return shipmentService.saveEntity(shipment, shipment.getSender().getCounterparty().getUser());
     }
 
     public Shipment createShipmentWithSameCounterparty(ShipmentGroup shipmentGroup, Counterparty counterparty) throws Exception {
-        Client client = createClientAsSenderWithSameCounterparty(counterparty);
+        Client client = createClientWithSameCounterparty(counterparty);
 
         Shipment shipment = new Shipment(client, client,
                 D2D, 4.0F, 3.8F, new BigDecimal(200), new BigDecimal(30), new BigDecimal(35.2));
@@ -135,67 +135,73 @@ public class TestHelper {
     public Client createClient() throws Exception {
         Client client = new Client("FOP Ivanov", "001", createAddress(), createPhone(),
                 createCounterparty());
-        return clientService.saveEntityAsRecipient(client, client.getCounterparty().getUser());
+        return clientService.saveEntity(client, client.getCounterparty().getUser());
+    }
+    
+    public Client createClientWithoutDiscount() throws Exception {
+        Client client = new Client("FOP Ivanov", "001", createAddress(), createPhone(),
+                createCounterpartyWithoutDiscount());
+        return clientService.saveEntity(client, client.getCounterparty().getUser());
     }
     
     public Client createSenderFor(Counterparty counterparty) throws Exception {
         Client client = new Client("FOP Sidorov", "456", createAddress(), createPhone(), counterparty);
-        return clientService.saveEntityAsSender(client, client.getCounterparty().getUser());
+        return clientService.saveEntity(client, client.getCounterparty().getUser());
     }
     
     public Client createRecipientFor(Counterparty counterparty) throws Exception {
         Client client = new Client("FOP Petrov", "123", createAddress(), createPhone(), counterparty);
-        return clientService.saveEntityAsRecipient(client, client.getCounterparty().getUser());
+        return clientService.saveEntity(client, client.getCounterparty().getUser());
     }
 
     public Client createClient(Counterparty counterparty) throws Exception {
         Client client = new Client("FOP Ivanov", "001", createAddress(), createPhone(),
                 counterparty);
-        return clientService.saveEntityAsRecipient(client, client.getCounterparty().getUser());
+        return clientService.saveEntity(client, client.getCounterparty().getUser());
     }
 
     public Client createClientWithDiscount() throws Exception {
         Client client = new Client("FOP Ivanov", "001", createAddress(), createPhone(),
                 createCounterparty());
         client.setDiscount(10f);
-        return clientService.saveEntityAsSender(client, client.getCounterparty().getUser());
+        return clientService.saveEntity(client, client.getCounterparty().getUser());
     }
 
-    public Client createClientAsSender() throws Exception {
+    public Client createClientAndCounterparty() throws Exception {
         Client client = new Client("FOP Ivanov", "001", createAddress(), createPhone(),
                 createCounterparty());
-        return clientService.saveEntityAsSender(client, client.getCounterparty().getUser());
+        return clientService.saveEntity(client, client.getCounterparty().getUser());
     }
 
-    public Client createClientAsSenderWithSameCounterparty(Counterparty counterparty) throws Exception {
+    public Client createClientWithSameCounterparty(Counterparty counterparty) throws Exception {
         Client client = new Client("FOP Ivanov", "001", createAddress(), createPhone(),
                 null);
         client.setCounterparty(counterparty);
-        return clientService.saveEntityAsSender(client, client.getCounterparty().getUser());
+        return clientService.saveEntity(client, client.getCounterparty().getUser());
     }
 
     public Client createClientSameRegion() throws Exception {
         Client client = new Client("FOP Ivanov", "001", createAddressSameRegion(), createPhone(),
                 createCounterparty());
-        return clientService.saveEntityAsRecipient(client, client.getCounterparty().getUser());
+        return clientService.saveEntity(client, client.getCounterparty().getUser());
     }
 
     public Client createClientOtherRegion() throws Exception {
         Client client = new Client("FOP Ivanov", "001", createAddressOtherRegion(), createPhone(),
                 createCounterparty());
-        return clientService.saveEntityAsRecipient(client, client.getCounterparty().getUser());
+        return clientService.saveEntity(client, client.getCounterparty().getUser());
     }
 
     public Client createClientSameRegionCountryside() throws Exception {
         Client client = new Client("FOP Ivanov", "001", createAddressSameRegionCountryside(), createPhone(),
                 createCounterparty());
-        return clientService.saveEntityAsRecipient(client, client.getCounterparty().getUser());
+        return clientService.saveEntity(client, client.getCounterparty().getUser());
     }
 
     public Client createClientOtherRegionCountryside() throws Exception {
         Client client = new Client("FOP Ivanov", "001", createAddressOtherRegionCountryside(), createPhone(),
                 createCounterparty());
-        return clientService.saveEntityAsRecipient(client, client.getCounterparty().getUser());
+        return clientService.saveEntity(client, client.getCounterparty().getUser());
     }
     
     public void deleteClientWithoutDeletingCounterparty(Client client) throws Exception {
@@ -295,6 +301,11 @@ public class TestHelper {
     public Counterparty createCounterparty() throws Exception {
         Counterparty counterparty = new Counterparty("Modna kasta", createPostcodePool());
         counterparty.setDiscount(DISCOUNT);
+        return counterpartyService.saveEntity(counterparty);
+    }
+    
+    public Counterparty createCounterpartyWithoutDiscount() throws Exception {
+        Counterparty counterparty = new Counterparty("Modna kasta", createPostcodePool());
         return counterpartyService.saveEntity(counterparty);
     }
 

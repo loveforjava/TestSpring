@@ -26,7 +26,6 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -95,7 +94,6 @@ public class ClientControllerIT extends BaseControllerIT {
         inputJson.put("counterpartyUuid", newCounterparty.getUuid().toString());
         inputJson.put("addressId", (int) newAddress.getId());
         inputJson.put("individual", true);
-        inputJson.put("sender", true);
     
         String firstName = (String) inputJson.get("firstName");
         String middleName = (String) inputJson.get("middleName");
@@ -115,14 +113,12 @@ public class ClientControllerIT extends BaseControllerIT {
                         body("firstName", equalTo(firstName)).
                         body("middleName", equalTo(middleName)).
                         body("lastName", equalTo(lastName)).
-                        body("sender", equalTo(false)).
                 extract().
                         path("uuid");
     
         JSONParser parser = new JSONParser();
         JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
         expectedJson.put("name", expectedFullName);
-        expectedJson.put("sender", false);
         
         UUID newClientUuid = UUID.fromString(newUuid);
 
@@ -147,7 +143,6 @@ public class ClientControllerIT extends BaseControllerIT {
         inputJson.put("counterpartyUuid", newCounterparty.getUuid().toString());
         inputJson.put("addressId", (int) newAddress.getId());
         inputJson.put("individual", false);
-        inputJson.put("sender", true);
         
         String expectedFullName = (String) inputJson.get("name");
         
@@ -164,13 +159,11 @@ public class ClientControllerIT extends BaseControllerIT {
                         body("firstName", equalTo("")).
                         body("middleName", equalTo("")).
                         body("lastName", equalTo("")).
-                        body("sender", equalTo(false)).
                 extract().
                         path("uuid");
     
         JSONParser parser = new JSONParser();
         JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
-        expectedJson.put("sender", false);
         // should use hamcrest to check, cuz oracle returns empty string as null, and other db as ""
         expectedJson.remove("firstName");
         expectedJson.remove("middleName");
@@ -193,7 +186,7 @@ public class ClientControllerIT extends BaseControllerIT {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void createClientAsSender_senderShouldBeCreatedDoesNotMeterWhichSenderMarkPassed() throws Exception {
+    public void createClient_discountShouldBeInheritedFromCounterparty() throws Exception {
         // create
         Counterparty newCounterparty = testHelper.createCounterparty();
         Address newAddress = testHelper.createAddress();
@@ -209,40 +202,7 @@ public class ClientControllerIT extends BaseControllerIT {
                         queryParam("token", newCounterparty.getUser().getToken()).
                         body(inputJson.toString()).
                 when().
-                        post("/clients/senders").
-                then().
-                        statusCode(SC_OK).
-                        body("sender", equalTo(true)).
-                extract().
-                        path("uuid");
-
-        // check created data
-        Client createdClient = clientService.getEntityByUuid(UUID.fromString(newUuid), newCounterparty.getUser());
-        assertTrue(createdClient.isSender());
-
-        // delete
-        testHelper.deleteClient(createdClient);
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void createClientAsSender_discountShouldBeInheritedFromCounterparty() throws Exception {
-        // create
-        Counterparty newCounterparty = testHelper.createCounterparty();
-        Address newAddress = testHelper.createAddress();
-
-        JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client.json");
-        inputJson.put("counterpartyUuid", newCounterparty.getUuid().toString());
-        inputJson.put("addressId", (int) newAddress.getId());
-        inputJson.put("individual", false);
-
-        String newUuid =
-                given().
-                        contentType(APPLICATION_JSON_VALUE).
-                        queryParam("token", newCounterparty.getUser().getToken()).
-                        body(inputJson.toString()).
-                when().
-                        post("/clients/senders").
+                        post("/clients").
                 then().
                         statusCode(SC_OK).
                         body("discount", equalTo(DISCOUNT)).
@@ -259,42 +219,6 @@ public class ClientControllerIT extends BaseControllerIT {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void createClientAsRecipient_discountShouldNotBeInheritedFromCounterparty() throws Exception {
-        float discountClient = 10.0f;
-
-        // create
-        Counterparty newCounterparty = testHelper.createCounterparty();
-        Address newAddress = testHelper.createAddress();
-
-        JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client.json");
-        inputJson.put("counterpartyUuid", newCounterparty.getUuid().toString());
-        inputJson.put("addressId", (int) newAddress.getId());
-        inputJson.put("individual", false);
-        inputJson.put("discount", discountClient);
-
-        String newUuid =
-                given().
-                        contentType(APPLICATION_JSON_VALUE).
-                        queryParam("token", newCounterparty.getUser().getToken()).
-                        body(inputJson.toString()).
-                when().
-                        post("/clients").
-                then().
-                        statusCode(SC_OK).
-                        body("discount", equalTo(discountClient)).
-                extract().
-                        path("uuid");
-
-        // check created data
-        Client createdClient = clientService.getEntityByUuid(UUID.fromString(newUuid), newCounterparty.getUser());
-        assertThat(discountClient, equalTo(createdClient.getDiscount()));
-
-        // delete
-        testHelper.deleteClient(createdClient);
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
     public void updateClientAsIndividual() throws Exception {
         float discountClient = 10.0f;
         // update
@@ -304,7 +228,6 @@ public class ClientControllerIT extends BaseControllerIT {
         inputJson.put("middleName", "Jakson [edited]");
         inputJson.put("phoneNumber", "0934314522");
         inputJson.put("individual", true);
-        inputJson.put("sender", true);
         inputJson.put("discount", discountClient);
 
         String firstName = (String) inputJson.get("firstName");
@@ -318,7 +241,6 @@ public class ClientControllerIT extends BaseControllerIT {
         when().
                 put("/clients/{uuid}", clientUuid.toString()).
         then().
-                body("sender", equalTo(false)).
                 body("discount", equalTo(discountClient)).
                 statusCode(SC_OK);
 
@@ -327,7 +249,6 @@ public class ClientControllerIT extends BaseControllerIT {
         String expectedFullName = join(" ", lastName, firstName, middleName);
         expectedJson.put("name", expectedFullName);
         expectedJson.put("middleName", inputJson.get("middleName"));
-        expectedJson.put("sender", false);
         expectedJson.put("discount", discountClient);
 
         // check updated data
@@ -372,37 +293,6 @@ public class ClientControllerIT extends BaseControllerIT {
         assertThat(updatedClient.getFirstName(), anyOf(equalTo(""), equalTo(null)));
         assertThat(updatedClient.getMiddleName(), anyOf(equalTo(""), equalTo(null)));
         assertThat(updatedClient.getLastName(), anyOf(equalTo(""), equalTo(null)));
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void updateClientAsSender_afterUpdatingSenderMarkShouldRemainTheSame() throws Exception {
-        Client clientSender = testHelper.createClientAsSender();
-        // update
-        JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client.json");
-        inputJson.put("counterpartyUuid", clientSender.getCounterparty().getUuid().toString());
-        inputJson.put("addressId", (int) clientSender.getAddress().getId());
-        inputJson.put("name", "Rozetka & Roga & Kopyta [edited]");
-        inputJson.put("individual", false);
-        inputJson.put("sender", false);
-
-        given().
-                contentType(APPLICATION_JSON_VALUE).
-                queryParam("token", clientSender.getCounterparty().getUser().getToken()).
-                body(inputJson.toString()).
-        when().
-                put("/clients/{uuid}", clientSender.getUuid().toString()).
-        then().
-                body("sender", equalTo(true)).
-                statusCode(SC_OK);
-
-        // check updated data
-        Client updatedClient = clientService.getEntityByUuid(clientSender.getUuid(),
-                clientSender.getCounterparty().getUser());
-        assertTrue(updatedClient.isSender());
-
-        // delete
-        testHelper.deleteClient(clientSender);
     }
     
     @Test

@@ -71,31 +71,11 @@ public class CounterpartyController {
         }
     }
 
-    @GetMapping(value = "{uuid}/clients", produces = APPLICATION_JSON_VALUE, params = "token")
+    @GetMapping(value = "{uuid}/clients", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getClientsByCounterpartyUuid(@PathVariable UUID uuid, @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
             return new ResponseEntity<>(clientService.getAllByCounterpartyUuid(uuid, user), OK);
-        } catch (AuthException e) {
-            return new ResponseEntity<>(getAllByFieldOnErrorLogEndpoint(Client.class, Counterparty.class, uuid, e),
-                    UNAUTHORIZED);
-        } catch (IncorrectInputDataException e) {
-            return new ResponseEntity<>(getAllByFieldOnErrorLogEndpoint(Client.class, Counterparty.class, uuid, e),
-                    NOT_FOUND);
-        }
-    }
-    
-    @GetMapping(value = "{uuid}/clients", produces = APPLICATION_JSON_VALUE, params = {"token", "sender"})
-    public ResponseEntity<?> getClientsByCounterpartyUuidAndType(@PathVariable UUID uuid,
-                                                                 @RequestParam UUID token,
-                                                                 @RequestParam boolean sender) {
-        try {
-            User user = userService.authenticate(token);
-            if (sender) {
-                return new ResponseEntity<>(clientService.getAllSendersByCounterpartyUuid(uuid, user), OK);
-            } else {
-                return new ResponseEntity<>(clientService.getAllRecipientsByCounterpartyUuid(uuid, user), OK);
-            }
         } catch (AuthException e) {
             return new ResponseEntity<>(getAllByFieldOnErrorLogEndpoint(Client.class, Counterparty.class, uuid, e),
                     UNAUTHORIZED);

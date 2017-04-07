@@ -95,34 +95,6 @@ public class CounterpartyControllerIT extends BaseControllerIT {
                 contentType(APPLICATION_JSON_VALUE).
                 statusCode(SC_OK);
     }
-    
-    @Test
-    public void getClientsByCounterpartyUuidAsSenders() {
-        given().
-                queryParam("token", user.getToken()).
-                queryParam("sender", true).
-        when().
-                get("counterparties/{uuid}/clients", counterpartyUuid.toString()).
-        then().
-                contentType(APPLICATION_JSON_VALUE).
-                statusCode(SC_OK).
-                body("[0].sender", equalTo(true)).
-                body("[0].uuid", equalTo(sender.getUuid().toString()));
-    }
-    
-    @Test
-    public void getClientsByCounterpartyUuidAsRecipients() {
-        given().
-                queryParam("token", user.getToken()).
-                queryParam("sender", false).
-        when().
-                get("counterparties/{uuid}/clients", counterpartyUuid.toString()).
-        then().
-                contentType(APPLICATION_JSON_VALUE).
-                statusCode(SC_OK).
-                body("[0].sender", equalTo(false)).
-                body("[0].uuid", equalTo(recipient.getUuid().toString()));
-    }
 
     @Test
     public void getCounterparty_notFound() throws Exception {
