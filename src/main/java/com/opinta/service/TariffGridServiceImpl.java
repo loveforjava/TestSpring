@@ -4,6 +4,7 @@ import com.opinta.dao.TariffGridDao;
 import com.opinta.dto.classifier.TariffGridDto;
 import com.opinta.entity.classifier.TariffGrid;
 import com.opinta.entity.W2wVariation;
+import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.exception.PerformProcessFailedException;
 
 import java.util.List;
@@ -33,24 +34,6 @@ public class TariffGridServiceImpl implements TariffGridService {
     public TariffGridServiceImpl(TariffGridDao tariffGridDao, TariffGridMapper tariffGridMapper) {
         this.tariffGridDao = tariffGridDao;
         this.tariffGridMapper = tariffGridMapper;
-    }
-    
-    @Override
-    @Transactional
-    public List<TariffGridDto> getAll() {
-        return tariffGridMapper.toDto(tariffGridDao.getAll());
-    }
-    
-    @Override
-    @Transactional
-    public TariffGridDto getByDimension(float weight, float length, W2wVariation w2wVariation) {
-        return tariffGridMapper.toDto(tariffGridDao.getByDimension(weight, length, w2wVariation));
-    }
-    
-    @Override
-    @Transactional
-    public TariffGridDto getById(long id) {
-        return tariffGridMapper.toDto(tariffGridDao.getById(id));
     }
     
     @Override
@@ -118,5 +101,28 @@ public class TariffGridServiceImpl implements TariffGridService {
     @Transactional
     public TariffGrid getLast(W2wVariation w2wVariation) {
         return tariffGridDao.getLast(w2wVariation);
+    }
+    
+    @Override
+    @Transactional
+    public List<TariffGridDto> getAll() {
+        return tariffGridMapper.toDto(tariffGridDao.getAll());
+    }
+    
+    @Override
+    @Transactional
+    public TariffGridDto getByDimension(float weight, float length, W2wVariation w2wVariation) {
+        return tariffGridMapper.toDto(tariffGridDao.getByDimension(weight, length, w2wVariation));
+    }
+    
+    @Override
+    @Transactional
+    public TariffGridDto getById(long id) throws IncorrectInputDataException {
+        TariffGrid tariff = tariffGridDao.getById(id);
+        if (tariff == null) {
+            log.error(getByIdOnErrorLogEndpoint(TariffGrid.class, id));
+            throw new IncorrectInputDataException(getByIdOnErrorLogEndpoint(TariffGrid.class, id));
+        }
+        return tariffGridMapper.toDto(tariff);
     }
 }
