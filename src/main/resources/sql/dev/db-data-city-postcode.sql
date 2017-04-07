@@ -22,3 +22,4 @@ Insert into CityPostcode (id, postcode, city_id) values (19, '01044',42309);
 Insert into CityPostcode (id, postcode, city_id) values (20, '01046',42309);
 Insert into CityPostcode (id, postcode, city_id) values (21, '01054',42309);
 Insert into CityPostcode (id, postcode, city_id) values (22, '01103',42309);
+Insert into CityPostcode (id, postcode, city_id) values (23, '01015',50247);

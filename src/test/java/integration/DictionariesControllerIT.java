@@ -17,6 +17,17 @@ public class DictionariesControllerIT extends BaseControllerIT {
     @Autowired
     private TariffGridService tariffGridService;
     private final int tariffId = 3;
+
+    @Test
+    public void getCitiesByPostcode() {
+        given().
+                queryParam("postcode", 01015).
+        when().
+                get("/dictionaries/addresses").
+        then().
+                contentType(APPLICATION_JSON_VALUE).
+                statusCode(SC_OK);
+    }
     
     @Test
     public void getAllTariffGrids() {
