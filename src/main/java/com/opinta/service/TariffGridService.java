@@ -1,5 +1,6 @@
 package com.opinta.service;
 
+import com.opinta.dto.classifier.TariffGridDto;
 import com.opinta.entity.classifier.TariffGrid;
 import com.opinta.entity.W2wVariation;
 import com.opinta.exception.PerformProcessFailedException;
@@ -7,9 +8,15 @@ import java.util.List;
 
 public interface TariffGridService {
     
-    List<TariffGrid> getAll();
+    List<TariffGridDto> getAll();
+    
+    TariffGridDto getByDimension(float weight, float length, W2wVariation w2wVariation);
+    
+    TariffGridDto getById(long id);
+    
+    List<TariffGrid> getAllEntities();
 
-    TariffGrid getById(long id);
+    TariffGrid getEntityById(long id);
 
     TariffGrid save(TariffGrid tariffGrid);
 
@@ -17,7 +24,7 @@ public interface TariffGridService {
     
     boolean delete(long id);
     
-    TariffGrid getByDimension(float weight, float length, W2wVariation w2wVariation);
+    TariffGrid getEntityByDimension(float weight, float length, W2wVariation w2wVariation);
 
     TariffGrid getLast(W2wVariation w2wVariation);
 }

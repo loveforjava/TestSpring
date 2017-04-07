@@ -200,7 +200,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         if (shipment.getWeight() < tariffGrid.getWeight() &&
                 shipment.getLength() < tariffGrid.getLength()) {
-            tariffGrid = tariffGridService.getByDimension(shipment.getWeight(), shipment.getLength(), w2wVariation);
+            tariffGrid = tariffGridService.getEntityByDimension(shipment.getWeight(), shipment.getLength(), w2wVariation);
         }
 
         log.info("TariffGrid for weight {} per length {} and type {}: {}",

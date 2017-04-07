@@ -1,12 +1,15 @@
 package com.opinta.service;
 
 import com.opinta.dao.TariffGridDao;
+import com.opinta.dto.classifier.TariffGridDto;
 import com.opinta.entity.classifier.TariffGrid;
 import com.opinta.entity.W2wVariation;
 import com.opinta.exception.PerformProcessFailedException;
 
 import java.util.List;
 import javax.transaction.Transactional;
+
+import com.opinta.mapper.TariffGridMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,23 +26,43 @@ import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 @Service
 @Slf4j
 public class TariffGridServiceImpl implements TariffGridService {
-    private TariffGridDao tariffGridDao;
+    private final TariffGridDao tariffGridDao;
+    private final TariffGridMapper tariffGridMapper;
 
     @Autowired
-    public TariffGridServiceImpl(TariffGridDao tariffGridDao) {
+    public TariffGridServiceImpl(TariffGridDao tariffGridDao, TariffGridMapper tariffGridMapper) {
         this.tariffGridDao = tariffGridDao;
+        this.tariffGridMapper = tariffGridMapper;
     }
-
+    
     @Override
     @Transactional
-    public List<TariffGrid> getAll() {
+    public List<TariffGridDto> getAll() {
+        return tariffGridMapper.toDto(tariffGridDao.getAll());
+    }
+    
+    @Override
+    @Transactional
+    public TariffGridDto getByDimension(float weight, float length, W2wVariation w2wVariation) {
+        return tariffGridMapper.toDto(tariffGridDao.getByDimension(weight, length, w2wVariation));
+    }
+    
+    @Override
+    @Transactional
+    public TariffGridDto getById(long id) {
+        return tariffGridMapper.toDto(tariffGridDao.getById(id));
+    }
+    
+    @Override
+    @Transactional
+    public List<TariffGrid> getAllEntities() {
         log.info(getAllLogEndpoint(TariffGrid.class));
         return tariffGridDao.getAll();
     }
 
     @Override
     @Transactional
-    public TariffGrid getById(long id) {
+    public TariffGrid getEntityById(long id) {
         log.info(getByIdLogEndpoint(TariffGrid.class, id));
         return tariffGridDao.getById(id);
     }
@@ -87,7 +110,7 @@ public class TariffGridServiceImpl implements TariffGridService {
     
     @Override
     @Transactional
-    public TariffGrid getByDimension(float weight, float length, W2wVariation w2wVariation) {
+    public TariffGrid getEntityByDimension(float weight, float length, W2wVariation w2wVariation) {
         return tariffGridDao.getByDimension(weight, length, w2wVariation);
     }
 
