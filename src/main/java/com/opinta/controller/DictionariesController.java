@@ -4,6 +4,7 @@ import com.opinta.dto.classifier.TariffGridDto;
 import com.opinta.entity.W2wVariation;
 import com.opinta.entity.classifier.TariffGrid;
 import com.opinta.exception.IncorrectInputDataException;
+import com.opinta.service.CountrysidePostcodeService;
 import com.opinta.service.TariffGridService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,10 +23,13 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 @RequestMapping("/dictionaries")
 public class DictionariesController {
     private final TariffGridService tariffGridService;
+    private final CountrysidePostcodeService countrysidePostcodeService;
     
     @Autowired
-    public DictionariesController(TariffGridService tariffGridService) {
+    public DictionariesController(
+            TariffGridService tariffGridService, CountrysidePostcodeService countrysidePostcodeService) {
         this.tariffGridService  = tariffGridService;
+        this.countrysidePostcodeService = countrysidePostcodeService;
     }
     
     @GetMapping(value = "tariffs", produces = APPLICATION_JSON_VALUE)
@@ -52,6 +56,15 @@ public class DictionariesController {
             return new ResponseEntity<>(tariff, OK);
         } catch (IncorrectInputDataException e) {
             return new ResponseEntity<>(getByIdOnErrorLogEndpoint(TariffGrid.class, id, e), NOT_FOUND);
+        }
+    }
+    
+    @GetMapping(value = "countrysides/{postcode}")
+    public ResponseEntity<?> isPostcodeInCountryside(@PathVariable String postcode) {
+        if (countrysidePostcodeService.isPostcodeInCountryside(postcode)) {
+            return new ResponseEntity<>(OK);
+        } else {
+            return new ResponseEntity<>(NOT_FOUND);
         }
     }
 }
