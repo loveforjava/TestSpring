@@ -1,12 +1,16 @@
 package com.opinta.service;
 
 import com.opinta.dao.TariffGridDao;
+import com.opinta.dto.classifier.TariffGridDto;
 import com.opinta.entity.classifier.TariffGrid;
 import com.opinta.entity.W2wVariation;
+import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.exception.PerformProcessFailedException;
 
 import java.util.List;
 import javax.transaction.Transactional;
+
+import com.opinta.mapper.TariffGridMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,34 +27,71 @@ import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 @Service
 @Slf4j
 public class TariffGridServiceImpl implements TariffGridService {
-    private TariffGridDao tariffGridDao;
+    private final TariffGridDao tariffGridDao;
+    private final TariffGridMapper tariffGridMapper;
 
     @Autowired
-    public TariffGridServiceImpl(TariffGridDao tariffGridDao) {
+    public TariffGridServiceImpl(TariffGridDao tariffGridDao, TariffGridMapper tariffGridMapper) {
         this.tariffGridDao = tariffGridDao;
+        this.tariffGridMapper = tariffGridMapper;
     }
-
+    
     @Override
     @Transactional
-    public List<TariffGrid> getAll() {
+    public List<TariffGrid> getAllEntities() {
         log.info(getAllLogEndpoint(TariffGrid.class));
         return tariffGridDao.getAll();
     }
 
     @Override
     @Transactional
-    public TariffGrid getById(long id) {
+    public TariffGrid getEntityById(long id) {
         log.info(getByIdLogEndpoint(TariffGrid.class, id));
         return tariffGridDao.getById(id);
     }
+    
+    @Override
+    @Transactional
+    public TariffGrid getEntityByDimension(float weight, float length, W2wVariation w2wVariation) {
+        return tariffGridDao.getByDimension(weight, length, w2wVariation);
+    }
 
+    @Override
+    @Transactional
+    public TariffGrid getMaxTariffEntity(W2wVariation w2wVariation) {
+        return tariffGridDao.getLast(w2wVariation);
+    }
+    
+    @Override
+    @Transactional
+    public List<TariffGridDto> getAll() {
+        return tariffGridMapper.toDto(tariffGridDao.getAll());
+    }
+    
+    @Override
+    @Transactional
+    public TariffGridDto getByDimension(float weight, float length, W2wVariation w2wVariation) {
+        return tariffGridMapper.toDto(tariffGridDao.getByDimension(weight, length, w2wVariation));
+    }
+    
+    @Override
+    @Transactional
+    public TariffGridDto getById(long id) throws IncorrectInputDataException {
+        TariffGrid tariff = tariffGridDao.getById(id);
+        if (tariff == null) {
+            log.error(getByIdOnErrorLogEndpoint(TariffGrid.class, id));
+            throw new IncorrectInputDataException(getByIdOnErrorLogEndpoint(TariffGrid.class, id));
+        }
+        return tariffGridMapper.toDto(tariff);
+    }
+    
     @Override
     @Transactional
     public TariffGrid save(TariffGrid tariffGrid) {
         log.info(saveLogEndpoint(TariffGrid.class, tariffGrid));
         return tariffGridDao.save(tariffGrid);
     }
-
+    
     @Override
     @Transactional
     public TariffGrid update(long id, TariffGrid source) throws PerformProcessFailedException {
@@ -71,7 +112,7 @@ public class TariffGridServiceImpl implements TariffGridService {
         tariffGridDao.update(target);
         return target;
     }
-
+    
     @Override
     @Transactional
     public boolean delete(long id) {
@@ -83,17 +124,5 @@ public class TariffGridServiceImpl implements TariffGridService {
         log.info(deleteLogEndpoint(TariffGrid.class, id));
         tariffGridDao.delete(tariffGrid);
         return true;
-    }
-    
-    @Override
-    @Transactional
-    public TariffGrid getByDimension(float weight, float length, W2wVariation w2wVariation) {
-        return tariffGridDao.getByDimension(weight, length, w2wVariation);
-    }
-
-    @Override
-    @Transactional
-    public TariffGrid getLast(W2wVariation w2wVariation) {
-        return tariffGridDao.getLast(w2wVariation);
     }
 }

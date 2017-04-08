@@ -192,7 +192,7 @@ public class ShipmentServiceImpl implements ShipmentService {
             w2wVariation = W2wVariation.REGION;
         }
 
-        TariffGrid tariffGrid = tariffGridService.getLast(w2wVariation);
+        TariffGrid tariffGrid = tariffGridService.getMaxTariffEntity(w2wVariation);
         TariffGrid maxTariffGrid = tariffGrid;
         if (tariffGrid == null) {
             return BigDecimal.ZERO;
@@ -200,7 +200,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         if (shipment.getWeight() < tariffGrid.getWeight() &&
                 shipment.getLength() < tariffGrid.getLength()) {
-            tariffGrid = tariffGridService.getByDimension(shipment.getWeight(), shipment.getLength(), w2wVariation);
+            tariffGrid = tariffGridService.getEntityByDimension(shipment.getWeight(), shipment.getLength(), w2wVariation);
         }
 
         log.info("TariffGrid for weight {} per length {} and type {}: {}",
