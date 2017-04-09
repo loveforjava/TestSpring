@@ -69,8 +69,11 @@ public class HibernateConfig {
         flyway.setBaselineOnMigrate(true);
         flyway.setLocations("db/migration/dev");
         flyway.setDataSource(dataSource());
-        // uncomment if the problem with checksum or failed migration
-//        flyway.repair();
+        // if the problem with checksum or failed migration run app with key -Dflyway.repair=true
+        if (environment.getProperty("flyway.repair", Boolean.class)) {
+            System.out.println("opinta");
+            flyway.repair();
+        }
         return flyway;
     }
 
