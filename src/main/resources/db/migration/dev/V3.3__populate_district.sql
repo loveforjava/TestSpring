@@ -1,5 +1,3 @@
-TRUNCATE table District;
-
 INSERT INTO District (id, country_id, region_id, name) VALUES ('1','UA','1','Бершадський');
 INSERT INTO District (id, country_id, region_id, name) VALUES ('2','UA','1','Вінницька');
 INSERT INTO District (id, country_id, region_id, name) VALUES ('3','UA','1','Вінницький');
