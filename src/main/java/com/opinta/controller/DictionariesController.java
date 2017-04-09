@@ -44,8 +44,7 @@ public class DictionariesController {
     }
     
     @GetMapping(value = "tariffs", produces = APPLICATION_JSON_VALUE, params = {"weight", "length", "w2wVariation"})
-    public ResponseEntity<?> getTariffGridByDimensions(@RequestParam float weight,
-                                                       @RequestParam float length,
+    public ResponseEntity<?> getTariffGridByDimensions(@RequestParam float weight, @RequestParam float length,
                                                        @RequestParam W2wVariation w2wVariation) {
         TariffGridDto tariff = tariffGridService.getByDimension(weight, length, w2wVariation);
         if (tariff != null) {

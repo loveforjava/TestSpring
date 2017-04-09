@@ -1,5 +1,3 @@
-DELETE FROM TariffGrid;
-
 INSERT INTO TariffGrid(id, weight, length, price, w2wVariation) VALUES (1, 250, 30, 12, 'TOWN');
 INSERT INTO TariffGrid(id, weight, length, price, w2wVariation) VALUES (2, 250, 30, 15, 'REGION');
 INSERT INTO TariffGrid(id, weight, length, price, w2wVariation) VALUES (3, 250, 30, 21, 'COUNTRY');

@@ -1,5 +1,3 @@
-DELETE FROM Country;
-
 INSERT INTO Country(ISO3166, name) VALUES ('AU','Австралія');
 INSERT INTO Country(ISO3166, name) VALUES ('AT','Австрія');
 INSERT INTO Country(ISO3166, name) VALUES ('AZ','Азербайджан');
