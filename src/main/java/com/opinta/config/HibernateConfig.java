@@ -34,17 +34,17 @@ import java.util.Properties;
 public class HibernateConfig {
     private static final String PACKAGE_TO_SCAN = "com.opinta.entity";
     private Environment environment;
-    @Value("classpath:db/migration/dev/V3.1__populate_country.sql")
+    @Value("classpath:db/migration/common/V3.1__populate_country.sql")
     private Resource countryPopulatorMemory;
-    @Value("classpath:db/migration/dev/V3.2__populate_region.sql")
+    @Value("classpath:db/migration/common/V3.2__populate_region.sql")
     private Resource regionPopulatorMemory;
-    @Value("classpath:db/migration/dev/V3.3__populate_district.sql")
+    @Value("classpath:db/migration/common/V3.3__populate_district.sql")
     private Resource districtPopulatorMemory;
     @Value("classpath:db/migration/dev/V3.4__populate_city.sql")
     private Resource cityPopulatorMemory;
     @Value("classpath:db/migration/dev/V3.5__populate_countryside_postcode.sql")
     private Resource countrysidePostcodePopulatorMemory;
-    @Value("classpath:db/migration/dev/V3.6__populate_tariff_grid.sql")
+    @Value("classpath:db/migration/common/V3.6__populate_tariff_grid.sql")
     private Resource tariffGridPopulatorMemory;
 
     @Autowired
@@ -57,8 +57,13 @@ public class HibernateConfig {
     public Flyway flyway() {
         Flyway flyway = new Flyway();
         flyway.setBaselineOnMigrate(true);
-        flyway.setLocations("db/migration/prod");
+        flyway.setLocations("db/migration/common", "db/migration/prod");
         flyway.setDataSource(dataSource());
+        // if the problem with checksum or failed migration run app with key -Dflyway.repair=true
+        String repair = environment.getProperty("flyway.repair");
+        if (repair != null && repair.equals("true")) {
+            flyway.repair();
+        }
         return flyway;
     }
 
@@ -67,11 +72,11 @@ public class HibernateConfig {
     public Flyway flywayDevelopment() {
         Flyway flyway = new Flyway();
         flyway.setBaselineOnMigrate(true);
-        flyway.setLocations("db/migration/dev");
+        flyway.setLocations("db/migration/common", "db/migration/dev");
         flyway.setDataSource(dataSource());
         // if the problem with checksum or failed migration run app with key -Dflyway.repair=true
-        if (environment.getProperty("flyway.repair", Boolean.class)) {
-            System.out.println("opinta");
+        String repair = environment.getProperty("flyway.repair");
+        if (repair != null && repair.equals("true")) {
             flyway.repair();
         }
         return flyway;
