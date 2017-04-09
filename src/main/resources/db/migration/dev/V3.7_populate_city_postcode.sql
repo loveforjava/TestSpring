@@ -1,5 +1,3 @@
-DELETE FROM CityPostcode ;
-
 Insert into CityPostcode (id, postcode, city_id) values (1, '01001',42309);
 Insert into CityPostcode (id, postcode, city_id) values (2, '01004',42309);
 Insert into CityPostcode (id, postcode, city_id) values (3, '01008',42309);

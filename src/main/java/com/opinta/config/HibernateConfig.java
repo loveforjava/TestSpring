@@ -34,20 +34,21 @@ import java.util.Properties;
 public class HibernateConfig {
     private static final String PACKAGE_TO_SCAN = "com.opinta.entity";
     private Environment environment;
-    @Value("classpath:db/migration/prod/db-data-countryside-postcode.sql")
-    private Resource dataScriptProductionCountrysidePostcode;
-    @Value("classpath:db/migration/prod/sql/prod/db-data-tariff-grid.sql")
-    private Resource dataScriptProductionTariffGrid;
-    @Value("classpath:db/migration/prod//db-data-country.sql")
-    private Resource dataScriptProductionCountry;
-    @Value("classpath:db/migration/prod/db-data-region.sql")
-    private Resource dataScriptProductionRegion;
-    @Value("classpath:db/migration/prod/db-data-district.sql")
-    private Resource dataScriptProductionDistrict;
-    @Value("classpath:db/migration/prod/db-data-city.sql")
-    private Resource dataScriptProductionCity;
-    @Value("classpath:db/migration/prod/db-data-city-postcode.sql")
-    private Resource dataScriptProductionCityPostcode;
+
+    @Value("classpath:db/migration/prod/V3.1__populate_country.sql.sql")
+    private Resource countryPopulatorProd;
+    @Value("classpath:db/migration/prod/V3.2__populate_region.sql.sql")
+    private Resource regionPopulatorProd;
+    @Value("classpath:db/migration/prod/V3.3__populate_district.sql")
+    private Resource districtPopulatorProd;
+    @Value("classpath:db/migration/prod/V3.4__populate_city.sql")
+    private Resource cityPopulatorProd;
+    @Value("classpath:db/migration/prod/V3.5__populate_countryside_postcode.sql")
+    private Resource countrysidePostcodePopulatorProd;
+    @Value("classpath:db/migration/prod/V3.6__populate_tariff_grid.sql")
+    private Resource tariffGridPopulatorProd;
+    @Value("classpath:db/migration/prod/V3.7_populate_city_postcode.sql")
+    private Resource postcodePopulatorProd;
 
     @Value("classpath:db/migration/dev/V3.1__populate_country.sql")
     private Resource countryPopulatorMemory;
@@ -61,6 +62,8 @@ public class HibernateConfig {
     private Resource countrysidePostcodePopulatorMemory;
     @Value("classpath:db/migration/dev/V3.6__populate_tariff_grid.sql")
     private Resource tariffGridPopulatorMemory;
+    @Value("classpath:db/migration/dev/V3.7_populate_city_postcode.sql")
+    private Resource postcodePopulatorMemory;
 
     @Autowired
     public HibernateConfig(Environment environment) {
@@ -221,21 +224,22 @@ public class HibernateConfig {
         populator.addScript(cityPopulatorMemory);
         populator.addScript(countrysidePostcodePopulatorMemory);
         populator.addScript(tariffGridPopulatorMemory);
+        populator.addScript(postcodePopulatorMemory);
         return populator;
     }
 
     @Bean(name = "databasePopulator")
-    @Profile({"prod"})
+    @Profile("prod")
     public DatabasePopulator databasePopulatorProduction() {
         log.info("DATABASE POPULATOR: prod");
         final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
-        populator.addScript(dataScriptProductionCountrysidePostcode);
-        populator.addScript(dataScriptProductionTariffGrid);
-        populator.addScript(dataScriptProductionCountry);
-        populator.addScript(dataScriptProductionRegion);
-        populator.addScript(dataScriptProductionDistrict);
-        populator.addScript(dataScriptProductionCity);
-        populator.addScript(dataScriptProductionCityPostcode);
+        populator.addScript(countrysidePostcodePopulatorProd);
+        populator.addScript(tariffGridPopulatorProd);
+        populator.addScript(countryPopulatorProd);
+        populator.addScript(regionPopulatorProd);
+        populator.addScript(districtPopulatorProd);
+        populator.addScript(cityPopulatorProd);
+        populator.addScript(postcodePopulatorProd);
         return populator;
     }
 
