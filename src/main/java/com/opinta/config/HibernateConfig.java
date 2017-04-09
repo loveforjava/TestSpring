@@ -35,21 +35,6 @@ public class HibernateConfig {
     private static final String PACKAGE_TO_SCAN = "com.opinta.entity";
     private Environment environment;
 
-    @Value("classpath:db/migration/prod/V3.1__populate_country.sql.sql")
-    private Resource countryPopulatorProd;
-    @Value("classpath:db/migration/prod/V3.2__populate_region.sql.sql")
-    private Resource regionPopulatorProd;
-    @Value("classpath:db/migration/prod/V3.3__populate_district.sql")
-    private Resource districtPopulatorProd;
-    @Value("classpath:db/migration/prod/V3.4__populate_city.sql")
-    private Resource cityPopulatorProd;
-    @Value("classpath:db/migration/prod/V3.5__populate_countryside_postcode.sql")
-    private Resource countrysidePostcodePopulatorProd;
-    @Value("classpath:db/migration/prod/V3.6__populate_tariff_grid.sql")
-    private Resource tariffGridPopulatorProd;
-    @Value("classpath:db/migration/prod/V3.7_populate_city_postcode.sql")
-    private Resource postcodePopulatorProd;
-
     @Value("classpath:db/migration/dev/V3.1__populate_country.sql")
     private Resource countryPopulatorMemory;
     @Value("classpath:db/migration/dev/V3.2__populate_region.sql")
@@ -227,20 +212,4 @@ public class HibernateConfig {
         populator.addScript(postcodePopulatorMemory);
         return populator;
     }
-
-    @Bean(name = "databasePopulator")
-    @Profile("prod")
-    public DatabasePopulator databasePopulatorProduction() {
-        log.info("DATABASE POPULATOR: prod");
-        final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
-        populator.addScript(countrysidePostcodePopulatorProd);
-        populator.addScript(tariffGridPopulatorProd);
-        populator.addScript(countryPopulatorProd);
-        populator.addScript(regionPopulatorProd);
-        populator.addScript(districtPopulatorProd);
-        populator.addScript(cityPopulatorProd);
-        populator.addScript(postcodePopulatorProd);
-        return populator;
-    }
-
 }

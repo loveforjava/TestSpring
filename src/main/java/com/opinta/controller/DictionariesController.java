@@ -75,7 +75,6 @@ public class DictionariesController {
 
     @RequestMapping("/addresses")
     public ResponseEntity<?> getAddressesByPostcode(@RequestParam String postcode) {
-        List<CityDto> cities = cityService.getAllCitiesByPostcode(postcode);
-        return new ResponseEntity<>(cities, OK);
+        return new ResponseEntity<>(cityService.getAllCitiesByPostcode(postcode), OK);
     }
 }
