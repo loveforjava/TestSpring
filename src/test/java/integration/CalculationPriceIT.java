@@ -26,7 +26,7 @@ public class CalculationPriceIT extends BaseControllerIT {
 
     @Before
     public void setUp() throws Exception {
-        sender = testHelper.createClientAsSender();
+        sender = testHelper.createClientWithoutDiscount();
         shipmentGroup = testHelper.createShipmentGroup();
     }
 

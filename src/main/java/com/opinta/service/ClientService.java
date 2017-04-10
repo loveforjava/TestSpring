@@ -21,9 +21,7 @@ public interface ClientService {
 
     Client getEntityByUuidAnonymous(UUID uuid) throws IncorrectInputDataException;
 
-    Client saveEntityAsRecipient(Client client, User user) throws IncorrectInputDataException, AuthException;
-
-    Client saveEntityAsSender(Client client, User user) throws IncorrectInputDataException, AuthException;
+    Client saveEntity(Client client, User user) throws IncorrectInputDataException, AuthException;
 
     Client updateEntity(Client client, User user) throws IncorrectInputDataException, AuthException;
     
@@ -31,18 +29,10 @@ public interface ClientService {
 
     List<ClientDto> getAllByCounterpartyUuid(UUID counterpartyUuid, User user)
             throws IncorrectInputDataException, AuthException;
-    
-    List<ClientDto> getAllSendersByCounterpartyUuid(UUID counterpartyUuid, User user)
-            throws IncorrectInputDataException, AuthException;
-    
-    List<ClientDto> getAllRecipientsByCounterpartyUuid(UUID counterpartyUuid, User user)
-            throws IncorrectInputDataException, AuthException;
 
     ClientDto getByUuid(UUID uuid, User user) throws AuthException, IncorrectInputDataException;
     
     ClientDto save(ClientDto client, User user) throws AuthException, IncorrectInputDataException;
-
-    ClientDto saveAsSender(ClientDto clientDto, User user) throws AuthException, IncorrectInputDataException;
 
     ClientDto update(UUID uuid, ClientDto source, User user) throws AuthException, IncorrectInputDataException,
             PerformProcessFailedException;

@@ -95,27 +95,13 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Transactional
-    private Client saveEntity(Client client, User user, boolean sender) throws IncorrectInputDataException, AuthException {
+    public Client saveEntity(Client client, User user) throws IncorrectInputDataException, AuthException {
         validateInnerReferenceAndFillObjectFromDB(client, user);
-
-        client.setSender(sender);
         setDiscount(client, false);
         client.setPhone(phoneService.getOrCreateEntityByPhoneNumber(client.getPhone().getPhoneNumber()));
         userService.authorizeForAction(client, user);
         log.info(saveLogEndpoint(Client.class, client));
         return clientDao.save(client);
-    }
-
-    @Override
-    @Transactional
-    public Client saveEntityAsRecipient(Client client, User user) throws IncorrectInputDataException, AuthException {
-        return saveEntity(client, user, false);
-    }
-
-    @Override
-    @Transactional
-    public Client saveEntityAsSender(Client client, User user) throws IncorrectInputDataException, AuthException {
-        return saveEntity(client, user, true);
     }
 
     @Override
@@ -142,31 +128,6 @@ public class ClientServiceImpl implements ClientService {
     
     @Override
     @Transactional
-    public List<ClientDto> getAllSendersByCounterpartyUuid(UUID counterpartyUuid, User user)
-            throws IncorrectInputDataException, AuthException {
-        return clientMapper.toDto(getAllClientsByCounterpartyUuidAndType(counterpartyUuid, true, user));
-    }
-    
-    @Override
-    @Transactional
-    public List<ClientDto> getAllRecipientsByCounterpartyUuid(UUID counterpartyUuid, User user)
-            throws IncorrectInputDataException, AuthException {
-        return clientMapper.toDto(getAllClientsByCounterpartyUuidAndType(counterpartyUuid, false, user));
-    }
-    
-    private List<Client> getAllClientsByCounterpartyUuidAndType(UUID counterpartyUuid, boolean isSender, User user)
-            throws IncorrectInputDataException, AuthException {
-        String description = counterpartyUuid.toString() + " and type: " + ( isSender ? "sender" : "recipient" );
-        log.info(getAllByFieldLogEndpoint(Client.class, Counterparty.class, description));
-        if (isSender) {
-            return clientDao.getAllSendersByCounterparty(counterpartyService.getEntityByUuid(counterpartyUuid, user));
-        } else {
-            return clientDao.getAllRecipientsByCounterparty(counterpartyService.getEntityByUuid(counterpartyUuid, user));
-        }
-    }
-    
-    @Override
-    @Transactional
     public ClientDto getByUuid(UUID uuid, User user) throws AuthException, IncorrectInputDataException {
         return clientMapper.toDto(getEntityByUuid(uuid, user));
     }
@@ -174,17 +135,11 @@ public class ClientServiceImpl implements ClientService {
     @Override
     @Transactional
     public ClientDto save(ClientDto clientDto, User user) throws AuthException, IncorrectInputDataException {
-        return clientMapper.toDto(saveEntityAsRecipient(clientMapper.toEntity(clientDto), user));
-    }
-
-    @Override
-    @Transactional
-    public ClientDto saveAsSender(ClientDto clientDto, User user) throws AuthException, IncorrectInputDataException {
         Client client = clientMapper.toEntity(clientDto);
         if (clientDto.getDiscount() == null) {
-            client.setDiscount(-1);
+            client.setDiscount(-1.0f);
         }
-        return clientMapper.toDto(saveEntityAsSender(client, user));
+        return clientMapper.toDto(saveEntity(client, user));
     }
 
     @Override
@@ -193,7 +148,6 @@ public class ClientServiceImpl implements ClientService {
             IncorrectInputDataException, PerformProcessFailedException {
         Client source = clientMapper.toEntity(clientDto);
         Client target = getEntityByUuid(uuid, user);
-        boolean sender = target.isSender();
 
         validateInnerReferenceAndFillObjectFromDB(source, user);
 
@@ -204,7 +158,6 @@ public class ClientServiceImpl implements ClientService {
             throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(Client.class, source, target, e));
         }
         target.setUuid(uuid);
-        target.setSender(sender);
         setDiscount(target, false);
         target.setCounterparty(source.getCounterparty());
         target.setPhone(phoneService.getOrCreateEntityByPhoneNumber(clientDto.getPhoneNumber()));
@@ -228,11 +181,8 @@ public class ClientServiceImpl implements ClientService {
         source.setCounterparty(counterparty);
         source.setAddress(address);
     }
-
+    
     private void setDiscount(Client client, boolean forceDiscountInheritance) {
-        if (! client.isSender()) {
-            return;
-        }
         if (forceDiscountInheritance || client.getDiscount() < 0) {
             client.setDiscount(client.getCounterparty().getDiscount());
         }
