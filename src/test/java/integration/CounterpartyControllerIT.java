@@ -84,17 +84,6 @@ public class CounterpartyControllerIT extends BaseControllerIT {
                 statusCode(SC_OK).
                 body("uuid", equalTo(counterpartyUuid.toString()));
     }
-    
-    @Test
-    public void getClientsByCounterpartyUuid() {
-        given().
-                queryParam("token", user.getToken()).
-        when().
-                get("counterparties/{uuid}/clients", counterpartyUuid.toString()).
-        then().
-                contentType(APPLICATION_JSON_VALUE).
-                statusCode(SC_OK);
-    }
 
     @Test
     public void getCounterparty_notFound() throws Exception {

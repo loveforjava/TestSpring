@@ -93,13 +93,13 @@ public class TestHelper {
     }
 
     public Shipment createShipment() throws Exception {
-        Shipment shipment = new Shipment(createClientAndCounterparty(), createClient(),
+        Shipment shipment = new Shipment(createClient(), createClient(),
                 D2D, 4.0F, 3.8F, new BigDecimal(200), new BigDecimal(30), new BigDecimal(35.2));
         return shipmentService.saveEntity(shipment, shipment.getSender().getCounterparty().getUser());
     }
 
     public Shipment createShipment(ShipmentGroup shipmentGroup) throws Exception {
-        Shipment shipment = new Shipment(createClientAndCounterparty(), createClient(),
+        Shipment shipment = new Shipment(createClient(), createClient(),
                 D2D, 4.0F, 3.8F, new BigDecimal(200), new BigDecimal(30), new BigDecimal(35.2));
         shipment.setShipmentGroup(shipmentGroup);
         return shipmentService.saveEntity(shipment, shipment.getSender().getCounterparty().getUser());
@@ -164,12 +164,6 @@ public class TestHelper {
         Client client = new Client("FOP Ivanov", "001", createAddress(), createPhone(),
                 createCounterparty());
         client.setDiscount(10f);
-        return clientService.saveEntity(client, client.getCounterparty().getUser());
-    }
-
-    public Client createClientAndCounterparty() throws Exception {
-        Client client = new Client("FOP Ivanov", "001", createAddress(), createPhone(),
-                createCounterparty());
         return clientService.saveEntity(client, client.getCounterparty().getUser());
     }
 

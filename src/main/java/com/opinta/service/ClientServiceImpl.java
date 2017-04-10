@@ -160,14 +160,18 @@ public class ClientServiceImpl implements ClientService {
             throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(Client.class, source, target, e));
         }
         target.setUuid(uuid);
-        if (clientDto.getDiscount() != null) {
-            target.setDiscount(clientDto.getDiscount());
-        }
+        setDiscount(target, false);
         target.setCounterparty(source.getCounterparty());
         target.setPhone(phoneService.getOrCreateEntityByPhoneNumber(clientDto.getPhoneNumber()));
         target.setAddress(source.getAddress());
         updateEntity(target, user);
         return clientMapper.toDto(target);
+    }
+    
+    private void setDiscount(Client client, boolean forceDiscountInheritance) {
+        if (forceDiscountInheritance || client.getDiscount() < 0) {
+            client.setDiscount(client.getCounterparty().getDiscount());
+        }
     }
 
     @Override

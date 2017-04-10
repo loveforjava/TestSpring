@@ -95,7 +95,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
     @Test
     @SuppressWarnings("unchecked")
     public void createShipment() throws Exception {
-        Client sender = testHelper.createClientAndCounterparty();
+        Client sender = testHelper.createClient();
         ShipmentGroup shipmentGroup = testHelper.createShipmentGroup();
         // create
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
@@ -132,7 +132,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
     @Test
     @SuppressWarnings("unchecked")
     public void createShipmentWithoutGroup() throws Exception {
-        Client sender = testHelper.createClientAndCounterparty();
+        Client sender = testHelper.createClient();
         // create
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
         jsonObject.put("senderUuid", sender.getUuid().toString());

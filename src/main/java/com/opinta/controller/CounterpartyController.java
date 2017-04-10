@@ -71,20 +71,6 @@ public class CounterpartyController {
         }
     }
 
-    @GetMapping(value = "{uuid}/clients", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getClientsByCounterpartyUuid(@PathVariable UUID uuid, @RequestParam UUID token) {
-        try {
-            User user = userService.authenticate(token);
-            return new ResponseEntity<>(clientService.getAllByCounterpartyUuid(uuid, user), OK);
-        } catch (AuthException e) {
-            return new ResponseEntity<>(getAllByFieldOnErrorLogEndpoint(Client.class, Counterparty.class, uuid, e),
-                    UNAUTHORIZED);
-        } catch (IncorrectInputDataException e) {
-            return new ResponseEntity<>(getAllByFieldOnErrorLogEndpoint(Client.class, Counterparty.class, uuid, e),
-                    NOT_FOUND);
-        }
-    }
-
     @PostMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createCounterparty(@RequestBody CounterpartyDto counterpartyDto) {
         try {
