@@ -1,5 +1,3 @@
-TRUNCATE TABLE CountrysidePostcode;
-
 INSERT INTO CountrysidePostcode(id, postcode) VALUES(1,'03027');
 INSERT INTO CountrysidePostcode(id, postcode) VALUES(2,'07024');
 INSERT INTO CountrysidePostcode(id, postcode) VALUES(3,'07031');
