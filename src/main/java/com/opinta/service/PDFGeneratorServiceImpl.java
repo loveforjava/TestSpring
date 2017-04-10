@@ -1,5 +1,9 @@
 package com.opinta.service;
 
+import be.quodlibet.boxable.BaseTable;
+import be.quodlibet.boxable.Cell;
+import be.quodlibet.boxable.Row;
+import com.google.common.io.Files;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
@@ -31,6 +35,7 @@ import org.apache.pdfbox.pdmodel.interactive.form.PDTextField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -44,6 +49,7 @@ import static java.lang.Math.round;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.rightPad;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -53,6 +59,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
     private static final String PDF_LABEL_TEMPLATE = "pdfTemplate/label-template.pdf";
     private static final String PDF_POSTPAY_TEMPLATE = "pdfTemplate/postpay-template.pdf";
     private static final String FONT = "fonts/Roboto-Regular.ttf";
+    private static final float[] COLUMN_WIDTHS = {6, 14, 12, 12, 8, 8, 10, 10, 10, 10};
 
     private MoneyToTextConverter moneyToTextConverter;
 
@@ -72,6 +79,118 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         this.moneyToTextConverter = new MoneyToTextConverter();
     }
 
+    public byte[] generateForm103() throws IOException {
+
+        File fontFile = new File(getClass()
+                .getClassLoader()
+                .getResource(FONT)
+                .getFile());
+        //Adding font to the acro form's resources
+        InputStream fontStream = new FileInputStream(fontFile);
+
+        //Initialize Document
+        // Set margins
+        float margin = 10;
+
+        List<String[]> entries = getEntries();
+
+        PDDocument doc = new PDDocument();
+        PDPage page = new PDPage();
+        PDType0Font font = PDType0Font.load(doc, fontStream);
+
+        boolean firstPage = true;
+
+        float tableWidth = page.getMediaBox().getWidth() - (2 * margin);
+        float yStartNewPage = page.getMediaBox().getHeight() - (2 * margin);
+        float yStart = yStartNewPage;
+        float bottomMargin = 70;
+        BaseTable table = new BaseTable(yStart, yStartNewPage, bottomMargin, tableWidth, margin, doc, page, true,
+                true);
+
+        float remainingSize = page.getMediaBox().getHeight() - yStart - bottomMargin - 30;
+
+        // Create Header row
+        createHeaderRow(font, table);
+        Row<PDPage> row;
+        Cell<PDPage> cell;
+
+        for (String[] entry : entries) {
+            float tableSize = table.getHeaderAndDataHeight();
+            if (remainingSize < tableSize && firstPage) {
+                firstPage = false;
+                page = new PDPage();
+                doc.addPage(page);
+                yStart = 500;
+                table = new BaseTable(yStart, yStartNewPage, bottomMargin, tableWidth, margin, doc, page, true,
+                        true);
+                createHeaderRow(font, table);
+            }
+
+            row = table.createRow(10f);
+
+            for (int i = 0; i < entry.length; i++) {
+                cell = row.createCell(COLUMN_WIDTHS[i], entry[i]);
+                cell.setFont(font);
+                cell.setFontSize(7);
+            }
+        }
+        table.draw();
+
+        // Create document outline
+
+        // Save the document
+        File file = new File("BoxableSample2.pdf");
+        System.out.println("Sample file saved at : " + file.getAbsolutePath());
+        Files.createParentDirs(file);
+        doc.save(file);
+        doc.close();
+        return null;
+    }
+
+    private void createHeaderRow(PDType0Font font, BaseTable table) {
+//        Row<PDPage> headerRow = table.createRow(10f);
+//        Cell<PDPage> cell = headerRow.createCell((100 / 3.0f) * 2, "№ п/п");
+//        cell.setFont(font);
+//        cell.setFontSize(10);
+//        cell.setFillColor(Color.lightGray);
+
+        Row<PDPage> headerRow = table.createRow(10f);
+        Cell<PDPage> cell;
+
+
+        String[] header = {"№ п/п", "Куди (поштова адреса)", "Кому (найменування адресата)", "№ телефону (адресата)",
+                "Особливі відмітки", "Маса (г)", "Оголошена цінність відправлення, (грн.)**", "Сума післяплати, (грн.)",
+                "Плата за пересилання з ПДВ, (грн.)", "№ відправлення (ШКІ)"};
+        for (int i = 0; i < header.length; i++) {
+            cell = headerRow.createCell(COLUMN_WIDTHS[i], header[i]);
+            cell.setFont(font);
+            cell.setFontSize(7);
+            cell.setFillColor(Color.lightGray);
+        }
+        table.addHeaderRow(headerRow);
+    }
+
+    private static List<String[]> getEntries() {
+        List<String[]> entries = new ArrayList<>();
+        entries.add(new String[]{"2", "вулиця Хмельницького, буд. 22, кв. 333, м. Київ, Київ обл., 01001", "Іван Іванович Іванов",
+                "+380961234567", "", "125", "12000", "25", "50", "346457457845"});
+        entries.add(new String[]{"2", "вулиця Лесі Українки, буд. 22, кв. 333, м. Київ, Київ обл., 01001", "Іван Іванович Іванов",
+                "+380961234567", "", "125", "12000", "25", "50", "346457457845"});
+        entries.add(new String[]{"2", "вулиця Степана Бандери, буд. 22, кв. 333, м. Київ, Київ обл., 01001", "Іван Іванович Іванов",
+                "+380961234567", "", "125", "12000", "25", "50", "346457457845"});
+        entries.add(new String[]{"2", "вулиця Вишгородська, буд. 22, кв. 333, м. Київ, Київ обл., 01001", "Іван Іванович Іванов",
+                "+380961234567", "", "125", "12000", "25", "50", "346457457845"});
+        entries.add(new String[]{"2", "вулиця Полтавська, буд. 22, кв. 333, м. Київ, Київ обл., 01001", "Іван Іванович Іванов",
+                "+380961234567", "", "125", "12000", "25", "50", "346457457845"});
+
+        entries.addAll(entries);
+        entries.addAll(entries);
+        entries.addAll(entries);
+        entries.addAll(entries);
+
+        return entries;
+    }
+
     @Override
     public byte[] generateShipmentForm(UUID shipmentId, User user) throws AuthException, IncorrectInputDataException, IOException {
         byte[] output = generateLabelAndPostpayForms(shipmentId, user);
@@ -84,7 +203,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             IncorrectInputDataException, IOException {
         List<Shipment> shipments = shipmentService.getAllEntitiesByShipmentGroupUuid(shipmentGroupUuid, user);
 
-        if(shipments.isEmpty()) {
+        if (shipments.isEmpty()) {
             log.error("Shipment group contains no shipments");
             throw new IncorrectInputDataException("Shipments group contains no shipments");
         }

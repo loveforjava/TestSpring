@@ -11,5 +11,8 @@ public interface PDFGeneratorService {
     byte[] generateShipmentGroupForms(UUID shipmentGroupUuid, User user) throws AuthException,
             IncorrectInputDataException, IOException;
 
+//    byte[] generateForm103() throws AuthException,
+//            IncorrectInputDataException, IOException;
+
     byte[] generateShipmentForm(UUID id, User user) throws AuthException, IncorrectInputDataException, IOException;
 }
