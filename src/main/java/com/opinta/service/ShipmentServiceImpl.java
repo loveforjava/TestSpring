@@ -1,6 +1,7 @@
 package com.opinta.service;
 
 import com.opinta.entity.Address;
+import com.opinta.entity.BarcodeInnerNumber;
 import com.opinta.entity.DeliveryType;
 import com.opinta.entity.ShipmentGroup;
 import com.opinta.entity.classifier.TariffGrid;
@@ -150,7 +151,8 @@ public class ShipmentServiceImpl implements ShipmentService {
             PerformProcessFailedException, IncorrectInputDataException {
         Shipment source = shipmentMapper.toEntity(shipmentDto);
         Shipment target = getEntityByUuid(uuid, user);
-
+        BarcodeInnerNumber barcodeInnerNumber = target.getBarcodeInnerNumber();
+        
         try {
             copyProperties(target, source);
         } catch (Exception e) {
@@ -160,6 +162,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         }
 
         target.setUuid(uuid);
+        target.setBarcodeInnerNumber(barcodeInnerNumber);
         fillSenderAndRecipient(target, user);
         target.setPrice(calculatePrice(target));
         log.info(updateLogEndpoint(Shipment.class, target));
