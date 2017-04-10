@@ -1,12 +1,8 @@
 package com.opinta.service;
 
-import com.opinta.dao.AddressDao;
 import com.opinta.dao.PhoneDao;
-import com.opinta.dto.AddressDto;
 import com.opinta.dto.PhoneDto;
-import com.opinta.entity.Address;
 import com.opinta.entity.Phone;
-import com.opinta.mapper.AddressMapper;
 import com.opinta.mapper.PhoneMapper;
 import com.opinta.util.LogMessageUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +13,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.List;
 
+import static com.opinta.util.EnhancedBeanUtilsBean.copyNotNullProperties;
 import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
 import static com.opinta.util.LogMessageUtil.deleteOnErrorLogEndpoint;
@@ -24,8 +21,6 @@ import static com.opinta.util.LogMessageUtil.getByIdLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.saveLogEndpoint;
 import static com.opinta.util.LogMessageUtil.updateLogEndpoint;
-import static com.opinta.util.LogMessageUtil.updateOnErrorLogEndpoint;
-import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 
 @Service
 @Slf4j
@@ -90,7 +85,7 @@ public class PhoneServiceImpl implements PhoneService {
             return null;
         }
         try {
-            copyProperties(target, source);
+            copyNotNullProperties(target, source);
         } catch (Exception e) {
             log.error(copyPropertiesOnErrorLogEndpoint(Phone.class, source, target, e));
         }
