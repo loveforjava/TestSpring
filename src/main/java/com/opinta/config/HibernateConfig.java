@@ -47,7 +47,7 @@ public class HibernateConfig {
     private Resource countrysidePostcodePopulatorMemory;
     @Value("classpath:db/migration/dev/V3.6__populate_tariff_grid.sql")
     private Resource tariffGridPopulatorMemory;
-    @Value("classpath:db/migration/dev/V3.7_populate_city_postcode.sql")
+    @Value("classpath:db/migration/dev/V3.7__populate_city_postcode.sql")
     private Resource postcodePopulatorMemory;
 
     @Autowired

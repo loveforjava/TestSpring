@@ -8,5 +8,4 @@ import java.util.List;
 public interface CityDao {
 
     List<City> getAllCitiesByPostcode(String postcode);
-
 }

@@ -29,6 +29,12 @@
         region_id number(19,0),
         primary key (id)
     );
+    create table CityPostcode (
+        id number(19,0) not null,
+        postcode varchar2(255 char),
+        city_id number(19,0),
+        primary key (id)
+    );
     create table Client (
         uuid raw(255) not null,
         bankAccount varchar2(255 char),
@@ -226,5 +232,10 @@
         add constraint FK_cvx8r66ygh66c3yy27tk9q96g
         foreign key (shipment_uuid)
         references Shipment;
+    alter table CityPostcode
+        add constraint FK_12pk2lvn0lrm3og6psevxx845
+        foreign key (city_id)
+        references City;
+
     create sequence hibernate_sequence;
 -- 2017-04-08 13:29:41 INFO  SchemaExport:405 - HHH000230: Schema export complete
