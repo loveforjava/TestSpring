@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.opinta.util.CustomBeanUtils.copyNonNullProperties;
+import static com.opinta.util.EnhancedBeanUtilsBean.copyNotNullProperties;
 import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getAllByFieldLogEndpoint;
@@ -131,7 +131,7 @@ public class CounterpartyServiceImpl implements CounterpartyService {
         source.setPostcodePool(target.getPostcodePool());
 
         try {
-            copyNonNullProperties(target, source);
+            copyNotNullProperties(target, source);
         } catch (Exception e) {
             log.error(copyPropertiesOnErrorLogEndpoint(Counterparty.class, source, target, e));
             throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(

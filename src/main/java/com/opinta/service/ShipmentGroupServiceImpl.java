@@ -17,7 +17,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 import java.util.UUID;
 
-import static com.opinta.util.CustomBeanUtils.copyNonNullProperties;
+import static com.opinta.util.EnhancedBeanUtilsBean.copyNotNullProperties;
 import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getAllByFieldLogEndpoint;
@@ -86,7 +86,7 @@ public class ShipmentGroupServiceImpl implements ShipmentGroupService {
         validateInnerReferenceAndFillObjectFromDB(source, user);
 
         try {
-            copyNonNullProperties(target, source);
+            copyNotNullProperties(target, source);
         } catch (Exception e) {
             log.error(copyPropertiesOnErrorLogEndpoint(ShipmentGroup.class, source, target, e));
             throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(

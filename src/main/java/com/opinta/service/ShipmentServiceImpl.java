@@ -29,7 +29,7 @@ import org.springframework.stereotype.Service;
 
 import static java.lang.String.format;
 
-import static com.opinta.util.CustomBeanUtils.copyNonNullProperties;
+import static com.opinta.util.EnhancedBeanUtilsBean.copyNotNullProperties;
 import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
@@ -149,7 +149,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         Shipment target = getEntityByUuid(uuid, user);
         
         try {
-            copyNonNullProperties(target, source);
+            copyNotNullProperties(target, source);
         } catch (Exception e) {
             log.error(copyPropertiesOnErrorLogEndpoint(Shipment.class, source, target, e));
             throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(

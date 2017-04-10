@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.opinta.util.CustomBeanUtils.copyNonNullProperties;
+import static com.opinta.util.EnhancedBeanUtilsBean.copyNotNullProperties;
 import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getAllLogEndpoint;
@@ -74,7 +74,7 @@ public class AddressServiceImpl implements AddressService {
             PerformProcessFailedException {
         Address target = getEntityById(id);
         try {
-            copyNonNullProperties(target, source);
+            copyNotNullProperties(target, source);
         } catch (Exception e) {
             log.error(copyPropertiesOnErrorLogEndpoint(Address.class, source, target, e));
             throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(Address.class, source, target, e));
