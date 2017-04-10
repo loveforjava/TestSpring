@@ -194,7 +194,8 @@ public class ShipmentControllerIT extends BaseControllerIT {
         jsonObject.put("senderUuid", shipment.getSender().getUuid().toString());
         jsonObject.put("recipientUuid", shipment.getRecipient().getUuid().toString());
         String expectedJson = jsonObject.toString();
-
+        ShipmentDto shipmentDtoBeforeUpdate = shipmentMapper.toDto(shipmentService.getEntityByUuid(shipmentUuid, user));
+        
         given().
                 contentType(APPLICATION_JSON_VALUE).
                 queryParam("token", user.getToken()).
@@ -202,6 +203,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         when().
                 put("/shipments/{uuid}", shipmentUuid.toString()).
         then().
+                body("barcode", equalTo(shipmentDtoBeforeUpdate.getBarcode())).
                 statusCode(SC_OK);
 
         // check updated data
