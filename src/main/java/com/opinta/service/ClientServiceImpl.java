@@ -167,12 +167,6 @@ public class ClientServiceImpl implements ClientService {
         updateEntity(target, user);
         return clientMapper.toDto(target);
     }
-    
-    private void setDiscount(Client client, boolean forceDiscountInheritance) {
-        if (forceDiscountInheritance || client.getDiscount() < 0) {
-            client.setDiscount(client.getCounterparty().getDiscount());
-        }
-    }
 
     @Override
     @Transactional
@@ -188,5 +182,11 @@ public class ClientServiceImpl implements ClientService {
         Address address = addressService.getEntityById(source.getAddress().getId());
         source.setCounterparty(counterparty);
         source.setAddress(address);
+    }
+    
+    private void setDiscount(Client client, boolean forceDiscountInheritance) {
+        if (forceDiscountInheritance || client.getDiscount() < 0) {
+            client.setDiscount(client.getCounterparty().getDiscount());
+        }
     }
 }
