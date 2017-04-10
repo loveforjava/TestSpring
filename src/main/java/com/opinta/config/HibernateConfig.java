@@ -1,12 +1,14 @@
 package com.opinta.config;
 
 import lombok.extern.slf4j.Slf4j;
+import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
@@ -24,61 +26,80 @@ import java.util.Properties;
 
 @Configuration
 @EnableTransactionManagement
-@ComponentScan({"com.opinta"})
+@ComponentScan("com.opinta")
 @PropertySource(value = {
         "classpath:application.properties",
         "classpath:application-dev.properties"})
 @Slf4j
 public class HibernateConfig {
+    private static final String PACKAGE_TO_SCAN = "com.opinta.entity";
     private Environment environment;
-    @Value("classpath:sql/prod/db-data-countryside-postcode.sql")
-    private Resource dataScriptProductionCountrysidePostcode;
-    @Value("classpath:sql/prod/db-data-tariff-grid.sql")
-    private Resource dataScriptProductionTariffGrid;
-    @Value("classpath:sql/prod/db-data-country.sql")
-    private Resource dataScriptProductionCountry;
-    @Value("classpath:sql/prod/db-data-region.sql")
-    private Resource dataScriptProductionRegion;
-    @Value("classpath:sql/prod/db-data-district.sql")
-    private Resource dataScriptProductionDistrict;
-    @Value("classpath:sql/prod/db-data-city.sql")
-    private Resource dataScriptProductionCity;
-
-    @Value("classpath:sql/dev/db-data-countryside-postcode.sql")
-    private Resource dataScriptDevelopmentCountrysidePostcode;
-    @Value("classpath:sql/dev/db-data-tariff-grid.sql")
-    private Resource dataScriptDevelopmentTariffGrid;
-    @Value("classpath:sql/dev/db-data-country.sql")
-    private Resource dataScriptDevelopmentCountry;
-    @Value("classpath:sql/dev/db-data-region.sql")
-    private Resource dataScriptDevelopmentRegion;
-    @Value("classpath:sql/dev/db-data-district.sql")
-    private Resource dataScriptDevelopmentDistrict;
-    @Value("classpath:sql/dev/db-data-city.sql")
-    private Resource dataScriptDevelopmentCity;
-
+    @Value("classpath:db/migration/common/V3.1__populate_country.sql")
+    private Resource countryPopulatorMemory;
+    @Value("classpath:db/migration/common/V3.2__populate_region.sql")
+    private Resource regionPopulatorMemory;
+    @Value("classpath:db/migration/common/V3.3__populate_district.sql")
+    private Resource districtPopulatorMemory;
+    @Value("classpath:db/migration/dev/V3.4__populate_city.sql")
+    private Resource cityPopulatorMemory;
+    @Value("classpath:db/migration/dev/V3.5__populate_countryside_postcode.sql")
+    private Resource countrysidePostcodePopulatorMemory;
+    @Value("classpath:db/migration/common/V3.6__populate_tariff_grid.sql")
+    private Resource tariffGridPopulatorMemory;
+    @Value("classpath:db/migration/dev/V3.7__populate_city_postcode.sql")
+    private Resource postcodePopulatorMemory;
 
     @Autowired
     public HibernateConfig(Environment environment) {
         this.environment = environment;
     }
 
-    @Bean(name = "sessionFactory")
+    @Bean(name = "flyway", initMethod = "migrate")
+    @Profile("prod")
+    public Flyway flyway() {
+        Flyway flyway = new Flyway();
+        flyway.setBaselineOnMigrate(true);
+        flyway.setLocations("db/migration/common", "db/migration/prod");
+        flyway.setDataSource(dataSource());
+        // if the problem with checksum or failed migration run app with key -Dflyway.repair=true
+        String repair = environment.getProperty("flyway.repair");
+        if (repair != null && repair.equals("true")) {
+            flyway.repair();
+        }
+        return flyway;
+    }
+
+    @Bean(name = "flyway", initMethod = "migrate")
+    @Profile("dev")
+    public Flyway flywayDevelopment() {
+        Flyway flyway = new Flyway();
+        flyway.setBaselineOnMigrate(true);
+        flyway.setLocations("db/migration/common", "db/migration/dev");
+        flyway.setDataSource(dataSource());
+        // if the problem with checksum or failed migration run app with key -Dflyway.repair=true
+        String repair = environment.getProperty("flyway.repair");
+        if (repair != null && repair.equals("true")) {
+            flyway.repair();
+        }
+        return flyway;
+    }
+
+    @Bean(name = "sessionFactory") @DependsOn("flyway")
     @Profile("prod")
     public LocalSessionFactoryBean sessionFactory() {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(dataSource());
-        sessionFactory.setPackagesToScan("com.opinta.entity");
+        sessionFactory.setPackagesToScan(PACKAGE_TO_SCAN);
         sessionFactory.setHibernateProperties(hibernatePropertiesProduction());
         return sessionFactory;
     }
 
-    @Bean(name = "sessionFactory")
+    @Bean(name = "sessionFactory") @DependsOn("flyway")
     @Profile("dev")
     public LocalSessionFactoryBean sessionFactoryDevelopment() {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(dataSourceDevelopment());
-        sessionFactory.setPackagesToScan("com.opinta.entity");
+        sessionFactory.setPackagesToScan(PACKAGE_TO_SCAN);
         sessionFactory.setHibernateProperties(hibernatePropertiesDevelopment());
         return sessionFactory;
     }
@@ -88,7 +109,7 @@ public class HibernateConfig {
     public LocalSessionFactoryBean sessionFactoryInMemory() {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(dataSourceInMemory());
-        sessionFactory.setPackagesToScan("com.opinta.entity");
+        sessionFactory.setPackagesToScan(PACKAGE_TO_SCAN);
         sessionFactory.setHibernateProperties(hibernatePropertiesInMemory());
         return sessionFactory;
     }
@@ -173,8 +194,10 @@ public class HibernateConfig {
         return txManager;
     }
 
+    // for in memory db, cuz trevis can't work with oracle, and we need CI
     @Bean
     @Autowired
+    @Profile("memory")
     public DataSourceInitializer dataSourceInitializer(final DataSource dataSource, DatabasePopulator databasePopulator) {
         final DataSourceInitializer initializer = new DataSourceInitializer();
         initializer.setDataSource(dataSource);
@@ -183,30 +206,17 @@ public class HibernateConfig {
     }
 
     @Bean(name = "databasePopulator")
-    @Profile({"prod", "memory"})
+    @Profile("memory")
     public DatabasePopulator databasePopulatorProduction() {
-        log.info("DATABASE POPULATOR: prod");
+        log.info("DATABASE POPULATOR: memory");
         final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
-        populator.addScript(dataScriptProductionCountrysidePostcode);
-        populator.addScript(dataScriptProductionTariffGrid);
-        populator.addScript(dataScriptProductionCountry);
-        populator.addScript(dataScriptProductionRegion);
-        populator.addScript(dataScriptProductionDistrict);
-        populator.addScript(dataScriptProductionCity);
-        return populator;
-    }
-
-    @Bean(name = "databasePopulator")
-    @Profile("dev")
-    public DatabasePopulator databasePopulatorDevelopment() {
-        log.info("DATABASE POPULATOR: dev");
-        final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
-        populator.addScript(dataScriptDevelopmentCountrysidePostcode);
-        populator.addScript(dataScriptDevelopmentTariffGrid);
-        populator.addScript(dataScriptDevelopmentCountry);
-        populator.addScript(dataScriptDevelopmentRegion);
-        populator.addScript(dataScriptDevelopmentDistrict);
-        populator.addScript(dataScriptDevelopmentCity);
+        populator.addScript(countryPopulatorMemory);
+        populator.addScript(regionPopulatorMemory);
+        populator.addScript(districtPopulatorMemory);
+        populator.addScript(cityPopulatorMemory);
+        populator.addScript(countrysidePostcodePopulatorMemory);
+        populator.addScript(tariffGridPopulatorMemory);
+        populator.addScript(postcodePopulatorMemory);
         return populator;
     }
 }

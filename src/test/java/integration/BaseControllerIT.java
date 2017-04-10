@@ -1,7 +1,6 @@
 package integration;
 
 import integration.config.ApplicationConfigTest;
-import integration.config.HibernateConfigTest;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -14,7 +13,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {ApplicationConfigTest.class, HibernateConfigTest.class})
+@ContextConfiguration(classes = ApplicationConfigTest.class)
 @WebAppConfiguration
 public abstract class BaseControllerIT {
     private MockMvc mockMvc;

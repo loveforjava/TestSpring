@@ -1,9 +1,11 @@
 package com.opinta.controller;
 
+import com.opinta.dto.CityDto;
 import com.opinta.dto.classifier.TariffGridDto;
 import com.opinta.entity.W2wVariation;
 import com.opinta.entity.classifier.TariffGrid;
 import com.opinta.exception.IncorrectInputDataException;
+import com.opinta.service.CityService;
 import com.opinta.service.CountrysidePostcodeService;
 import com.opinta.service.TariffGridService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -24,11 +28,13 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 public class DictionariesController {
     private final TariffGridService tariffGridService;
     private final CountrysidePostcodeService countrysidePostcodeService;
+    private final CityService cityService;
     
     @Autowired
-    public DictionariesController(TariffGridService tariffGridService,
+    public DictionariesController(TariffGridService tariffGridService, CityService cityService,
             CountrysidePostcodeService countrysidePostcodeService) {
         this.tariffGridService  = tariffGridService;
+        this.cityService = cityService;
         this.countrysidePostcodeService = countrysidePostcodeService;
     }
     
@@ -38,8 +44,7 @@ public class DictionariesController {
     }
     
     @GetMapping(value = "tariffs", produces = APPLICATION_JSON_VALUE, params = {"weight", "length", "w2wVariation"})
-    public ResponseEntity<?> getTariffGridByDimensions(@RequestParam float weight,
-                                                       @RequestParam float length,
+    public ResponseEntity<?> getTariffGridByDimensions(@RequestParam float weight, @RequestParam float length,
                                                        @RequestParam W2wVariation w2wVariation) {
         TariffGridDto tariff = tariffGridService.getByDimension(weight, length, w2wVariation);
         if (tariff != null) {
@@ -66,5 +71,10 @@ public class DictionariesController {
         } else {
             return new ResponseEntity<>(NOT_FOUND);
         }
+    }
+
+    @RequestMapping("/addresses")
+    public ResponseEntity<?> getAddressesByPostcode(@RequestParam String postcode) {
+        return new ResponseEntity<>(cityService.getAllCitiesByPostcode(postcode), OK);
     }
 }
