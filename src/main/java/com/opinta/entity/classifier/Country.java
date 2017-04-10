@@ -14,5 +14,5 @@ public class Country {
     @Id
     @Column(columnDefinition = "varchar(2)", unique = true)
     private String ISO3166;
-    private String NAME;
+    private String name;
 }
