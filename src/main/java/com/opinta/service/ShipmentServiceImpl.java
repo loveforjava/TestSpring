@@ -1,7 +1,6 @@
 package com.opinta.service;
 
 import com.opinta.entity.Address;
-import com.opinta.entity.BarcodeInnerNumber;
 import com.opinta.entity.DeliveryType;
 import com.opinta.entity.ShipmentGroup;
 import com.opinta.entity.classifier.TariffGrid;
@@ -30,11 +29,11 @@ import org.springframework.stereotype.Service;
 
 import static java.lang.String.format;
 
+import static com.opinta.util.CustomBeanUtils.copyNonNullProperties;
 import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.updateLogEndpoint;
-import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 
 @Service
 @Slf4j
@@ -148,10 +147,9 @@ public class ShipmentServiceImpl implements ShipmentService {
             PerformProcessFailedException, IncorrectInputDataException {
         Shipment source = shipmentMapper.toEntity(shipmentDto);
         Shipment target = getEntityByUuid(uuid, user);
-        BarcodeInnerNumber barcodeInnerNumber = target.getBarcodeInnerNumber();
         
         try {
-            copyProperties(target, source);
+            copyNonNullProperties(target, source);
         } catch (Exception e) {
             log.error(copyPropertiesOnErrorLogEndpoint(Shipment.class, source, target, e));
             throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(
@@ -159,7 +157,6 @@ public class ShipmentServiceImpl implements ShipmentService {
         }
 
         target.setUuid(uuid);
-        target.setBarcodeInnerNumber(barcodeInnerNumber);
         fillSenderAndRecipient(target, user);
         target.setPrice(calculatePrice(target));
         log.info(updateLogEndpoint(Shipment.class, target));

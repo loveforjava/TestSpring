@@ -24,10 +24,10 @@ public class ShipmentDto {
     private DeliveryType deliveryType;
     @Size(min = BARCODE_LENGTH, max = BARCODE_LENGTH)
     private String barcode;
-    private float weight;
-    private float length;
-    private float width;
-    private float height;
+    private Float weight;
+    private Float length;
+    private Float width;
+    private Float height;
     private BigDecimal declaredPrice;
     private BigDecimal price;
     private BigDecimal postPay;
