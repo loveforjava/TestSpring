@@ -11,6 +11,8 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 public class DictionariesControllerIT extends BaseControllerIT {
@@ -21,12 +23,13 @@ public class DictionariesControllerIT extends BaseControllerIT {
     @Test
     public void getCitiesByPostcode() {
         given().
-                queryParam("postcode", 01015).
+                queryParam("postcode", "01015").
         when().
                 get("/dictionaries/addresses").
         then().
                 contentType(APPLICATION_JSON_VALUE).
-                statusCode(SC_OK);
+                statusCode(SC_OK).
+                body("results", hasSize(greaterThan(0)));
     }
     
     @Test
