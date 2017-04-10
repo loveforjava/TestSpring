@@ -11,22 +11,18 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = ClientMapper.class)
 public interface ShipmentMapper extends BaseMapper<ShipmentDto, Shipment> {
 
     @Override
     @Mappings({
             @Mapping(expression = "java(stringifyBarcode(shipment.getBarcodeInnerNumber()))", target = "barcode"),
-            @Mapping(source = "sender.uuid", target = "senderUuid"),
-            @Mapping(source = "recipient.uuid", target = "recipientUuid"),
             @Mapping(source = "shipmentGroup.uuid", target = "shipmentGroupUuid")
     })
     ShipmentDto toDto(Shipment shipment);
 
     @Override
     @Mappings({
-            @Mapping(target = "sender", expression = "java(createClientById(shipmentDto.getSenderUuid()))"),
-            @Mapping(target = "recipient", expression = "java(createClientById(shipmentDto.getRecipientUuid()))"),
             @Mapping(target = "shipmentGroup",
                     expression = "java(ShipmentGroupUuidToShipmentGroupEntity(shipmentDto.getShipmentGroupUuid()))")
     })

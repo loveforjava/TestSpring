@@ -5,7 +5,9 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opinta.dto.ShipmentDto;
+import com.opinta.entity.Address;
 import com.opinta.entity.Client;
+import com.opinta.entity.Counterparty;
 import com.opinta.entity.Shipment;
 import com.opinta.entity.ShipmentGroup;
 import com.opinta.entity.User;
@@ -131,19 +133,25 @@ public class ShipmentControllerIT extends BaseControllerIT {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void createShipmentWithoutGroup() throws Exception {
-        Client sender = testHelper.createClient();
-        // create
+    public void createShipmentWithoutGroup_unsavedSender_unsavedRecipient() throws Exception {
+        Counterparty counterparty = testHelper.createCounterparty();
+        Address senderAddress = testHelper.createAddress();
+        Address recipientAddress = testHelper.createAddressOtherRegion();
+        
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
-        jsonObject.put("senderUuid", sender.getUuid().toString());
-        jsonObject.put("recipientUuid", testHelper.createClientOtherRegion().getUuid().toString());
-        String expectedJson = jsonObject.toString();
+        ((JSONObject) jsonObject.get("sender")).put("counterpartyUuid", counterparty.getUuid().toString());
+        ((JSONObject) jsonObject.get("sender")).put("addressId", senderAddress.getId());
+        ((JSONObject) jsonObject.get("sender")).put("uuid", null);
+        ((JSONObject) jsonObject.get("recipient")).put("counterpartyUuid", counterparty.getUuid().toString());
+        ((JSONObject) jsonObject.get("recipient")).put("addressId", recipientAddress.getId());
+        ((JSONObject) jsonObject.get("recipient")).put("uuid", null);
+        String inputJson = jsonObject.toJSONString();
 
         String newShipmentUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
-                        queryParam("token", sender.getCounterparty().getUser().getToken()).
-                        body(expectedJson).
+                        queryParam("token", counterparty.getUser().getToken()).
+                        body(inputJson).
                 when().
                         post("/shipments").
                 then().
@@ -152,14 +160,84 @@ public class ShipmentControllerIT extends BaseControllerIT {
                 extract().
                         path("uuid");
 
+        
         // check created data
         Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
-                sender.getCounterparty().getUser());
+                counterparty.getUser());
+        // adjust jsonObject with actual data, modified into
+        ((JSONObject) jsonObject.get("recipient")).put("uuid", createdShipment.getRecipient().getUuid().toString());
+        ((JSONObject) jsonObject.get("recipient")).put("name", createdShipment.getRecipient().getName());
+        ((JSONObject) jsonObject.get("recipient")).put("firstName", createdShipment.getRecipient().getFirstName());
+        ((JSONObject) jsonObject.get("recipient")).put("middleName", createdShipment.getRecipient().getMiddleName());
+        ((JSONObject) jsonObject.get("recipient")).put("lastName", createdShipment.getRecipient().getLastName());
+        ((JSONObject) jsonObject.get("sender")).put("uuid", createdShipment.getSender().getUuid().toString());
+        ((JSONObject) jsonObject.get("sender")).put("name", createdShipment.getSender().getName());
+        ((JSONObject) jsonObject.get("sender")).put("firstName", createdShipment.getSender().getFirstName());
+        ((JSONObject) jsonObject.get("sender")).put("middleName", createdShipment.getSender().getMiddleName());
+        ((JSONObject) jsonObject.get("sender")).put("lastName", createdShipment.getSender().getLastName());
+        
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(shipmentMapper.toDto(createdShipment));
-
+        
+        String expectedJson = jsonObject.toJSONString();
         JSONAssert.assertEquals(expectedJson, actualJson, false);
 
+        // delete
+        testHelper.deleteShipment(createdShipment);
+    }
+    
+    
+    @Test
+    @SuppressWarnings("unchecked")
+    public void createShipmentWithoutGroup_savedSender_unsavedRecipient() throws Exception {
+        Counterparty counterparty = testHelper.createCounterparty();
+        Client sender = testHelper.createClient(counterparty);
+        Address recipientAddress = testHelper.createAddressOtherRegion();
+        
+        JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
+        ((JSONObject) jsonObject.get("sender")).put("counterpartyUuid", sender.getCounterparty().getUuid().toString());
+        ((JSONObject) jsonObject.get("sender")).put("addressId", sender.getAddress().getId());
+        ((JSONObject) jsonObject.get("sender")).put("uuid", sender.getUuid().toString());
+        ((JSONObject) jsonObject.get("recipient")).put("counterpartyUuid", counterparty.getUuid().toString());
+        ((JSONObject) jsonObject.get("recipient")).put("addressId", recipientAddress.getId());
+        ((JSONObject) jsonObject.get("recipient")).put("uuid", null);
+        String inputJson = jsonObject.toJSONString();
+        
+        String newShipmentUuid =
+                given().
+                        contentType(APPLICATION_JSON_VALUE).
+                        queryParam("token", counterparty.getUser().getToken()).
+                        body(inputJson).
+                        when().
+                        post("/shipments").
+                        then().
+                        statusCode(SC_OK).
+                        body("barcode", RegexMatcher.matches(BARCODE_REGEX)).
+                        extract().
+                        path("uuid");
+        
+        
+        // check created data
+        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
+                counterparty.getUser());
+        // adjust jsonObject with actual data, modified into
+        ((JSONObject) jsonObject.get("recipient")).put("uuid", createdShipment.getRecipient().getUuid().toString());
+        ((JSONObject) jsonObject.get("recipient")).put("name", createdShipment.getRecipient().getName());
+        ((JSONObject) jsonObject.get("recipient")).put("firstName", createdShipment.getRecipient().getFirstName());
+        ((JSONObject) jsonObject.get("recipient")).put("middleName", createdShipment.getRecipient().getMiddleName());
+        ((JSONObject) jsonObject.get("recipient")).put("lastName", createdShipment.getRecipient().getLastName());
+        ((JSONObject) jsonObject.get("sender")).put("uuid", createdShipment.getSender().getUuid().toString());
+        ((JSONObject) jsonObject.get("sender")).put("name", createdShipment.getSender().getName());
+        ((JSONObject) jsonObject.get("sender")).put("firstName", createdShipment.getSender().getFirstName());
+        ((JSONObject) jsonObject.get("sender")).put("middleName", createdShipment.getSender().getMiddleName());
+        ((JSONObject) jsonObject.get("sender")).put("lastName", createdShipment.getSender().getLastName());
+        
+        ObjectMapper mapper = new ObjectMapper();
+        String actualJson = mapper.writeValueAsString(shipmentMapper.toDto(createdShipment));
+        
+        String expectedJson = jsonObject.toJSONString();
+        JSONAssert.assertEquals(expectedJson, actualJson, false);
+        
         // delete
         testHelper.deleteShipment(createdShipment);
     }
