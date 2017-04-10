@@ -45,7 +45,6 @@
         lastName varchar2(255 char),
         middleName varchar2(255 char),
         name varchar2(255 char),
-        sender number(1,0) not null,
         uniqueRegistrationNumber varchar2(255 char),
         address_id number(19,0),
         counterparty_uuid raw(255),
