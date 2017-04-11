@@ -137,23 +137,6 @@ public class TestHelper {
         clientUuidJsonObject.put("uuid", client.getUuid().toString());
         return clientUuidJsonObject;
     }
-    
-    public JSONObject toJsonClientObject(Client client) {
-        JSONObject clientJsonObject = new JSONObject();
-        clientJsonObject.put("uuid", client.getUuid().toString());
-        clientJsonObject.put("name", client.getName());
-        clientJsonObject.put("firstName", client.getFirstName());
-        clientJsonObject.put("middleName", client.getMiddleName());
-        clientJsonObject.put("lastName", client.getLastName());
-        clientJsonObject.put("uniqueRegistrationNumber", client.getUniqueRegistrationNumber());
-        clientJsonObject.put("phoneNumber", client.getPhone().getPhoneNumber());
-        clientJsonObject.put("bankAccount", client.getBankAccount());
-        clientJsonObject.put("bankCode", client.getBankCode());
-        clientJsonObject.put("individual", client.isIndividual());
-        clientJsonObject.put("addressId", client.getAddress().getId());
-        clientJsonObject.put("counterpartyUuid", client.getCounterparty().getUuid().toString());
-        return clientJsonObject;
-    }
 
     public Client createClient() throws Exception {
         Client client = new Client("FOP Ivanov", "001", createAddress(), createPhone(),

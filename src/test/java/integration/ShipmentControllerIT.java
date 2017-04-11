@@ -256,12 +256,8 @@ public class ShipmentControllerIT extends BaseControllerIT {
     public void updateShipment() throws Exception {
         // update
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
-        JSONObject jsonSenderUuidOnly = new JSONObject();
-        jsonSenderUuidOnly.put("uuid", shipment.getSender().getUuid().toString());
-        JSONObject jsonRecipientUuidOnly = new JSONObject();
-        jsonRecipientUuidOnly.put("uuid", shipment.getRecipient().getUuid().toString());
-        jsonObject.put("sender", jsonSenderUuidOnly);
-        jsonObject.put("recipient", jsonRecipientUuidOnly);
+        jsonObject.put("sender", testHelper.toJsonClientUuidObject(shipment.getSender()));
+        jsonObject.put("recipient", testHelper.toJsonClientUuidObject(shipment.getRecipient()));
         String expectedJson = jsonObject.toString();
         ShipmentDto shipmentDtoBeforeUpdate = shipmentMapper.toDto(shipmentService.getEntityByUuid(shipmentUuid, user));
         
