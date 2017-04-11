@@ -48,6 +48,7 @@ import java.math.BigDecimal;
 import static java.lang.Math.round;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.rightPad;
+import static org.apache.pdfbox.pdmodel.PDPageContentStream.AppendMode.APPEND;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +60,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
     private static final String PDF_LABEL_TEMPLATE = "pdfTemplate/label-template.pdf";
     private static final String PDF_POSTPAY_TEMPLATE = "pdfTemplate/postpay-template.pdf";
     private static final String FONT = "fonts/Roboto-Regular.ttf";
-    private static final float[] COLUMN_WIDTHS = {6, 14, 12, 12, 8, 8, 10, 10, 10, 10};
+    private static final float[] COLUMN_WIDTHS = {3, 17, 12, 12, 8, 8, 10, 10, 10, 10};
 
     private MoneyToTextConverter moneyToTextConverter;
 
@@ -85,42 +86,144 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
                 .getClassLoader()
                 .getResource(FONT)
                 .getFile());
-        //Adding font to the acro form's resources
         InputStream fontStream = new FileInputStream(fontFile);
 
         //Initialize Document
-        // Set margins
+        //Set margins
         float margin = 10;
 
         List<String[]> entries = getEntries();
 
         PDDocument doc = new PDDocument();
         PDPage page = new PDPage();
+        doc.addPage(page);
         PDType0Font font = PDType0Font.load(doc, fontStream);
 
         boolean firstPage = true;
 
         float tableWidth = page.getMediaBox().getWidth() - (2 * margin);
-        float yStartNewPage = page.getMediaBox().getHeight() - (2 * margin);
+        float yStartNewPage = 650;
         float yStart = yStartNewPage;
-        float bottomMargin = 70;
+        float bottomMargin = 30;
         BaseTable table = new BaseTable(yStart, yStartNewPage, bottomMargin, tableWidth, margin, doc, page, true,
                 true);
 
-        float remainingSize = page.getMediaBox().getHeight() - yStart - bottomMargin - 30;
+        float remainingSize = yStart - bottomMargin - 50;
 
         // Create Header row
         createHeaderRow(font, table);
         Row<PDPage> row;
         Cell<PDPage> cell;
 
+        PDPageContentStream contentStream;
+
+        int index = 0;
         for (String[] entry : entries) {
+            index++;
             float tableSize = table.getHeaderAndDataHeight();
             if (remainingSize < tableSize && firstPage) {
+                contentStream = new PDPageContentStream(doc, table.getCurrentPage(), APPEND, true);
+
+                int fontSize = 15;
+                int xText = 230;
+                int yText = 750;
+                String textToFill = "Список № 1";
+
+                contentStream.beginText();
+                contentStream.setFont(font, fontSize);
+                contentStream.newLineAtOffset(xText, yText);
+                contentStream.showText(textToFill);
+                contentStream.endText();
+
+                contentStream.beginText();
+                contentStream.newLineAtOffset(520, 750);
+                contentStream.showText("ф. 103");
+                contentStream.endText();
+
+                contentStream.beginText();
+                contentStream.setFont(font, 10);
+                contentStream.newLineAtOffset(50, 730);
+                contentStream.showText("згрупованих поштових відправлень");
+                contentStream.endText();
+
+                contentStream.beginText();
+                contentStream.newLineAtOffset(250, 729);
+                contentStream.showText("___________________________________________________________________");
+                contentStream.endText();
+
+                contentStream.beginText();
+                contentStream.newLineAtOffset(320, 730);
+                contentStream.showText("посилок з оголошенною цінністю");
+                contentStream.endText();
+
+                contentStream.beginText();
+                contentStream.setFont(font, 8);
+                contentStream.newLineAtOffset(360, 722);
+                contentStream.showText("(вид, категорія)");
+                contentStream.endText();
+
+                contentStream.beginText();
+                contentStream.setFont(font, 10);
+                contentStream.newLineAtOffset(50, 710);
+                contentStream.showText("поданих в");
+                contentStream.endText();
+
+                String gottenIn= "Київ 70"; //TODO: Placeholder?
+                float textWidth = font.getStringWidth(gottenIn) / 1000 * 10; //10 is font size
+
+                contentStream.beginText();
+                contentStream.newLineAtOffset(390 - (textWidth/2), 710);
+                contentStream.showText(gottenIn);
+                contentStream.endText();
+
+                contentStream.beginText();
+                contentStream.newLineAtOffset(200, 709);
+                contentStream.showText("_____________________________________________" +
+                        "_________________________________");
+                contentStream.endText();
+
+                contentStream.beginText();
+                contentStream.newLineAtOffset(50, 690);
+                contentStream.showText("Відправник");
+                contentStream.endText();
+
+                String sender = "ООО Тест"; //TODO: Placeholder
+                textWidth = font.getStringWidth(sender) / 1000 * 10;
+
+                contentStream.beginText();
+                contentStream.newLineAtOffset(390 - (textWidth/2), 690);
+                contentStream.showText(sender);
+                contentStream.endText();
+
+                contentStream.beginText();
+                contentStream.newLineAtOffset(200, 689);
+                contentStream.showText("_____________________________________________" +
+                        "_________________________________");
+                contentStream.endText();
+
+                contentStream.beginText();
+                contentStream.setFont(font, 8);
+                contentStream.newLineAtOffset(320, 682);
+                contentStream.showText("(повне найменування відправника)");
+                contentStream.endText();
+
+                String bankData = "ЄДРПОУ 12345678, МФО 123456, р/р 1234567890123, в АТ Ощадбанк"; //TODO: Placeholder
+                textWidth = font.getStringWidth(bankData) / 1000 * 10;
+
+                contentStream.beginText();
+                contentStream.setFont(font, 10);
+                contentStream.newLineAtOffset(page.getMediaBox().getWidth() / 2 - (textWidth/2), 660);
+                contentStream.showText(bankData);
+                contentStream.endText();
+
+                contentStream.close();
+                table.draw();
+
                 firstPage = false;
                 page = new PDPage();
                 doc.addPage(page);
-                yStart = 500;
+                yStart = page.getMediaBox().getHeight() - (2 * margin);
+                yStartNewPage = yStart;
                 table = new BaseTable(yStart, yStartNewPage, bottomMargin, tableWidth, margin, doc, page, true,
                         true);
                 createHeaderRow(font, table);
@@ -128,15 +231,17 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
 
             row = table.createRow(10f);
 
-            for (int i = 0; i < entry.length; i++) {
+            cell = row.createCell(COLUMN_WIDTHS[0], String.valueOf(index));
+            cell.setFont(font);
+            cell.setFontSize(7);
+
+            for (int i = 1; i < entry.length; i++) {
                 cell = row.createCell(COLUMN_WIDTHS[i], entry[i]);
                 cell.setFont(font);
                 cell.setFontSize(7);
             }
         }
         table.draw();
-
-        // Create document outline
 
         // Save the document
         File file = new File("BoxableSample2.pdf");
@@ -148,16 +253,9 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
     }
 
     private void createHeaderRow(PDType0Font font, BaseTable table) {
-//        Row<PDPage> headerRow = table.createRow(10f);
-//        Cell<PDPage> cell = headerRow.createCell((100 / 3.0f) * 2, "№ п/п");
-//        cell.setFont(font);
-//        cell.setFontSize(10);
-//        cell.setFillColor(Color.lightGray);
 
         Row<PDPage> headerRow = table.createRow(10f);
         Cell<PDPage> cell;
-
-
         String[] header = {"№ п/п", "Куди (поштова адреса)", "Кому (найменування адресата)", "№ телефону (адресата)",
                 "Особливі відмітки", "Маса (г)", "Оголошена цінність відправлення, (грн.)**", "Сума післяплати, (грн.)",
                 "Плата за пересилання з ПДВ, (грн.)", "№ відправлення (ШКІ)"};
@@ -172,16 +270,16 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
 
     private static List<String[]> getEntries() {
         List<String[]> entries = new ArrayList<>();
-        entries.add(new String[]{"2", "вулиця Хмельницького, буд. 22, кв. 333, м. Київ, Київ обл., 01001", "Іван Іванович Іванов",
-                "+380961234567", "", "125", "12000", "25", "50", "346457457845"});
-        entries.add(new String[]{"2", "вулиця Лесі Українки, буд. 22, кв. 333, м. Київ, Київ обл., 01001", "Іван Іванович Іванов",
-                "+380961234567", "", "125", "12000", "25", "50", "346457457845"});
-        entries.add(new String[]{"2", "вулиця Степана Бандери, буд. 22, кв. 333, м. Київ, Київ обл., 01001", "Іван Іванович Іванов",
-                "+380961234567", "", "125", "12000", "25", "50", "346457457845"});
-        entries.add(new String[]{"2", "вулиця Вишгородська, буд. 22, кв. 333, м. Київ, Київ обл., 01001", "Іван Іванович Іванов",
-                "+380961234567", "", "125", "12000", "25", "50", "346457457845"});
-        entries.add(new String[]{"2", "вулиця Полтавська, буд. 22, кв. 333, м. Київ, Київ обл., 01001", "Іван Іванович Іванов",
-                "+380961234567", "", "125", "12000", "25", "50", "346457457845"});
+        entries.add(new String[]{"2", "вулиця Хмельницького, буд. 22, кв. 333, м. Київ, Київ обл., 01001",
+                "Іван Іванович Іванов", "+380961234567", "", "125", "12000", "25", "50", "346457457845"});
+        entries.add(new String[]{"2", "вулиця Лесі Українки, буд. 22, кв. 333, м. Київ, Київ обл., 01001",
+                "Іван Іванович Іванов", "+380961234567", "", "125", "12000", "25", "50", "346457457845"});
+        entries.add(new String[]{"2", "вулиця Степана Бандери, буд. 22, кв. 333, м. Київ, Київ обл., 01001",
+                "Іван Іванович Іванов", "+380961234567", "", "125", "12000", "25", "50", "346457457845"});
+        entries.add(new String[]{"2", "вулиця Вишгородська, буд. 22, кв. 333, м. Київ, Київ обл., 01001",
+                "Іван Іванович Іванов", "+380961234567", "", "125", "12000", "25", "50", "346457457845"});
+        entries.add(new String[]{"2", "вулиця Полтавська, буд. 22, кв. 333, м. Київ, Київ обл., 01001",
+                "Іван Іванович Іванов", "+380961234567", "", "125", "12000", "25", "50", "346457457845"});
 
         entries.addAll(entries);
         entries.addAll(entries);
@@ -368,7 +466,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             //Creating content stream for the page to allow data appending
             PDPage page = template.getPage(0);
             PDPageContentStream contentStream =
-                    new PDPageContentStream(template, page, PDPageContentStream.AppendMode.APPEND, true);
+                    new PDPageContentStream(template, page, APPEND, true);
 
             //Constructing 13 digits of the barcodeInnerNumber
             String barcode = shipment.getBarcodeInnerNumber().getPostcodePool().getPostcode() +
