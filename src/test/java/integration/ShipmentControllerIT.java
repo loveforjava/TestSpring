@@ -136,7 +136,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void createShipmentWithoutGroup_unsavedSender_unsavedRecipient() throws Exception {
+    public void createShipmentWithoutGroup_unsavedSenderAndRecipient() throws Exception {
         Counterparty counterparty = testHelper.createCounterparty();
         Address senderAddress = testHelper.createAddress();
         Address recipientAddress = testHelper.createAddressOtherRegion();
