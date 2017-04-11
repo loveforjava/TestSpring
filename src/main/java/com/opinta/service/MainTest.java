@@ -6,12 +6,12 @@ public class MainTest {
 
     public static void main(String[] args) {
 
-        PDFGeneratorServiceImpl generator = new PDFGeneratorServiceImpl(null, null);
-        try {
-            generator.generateForm103();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        PDFGeneratorServiceImpl generator = new PDFGeneratorServiceImpl(null, null, null);
+//        try {
+//            generator.generateForm103test();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
     }
 

@@ -42,7 +42,7 @@ public interface ShipmentMapper extends BaseMapper<ShipmentDto, Shipment> {
         if (barcodeInnerNumber == null) {
             return null;
         }
-        return barcodeInnerNumber.getPostcodePool().getPostcode() + barcodeInnerNumber.getInnerNumber();
+        return barcodeInnerNumber.stringify();
     }
 
     default ShipmentGroup ShipmentGroupUuidToShipmentGroupEntity(UUID uuid) {

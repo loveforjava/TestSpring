@@ -27,4 +27,8 @@ public class BarcodeInnerNumber {
     @ManyToOne
     @JoinColumn(name = "postcode_pool_uuid")
     private PostcodePool postcodePool;
+
+    public String stringify() {
+        return postcodePool.getPostcode() + innerNumber;
+    }
 }
