@@ -105,7 +105,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Transactional
     public Client saveEntity(Client client, User user) throws IncorrectInputDataException, AuthException {
-        validateInnerReferenceAndFillObjectFromDB(client, user);
+        validateInnerReferencesAndFillObjectFromDB(client, user);
         setDiscount(client, false);
         client.setPhone(phoneService.getOrCreateEntityByPhoneNumber(client.getPhone().getPhoneNumber()));
         userService.authorizeForAction(client, user);
@@ -145,6 +145,8 @@ public class ClientServiceImpl implements ClientService {
     @Transactional
     public ClientDto save(ClientDto clientDto, User user) throws AuthException, IncorrectInputDataException {
         Client client = clientMapper.toEntity(clientDto);
+        Counterparty counterparty = counterpartyService.getEntityByUser(user);
+        client.setCounterparty(counterparty);
         if (clientDto.getDiscount() == null) {
             client.setDiscount(-1.0f);
         }
@@ -156,9 +158,10 @@ public class ClientServiceImpl implements ClientService {
     public ClientDto update(UUID uuid, ClientDto clientDto, User user) throws AuthException,
             IncorrectInputDataException, PerformProcessFailedException {
         Client source = clientMapper.toEntity(clientDto);
+        source.setCounterparty(null);
         Client target = getEntityByUuid(uuid, user);
 
-        validateInnerReferenceAndFillObjectFromDB(source, user);
+        validateInnerReferencesAndFillObjectFromDB(source, user);
 
         try {
             copyNotNullProperties(target, source);
@@ -168,7 +171,6 @@ public class ClientServiceImpl implements ClientService {
         }
         target.setUuid(uuid);
         setDiscount(target, false);
-        target.setCounterparty(source.getCounterparty());
         target.setPhone(phoneService.getOrCreateEntityByPhoneNumber(clientDto.getPhoneNumber()));
         target.setAddress(source.getAddress());
         updateEntity(target, user);
@@ -183,9 +185,9 @@ public class ClientServiceImpl implements ClientService {
         clientDao.delete(client);
     }
 
-    private void validateInnerReferenceAndFillObjectFromDB(Client source, User user) throws IncorrectInputDataException,
+    private void validateInnerReferencesAndFillObjectFromDB(Client source, User user) throws IncorrectInputDataException,
             AuthException {
-        Counterparty counterparty = counterpartyService.getEntityByUuid(source.getCounterparty().getUuid(), user);
+        Counterparty counterparty = counterpartyService.getEntityByUser(user);
         Address address = addressService.getEntityById(source.getAddress().getId());
         source.setCounterparty(counterparty);
         source.setAddress(address);

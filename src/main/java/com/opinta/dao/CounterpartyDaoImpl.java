@@ -5,6 +5,7 @@ import com.opinta.entity.PostcodePool;
 import java.util.List;
 import java.util.UUID;
 
+import com.opinta.entity.User;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -35,7 +36,16 @@ public class CounterpartyDaoImpl implements CounterpartyDao {
         Session session = this.sessionFactory.getCurrentSession();
         return (Counterparty) session.get(Counterparty.class, uuid);
     }
-
+    
+    @Override
+    public Counterparty getByUser(User user) {
+        Session session = this.sessionFactory.getCurrentSession();
+        return (Counterparty) session.createCriteria(Counterparty.class)
+                .add(Restrictions.eq("user", user))
+                .setMaxResults(1)
+                .uniqueResult();
+    }
+    
     @Override
     @SuppressWarnings("unchecked")
     public List<Counterparty> getByPostcodePool(PostcodePool postcodePool) {

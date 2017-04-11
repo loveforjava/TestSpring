@@ -91,7 +91,6 @@ public class ClientControllerIT extends BaseControllerIT {
         Address newAddress = testHelper.createAddress();
 
         JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client.json");
-        inputJson.put("counterpartyUuid", newCounterparty.getUuid().toString());
         inputJson.put("addressId", (int) newAddress.getId());
         inputJson.put("individual", true);
     
@@ -140,7 +139,6 @@ public class ClientControllerIT extends BaseControllerIT {
         Address newAddress = testHelper.createAddress();
         
         JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client.json");
-        inputJson.put("counterpartyUuid", newCounterparty.getUuid().toString());
         inputJson.put("addressId", (int) newAddress.getId());
         inputJson.put("individual", false);
         
@@ -192,7 +190,6 @@ public class ClientControllerIT extends BaseControllerIT {
         Address newAddress = testHelper.createAddress();
 
         JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client.json");
-        inputJson.put("counterpartyUuid", newCounterparty.getUuid().toString());
         inputJson.put("addressId", (int) newAddress.getId());
         inputJson.put("individual", false);
 
@@ -223,7 +220,6 @@ public class ClientControllerIT extends BaseControllerIT {
         float discountClient = 10.0f;
         // update
         JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client.json");
-        inputJson.put("counterpartyUuid", client.getCounterparty().getUuid().toString());
         inputJson.put("addressId", (int) client.getAddress().getId());
         inputJson.put("middleName", "Jakson [edited]");
         inputJson.put("phoneNumber", "0934314522");
@@ -242,6 +238,7 @@ public class ClientControllerIT extends BaseControllerIT {
                 put("/clients/{uuid}", clientUuid.toString()).
         then().
                 body("discount", equalTo(discountClient)).
+                body("counterpartyUuid", equalTo(client.getCounterparty().getUuid().toString())).
                 statusCode(SC_OK);
 
         JSONParser parser = new JSONParser();
@@ -263,7 +260,6 @@ public class ClientControllerIT extends BaseControllerIT {
     public void updateClientAsCompany() throws Exception {
         // update
         JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client.json");
-        inputJson.put("counterpartyUuid", client.getCounterparty().getUuid().toString());
         inputJson.put("addressId", (int) client.getAddress().getId());
         inputJson.put("name", "Rozetka & Roga & Kopyta [edited]");
         inputJson.put("individual", false);
@@ -275,6 +271,7 @@ public class ClientControllerIT extends BaseControllerIT {
         when().
                 put("/clients/{uuid}", clientUuid.toString()).
         then().
+                body("counterpartyUuid", equalTo(client.getCounterparty().getUuid().toString())).
                 statusCode(SC_OK);
     
         JSONParser parser = new JSONParser();
