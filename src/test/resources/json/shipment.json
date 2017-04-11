@@ -5,7 +5,7 @@
     "firstName": "John",
     "middleName": "Johnson",
     "lastName": "Doe",
-    "uniqueRegistrationNumber": "009"
+    "uniqueRegistrationNumber": "009",
     "phoneNumber": "0982004113",
     "addressId": [],
     "individual": false,

@@ -171,7 +171,6 @@ public class ClientServiceImpl implements ClientService {
         }
         target.setUuid(uuid);
         setDiscount(target, false);
-//        target.setCounterparty(source.getCounterparty());
         target.setPhone(phoneService.getOrCreateEntityByPhoneNumber(clientDto.getPhoneNumber()));
         target.setAddress(source.getAddress());
         updateEntity(target, user);
