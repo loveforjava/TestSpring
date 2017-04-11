@@ -26,7 +26,7 @@ public class CalculationPriceIT extends BaseControllerIT {
 
     @Before
     public void setUp() throws Exception {
-        sender = testHelper.createClientWithoutDiscount();
+        sender = testHelper.createSenderWithoutDiscount();
         shipmentGroup = testHelper.createShipmentGroup();
     }
 
@@ -36,9 +36,9 @@ public class CalculationPriceIT extends BaseControllerIT {
         // create
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
         jsonObject.put("shipmentGroupUuid", shipmentGroup.getUuid().toString());
-        jsonObject.put("sender", testHelper.toJsonClientUuidObject(sender));
+        jsonObject.put("sender", testHelper.toJsonWithUuid(sender));
         Client recipient = testHelper.createRecipientFor(sender.getCounterparty());
-        jsonObject.put("recipient", testHelper.toJsonClientUuidObject(recipient));
+        jsonObject.put("recipient", testHelper.toJsonWithUuid(recipient));
         jsonObject.put("weight", 1000);
         jsonObject.put("length", 25);
         jsonObject.put("deliveryType", "W2W");
@@ -70,9 +70,9 @@ public class CalculationPriceIT extends BaseControllerIT {
         // create
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
         jsonObject.put("shipmentGroupUuid", shipmentGroup.getUuid().toString());
-        jsonObject.put("sender", testHelper.toJsonClientUuidObject(sender));
+        jsonObject.put("sender", testHelper.toJsonWithUuid(sender));
         Client recipient = testHelper.createRecipientSameRegionFor(sender.getCounterparty());
-        jsonObject.put("recipient", testHelper.toJsonClientUuidObject(recipient));
+        jsonObject.put("recipient", testHelper.toJsonWithUuid(recipient));
         jsonObject.put("weight", 12000);
         jsonObject.put("length", 54);
         jsonObject.put("deliveryType", "W2W");
@@ -104,9 +104,9 @@ public class CalculationPriceIT extends BaseControllerIT {
         // create
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
         jsonObject.put("shipmentGroupUuid", shipmentGroup.getUuid().toString());
-        jsonObject.put("sender", testHelper.toJsonClientUuidObject(sender));
+        jsonObject.put("sender", testHelper.toJsonWithUuid(sender));
         Client recipient = testHelper.createRecipientOtherRegionFor(sender.getCounterparty());
-        jsonObject.put("recipient", testHelper.toJsonClientUuidObject(recipient));
+        jsonObject.put("recipient", testHelper.toJsonWithUuid(recipient));
         jsonObject.put("weight", 25000);
         jsonObject.put("length", 70);
         jsonObject.put("deliveryType", "W2W");
@@ -138,9 +138,9 @@ public class CalculationPriceIT extends BaseControllerIT {
         // create
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
         jsonObject.put("shipmentGroupUuid", shipmentGroup.getUuid().toString());
-        jsonObject.put("sender", testHelper.toJsonClientUuidObject(sender));
+        jsonObject.put("sender", testHelper.toJsonWithUuid(sender));
         Client recipient = testHelper.createRecipientFor(sender.getCounterparty());
-        jsonObject.put("recipient", testHelper.toJsonClientUuidObject(recipient));
+        jsonObject.put("recipient", testHelper.toJsonWithUuid(recipient));
         jsonObject.put("weight", 1000);
         jsonObject.put("length", 25);
         jsonObject.put("deliveryType", "W2D");
@@ -172,9 +172,9 @@ public class CalculationPriceIT extends BaseControllerIT {
         // create
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
         jsonObject.put("shipmentGroupUuid", shipmentGroup.getUuid().toString());
-        jsonObject.put("sender", testHelper.toJsonClientUuidObject(sender));
+        jsonObject.put("sender", testHelper.toJsonWithUuid(sender));
         Client recipient = testHelper.createRecipientFor(sender.getCounterparty());
-        jsonObject.put("recipient", testHelper.toJsonClientUuidObject(recipient));
+        jsonObject.put("recipient", testHelper.toJsonWithUuid(recipient));
         jsonObject.put("weight", 2500);
         jsonObject.put("length", 140);
         jsonObject.put("deliveryType", "W2W");
@@ -206,9 +206,9 @@ public class CalculationPriceIT extends BaseControllerIT {
         // create
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
         jsonObject.put("shipmentGroupUuid", shipmentGroup.getUuid().toString());
-        jsonObject.put("sender", testHelper.toJsonClientUuidObject(sender));
+        jsonObject.put("sender", testHelper.toJsonWithUuid(sender));
         Client recipient = testHelper.createRecipientFor(sender.getCounterparty());
-        jsonObject.put("recipient", testHelper.toJsonClientUuidObject(recipient));
+        jsonObject.put("recipient", testHelper.toJsonWithUuid(recipient));
         jsonObject.put("weight", 1000);
         jsonObject.put("length", 25);
         jsonObject.put("deliveryType", "D2D");
@@ -240,9 +240,9 @@ public class CalculationPriceIT extends BaseControllerIT {
         // create
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
         jsonObject.put("shipmentGroupUuid", shipmentGroup.getUuid().toString());
-        jsonObject.put("sender", testHelper.toJsonClientUuidObject(sender));
+        jsonObject.put("sender", testHelper.toJsonWithUuid(sender));
         Client recipient = testHelper.createRecipientSameRegionCountrysideFor(sender.getCounterparty());
-        jsonObject.put("recipient", testHelper.toJsonClientUuidObject(recipient));
+        jsonObject.put("recipient", testHelper.toJsonWithUuid(recipient));
         jsonObject.put("weight", 1000);
         jsonObject.put("length", 25);
         jsonObject.put("deliveryType", "W2W");
@@ -274,9 +274,9 @@ public class CalculationPriceIT extends BaseControllerIT {
         // create
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
         jsonObject.put("shipmentGroupUuid", shipmentGroup.getUuid().toString());
-        jsonObject.put("sender", testHelper.toJsonClientUuidObject(sender));
+        jsonObject.put("sender", testHelper.toJsonWithUuid(sender));
         Client recipient = testHelper.createRecipientOtherRegionCountrysideFor(sender.getCounterparty());
-        jsonObject.put("recipient", testHelper.toJsonClientUuidObject(recipient));
+        jsonObject.put("recipient", testHelper.toJsonWithUuid(recipient));
         jsonObject.put("weight", 1000);
         jsonObject.put("length", 25);
         jsonObject.put("deliveryType", "W2W");
@@ -308,9 +308,9 @@ public class CalculationPriceIT extends BaseControllerIT {
         // create
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
         jsonObject.put("shipmentGroupUuid", shipmentGroup.getUuid().toString());
-        jsonObject.put("sender", testHelper.toJsonClientUuidObject(sender));
+        jsonObject.put("sender", testHelper.toJsonWithUuid(sender));
         Client recipient = testHelper.createRecipientOtherRegionFor(sender.getCounterparty());
-        jsonObject.put("recipient", testHelper.toJsonClientUuidObject(recipient));
+        jsonObject.put("recipient", testHelper.toJsonWithUuid(recipient));
         jsonObject.put("weight", 1000);
         jsonObject.put("length", 25);
         jsonObject.put("deliveryType", "W2W");
@@ -343,9 +343,9 @@ public class CalculationPriceIT extends BaseControllerIT {
         // create
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
         jsonObject.put("shipmentGroupUuid", shipmentGroup.getUuid().toString());
-        jsonObject.put("sender", testHelper.toJsonClientUuidObject(sender));
+        jsonObject.put("sender", testHelper.toJsonWithUuid(sender));
         Client recipient = testHelper.createRecipientSameRegionCountrysideFor(sender.getCounterparty());
-        jsonObject.put("recipient", testHelper.toJsonClientUuidObject(recipient));
+        jsonObject.put("recipient", testHelper.toJsonWithUuid(recipient));
         jsonObject.put("weight", 1000);
         jsonObject.put("length", 25);
         jsonObject.put("deliveryType", "D2W");
@@ -380,9 +380,9 @@ public class CalculationPriceIT extends BaseControllerIT {
         // create
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
         jsonObject.put("shipmentGroupUuid", shipmentGroup.getUuid().toString());
-        jsonObject.put("sender", testHelper.toJsonClientUuidObject(senderWithDiscount));
+        jsonObject.put("sender", testHelper.toJsonWithUuid(senderWithDiscount));
         Client recipient = testHelper.createRecipientSameRegionCountrysideFor(senderWithDiscount.getCounterparty());
-        jsonObject.put("recipient", testHelper.toJsonClientUuidObject(recipient));
+        jsonObject.put("recipient", testHelper.toJsonWithUuid(recipient));
         jsonObject.put("weight", 1000);
         jsonObject.put("length", 25);
         jsonObject.put("deliveryType", "D2W");
