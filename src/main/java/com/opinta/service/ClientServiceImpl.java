@@ -66,7 +66,17 @@ public class ClientServiceImpl implements ClientService {
         log.info(getAllByFieldLogEndpoint(Client.class, Counterparty.class, counterpartyUuid));
         return clientDao.getAllByCounterparty(counterpartyService.getEntityByUuid(counterpartyUuid, user));
     }
-
+    
+    @Override
+    @Transactional
+    public Client saveOrGet(Client client, User user) throws IncorrectInputDataException, AuthException {
+        if (client.getUuid() == null) {
+            return saveEntity(client, user);
+        } else {
+            return getEntityByUuid(client.getUuid(), user);
+        }
+    }
+    
     @Override
     @Transactional
     public Client getEntityByUuid(UUID uuid, User user) throws AuthException, IncorrectInputDataException {

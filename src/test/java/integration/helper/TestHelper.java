@@ -132,7 +132,13 @@ public class TestHelper {
         }
     }
     
-    public JSONObject toJsonObject(Client client) {
+    public JSONObject toJsonClientUuidObject(Client client) {
+        JSONObject clientUuidJsonObject = new JSONObject();
+        clientUuidJsonObject.put("uuid", client.getUuid().toString());
+        return clientUuidJsonObject;
+    }
+    
+    public JSONObject toJsonClientObject(Client client) {
         JSONObject clientJsonObject = new JSONObject();
         clientJsonObject.put("uuid", client.getUuid().toString());
         clientJsonObject.put("name", client.getName());
@@ -177,7 +183,7 @@ public class TestHelper {
         return clientService.saveEntity(client, client.getCounterparty().getUser());
     }
 
-    public Client createClientWithDiscount() throws Exception {
+    public Client createSenderWithDiscount() throws Exception {
         Client client = new Client("FOP Ivanov", "001", createAddress(), createPhone(),
                 createCounterparty());
         client.setDiscount(10f);
@@ -191,27 +197,27 @@ public class TestHelper {
         return clientService.saveEntity(client, client.getCounterparty().getUser());
     }
 
-    public Client createClientSameRegion() throws Exception {
+    public Client createRecipientSameRegionFor(Counterparty counterparty) throws Exception {
         Client client = new Client("FOP Ivanov", "001", createAddressSameRegion(), createPhone(),
-                createCounterparty());
+                counterparty);
         return clientService.saveEntity(client, client.getCounterparty().getUser());
     }
 
-    public Client createClientOtherRegion() throws Exception {
+    public Client createRecipientOtherRegionFor(Counterparty counterparty) throws Exception {
         Client client = new Client("FOP Ivanov", "001", createAddressOtherRegion(), createPhone(),
-                createCounterparty());
+                counterparty);
         return clientService.saveEntity(client, client.getCounterparty().getUser());
     }
 
-    public Client createClientSameRegionCountryside() throws Exception {
+    public Client createRecipientSameRegionCountrysideFor(Counterparty counterparty) throws Exception {
         Client client = new Client("FOP Ivanov", "001", createAddressSameRegionCountryside(), createPhone(),
-                createCounterparty());
+                counterparty);
         return clientService.saveEntity(client, client.getCounterparty().getUser());
     }
 
-    public Client createClientOtherRegionCountryside() throws Exception {
+    public Client createRecipientOtherRegionCountrysideFor(Counterparty counterparty) throws Exception {
         Client client = new Client("FOP Ivanov", "001", createAddressOtherRegionCountryside(), createPhone(),
-                createCounterparty());
+                counterparty);
         return clientService.saveEntity(client, client.getCounterparty().getUser());
     }
     

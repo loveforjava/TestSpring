@@ -96,20 +96,23 @@ public class ShipmentControllerIT extends BaseControllerIT {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void createShipment() throws Exception {
-        Client sender = testHelper.createClient();
+    public void createShipment_presavedClients_trasmittingUuidOnly() throws Exception {
+        Counterparty counterparty = testHelper.createCounterparty();
+        Client presavedSender = testHelper.createClient(counterparty);
+        Client presavedRecipient = testHelper.createClient(counterparty);
         ShipmentGroup shipmentGroup = testHelper.createShipmentGroup();
-        // create
+        
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
-        jsonObject.put("senderUuid", sender.getUuid().toString());
-        jsonObject.put("recipientUuid", testHelper.createClientOtherRegion().getUuid().toString());
+        // populate input json with sender and recipient uuid
+        jsonObject.put("sender", testHelper.toJsonClientUuidObject(presavedSender));
+        jsonObject.put("recipient", testHelper.toJsonClientUuidObject(presavedRecipient));
         jsonObject.put("shipmentGroupUuid", shipmentGroup.getUuid().toString());
         String expectedJson = jsonObject.toString();
 
         String newShipmentUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
-                        queryParam("token", sender.getCounterparty().getUser().getToken()).
+                        queryParam("token", presavedSender.getCounterparty().getUser().getToken()).
                         body(expectedJson).
                 when().
                         post("/shipments").
@@ -121,7 +124,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
 
         // check created data
         Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
-                sender.getCounterparty().getUser());
+                presavedSender.getCounterparty().getUser());
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(shipmentMapper.toDto(createdShipment));
 
@@ -133,18 +136,21 @@ public class ShipmentControllerIT extends BaseControllerIT {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void createShipmentWithoutGroup_unsavedSender_unsavedRecipient() throws Exception {
+    public void createpShipmentWithoutGrou_unsavedSender_unsavedRecipient() throws Exception {
         Counterparty counterparty = testHelper.createCounterparty();
         Address senderAddress = testHelper.createAddress();
         Address recipientAddress = testHelper.createAddressOtherRegion();
         
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
-        ((JSONObject) jsonObject.get("sender")).put("counterpartyUuid", counterparty.getUuid().toString());
-        ((JSONObject) jsonObject.get("sender")).put("addressId", senderAddress.getId());
-        ((JSONObject) jsonObject.get("sender")).put("uuid", null);
-        ((JSONObject) jsonObject.get("recipient")).put("counterpartyUuid", counterparty.getUuid().toString());
-        ((JSONObject) jsonObject.get("recipient")).put("addressId", recipientAddress.getId());
-        ((JSONObject) jsonObject.get("recipient")).put("uuid", null);
+        // populate json object template with clients data
+        JSONObject jsonSender = (JSONObject) jsonObject.get("sender");
+        jsonSender.put("counterpartyUuid", counterparty.getUuid().toString());
+        jsonSender.put("addressId", senderAddress.getId());
+        jsonSender.put("uuid", null);
+        JSONObject jsonRecipient = (JSONObject) jsonObject.get("recipient");
+        jsonRecipient.put("counterpartyUuid", counterparty.getUuid().toString());
+        jsonRecipient.put("addressId", recipientAddress.getId());
+        jsonRecipient.put("uuid", null);
         String inputJson = jsonObject.toJSONString();
 
         String newShipmentUuid =
@@ -164,17 +170,19 @@ public class ShipmentControllerIT extends BaseControllerIT {
         // check created data
         Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
                 counterparty.getUser());
-        // adjust jsonObject with actual data, modified into
-        ((JSONObject) jsonObject.get("recipient")).put("uuid", createdShipment.getRecipient().getUuid().toString());
-        ((JSONObject) jsonObject.get("recipient")).put("name", createdShipment.getRecipient().getName());
-        ((JSONObject) jsonObject.get("recipient")).put("firstName", createdShipment.getRecipient().getFirstName());
-        ((JSONObject) jsonObject.get("recipient")).put("middleName", createdShipment.getRecipient().getMiddleName());
-        ((JSONObject) jsonObject.get("recipient")).put("lastName", createdShipment.getRecipient().getLastName());
-        ((JSONObject) jsonObject.get("sender")).put("uuid", createdShipment.getSender().getUuid().toString());
-        ((JSONObject) jsonObject.get("sender")).put("name", createdShipment.getSender().getName());
-        ((JSONObject) jsonObject.get("sender")).put("firstName", createdShipment.getSender().getFirstName());
-        ((JSONObject) jsonObject.get("sender")).put("middleName", createdShipment.getSender().getMiddleName());
-        ((JSONObject) jsonObject.get("sender")).put("lastName", createdShipment.getSender().getLastName());
+        // adjust jsonObject with actual data, modified in server
+        JSONObject createdRecipient = (JSONObject) jsonObject.get("recipient");
+        createdRecipient.put("uuid", createdShipment.getRecipient().getUuid().toString());
+        createdRecipient.put("name", createdShipment.getRecipient().getName());
+        createdRecipient.put("firstName", createdShipment.getRecipient().getFirstName());
+        createdRecipient.put("middleName", createdShipment.getRecipient().getMiddleName());
+        createdRecipient.put("lastName", createdShipment.getRecipient().getLastName());
+        JSONObject createdSender = (JSONObject) jsonObject.get("sender");
+        createdSender.put("uuid", createdShipment.getSender().getUuid().toString());
+        createdSender.put("name", createdShipment.getSender().getName());
+        createdSender.put("firstName", createdShipment.getSender().getFirstName());
+        createdSender.put("middleName", createdShipment.getSender().getMiddleName());
+        createdSender.put("lastName", createdShipment.getSender().getLastName());
         
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(shipmentMapper.toDto(createdShipment));
@@ -191,16 +199,15 @@ public class ShipmentControllerIT extends BaseControllerIT {
     @SuppressWarnings("unchecked")
     public void createShipmentWithoutGroup_savedSender_unsavedRecipient() throws Exception {
         Counterparty counterparty = testHelper.createCounterparty();
-        Client sender = testHelper.createClient(counterparty);
+        Client presavedSender = testHelper.createClient(counterparty);
         Address recipientAddress = testHelper.createAddressOtherRegion();
         
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
-        ((JSONObject) jsonObject.get("sender")).put("counterpartyUuid", sender.getCounterparty().getUuid().toString());
-        ((JSONObject) jsonObject.get("sender")).put("addressId", sender.getAddress().getId());
-        ((JSONObject) jsonObject.get("sender")).put("uuid", sender.getUuid().toString());
-        ((JSONObject) jsonObject.get("recipient")).put("counterpartyUuid", counterparty.getUuid().toString());
-        ((JSONObject) jsonObject.get("recipient")).put("addressId", recipientAddress.getId());
-        ((JSONObject) jsonObject.get("recipient")).put("uuid", null);
+        jsonObject.put("sender", testHelper.toJsonClientUuidObject(presavedSender));
+        JSONObject jsonRecipient = (JSONObject) jsonObject.get("recipient");
+        jsonRecipient.put("counterpartyUuid", counterparty.getUuid().toString());
+        jsonRecipient.put("addressId", recipientAddress.getId());
+        jsonRecipient.put("uuid", null);
         String inputJson = jsonObject.toJSONString();
         
         String newShipmentUuid =
@@ -208,12 +215,12 @@ public class ShipmentControllerIT extends BaseControllerIT {
                         contentType(APPLICATION_JSON_VALUE).
                         queryParam("token", counterparty.getUser().getToken()).
                         body(inputJson).
-                        when().
+                when().
                         post("/shipments").
-                        then().
+                then().
                         statusCode(SC_OK).
                         body("barcode", RegexMatcher.matches(BARCODE_REGEX)).
-                        extract().
+                extract().
                         path("uuid");
         
         
@@ -221,16 +228,18 @@ public class ShipmentControllerIT extends BaseControllerIT {
         Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
                 counterparty.getUser());
         // adjust jsonObject with actual data, modified into
-        ((JSONObject) jsonObject.get("recipient")).put("uuid", createdShipment.getRecipient().getUuid().toString());
-        ((JSONObject) jsonObject.get("recipient")).put("name", createdShipment.getRecipient().getName());
-        ((JSONObject) jsonObject.get("recipient")).put("firstName", createdShipment.getRecipient().getFirstName());
-        ((JSONObject) jsonObject.get("recipient")).put("middleName", createdShipment.getRecipient().getMiddleName());
-        ((JSONObject) jsonObject.get("recipient")).put("lastName", createdShipment.getRecipient().getLastName());
-        ((JSONObject) jsonObject.get("sender")).put("uuid", createdShipment.getSender().getUuid().toString());
-        ((JSONObject) jsonObject.get("sender")).put("name", createdShipment.getSender().getName());
-        ((JSONObject) jsonObject.get("sender")).put("firstName", createdShipment.getSender().getFirstName());
-        ((JSONObject) jsonObject.get("sender")).put("middleName", createdShipment.getSender().getMiddleName());
-        ((JSONObject) jsonObject.get("sender")).put("lastName", createdShipment.getSender().getLastName());
+        JSONObject createdRecipient = (JSONObject) jsonObject.get("recipient");
+        createdRecipient.put("uuid", createdShipment.getRecipient().getUuid().toString());
+        createdRecipient.put("name", createdShipment.getRecipient().getName());
+        createdRecipient.put("firstName", createdShipment.getRecipient().getFirstName());
+        createdRecipient.put("middleName", createdShipment.getRecipient().getMiddleName());
+        createdRecipient.put("lastName", createdShipment.getRecipient().getLastName());
+        JSONObject createdSender = (JSONObject) jsonObject.get("sender");
+        createdSender.put("uuid", createdShipment.getSender().getUuid().toString());
+        createdSender.put("name", createdShipment.getSender().getName());
+        createdSender.put("firstName", createdShipment.getSender().getFirstName());
+        createdSender.put("middleName", createdShipment.getSender().getMiddleName());
+        createdSender.put("lastName", createdShipment.getSender().getLastName());
         
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(shipmentMapper.toDto(createdShipment));
@@ -247,8 +256,12 @@ public class ShipmentControllerIT extends BaseControllerIT {
     public void updateShipment() throws Exception {
         // update
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
-        jsonObject.put("senderUuid", shipment.getSender().getUuid().toString());
-        jsonObject.put("recipientUuid", shipment.getRecipient().getUuid().toString());
+        JSONObject jsonSenderUuidOnly = new JSONObject();
+        jsonSenderUuidOnly.put("uuid", shipment.getSender().getUuid().toString());
+        JSONObject jsonRecipientUuidOnly = new JSONObject();
+        jsonRecipientUuidOnly.put("uuid", shipment.getRecipient().getUuid().toString());
+        jsonObject.put("sender", jsonSenderUuidOnly);
+        jsonObject.put("recipient", jsonRecipientUuidOnly);
         String expectedJson = jsonObject.toString();
         ShipmentDto shipmentDtoBeforeUpdate = shipmentMapper.toDto(shipmentService.getEntityByUuid(shipmentUuid, user));
         

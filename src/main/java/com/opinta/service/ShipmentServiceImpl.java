@@ -140,14 +140,10 @@ public class ShipmentServiceImpl implements ShipmentService {
     @Transactional
     public ShipmentDto save(ShipmentDto shipmentDto, User user) throws AuthException, IncorrectInputDataException {
         Shipment shipment = shipmentMapper.toEntity(shipmentDto);
-        if (shipment.getSender().getUuid() == null) {
-            Client sender = clientService.saveEntity(shipment.getSender(), user);
-            shipment.setSender(sender);
-        }
-        if (shipment.getRecipient().getUuid() == null) {
-            Client recipient = clientService.saveEntity(shipment.getRecipient(), user);
-            shipment.setRecipient(recipient);
-        }
+        Client sender = clientService.saveOrGet(shipment.getSender(), user);
+        shipment.setSender(sender);
+        Client recipient = clientService.saveOrGet(shipment.getRecipient(), user);
+        shipment.setRecipient(recipient);
         return shipmentMapper.toDto(saveEntity(shipment, user));
     }
 
