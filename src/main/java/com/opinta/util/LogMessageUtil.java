@@ -2,6 +2,8 @@ package com.opinta.util;
 
 import java.util.UUID;
 
+import com.opinta.entity.User;
+
 import static java.lang.String.format;
 
 public class LogMessageUtil {
@@ -43,6 +45,10 @@ public class LogMessageUtil {
 
     public static String getByIdOnErrorLogEndpoint(Class clazz, Object value) {
         return format("%s %s not found!", clazz.getSimpleName(), value);
+    }
+    
+    public static String getByUserOnErrorLogEndpoint(Class clazz, User user) {
+        return format("%s not found by user: %s !", clazz.getSimpleName(), user.toString());
     }
 
     public static String getByIdOnErrorLogEndpoint(Class clazz, Object value, Exception e) {

@@ -27,6 +27,7 @@ import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getAllByFieldLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getByUserOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.saveLogEndpoint;
 import static com.opinta.util.LogMessageUtil.updateLogEndpoint;
 import static java.lang.String.format;
@@ -72,7 +73,18 @@ public class CounterpartyServiceImpl implements CounterpartyService {
 
         return counterparty;
     }
-
+    
+    @Override
+    public Counterparty getEntityByUser(User user) throws IncorrectInputDataException {
+        Counterparty counterparty = counterpartyDao.getByUser(user);
+        if (counterparty == null) {
+            String errorMessage = getByUserOnErrorLogEndpoint(Counterparty.class, user);
+            log.error(errorMessage);
+            throw new IncorrectInputDataException(errorMessage);
+        }
+        return counterparty;
+    }
+    
     @Override
     @Transactional
     public List<Counterparty> getEntityByPostcodePoolUuid(UUID postcodePoolUuid) throws IncorrectInputDataException {
