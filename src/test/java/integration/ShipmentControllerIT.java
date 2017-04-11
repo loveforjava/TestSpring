@@ -143,8 +143,8 @@ public class ShipmentControllerIT extends BaseControllerIT {
         
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
         // populate json object template with clients data
-        testHelper.adjustClientData((JSONObject) jsonObject.get("sender"), senderAddress, counterparty);
-        testHelper.adjustClientData((JSONObject) jsonObject.get("recipient"), recipientAddress, counterparty);
+        testHelper.adjustClientData((JSONObject) jsonObject.get("sender"), senderAddress);
+        testHelper.adjustClientData((JSONObject) jsonObject.get("recipient"), recipientAddress);
         String inputJson = jsonObject.toJSONString();
 
         String newShipmentUuid =
@@ -188,7 +188,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
         jsonObject.put("sender", testHelper.toJsonWithUuid(sender));
-        testHelper.adjustClientData((JSONObject) jsonObject.get("recipient"), recipientAddress, counterparty);
+        testHelper.adjustClientData((JSONObject) jsonObject.get("recipient"), recipientAddress);
         String inputJson = jsonObject.toJSONString();
         
         String newShipmentUuid =

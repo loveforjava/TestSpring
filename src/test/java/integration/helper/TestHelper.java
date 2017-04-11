@@ -147,8 +147,7 @@ public class TestHelper {
         target.put("lastName", source.getLastName());
     }
     
-    public void adjustClientData(JSONObject target, Address address, Counterparty counterparty) {
-        target.put("counterpartyUuid", counterparty.getUuid().toString());
+    public void adjustClientData(JSONObject target, Address address) {
         target.put("addressId", address.getId());
         target.remove("uuid");
     }
