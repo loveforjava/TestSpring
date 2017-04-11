@@ -17,8 +17,8 @@ import static com.opinta.constraint.RegexPattern.BARCODE_LENGTH;
 @ToString
 public class ShipmentDto {
     private UUID uuid;
-    private UUID senderUuid;
-    private UUID recipientUuid;
+    private ClientDto sender;
+    private ClientDto recipient;
     private UUID shipmentGroupUuid;
     @EnumString(source = DeliveryType.class)
     private DeliveryType deliveryType;

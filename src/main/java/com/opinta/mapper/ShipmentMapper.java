@@ -11,32 +11,20 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = ClientMapper.class)
 public interface ShipmentMapper extends BaseMapper<ShipmentDto, Shipment> {
 
     @Override
     @Mappings({
             @Mapping(expression = "java(stringifyBarcode(shipment.getBarcodeInnerNumber()))", target = "barcode"),
-            @Mapping(source = "sender.uuid", target = "senderUuid"),
-            @Mapping(source = "recipient.uuid", target = "recipientUuid"),
-            @Mapping(source = "shipmentGroup.uuid", target = "shipmentGroupUuid")
-    })
+            @Mapping(source = "shipmentGroup.uuid", target = "shipmentGroupUuid")})
     ShipmentDto toDto(Shipment shipment);
 
     @Override
     @Mappings({
-            @Mapping(target = "sender", expression = "java(createClientById(shipmentDto.getSenderUuid()))"),
-            @Mapping(target = "recipient", expression = "java(createClientById(shipmentDto.getRecipientUuid()))"),
             @Mapping(target = "shipmentGroup",
-                    expression = "java(ShipmentGroupUuidToShipmentGroupEntity(shipmentDto.getShipmentGroupUuid()))")
-    })
+                    expression = "java(ShipmentGroupUuidToShipmentGroupEntity(shipmentDto.getShipmentGroupUuid()))")})
     Shipment toEntity(ShipmentDto shipmentDto);
-
-    default Client createClientById(UUID id) {
-        Client client = new Client();
-        client.setUuid(id);
-        return client;
-    }
 
     default String stringifyBarcode(BarcodeInnerNumber barcodeInnerNumber) {
         if (barcodeInnerNumber == null) {
