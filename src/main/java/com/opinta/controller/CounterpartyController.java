@@ -1,6 +1,5 @@
 package com.opinta.controller;
 
-import com.opinta.entity.Client;
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.User;
 import com.opinta.exception.AuthException;
@@ -26,7 +25,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import static com.opinta.util.LogMessageUtil.deleteOnErrorLogEndpoint;
-import static com.opinta.util.LogMessageUtil.getAllByFieldOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.saveOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.updateOnErrorLogEndpoint;

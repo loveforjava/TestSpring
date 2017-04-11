@@ -25,9 +25,9 @@ import static com.opinta.util.EnhancedBeanUtilsBean.copyNotNullProperties;
 import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getAllByFieldLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getByFieldOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
-import static com.opinta.util.LogMessageUtil.getByUserOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.saveLogEndpoint;
 import static com.opinta.util.LogMessageUtil.updateLogEndpoint;
 import static java.lang.String.format;
@@ -78,7 +78,7 @@ public class CounterpartyServiceImpl implements CounterpartyService {
     public Counterparty getEntityByUser(User user) throws IncorrectInputDataException {
         Counterparty counterparty = counterpartyDao.getByUser(user);
         if (counterparty == null) {
-            String errorMessage = getByUserOnErrorLogEndpoint(Counterparty.class, user);
+            String errorMessage = getByFieldOnErrorLogEndpoint(Counterparty.class, User.class, user.getId());
             log.error(errorMessage);
             throw new IncorrectInputDataException(errorMessage);
         }
