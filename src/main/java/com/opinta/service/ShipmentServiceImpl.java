@@ -1,7 +1,6 @@
 package com.opinta.service;
 
 import com.opinta.entity.Address;
-import com.opinta.entity.BarcodeInnerNumber;
 import com.opinta.entity.DeliveryType;
 import com.opinta.entity.ShipmentGroup;
 import com.opinta.entity.classifier.TariffGrid;
@@ -30,11 +29,11 @@ import org.springframework.stereotype.Service;
 
 import static java.lang.String.format;
 
+import static com.opinta.util.EnhancedBeanUtilsBean.copyNotNullProperties;
 import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.updateLogEndpoint;
-import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 
 @Service
 @Slf4j
@@ -87,9 +86,6 @@ public class ShipmentServiceImpl implements ShipmentService {
     @Transactional
     public Shipment saveEntity(Shipment shipment, User user) throws AuthException, IncorrectInputDataException {
         Client sender = clientService.getEntityByUuid(shipment.getSender().getUuid(), user);
-        if (!sender.isSender()) {
-            throw new IncorrectInputDataException("Sender in shipment should be client-sender!");
-        }
         PostcodePool postcodePool = sender.getCounterparty().getPostcodePool();
 
         shipment.setSender(sender);
@@ -142,7 +138,10 @@ public class ShipmentServiceImpl implements ShipmentService {
     @Override
     @Transactional
     public ShipmentDto save(ShipmentDto shipmentDto, User user) throws AuthException, IncorrectInputDataException {
-        return shipmentMapper.toDto(saveEntity(shipmentMapper.toEntity(shipmentDto), user));
+        Shipment shipment = shipmentMapper.toEntity(shipmentDto);
+        shipment.setSender(clientService.saveOrGet(shipment.getSender(), user));
+        shipment.setRecipient(clientService.saveOrGet(shipment.getRecipient(), user));
+        return shipmentMapper.toDto(saveEntity(shipment, user));
     }
 
     @Override
@@ -151,10 +150,9 @@ public class ShipmentServiceImpl implements ShipmentService {
             PerformProcessFailedException, IncorrectInputDataException {
         Shipment source = shipmentMapper.toEntity(shipmentDto);
         Shipment target = getEntityByUuid(uuid, user);
-        BarcodeInnerNumber barcodeInnerNumber = target.getBarcodeInnerNumber();
         
         try {
-            copyProperties(target, source);
+            copyNotNullProperties(target, source);
         } catch (Exception e) {
             log.error(copyPropertiesOnErrorLogEndpoint(Shipment.class, source, target, e));
             throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(
@@ -162,7 +160,6 @@ public class ShipmentServiceImpl implements ShipmentService {
         }
 
         target.setUuid(uuid);
-        target.setBarcodeInnerNumber(barcodeInnerNumber);
         fillSenderAndRecipient(target, user);
         target.setPrice(calculatePrice(target));
         log.info(updateLogEndpoint(Shipment.class, target));

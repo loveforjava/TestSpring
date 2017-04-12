@@ -37,8 +37,12 @@ public class LogMessageUtil {
         return format("List of %s has not been got! %s", clazz.getSimpleName(), e.getMessage());
     }
 
-    public static String getAllByFieldOnErrorLogEndpoint(Class clazz, Class clazzField, Object value, Exception e) {
-        return format("%s by %s %s has not been got! %s", clazz.getSimpleName(), clazzField.getSimpleName(), value, e.getMessage());
+    public static String getByFieldOnErrorLogEndpoint(Class clazz, Class clazzField, Object value, Exception e) {
+        return format("%s by %s %s not found! %s", clazz.getSimpleName(), clazzField.getSimpleName(), value, e.getMessage());
+    }
+    
+    public static String getByFieldOnErrorLogEndpoint(Class clazz, Class clazzField, Object value) {
+        return format("%s not found by %s %s!", clazz.getSimpleName(), clazzField.getSimpleName(), value);
     }
 
     public static String getByIdOnErrorLogEndpoint(Class clazz, Object value) {

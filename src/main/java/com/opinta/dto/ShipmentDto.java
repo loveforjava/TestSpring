@@ -17,17 +17,17 @@ import static com.opinta.constraint.RegexPattern.BARCODE_LENGTH;
 @ToString
 public class ShipmentDto {
     private UUID uuid;
-    private UUID senderUuid;
-    private UUID recipientUuid;
+    private ClientDto sender;
+    private ClientDto recipient;
     private UUID shipmentGroupUuid;
     @EnumString(source = DeliveryType.class)
     private DeliveryType deliveryType;
     @Size(min = BARCODE_LENGTH, max = BARCODE_LENGTH)
     private String barcode;
-    private float weight;
-    private float length;
-    private float width;
-    private float height;
+    private Float weight;
+    private Float length;
+    private Float width;
+    private Float height;
     private BigDecimal declaredPrice;
     private BigDecimal price;
     private BigDecimal postPay;

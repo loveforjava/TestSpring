@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import static com.opinta.util.LogMessageUtil.deleteOnErrorLogEndpoint;
-import static com.opinta.util.LogMessageUtil.getAllByFieldOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getByFieldOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getAllOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.saveOnErrorLogEndpoint;
@@ -78,10 +78,10 @@ public class ClientController {
             User user = userService.authenticate(token);
             return new ResponseEntity<>(shipmentService.getAllByClientUuid(uuid, user), OK);
         } catch (AuthException e) {
-            return new ResponseEntity<>(getAllByFieldOnErrorLogEndpoint(Shipment.class, Client.class, uuid, e),
+            return new ResponseEntity<>(getByFieldOnErrorLogEndpoint(Shipment.class, Client.class, uuid, e),
                     UNAUTHORIZED);
         } catch (IncorrectInputDataException e) {
-            return new ResponseEntity<>(getAllByFieldOnErrorLogEndpoint(Shipment.class, Client.class, uuid, e),
+            return new ResponseEntity<>(getByFieldOnErrorLogEndpoint(Shipment.class, Client.class, uuid, e),
                     NOT_FOUND);
         }
     }
@@ -91,18 +91,6 @@ public class ClientController {
         try {
             User user = userService.authenticate(token);
             return new ResponseEntity<>(clientService.save(clientDto, user), OK);
-        } catch (AuthException e) {
-            return new ResponseEntity<>(saveOnErrorLogEndpoint(Client.class, clientDto, e), UNAUTHORIZED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(saveOnErrorLogEndpoint(Client.class, clientDto, e), BAD_REQUEST);
-        }
-    }
-
-    @PostMapping("/senders")
-    public ResponseEntity<?> createClientAsSender(@RequestBody ClientDto clientDto, @RequestParam UUID token) {
-        try {
-            User user = userService.authenticate(token);
-            return new ResponseEntity<>(clientService.saveAsSender(clientDto, user), OK);
         } catch (AuthException e) {
             return new ResponseEntity<>(saveOnErrorLogEndpoint(Client.class, clientDto, e), UNAUTHORIZED);
         } catch (Exception e) {

@@ -11,12 +11,26 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 public class DictionariesControllerIT extends BaseControllerIT {
     @Autowired
     private TariffGridService tariffGridService;
     private final int tariffId = 3;
+
+    @Test
+    public void getCitiesByPostcode() {
+        given().
+                queryParam("postcode", "01015").
+        when().
+                get("/dictionaries/addresses").
+        then().
+                contentType(APPLICATION_JSON_VALUE).
+                statusCode(SC_OK).
+                body("results", hasSize(greaterThan(0)));
+    }
     
     @Test
     public void getAllTariffGrids() {

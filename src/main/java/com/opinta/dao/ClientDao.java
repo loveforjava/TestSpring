@@ -12,10 +12,6 @@ public interface ClientDao {
     List<Client> getAll(User user);
 
     List<Client> getAllByCounterparty(Counterparty counterparty);
-    
-    List<Client> getAllSendersByCounterparty(Counterparty counterparty);
-    
-    List<Client> getAllRecipientsByCounterparty(Counterparty counterparty);
 
     Client getByUuid(UUID uuid);
 

@@ -1,6 +1,5 @@
 package com.opinta.controller;
 
-import com.opinta.entity.Client;
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.User;
 import com.opinta.exception.AuthException;
@@ -26,7 +25,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import static com.opinta.util.LogMessageUtil.deleteOnErrorLogEndpoint;
-import static com.opinta.util.LogMessageUtil.getAllByFieldOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.saveOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.updateOnErrorLogEndpoint;
@@ -68,40 +66,6 @@ public class CounterpartyController {
             return new ResponseEntity<>(getByIdOnErrorLogEndpoint(Counterparty.class, uuid, e), UNAUTHORIZED);
         } catch (IncorrectInputDataException e) {
             return new ResponseEntity<>(getByIdOnErrorLogEndpoint(Counterparty.class, uuid, e), NOT_FOUND);
-        }
-    }
-
-    @GetMapping(value = "{uuid}/clients", produces = APPLICATION_JSON_VALUE, params = "token")
-    public ResponseEntity<?> getClientsByCounterpartyUuid(@PathVariable UUID uuid, @RequestParam UUID token) {
-        try {
-            User user = userService.authenticate(token);
-            return new ResponseEntity<>(clientService.getAllByCounterpartyUuid(uuid, user), OK);
-        } catch (AuthException e) {
-            return new ResponseEntity<>(getAllByFieldOnErrorLogEndpoint(Client.class, Counterparty.class, uuid, e),
-                    UNAUTHORIZED);
-        } catch (IncorrectInputDataException e) {
-            return new ResponseEntity<>(getAllByFieldOnErrorLogEndpoint(Client.class, Counterparty.class, uuid, e),
-                    NOT_FOUND);
-        }
-    }
-    
-    @GetMapping(value = "{uuid}/clients", produces = APPLICATION_JSON_VALUE, params = {"token", "sender"})
-    public ResponseEntity<?> getClientsByCounterpartyUuidAndType(@PathVariable UUID uuid,
-                                                                 @RequestParam UUID token,
-                                                                 @RequestParam boolean sender) {
-        try {
-            User user = userService.authenticate(token);
-            if (sender) {
-                return new ResponseEntity<>(clientService.getAllSendersByCounterpartyUuid(uuid, user), OK);
-            } else {
-                return new ResponseEntity<>(clientService.getAllRecipientsByCounterpartyUuid(uuid, user), OK);
-            }
-        } catch (AuthException e) {
-            return new ResponseEntity<>(getAllByFieldOnErrorLogEndpoint(Client.class, Counterparty.class, uuid, e),
-                    UNAUTHORIZED);
-        } catch (IncorrectInputDataException e) {
-            return new ResponseEntity<>(getAllByFieldOnErrorLogEndpoint(Client.class, Counterparty.class, uuid, e),
-                    NOT_FOUND);
         }
     }
 
