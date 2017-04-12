@@ -87,7 +87,7 @@ public class CounterpartyServiceImpl implements CounterpartyService {
     
     @Override
     @Transactional
-    public List<Counterparty> getEntityByPostcodePoolUuid(UUID postcodePoolUuid) throws IncorrectInputDataException {
+    public List<Counterparty> getEntitiesBySharedPostcodePoolUuid(UUID postcodePoolUuid) throws IncorrectInputDataException {
         PostcodePool postcodePool = postcodePoolService.getEntityByUuid(postcodePoolUuid);
         log.info(getAllByFieldLogEndpoint(Counterparty.class, PostcodePool.class, postcodePool));
         return counterpartyDao.getByPostcodePool(postcodePool);
@@ -96,15 +96,6 @@ public class CounterpartyServiceImpl implements CounterpartyService {
     @Override
     @Transactional
     public Counterparty saveEntity(Counterparty counterparty) throws IncorrectInputDataException {
-        UUID postcodePoolUuid = counterparty.getPostcodePool().getUuid();
-        List<Counterparty> counterpartiesByPostcodePool = getEntityByPostcodePoolUuid(postcodePoolUuid);
-        if (counterpartiesByPostcodePool.size() > 0) {
-            log.error("PostcodePool {} is already used in the counterparty {}", postcodePoolUuid,
-                    counterpartiesByPostcodePool);
-            throw new IncorrectInputDataException(format("PostcodePool %s is already used in the counterparty %s",
-                    postcodePoolUuid, counterpartiesByPostcodePool));
-        }
-
         User user = new User();
         user.setUsername(counterparty.getName());
         user.setToken(UUID.randomUUID());
