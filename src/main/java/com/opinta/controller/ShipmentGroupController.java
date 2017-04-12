@@ -96,14 +96,34 @@ public class ShipmentGroupController {
             headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
             return new ResponseEntity<>(data, headers, OK);
         } catch (AuthException e) {
-            return new ResponseEntity<>(generatePdfFormOnErrorLogEndpoint(Shipment.class, uuid, e), UNAUTHORIZED);
+            return new ResponseEntity<>(generatePdfFormOnErrorLogEndpoint(ShipmentGroup.class, uuid, e), UNAUTHORIZED);
         } catch (IncorrectInputDataException e) {
-            return new ResponseEntity<>(generatePdfFormOnErrorLogEndpoint(Shipment.class, uuid, e), NOT_FOUND);
+            return new ResponseEntity<>(generatePdfFormOnErrorLogEndpoint(ShipmentGroup.class, uuid, e), NOT_FOUND);
         } catch (IOException e) {
-            return new ResponseEntity<>(generatePdfFormOnErrorLogEndpoint(Shipment.class, uuid, e), BAD_REQUEST);
+            return new ResponseEntity<>(generatePdfFormOnErrorLogEndpoint(ShipmentGroup.class, uuid, e), BAD_REQUEST);
         }
     }
-    
+
+    @GetMapping("{uuid}/form103")
+    public ResponseEntity<?> getShipmentGroupForm103(@PathVariable UUID uuid, @RequestParam UUID token) {
+        try {
+            User user = userService.authenticate(token);
+            byte[] data = pdfGeneratorService.generateForm103(uuid, user);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(parseMediaType(APPLICATION_PDF_VALUE));
+            String filename = uuid + ".pdf";
+            headers.setContentDispositionFormData(filename, filename);
+            headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+            return new ResponseEntity<>(data, headers, OK);
+        } catch (AuthException e) {
+            return new ResponseEntity<>(generatePdfFormOnErrorLogEndpoint(ShipmentGroup.class, uuid, e), UNAUTHORIZED);
+        } catch (IncorrectInputDataException e) {
+            return new ResponseEntity<>(generatePdfFormOnErrorLogEndpoint(ShipmentGroup.class, uuid, e), NOT_FOUND);
+        } catch (IOException e) {
+            return new ResponseEntity<>(generatePdfFormOnErrorLogEndpoint(ShipmentGroup.class, uuid, e), BAD_REQUEST);
+        }
+    }
+
     @GetMapping("{uuid}")
     public ResponseEntity<?> getShipmentGroup(@PathVariable UUID uuid, @RequestParam UUID token) {
         try {

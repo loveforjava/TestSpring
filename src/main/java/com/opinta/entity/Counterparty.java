@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
@@ -26,7 +27,7 @@ public class Counterparty {
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     private UUID uuid;
     private String name;
-    @OneToOne
+    @ManyToOne
     @NotNull
     private PostcodePool postcodePool;
     @OneToOne(cascade = CascadeType.MERGE)

@@ -29,6 +29,8 @@ public class PDFGeneratorServiceTest {
     private ShipmentService shipmentService;
     @Mock
     private UserService userService;
+    @Mock
+    private ShipmentGroupService shipmentGroupService;
     private PDFGeneratorService pdfGeneratorService;
 
     private Shipment shipment;
@@ -36,7 +38,7 @@ public class PDFGeneratorServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        pdfGeneratorService = new PDFGeneratorServiceImpl(shipmentService, userService);
+        pdfGeneratorService = new PDFGeneratorServiceImpl(shipmentService, shipmentGroupService, userService);
 
         Address senderAddress = new Address("00001", "Ternopil", "Monastiriska", "Monastiriska", "Sadova", "51", "");
         Address recipientAddress = new Address("00002", "Kiev", "", "Kiev", "Khreschatik", "121", "37");

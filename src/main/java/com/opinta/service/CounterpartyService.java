@@ -18,7 +18,7 @@ public interface CounterpartyService {
 
     Counterparty getEntityByUser(User user) throws IncorrectInputDataException;
     
-    List<Counterparty> getEntityByPostcodePoolUuid(UUID postcodePoolUuid) throws IncorrectInputDataException;
+    List<Counterparty> getAllEntitiesByPostcodePoolUuid(UUID postcodePoolUuid) throws IncorrectInputDataException;
 
     Counterparty saveEntity(Counterparty counterparty) throws IncorrectInputDataException;
     
