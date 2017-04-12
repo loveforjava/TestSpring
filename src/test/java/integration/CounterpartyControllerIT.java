@@ -1,10 +1,13 @@
 package integration;
 
 import com.opinta.entity.Client;
+import com.opinta.entity.PostcodePool;
 import com.opinta.service.ClientService;
+import com.opinta.service.PostcodePoolService;
 import com.opinta.service.UserService;
 import io.restassured.module.mockmvc.response.MockMvcResponse;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,6 +30,8 @@ import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
@@ -47,6 +52,8 @@ public class CounterpartyControllerIT extends BaseControllerIT {
     private TestHelper testHelper;
     @Autowired
     private ClientService clientService;
+    @Autowired
+    private PostcodePoolService postcodePoolService;
 
     @Before
     public void setUp() throws Exception {
@@ -61,7 +68,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
     public void tearDown() throws Exception {
         testHelper.deleteClientWithoutDeletingCounterparty(sender);
         testHelper.deleteClientWithoutDeletingCounterparty(recipient);
-        testHelper.deleteCounterpartyWithPostcodePool(counterparty);
+        testHelper.deleteCounterparty(counterparty);
     }
 
     @Test
@@ -124,7 +131,64 @@ public class CounterpartyControllerIT extends BaseControllerIT {
         JSONAssert.assertEquals(expectedJson, actualJson, false);
 
         // delete
-        testHelper.deleteCounterpartyWithPostcodePool(createdCounterparty);
+        testHelper.deleteCounterparty(createdCounterparty);
+    }
+    
+    @Test
+    @SuppressWarnings("unchecked")
+    public void createSeveralCounterparties_onePostcodePool() throws Exception {
+        PostcodePool postcodePool = testHelper.createPostcodePool();
+        String fakeName = "Company № ";
+        MockMvcResponse response;
+        String expectedJson;
+        JSONObject inputJson;
+        User user;
+        Counterparty createdCounterparty;
+        List<Counterparty> createdCounterparties = new ArrayList<>();
+        String actualJson;
+        
+        int counterpartiesQty = 3;
+        ObjectMapper mapper = new ObjectMapper();
+        
+        for (int i = 0; i < counterpartiesQty; i++) {
+            inputJson = testHelper.getJsonObjectFromFile("json/counterparty.json");
+            inputJson.put("postcodePoolUuid", postcodePool.getUuid().toString());
+            inputJson.put("name", fakeName + i);
+            expectedJson = inputJson.toString();
+    
+            response =
+                    given().
+                            contentType(APPLICATION_JSON_VALUE).
+                            body(expectedJson).
+                    when().
+                            post("/counterparties").
+                    then().
+                            contentType(APPLICATION_JSON_VALUE).
+                            statusCode(SC_OK).
+                    extract().
+                            response();
+    
+            // check created data
+            user = userService.authenticate(UUID.fromString(response.path("token")));
+            createdCounterparty = counterpartyService.getEntityByUuid(UUID.fromString(response.path("uuid")), user);
+            createdCounterparties.add(createdCounterparty);
+            actualJson = mapper.writeValueAsString(counterpartyMapper.toDto(createdCounterparty));
+            JSONAssert.assertEquals(expectedJson, actualJson, false);
+        }
+        
+        // delete one by one
+        for (Counterparty counterparty : createdCounterparties) {
+            testHelper.deleteCounterparty(counterparty);
+        }
+        
+        // make sure that postcode pool remains not affected by associated counterparties removing.
+        PostcodePool postcodePoolAfter = postcodePoolService.getEntityByUuid(postcodePool.getUuid());
+        assertNotNull(postcodePoolAfter);
+        
+        // make sure that postcode pool do not hold any counterparties any more.
+        List<Counterparty> foundCounterparties = counterpartyService
+                .getAllEntitiesByPostcodePoolUuid(postcodePool.getUuid());
+        assertEquals(0, foundCounterparties.size());
     }
 
     @Test

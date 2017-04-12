@@ -236,7 +236,7 @@ public class TestHelper {
             log.debug(e.getMessage());
         }
         try {
-            deleteCounterpartyWithPostcodePool(client.getCounterparty());
+            deleteCounterparty(client.getCounterparty());
         } catch (Exception e) {
             log.debug(e.getMessage());
         }
@@ -257,7 +257,7 @@ public class TestHelper {
             log.debug(e.getMessage());
         }
         try {
-            deleteCounterpartyWithPostcodePool(shipmentGroup.getCounterparty());
+            deleteCounterparty(shipmentGroup.getCounterparty());
         } catch (Exception e) {
             log.debug(e.getMessage());
         }
@@ -320,7 +320,7 @@ public class TestHelper {
         return postcodePoolService.saveEntity(new PostcodePool("12345", false));
     }
 
-    public void deleteCounterpartyWithPostcodePool(Counterparty counterparty) throws Exception{
+    public void deleteCounterparty(Counterparty counterparty) throws Exception {
         try {
             counterpartyService.delete(counterparty.getUuid(), counterparty.getUser());
         } catch (Exception e) {
