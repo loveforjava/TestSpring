@@ -42,14 +42,14 @@ public class ClientController {
     private final ClientService clientService;
     private final ShipmentService shipmentService;
     private final UserService userService;
-    
+
     @Autowired
     public ClientController(ClientService clientService, ShipmentService shipmentService, UserService userService) {
         this.clientService = clientService;
         this.shipmentService = shipmentService;
         this.userService = userService;
     }
-    
+
     @GetMapping
     public ResponseEntity<?> getAllClients(@RequestParam UUID token) {
         try {
@@ -59,7 +59,7 @@ public class ClientController {
             return new ResponseEntity<>(getAllOnErrorLogEndpoint(Client.class, e), UNAUTHORIZED);
         }
     }
-    
+
     @GetMapping("{uuid}")
     public ResponseEntity<?> getClient(@PathVariable UUID uuid, @RequestParam UUID token) {
         try {
@@ -85,7 +85,7 @@ public class ClientController {
                     NOT_FOUND);
         }
     }
-    
+
     @PostMapping
     public ResponseEntity<?> createClient(@RequestBody ClientDto clientDto, @RequestParam UUID token) {
         try {
@@ -113,7 +113,7 @@ public class ClientController {
             return new ResponseEntity<>(updateOnErrorLogEndpoint(Client.class, clientDto, e), BAD_REQUEST);
         }
     }
-    
+
     @DeleteMapping("{uuid}")
     public ResponseEntity<?> deleteClient(@PathVariable UUID uuid, @RequestParam UUID token) {
         try {

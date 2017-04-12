@@ -61,7 +61,7 @@ public class ClientControllerIT extends BaseControllerIT {
         then().
                 statusCode(SC_OK);
     }
-    
+
     @Test
     public void getClient() throws Exception {
         given().
@@ -72,7 +72,7 @@ public class ClientControllerIT extends BaseControllerIT {
                 statusCode(SC_OK).
                 body("uuid", equalTo(clientUuid.toString()));
     }
-    
+
     @Test
     public void getClient_notFound() throws Exception {
         given().
@@ -82,7 +82,7 @@ public class ClientControllerIT extends BaseControllerIT {
         then().
                 statusCode(SC_NOT_FOUND);
     }
-    
+
     @Test
     @SuppressWarnings("unchecked")
     public void createClientAsIndividual() throws Exception {
@@ -93,12 +93,12 @@ public class ClientControllerIT extends BaseControllerIT {
         JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client.json");
         inputJson.put("addressId", (int) newAddress.getId());
         inputJson.put("individual", true);
-    
+
         String firstName = (String) inputJson.get("firstName");
         String middleName = (String) inputJson.get("middleName");
         String lastName = (String) inputJson.get("lastName");
         String expectedFullName = join(" ", lastName, firstName, middleName);
-    
+
         String newUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
@@ -114,11 +114,11 @@ public class ClientControllerIT extends BaseControllerIT {
                         body("lastName", equalTo(lastName)).
                 extract().
                         path("uuid");
-    
+
         JSONParser parser = new JSONParser();
         JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
         expectedJson.put("name", expectedFullName);
-        
+
         UUID newClientUuid = UUID.fromString(newUuid);
 
         // check created data
@@ -137,13 +137,13 @@ public class ClientControllerIT extends BaseControllerIT {
         // create
         Counterparty newCounterparty = testHelper.createCounterparty();
         Address newAddress = testHelper.createAddress();
-        
+
         JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client.json");
         inputJson.put("addressId", (int) newAddress.getId());
         inputJson.put("individual", false);
-        
+
         String expectedFullName = (String) inputJson.get("name");
-        
+
         String newUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
@@ -159,7 +159,7 @@ public class ClientControllerIT extends BaseControllerIT {
                         body("lastName", equalTo("")).
                 extract().
                         path("uuid");
-    
+
         JSONParser parser = new JSONParser();
         JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
         // should use hamcrest to check, cuz oracle returns empty string as null, and other db as ""
@@ -168,7 +168,7 @@ public class ClientControllerIT extends BaseControllerIT {
         expectedJson.remove("lastName");
 
         UUID newClientUuid = UUID.fromString(newUuid);
-        
+
         // check created data
         Client createdClient = clientService.getEntityByUuid(newClientUuid, newCounterparty.getUser());
         ObjectMapper mapper = new ObjectMapper();
@@ -177,7 +177,7 @@ public class ClientControllerIT extends BaseControllerIT {
         assertThat(createdClient.getFirstName(), anyOf(equalTo(""), equalTo(null)));
         assertThat(createdClient.getMiddleName(), anyOf(equalTo(""), equalTo(null)));
         assertThat(createdClient.getLastName(), anyOf(equalTo(""), equalTo(null)));
-        
+
         // delete
         testHelper.deleteClient(createdClient);
     }
@@ -273,7 +273,7 @@ public class ClientControllerIT extends BaseControllerIT {
         then().
                 body("counterpartyUuid", equalTo(client.getCounterparty().getUuid().toString())).
                 statusCode(SC_OK);
-    
+
         JSONParser parser = new JSONParser();
         JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
         expectedJson.put("name", inputJson.get("name"));
@@ -281,7 +281,7 @@ public class ClientControllerIT extends BaseControllerIT {
         expectedJson.remove("firstName");
         expectedJson.remove("middleName");
         expectedJson.remove("lastName");
-        
+
         // check updated data
         Client updatedClient = clientService.getEntityByUuid(clientUuid, user);
         ObjectMapper mapper = new ObjectMapper();
@@ -291,7 +291,7 @@ public class ClientControllerIT extends BaseControllerIT {
         assertThat(updatedClient.getMiddleName(), anyOf(equalTo(""), equalTo(null)));
         assertThat(updatedClient.getLastName(), anyOf(equalTo(""), equalTo(null)));
     }
-    
+
     @Test
     public void deleteClient() throws Exception {
         given().
@@ -301,7 +301,7 @@ public class ClientControllerIT extends BaseControllerIT {
         then().
                 statusCode(SC_OK);
     }
-    
+
     @Test
     public void deleteClient_notFound() throws Exception {
         given().
@@ -310,5 +310,45 @@ public class ClientControllerIT extends BaseControllerIT {
                 delete("/clients/{uuid}", UUID.randomUUID().toString()).
         then().
                 statusCode(SC_NOT_FOUND);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void savingPhoneRemovesAllNonNumericalDigits() throws Exception {
+        Address newAddress = testHelper.createAddress();
+
+        JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client-with-weird-phone.json");
+        inputJson.put("addressId", (int) newAddress.getId());
+
+        String expectedPhone = "0982004113";
+
+        given().
+                contentType(APPLICATION_JSON_VALUE).
+                queryParam("token", user.getToken()).
+                body(inputJson.toString()).
+                when().
+                post("/clients").
+                then().
+                statusCode(SC_OK).
+                body("phoneNumber", equalTo(expectedPhone));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void updatingPhoneRemovesAllNonNumericalDigits() throws Exception {
+        JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client-with-weird-phone.json");
+        inputJson.put("addressId", (int) client.getAddress().getId());
+
+        String expectedPhone = "0982004113";
+
+        given().
+                contentType(APPLICATION_JSON_VALUE).
+                queryParam("token", user.getToken()).
+        body(inputJson.toString()).
+                when().
+                put("/clients/{uuid}", clientUuid.toString()).
+        then().
+                body("phoneNumber", equalTo(expectedPhone)).
+                statusCode(SC_OK);
     }
 }

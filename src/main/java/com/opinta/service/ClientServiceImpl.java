@@ -8,6 +8,7 @@ import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.exception.PerformProcessFailedException;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import javax.transaction.Transactional;
 
@@ -19,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static com.opinta.constraint.RegexPattern.PHONE_NUMBER_SYMBOLS_REGEX;
 import static com.opinta.util.EnhancedBeanUtilsBean.copyNotNullProperties;
 import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
@@ -144,6 +146,9 @@ public class ClientServiceImpl implements ClientService {
     @Override
     @Transactional
     public ClientDto save(ClientDto clientDto, User user) throws AuthException, IncorrectInputDataException {
+        if(!phoneIsValid(clientDto.getPhoneNumber())) {
+            throw new IncorrectInputDataException("Phone contains not allowed symbols");
+        }
         Client client = clientMapper.toEntity(clientDto);
         Counterparty counterparty = counterpartyService.getEntityByUser(user);
         client.setCounterparty(counterparty);
@@ -157,6 +162,9 @@ public class ClientServiceImpl implements ClientService {
     @Transactional
     public ClientDto update(UUID uuid, ClientDto clientDto, User user) throws AuthException,
             IncorrectInputDataException, PerformProcessFailedException {
+        if(!phoneIsValid(clientDto.getPhoneNumber())) {
+            throw new IncorrectInputDataException("Phone contains not allowed symbols");
+        }
         Client source = clientMapper.toEntity(clientDto);
         source.setCounterparty(null);
         Client target = getEntityByUuid(uuid, user);
@@ -197,5 +205,11 @@ public class ClientServiceImpl implements ClientService {
         if (forceDiscountInheritance || client.getDiscount() < 0) {
             client.setDiscount(client.getCounterparty().getDiscount());
         }
+    }
+
+    private boolean phoneIsValid(String phoneNumber) {
+        return Pattern.compile(PHONE_NUMBER_SYMBOLS_REGEX)
+                .matcher(phoneNumber)
+                .matches();
     }
 }

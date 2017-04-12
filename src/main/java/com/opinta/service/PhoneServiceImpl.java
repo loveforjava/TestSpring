@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.List;
 
+import static com.opinta.constraint.RegexPattern.REMOVE_NON_DIGIT_SYMBOLS_REGEX;
 import static com.opinta.util.EnhancedBeanUtilsBean.copyNotNullProperties;
 import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
@@ -64,14 +65,18 @@ public class PhoneServiceImpl implements PhoneService {
         }
         Phone phone = phoneDao.getByPhoneNumber(phoneNumber);
         if (phone != null) {
+            removeNonNumericalCharacters(phone);
             return phone;
         }
-        return phoneDao.save(new Phone(phoneNumber));
+        phone = new Phone(phoneNumber);
+        removeNonNumericalCharacters(phone);
+        return phoneDao.save(phone);
     }
 
     @Override
     @Transactional
     public Phone saveEntity(Phone phone) {
+        removeNonNumericalCharacters(phone);
         log.info(saveLogEndpoint(Phone.class, phone));
         return phoneDao.save(phone);
     }
@@ -91,6 +96,7 @@ public class PhoneServiceImpl implements PhoneService {
         }
         target.setId(id);
         log.info(updateLogEndpoint(Phone.class, target));
+        removeNonNumericalCharacters(target);
         phoneDao.update(target);
         return target;
     }
@@ -131,5 +137,9 @@ public class PhoneServiceImpl implements PhoneService {
         log.info(deleteLogEndpoint(Phone.class, id));
         phoneDao.delete(phone);
         return true;
+    }
+
+    private void removeNonNumericalCharacters(Phone phone) {
+        phone.setPhoneNumber(phone.getPhoneNumber().replaceAll(REMOVE_NON_DIGIT_SYMBOLS_REGEX, ""));
     }
 }
