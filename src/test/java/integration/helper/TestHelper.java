@@ -3,6 +3,7 @@ package integration.helper;
 import com.opinta.entity.Address;
 import com.opinta.entity.Client;
 import com.opinta.entity.Counterparty;
+import com.opinta.entity.Discount;
 import com.opinta.entity.Phone;
 import com.opinta.entity.PostOffice;
 import com.opinta.entity.PostcodePool;
@@ -12,6 +13,7 @@ import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.service.AddressService;
 import com.opinta.service.ClientService;
 import com.opinta.service.CounterpartyService;
+import com.opinta.service.DiscountService;
 import com.opinta.service.PhoneService;
 import com.opinta.service.PostOfficeService;
 import com.opinta.service.PostcodePoolService;
@@ -21,6 +23,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
@@ -30,6 +35,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+
+import static java.time.LocalDateTime.now;
 
 import static com.opinta.entity.DeliveryType.D2D;
 import static com.opinta.util.LogMessageUtil.deleteOnErrorLogEndpoint;
@@ -49,12 +56,13 @@ public class TestHelper {
     private final PostOfficeService postOfficeService;
     private final PhoneService phoneService;
     private final ShipmentGroupService shipmentGroupService;
+    private final DiscountService discountService;
 
     @Autowired
     public TestHelper(ClientService clientService, AddressService addressService,
                       CounterpartyService counterpartyService, PostcodePoolService postcodePoolService,
                       ShipmentService shipmentService, PostOfficeService postOfficeService,
-                      PhoneService phoneService,
+                      PhoneService phoneService, DiscountService discountService,
                       ShipmentGroupService shipmentGroupService) {
         this.clientService = clientService;
         this.addressService = addressService;
@@ -64,6 +72,7 @@ public class TestHelper {
         this.postOfficeService = postOfficeService;
         this.phoneService = phoneService;
         this.shipmentGroupService = shipmentGroupService;
+        this.discountService = discountService;
     }
 
     public PostOffice createPostOffice() {
@@ -339,5 +348,19 @@ public class TestHelper {
 
     public File getFileFromResources(String path) {
         return new File(getClass().getClassLoader().getResource(path).getFile());
+    }
+    
+    public List<Discount> createDiscounts() {
+        List<Discount> created = new ArrayList<>();
+        
+        Discount discount1 = new Discount("first", now().minusMonths(1), now().plusMonths(3), 10F);
+        Discount discount2 = new Discount("second", now().minusMonths(3), now().plusMonths(1), 15F);
+        Discount discount3 = new Discount("third", now().minusMonths(1), now().plusMonths(6), 5F);
+            
+        created.add(discountService.saveEntity(discount1));
+        created.add(discountService.saveEntity(discount2));
+        created.add(discountService.saveEntity(discount3));
+        
+        return created;
     }
 }

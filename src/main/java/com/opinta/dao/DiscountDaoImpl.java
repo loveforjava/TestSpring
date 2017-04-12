@@ -1,11 +1,12 @@
 package com.opinta.dao;
 
+import java.util.List;
 import java.util.UUID;
 
 import com.opinta.entity.Discount;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -31,21 +32,11 @@ public class DiscountDaoImpl implements DiscountDao {
     }
     
     @Override
-    public Discount getEntityZeroValue() {
+    public List<Discount> getAllEntities() {
         Session session = this.sessionFactory.getCurrentSession();
-        return (Discount) session.createCriteria(Discount.class)
-                .add(Restrictions.eq("value", 0))
-                .setMaxResults(1)
-                .uniqueResult();
-    }
-    
-    @Override
-    public Discount getEntityByValue(float value) {
-        Session session = this.sessionFactory.getCurrentSession();
-        return (Discount) session.createCriteria(Discount.class)
-                .add(Restrictions.eq("value", value))
-                .setMaxResults(1)
-                .uniqueResult();
+        return session.createCriteria(Discount.class)
+                .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
+                .list();
     }
     
     @Override

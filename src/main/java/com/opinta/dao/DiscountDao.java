@@ -1,5 +1,6 @@
 package com.opinta.dao;
 
+import java.util.List;
 import java.util.UUID;
 
 import com.opinta.entity.Discount;
@@ -10,9 +11,7 @@ public interface DiscountDao {
     
     Discount getEntityByUuid(UUID uuid);
     
-    Discount getEntityZeroValue();
-    
-    Discount getEntityByValue(float value);
+    List<Discount> getAllEntities();
     
     void delete(Discount entity);
 }

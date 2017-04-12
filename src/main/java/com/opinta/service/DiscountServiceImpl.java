@@ -1,5 +1,6 @@
 package com.opinta.service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -48,14 +49,8 @@ public class DiscountServiceImpl implements DiscountService {
     
     @Override
     @Transactional
-    public Discount getEntityZeroValue() {
-        return discountDao.getEntityZeroValue();
-    }
-    
-    @Override
-    @Transactional
-    public Optional<Discount> getEntityByValue(float value) {
-        return Optional.ofNullable(discountDao.getEntityByValue(value));
+    public List<Discount> getAllEntities() {
+        return discountDao.getAllEntities();
     }
     
     @Override
@@ -66,7 +61,7 @@ public class DiscountServiceImpl implements DiscountService {
     
     @Override
     @Transactional
-    public void delete(UUID uuid) throws IncorrectInputDataException {
+    public void deleteByUuid(UUID uuid) throws IncorrectInputDataException {
         Discount discount = getEntityByUuid(uuid);
         discountDao.delete(discount);
     }

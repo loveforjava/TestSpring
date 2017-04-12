@@ -1,5 +1,6 @@
 package com.opinta.service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -13,11 +14,9 @@ public interface DiscountService {
     
     Discount getEntityByUuid(UUID uuid) throws IncorrectInputDataException;
     
-    Discount getEntityZeroValue();
-    
-    Optional<Discount> getEntityByValue(float value);
+    List<Discount> getAllEntities();
     
     DiscountDto save(DiscountDto dto);
     
-    void delete(UUID uuid) throws IncorrectInputDataException;
+    void deleteByUuid(UUID uuid) throws IncorrectInputDataException;
 }
