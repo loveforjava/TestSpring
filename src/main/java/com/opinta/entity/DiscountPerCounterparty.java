@@ -1,5 +1,6 @@
 package com.opinta.entity;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -14,6 +15,9 @@ import javax.persistence.TemporalType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.cglib.core.Local;
+
+import static java.time.LocalDateTime.now;
 
 @Entity
 @Data
@@ -27,10 +31,8 @@ public class DiscountPerCounterparty {
     private Discount discount;
     @OneToOne
     private Counterparty counterparty;
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date from;
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date to;
+    private LocalDateTime fromDate;
+    private LocalDateTime toDate;
     
     public DiscountPerCounterparty(Counterparty counterparty, Discount discount) {
         this.counterparty = counterparty;
@@ -39,15 +41,14 @@ public class DiscountPerCounterparty {
     
     public boolean isDiscountTimeSpanValid() {
         // is DiscountPerCounterparty time span is valid in the associated Discount time span.
-        return (discount.getFrom().before(this.from) && discount.getTo().after(this.to));
+        return (discount.getFromDate().isBefore(this.fromDate) && discount.getToDate().isAfter(this.toDate));
     }
     
-    public boolean isDiscountValidFor(Date requestDate) {
-        return (requestDate.after(from) && requestDate.before(to));
+    public boolean isDiscountValidFor(LocalDateTime requestDate) {
+        return (requestDate.isAfter(fromDate) && requestDate.isBefore(toDate));
     }
     
     public boolean isDiscountValidNow() {
-        // new Date() means now.
-        return isDiscountValidFor(new Date());
+        return isDiscountValidFor(now());
     }
 }
