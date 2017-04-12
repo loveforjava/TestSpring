@@ -137,7 +137,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
     @Test
     @SuppressWarnings("unchecked")
     public void createSeveralCounterparties_onePostcodePool() throws Exception {
-        PostcodePool sharedPostcodePool = testHelper.createPostcodePool();
+        PostcodePool postcodePool = testHelper.createPostcodePool();
         String fakeName = "Company № ";
         MockMvcResponse response;
         String expectedJson;
@@ -152,7 +152,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
         
         for (int i = 0; i < counterpartiesQty; i++) {
             inputJson = testHelper.getJsonObjectFromFile("json/counterparty.json");
-            inputJson.put("postcodePoolUuid", sharedPostcodePool.getUuid().toString());
+            inputJson.put("postcodePoolUuid", postcodePool.getUuid().toString());
             inputJson.put("name", fakeName + i);
             expectedJson = inputJson.toString();
     
@@ -182,12 +182,12 @@ public class CounterpartyControllerIT extends BaseControllerIT {
         }
         
         // make sure that postcode pool remains not affected by associated counterparties removing.
-        PostcodePool postcodePoolAfter = postcodePoolService.getEntityByUuid(sharedPostcodePool.getUuid());
+        PostcodePool postcodePoolAfter = postcodePoolService.getEntityByUuid(postcodePool.getUuid());
         assertNotNull(postcodePoolAfter);
         
         // make sure that postcode pool do not hold any counterparties any more.
         List<Counterparty> foundCounterparties = counterpartyService
-                .getEntitiesBySharedPostcodePoolUuid(sharedPostcodePool.getUuid());
+                .getAllEntitiesByPostcodePoolUuid(postcodePool.getUuid());
         assertEquals(0, foundCounterparties.size());
     }
 

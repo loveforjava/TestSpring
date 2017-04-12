@@ -87,7 +87,7 @@ public class CounterpartyServiceImpl implements CounterpartyService {
     
     @Override
     @Transactional
-    public List<Counterparty> getEntitiesBySharedPostcodePoolUuid(UUID postcodePoolUuid) throws IncorrectInputDataException {
+    public List<Counterparty> getAllEntitiesByPostcodePoolUuid(UUID postcodePoolUuid) throws IncorrectInputDataException {
         PostcodePool postcodePool = postcodePoolService.getEntityByUuid(postcodePoolUuid);
         log.info(getAllByFieldLogEndpoint(Counterparty.class, PostcodePool.class, postcodePool));
         return counterpartyDao.getByPostcodePool(postcodePool);
