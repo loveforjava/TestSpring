@@ -128,13 +128,13 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             index++;
             float tableSize = table.getHeaderAndDataHeight();
             if (tableSize > allowedTableSize) {
-                contentStream = new PDPageContentStream(doc, table.getCurrentPage(), APPEND, true);
                 //Drawing the header if we are on the first page
                 if (firstPage) {
+                    contentStream = new PDPageContentStream(doc, table.getCurrentPage(), APPEND, true);
                     generateHeader(font, contentStream, shipmentGroup);
+                    contentStream.close();
                     allowedTableSize += 80;
                 }
-                contentStream.close();
                 //Drawing table for the first page
                 table.draw();
                 firstPage = false;
