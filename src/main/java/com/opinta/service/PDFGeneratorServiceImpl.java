@@ -3,7 +3,6 @@ package com.opinta.service;
 import be.quodlibet.boxable.BaseTable;
 import be.quodlibet.boxable.Cell;
 import be.quodlibet.boxable.Row;
-import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
@@ -19,6 +18,7 @@ import com.opinta.entity.ShipmentGroup;
 import com.opinta.entity.User;
 import com.opinta.exception.AuthException;
 import com.opinta.exception.IncorrectInputDataException;
+import com.opinta.util.LogMessageUtil;
 import com.opinta.util.MoneyToTextConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 
+import static com.google.zxing.BarcodeFormat.CODE_128;
 import static java.awt.Color.GRAY;
 import static java.awt.Color.LIGHT_GRAY;
 import static java.lang.Math.round;
@@ -87,7 +88,8 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         ShipmentGroup shipmentGroup = shipmentGroupService.getEntityById(shipmentGroupUuid, user);
 
         if (shipments.isEmpty()) {
-            log.error("Shipment group contains no shipments");
+            LogMessageUtil.getByFieldOnErrorLogEndpoint(Shipment.class, ShipmentGroup.class,
+                    shipmentGroupUuid.toString());
             throw new IncorrectInputDataException("Shipments group contains no shipments");
         }
 
@@ -151,45 +153,27 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             row = table.createRow(10f);
             //Populating the row with shipment's data
             //index
-            cell = row.createCell(COLUMN_WIDTHS[0], String.valueOf(index));
-            cell.setFont(font);
-            cell.setFontSize(7);
+            int fontSize = 7;
+
+            createCell(font, row, fontSize, COLUMN_WIDTHS[0], String.valueOf(index));
             //recipient address
-            cell = row.createCell(COLUMN_WIDTHS[1], processAddress(shipment.getRecipient().getAddress(), false));
-            cell.setFont(font);
-            cell.setFontSize(7);
+            createCell(font, row, fontSize, COLUMN_WIDTHS[1], processAddress(shipment.getRecipient().getAddress(), false));
             //recipient name
-            cell = row.createCell(COLUMN_WIDTHS[2], shipment.getRecipient().getName());
-            cell.setFont(font);
-            cell.setFontSize(7);
+            createCell(font, row, fontSize, COLUMN_WIDTHS[2], shipment.getRecipient().getName());
             //recipient phone
-            cell = row.createCell(COLUMN_WIDTHS[3], shipment.getRecipient().getPhone().getPhoneNumber());
-            cell.setFont(font);
-            cell.setFontSize(7);
+            createCell(font, row, fontSize, COLUMN_WIDTHS[3], shipment.getRecipient().getPhone().getPhoneNumber());
             //special marks column is intentionally empty
-            cell = row.createCell(COLUMN_WIDTHS[4], "");
-            cell.setFont(font);
-            cell.setFontSize(7);
+            createCell(font, row, fontSize, COLUMN_WIDTHS[4], "");
             //weight of the shipment
-            cell = row.createCell(COLUMN_WIDTHS[5], String.valueOf(shipment.getWeight()));
-            cell.setFont(font);
-            cell.setFontSize(7);
+            createCell(font, row, fontSize, COLUMN_WIDTHS[5], String.valueOf(shipment.getWeight()));
             //declared price
-            cell = row.createCell(COLUMN_WIDTHS[6], String.valueOf(shipment.getDeclaredPrice()));
-            cell.setFont(font);
-            cell.setFontSize(7);
+            createCell(font, row, fontSize, COLUMN_WIDTHS[6], String.valueOf(shipment.getDeclaredPrice()));
             //post pay
-            cell = row.createCell(COLUMN_WIDTHS[7], String.valueOf(shipment.getPostPay()));
-            cell.setFont(font);
-            cell.setFontSize(7);
+            createCell(font, row, fontSize, COLUMN_WIDTHS[7], String.valueOf(shipment.getPostPay()));
             //price
-            cell = row.createCell(COLUMN_WIDTHS[8], String.valueOf(shipment.getPrice()));
-            cell.setFont(font);
-            cell.setFontSize(7);
+            createCell(font, row, fontSize, COLUMN_WIDTHS[8], String.valueOf(shipment.getPrice()));
             //barcode number
-            cell = row.createCell(COLUMN_WIDTHS[9], String.valueOf(shipment.getBarcodeInnerNumber().stringify()));
-            cell.setFont(font);
-            cell.setFontSize(7);
+            createCell(font, row, fontSize, COLUMN_WIDTHS[9], String.valueOf(shipment.getBarcodeInnerNumber().stringify()));
         }
         //Check if we are still on the first page, if yes, draw header and count header space as part of the table size
         if (firstPage) {
@@ -221,6 +205,13 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         outputStream.close();
         doc.close();
         return data;
+    }
+
+    private void createCell(PDType0Font font, Row<PDPage> row, int fontSize, float columnWidth, String value) {
+        Cell<PDPage> cell;
+        cell = row.createCell(columnWidth, value);
+        cell.setFont(font);
+        cell.setFontSize(fontSize);
     }
 
     private void generateFooter(PDType0Font font, PDPageContentStream contentStream, float footerStartY,
@@ -328,7 +319,8 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         List<Shipment> shipments = shipmentService.getAllEntitiesByShipmentGroupUuid(shipmentGroupUuid, user);
 
         if (shipments.isEmpty()) {
-            log.error("Shipment group contains no shipments");
+            LogMessageUtil.getByFieldOnErrorLogEndpoint(Shipment.class, ShipmentGroup.class,
+                    shipmentGroupUuid.toString());
             throw new IncorrectInputDataException("Shipments group contains no shipments");
         }
 
@@ -499,13 +491,13 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
                     shipment.getBarcodeInnerNumber().getInnerNumber();
 
             //Generating first barcodeInnerNumber
-            BitMatrix bitMatrix = new Code128Writer().encode(barcode, BarcodeFormat.CODE_128, 170, 32, null);
+            BitMatrix bitMatrix = new Code128Writer().encode(barcode, CODE_128, 170, 32, null);
             BufferedImage buffImg = MatrixToImageWriter.toBufferedImage(bitMatrix);
             PDImageXObject ximage = JPEGFactory.createFromImage(template, buffImg);
             contentStream.drawImage(ximage, 242, 790);
 
             //Generating second barcodeInnerNumber
-            bitMatrix = new Code128Writer().encode(barcode, BarcodeFormat.CODE_128, 170, 32, null);
+            bitMatrix = new Code128Writer().encode(barcode, CODE_128, 170, 32, null);
             buffImg = MatrixToImageWriter.toBufferedImage(bitMatrix);
             ximage = JPEGFactory.createFromImage(template, buffImg);
             contentStream.drawImage(ximage, 242, 377);
