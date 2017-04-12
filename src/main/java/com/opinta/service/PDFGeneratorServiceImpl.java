@@ -97,10 +97,9 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
                 .getFile());
         InputStream fontStream = new FileInputStream(fontFile);
 
-        //Initializing Document
         //Setting margins
         float margin = 10;
-
+        //Initializing Document
         PDDocument doc = new PDDocument();
         PDPage page = new PDPage();
         doc.addPage(page);
@@ -224,8 +223,8 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         return data;
     }
 
-    private void generateFooter(PDType0Font font, PDPageContentStream contentStream,
-                                float footerStartY, List<Shipment> shipments) throws IOException {
+    private void generateFooter(PDType0Font font, PDPageContentStream contentStream, float footerStartY,
+                                List<Shipment> shipments) throws IOException {
         BigDecimal totalPrice = new BigDecimal("0");
         for(Shipment shipment : shipments) {
             totalPrice = totalPrice.add(shipment.getPrice());
@@ -237,8 +236,9 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         drawText(font, contentStream, 10, 247 + priceTextWidth, footerStartY,
                 "(" + moneyToTextConverter.convert(totalPrice, false) + ")");
         drawText(font, contentStream, 8, 120, footerStartY - 15, "у т.ч. ПДВ (20%)");
+        //print taxes
         drawText(font, contentStream, 10, 245, footerStartY - 15,
-                totalPrice.divide(new BigDecimal("5"), BigDecimal.ROUND_HALF_EVEN).toString());
+                totalPrice.divide(new BigDecimal("5"), 2, BigDecimal.ROUND_HALF_EVEN).toString());
         drawText(font, contentStream, 8, 120, footerStartY - 30, "за інші послуги ______________________" +
                 "______________ на суму _________ грн. _________ коп.");
         drawText(font, contentStream, 8, 120, footerStartY - 45, "Недозволених до пересилання вкладень немає");

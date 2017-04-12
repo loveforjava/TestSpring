@@ -15,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 
 import java.util.UUID;
 
@@ -22,6 +23,7 @@ import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 
 public class ShipmentGroupControllerIT extends BaseControllerIT {
     private ShipmentGroup shipmentGroup;
@@ -77,8 +79,23 @@ public class ShipmentGroupControllerIT extends BaseControllerIT {
         when().
                 get("shipment-groups/{uuid}/form", shipmentGroupUuid.toString()).
         then().
-                statusCode(SC_OK);
+                statusCode(SC_OK).
+                contentType(APPLICATION_PDF_VALUE);
+        // delete shipment
+        testHelper.deleteShipment(shipment);
+    }
 
+    @Test
+    public void getShipmentGroupForm103() throws Exception {
+        Shipment shipment = testHelper.createShipmentWithSameCounterparty(shipmentGroup,
+                shipmentGroup.getCounterparty());
+        given().
+                queryParam("token", user.getToken()).
+        when().
+                get("shipment-groups/{uuid}/form103", shipmentGroupUuid.toString()).
+        then().
+                statusCode(SC_OK).
+                contentType(APPLICATION_PDF_VALUE);
         // delete shipment
         testHelper.deleteShipment(shipment);
     }
