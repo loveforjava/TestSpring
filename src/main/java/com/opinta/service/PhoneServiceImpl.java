@@ -72,6 +72,7 @@ public class PhoneServiceImpl implements PhoneService {
     @Override
     @Transactional
     public Phone saveEntity(Phone phone) {
+        phone.removeNonNumericalCharacters();
         log.info(saveLogEndpoint(Phone.class, phone));
         return phoneDao.save(phone);
     }
@@ -91,7 +92,7 @@ public class PhoneServiceImpl implements PhoneService {
         }
         target.setId(id);
         log.info(updateLogEndpoint(Phone.class, target));
-        phoneDao.update(target);
+        phoneDao.update(target.removeNonNumericalCharacters());
         return target;
     }
 

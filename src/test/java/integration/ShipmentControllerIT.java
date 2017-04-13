@@ -251,6 +251,24 @@ public class ShipmentControllerIT extends BaseControllerIT {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
+    public void removeShipmentGroup() throws Exception {
+        ShipmentGroup shipmentGroup = testHelper.createShipmentGroup();
+        Shipment shipment = testHelper.createShipment(shipmentGroup);
+
+        given().
+                contentType(APPLICATION_JSON_VALUE).
+                queryParam("token", shipment.getSender().getCounterparty().getUser().getToken()).
+        when().
+                delete("/shipments/{uuid}/shipment-group", shipment.getUuid().toString()).
+        then().
+                body("shipmentGroupUuid", equalTo(null)).
+                statusCode(SC_OK);
+
+        testHelper.deleteShipment(shipment);
+    }
+
+    @Test
     public void deleteShipment() throws Exception {
         given().
                 queryParam("token", user.getToken()).
