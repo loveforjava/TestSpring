@@ -57,9 +57,7 @@ public class PDFGeneratorServiceTest {
 
     @Test
     public void generateLabel_and_generatePostpay_ShouldReturnNotEmptyFile() throws Exception {
-        // TODO
         User user = new User();
-
         when(shipmentService.getEntityByUuid(shipmentId, user)).thenReturn(shipment);
         assertNotEquals("PDFGenerator returned an empty label",
                 pdfGeneratorService.generateShipmentForm(shipmentId, user).length, 0);

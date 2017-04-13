@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 import static com.opinta.util.LogMessageUtil.deleteOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByFieldOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getAllOnErrorLogEndpoint;
@@ -42,14 +44,14 @@ public class ClientController {
     private final ClientService clientService;
     private final ShipmentService shipmentService;
     private final UserService userService;
-    
+
     @Autowired
     public ClientController(ClientService clientService, ShipmentService shipmentService, UserService userService) {
         this.clientService = clientService;
         this.shipmentService = shipmentService;
         this.userService = userService;
     }
-    
+
     @GetMapping
     public ResponseEntity<?> getAllClients(@RequestParam UUID token) {
         try {
@@ -59,7 +61,7 @@ public class ClientController {
             return new ResponseEntity<>(getAllOnErrorLogEndpoint(Client.class, e), UNAUTHORIZED);
         }
     }
-    
+
     @GetMapping("{uuid}")
     public ResponseEntity<?> getClient(@PathVariable UUID uuid, @RequestParam UUID token) {
         try {
@@ -85,9 +87,9 @@ public class ClientController {
                     NOT_FOUND);
         }
     }
-    
+
     @PostMapping
-    public ResponseEntity<?> createClient(@RequestBody ClientDto clientDto, @RequestParam UUID token) {
+    public ResponseEntity<?> createClient(@RequestBody @Valid ClientDto clientDto, @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
             return new ResponseEntity<>(clientService.save(clientDto, user), OK);
@@ -99,8 +101,7 @@ public class ClientController {
     }
 
     @PutMapping("{uuid}")
-    public ResponseEntity<?> updateClient(@PathVariable UUID uuid,
-                                          @RequestBody ClientDto clientDto,
+    public ResponseEntity<?> updateClient(@PathVariable UUID uuid, @RequestBody @Valid ClientDto clientDto,
                                           @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
@@ -113,7 +114,7 @@ public class ClientController {
             return new ResponseEntity<>(updateOnErrorLogEndpoint(Client.class, clientDto, e), BAD_REQUEST);
         }
     }
-    
+
     @DeleteMapping("{uuid}")
     public ResponseEntity<?> deleteClient(@PathVariable UUID uuid, @RequestParam UUID token) {
         try {
