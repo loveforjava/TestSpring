@@ -10,13 +10,13 @@ import com.opinta.dto.DiscountPerCounterpartyDto;
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.Discount;
 import com.opinta.entity.DiscountPerCounterparty;
+import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.mapper.DiscountPerCounterpartyMapper;
-import com.opinta.service.CounterpartyService;
 import com.opinta.service.DiscountPerCounterpartyService;
-import com.opinta.service.DiscountService;
 import integration.helper.TestHelper;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import static org.junit.Assert.assertEquals;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,6 +29,7 @@ import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.fail;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -39,10 +40,6 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
     @Autowired
     private DiscountPerCounterpartyService discountPerCounterpartyService;
     @Autowired
-    private CounterpartyService counterpartyService;
-    @Autowired
-    private DiscountService discountService;
-    @Autowired
     private DiscountPerCounterpartyMapper discountPerCounterpartyMapper;
     @Autowired
     private TestHelper testHelper;
@@ -51,6 +48,7 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
     private Counterparty counterparty;
     private JSONParser jsonParser = new JSONParser();
     private SimpleDateFormat simpleDateFormat;
+    private ObjectMapper jsonMapper = new ObjectMapper();
     
     @Before
     public void setUp() throws Exception {
@@ -121,9 +119,8 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
 
         JSONObject expectedJson = (JSONObject) jsonParser.parse(inputJson.toJSONString());
         expectedJson.put("uuid", discountPerCounterpartyDto.getUuid());
-    
-        ObjectMapper mapper = new ObjectMapper();
-        JSONObject actualJson = (JSONObject) jsonParser.parse(mapper.writeValueAsString(discountPerCounterpartyDto));
+        
+        JSONObject actualJson = (JSONObject) jsonParser.parse(jsonMapper.writeValueAsString(discountPerCounterpartyDto));
         actualJson.put("fromDate", simpleDateFormat.format(discountPerCounterpartyDto.getFromDate()));
         actualJson.put("toDate", simpleDateFormat.format(discountPerCounterpartyDto.getToDate()));
         
@@ -133,12 +130,52 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
     }
     
     @Test
-    public void updateDiscountPerCounterparty() {
+    public void updateDiscountPerCounterparty() throws Exception {
+        Discount newDiscount = testHelper.createDiscount();
+        DiscountPerCounterparty discountPerCounterparty = discountsPerCounterparty.get(0);
         
+        JSONObject inputJson = testHelper.getJsonObjectFromFile("json/discount-per-counterparty.json");
+        inputJson.put("discountUuid", newDiscount.getUuid().toString());
+        inputJson.put("counterpartyUuid", discountPerCounterparty.getCounterparty().getUuid().toString());
+        
+        given().
+                queryParam("token", discountPerCounterparty.getCounterparty().getUser().getToken().toString()).
+                contentType(APPLICATION_JSON_VALUE).
+                body(inputJson.toString()).
+        when().
+                put("/discounts-per-counterparty/{uuid}", discountPerCounterparty.getUuid().toString()).
+        then().
+                body("discountUuid", equalTo(newDiscount.getUuid().toString())).
+                statusCode(SC_OK).
+        extract().
+                path("uuid");
+    
+        DiscountPerCounterparty updatedDiscountPerCounterparty = discountPerCounterpartyService
+                .getEntityByUuid(discountPerCounterparty.getUuid(), discountPerCounterparty.getCounterparty().getUser());
+        
+        assertEquals(updatedDiscountPerCounterparty.getDiscount().getUuid().toString(), newDiscount.getUuid().toString());
     }
     
     @Test
-    public void deleteDiscountPerCounterparty() {
-        
+    public void deleteDiscountPerCounterparty() throws Exception {
+        Discount newDiscount = testHelper.createDiscount();
+        DiscountPerCounterparty discountPerCounterparty = testHelper
+                .createDiscountPerCounterparty(counterparty, newDiscount);
+    
+        given().
+                queryParam("token", counterparty.getUser().getToken().toString()).
+                contentType(APPLICATION_JSON_VALUE).
+        when().
+                delete("/discounts-per-counterparty/{uuid}", discountPerCounterparty.getUuid().toString()).
+                then().
+                statusCode(SC_OK);
+    
+        try {
+            DiscountPerCounterparty removed = discountPerCounterpartyService
+                    .getEntityByUuid(discountPerCounterparty.getUuid(), counterparty.getUser());
+            fail();
+        } catch (IncorrectInputDataException e) {
+            // must be thrown due to discount has been already removed.
+        }
     }
 }

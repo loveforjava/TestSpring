@@ -17,6 +17,9 @@ public interface DiscountPerCounterpartyService {
 
     DiscountPerCounterparty saveEntity(DiscountPerCounterparty discountPerCounterparty, User user)
             throws AuthException, IncorrectInputDataException;
+    
+    DiscountPerCounterparty updateEntity(DiscountPerCounterparty discountPerCounterparty, User user)
+            throws AuthException ;
 
     List<DiscountPerCounterpartyDto> getAll(User user);
 

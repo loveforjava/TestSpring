@@ -403,6 +403,14 @@ public class TestHelper {
         
         return discountsPerCounterparty;
     }
+    
+    public DiscountPerCounterparty createDiscountPerCounterparty(Counterparty counterparty, Discount discount)
+            throws Exception {
+        DiscountPerCounterparty discountPerCounterparty = new DiscountPerCounterparty(counterparty, discount,
+                Date.from(now().minusDays(15).toInstant(ZoneOffset.UTC)),
+                Date.from(now().plusDays(25).toInstant(ZoneOffset.UTC)));
+        return discountPerCounterpartyService.saveEntity(discountPerCounterparty, counterparty.getUser());
+    }
 
     public void deleteDiscounts(List<Discount> discounts) {
         discounts.forEach((discount -> {

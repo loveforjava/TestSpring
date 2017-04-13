@@ -82,8 +82,16 @@ public class DiscountPerCounterpartyServiceImpl implements DiscountPerCounterpar
         log.info(LogMessageUtil.saveLogEndpoint(DiscountPerCounterparty.class, discountPerCounterparty));
         return discountPerCounterpartyDao.save(discountPerCounterparty);
     }
-
-
+    
+    @Override
+    public DiscountPerCounterparty updateEntity(DiscountPerCounterparty discountPerCounterparty, User user)
+            throws AuthException {
+        userService.authorizeForAction(discountPerCounterparty, user);
+        discountPerCounterpartyDao.update(discountPerCounterparty);
+        return discountPerCounterparty;
+    }
+    
+    
     @Override
     @Transactional
     public List<DiscountPerCounterpartyDto> getAll(User user) {
@@ -114,7 +122,6 @@ public class DiscountPerCounterpartyServiceImpl implements DiscountPerCounterpar
         DiscountPerCounterparty target = getEntityByUuid(uuid, user);
 
         source.setCounterparty(target.getCounterparty());
-        source.setDiscount(target.getDiscount());
 
         try {
             copyNotNullProperties(target, source);
