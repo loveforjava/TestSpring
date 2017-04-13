@@ -13,7 +13,6 @@ import com.opinta.entity.ShipmentGroup;
 import com.opinta.entity.User;
 import com.opinta.mapper.ShipmentMapper;
 import com.opinta.service.ShipmentService;
-import org.hamcrest.Matchers;
 import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -27,7 +26,6 @@ import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 

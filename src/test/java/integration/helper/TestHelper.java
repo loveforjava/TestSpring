@@ -131,7 +131,6 @@ public class TestHelper {
         } catch (Exception e) {
             log.debug(e.getMessage());
         }
-
         if(shipment.getShipmentGroup() != null) {
             try {
                 deleteShipmentGroup(shipment.getShipmentGroup());
