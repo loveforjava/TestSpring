@@ -27,7 +27,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.opinta.util.LogMessageUtil.*;
+import static com.opinta.util.LogMessageUtil.generatePdfFormOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.saveOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.updateOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.deleteOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.deleteFieldOnErrorLogEndpoint;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
@@ -144,7 +149,8 @@ public class ShipmentController {
             return new ResponseEntity<>(deleteFieldOnErrorLogEndpoint(Shipment.class, ShipmentGroup.class,
                     uuid, e), UNAUTHORIZED);
         } catch (IncorrectInputDataException e) {
-            return new ResponseEntity<>(deleteOnErrorLogEndpoint(Shipment.class, uuid, e), NOT_FOUND);
+            return new ResponseEntity<>(deleteFieldOnErrorLogEndpoint(Shipment.class, ShipmentGroup.class,
+                    uuid, e), UNAUTHORIZED);
         }
     }
 }
