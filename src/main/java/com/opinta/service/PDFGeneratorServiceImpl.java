@@ -122,7 +122,6 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         createHeaderRow(font, table);
 
         Row<PDPage> row;
-        Cell<PDPage> cell;
         PDPageContentStream contentStream;
 
         int index = 0;
@@ -207,11 +206,11 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         return data;
     }
 
-    private void createCell(PDType0Font font, Row<PDPage> row, int fontSize, float columnWidth, String value) {
-        Cell<PDPage> cell;
-        cell = row.createCell(columnWidth, value);
+    private Cell<PDPage> createCell(PDType0Font font, Row<PDPage> row, int fontSize, float columnWidth, String value) {
+        Cell<PDPage> cell = row.createCell(columnWidth, value);
         cell.setFont(font);
         cell.setFontSize(fontSize);
+        return cell;
     }
 
     private void generateFooter(PDType0Font font, PDPageContentStream contentStream, float footerStartY,
@@ -298,9 +297,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
                 "Особливі відмітки", "Маса (г)", "Оголошена цінність відправлення, (грн.)", "Сума післяплати, (грн.)",
                 "Плата за пересилання з ПДВ, (грн.)", "№ відправлення (ШКІ)"};
         for (int i = 0; i < header.length; i++) {
-            cell = headerRow.createCell(COLUMN_WIDTHS[i], header[i]);
-            cell.setFont(font);
-            cell.setFontSize(7);
+            cell = createCell(font, headerRow, 7, COLUMN_WIDTHS[i], header[i]);
             cell.setFillColor(LIGHT_GRAY);
         }
         table.addHeaderRow(headerRow);
