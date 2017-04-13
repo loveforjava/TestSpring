@@ -418,10 +418,19 @@ public class TestHelper {
         discountService.delete(discount.getUuid());
     }
     
-    public void deleteDiscountsPerCounterparty(List<DiscountPerCounterparty> discountsPerCounterparty, User user)
+    public void deleteDiscountsPerCounterparty(List<DiscountPerCounterparty> discountsPerCounterparty)
             throws Exception {
         for (DiscountPerCounterparty discountPerCounterparty : discountsPerCounterparty) {
-            discountPerCounterpartyService.delete(discountPerCounterparty.getUuid(), user);
+            deleteDiscountPerCounterparty(discountPerCounterparty);
+        }
+    }
+
+    public void deleteDiscountPerCounterparty(DiscountPerCounterparty discountPerCounterparty)
+            throws Exception {
+        discountPerCounterpartyService.delete(discountPerCounterparty.getUuid(),
+                discountPerCounterparty.getCounterparty().getUser());
+        if (discountPerCounterparty.getDiscount() != null) {
+            deleteDiscount(discountPerCounterparty.getDiscount());
         }
     }
 }
