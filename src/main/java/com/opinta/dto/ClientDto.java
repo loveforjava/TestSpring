@@ -2,6 +2,7 @@ package com.opinta.dto;
 
 import java.util.UUID;
 
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import lombok.EqualsAndHashCode;
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import static com.opinta.constraint.RegexPattern.PHONE_NUMBER_REGEX;
 
 @Getter
 @Setter
@@ -30,6 +32,8 @@ public class ClientDto {
     private String uniqueRegistrationNumber;
     private UUID counterpartyUuid;
     private long addressId;
+    @Size(max = 25)
+    @Pattern(message = "Phone contains not allowed symbols", regexp = PHONE_NUMBER_REGEX)
     private String phoneNumber;
     private boolean individual;
     private Float discount;

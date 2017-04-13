@@ -81,6 +81,10 @@ public class LogMessageUtil {
         return format("Can't copy properties from %s to %s for %s! %s", from, to, clazz.getSimpleName(), e.getMessage());
     }
 
+    public static String deleteFieldOnErrorLogEndpoint(Class clazz, Class clazzField, Object value, Exception e) {
+        return format("Can't remove %s from %s %s! %s!", clazzField.getSimpleName(), clazz.getSimpleName(), value, e);
+    }
+
     public static String authenticationOnErrorLogEndpoint(UUID token) {
         return format("Can't authenticate user with token %s!", token);
     }

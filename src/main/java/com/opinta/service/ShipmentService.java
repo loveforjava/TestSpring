@@ -34,4 +34,6 @@ public interface ShipmentService {
             PerformProcessFailedException, IncorrectInputDataException;
     
     void delete(UUID uuid, User user) throws AuthException, IncorrectInputDataException;
+
+    ShipmentDto removeShipmentGroupFromShipment(UUID uuid, User user) throws AuthException, IncorrectInputDataException;
 }
