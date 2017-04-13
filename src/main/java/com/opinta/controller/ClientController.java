@@ -101,8 +101,7 @@ public class ClientController {
     }
 
     @PutMapping("{uuid}")
-    public ResponseEntity<?> updateClient(@PathVariable UUID uuid,
-                                          @RequestBody ClientDto clientDto,
+    public ResponseEntity<?> updateClient(@PathVariable UUID uuid, @RequestBody @Valid ClientDto clientDto,
                                           @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);

@@ -25,7 +25,7 @@ public class Phone {
     }
 
     public Phone removeNonNumericalCharacters() {
-        this.phoneNumber = this.phoneNumber.replaceAll(DIGIT_REGEX, "");
+        phoneNumber = phoneNumber.replaceAll(DIGIT_REGEX, "");
         return this;
     }
 }
