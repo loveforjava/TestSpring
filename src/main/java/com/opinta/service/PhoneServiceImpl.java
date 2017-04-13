@@ -5,6 +5,7 @@ import com.opinta.dto.PhoneDto;
 import com.opinta.entity.Phone;
 import com.opinta.mapper.PhoneMapper;
 import com.opinta.util.LogMessageUtil;
+import com.opinta.util.PhoneUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import static com.opinta.util.LogMessageUtil.getByIdLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.saveLogEndpoint;
 import static com.opinta.util.LogMessageUtil.updateLogEndpoint;
+import static com.opinta.util.PhoneUtil.removeNonNumericalCharactersFromPhone;
 
 @Service
 @Slf4j
@@ -65,18 +67,18 @@ public class PhoneServiceImpl implements PhoneService {
         }
         Phone phone = phoneDao.getByPhoneNumber(phoneNumber);
         if (phone != null) {
-            removeNonNumericalCharacters(phone);
+            removeNonNumericalCharactersFromPhone(phone);
             return phone;
         }
         phone = new Phone(phoneNumber);
-        removeNonNumericalCharacters(phone);
+        removeNonNumericalCharactersFromPhone(phone);
         return phoneDao.save(phone);
     }
 
     @Override
     @Transactional
     public Phone saveEntity(Phone phone) {
-        removeNonNumericalCharacters(phone);
+        removeNonNumericalCharactersFromPhone(phone);
         log.info(saveLogEndpoint(Phone.class, phone));
         return phoneDao.save(phone);
     }
@@ -96,7 +98,7 @@ public class PhoneServiceImpl implements PhoneService {
         }
         target.setId(id);
         log.info(updateLogEndpoint(Phone.class, target));
-        removeNonNumericalCharacters(target);
+        removeNonNumericalCharactersFromPhone(target);
         phoneDao.update(target);
         return target;
     }
@@ -137,9 +139,5 @@ public class PhoneServiceImpl implements PhoneService {
         log.info(deleteLogEndpoint(Phone.class, id));
         phoneDao.delete(phone);
         return true;
-    }
-
-    private void removeNonNumericalCharacters(Phone phone) {
-        phone.setPhoneNumber(phone.getPhoneNumber().replaceAll(REMOVE_NON_DIGIT_SYMBOLS_REGEX, ""));
     }
 }

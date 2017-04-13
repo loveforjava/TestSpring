@@ -21,6 +21,7 @@ import static integration.helper.TestHelper.DISCOUNT;
 import static java.lang.String.join;
 
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.CoreMatchers.anyOf;
@@ -316,21 +317,26 @@ public class ClientControllerIT extends BaseControllerIT {
     @SuppressWarnings("unchecked")
     public void savingPhoneRemovesAllNonNumericalDigits() throws Exception {
         Address newAddress = testHelper.createAddress();
+        Counterparty newCounterparty = testHelper.createCounterparty();
 
         JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client-with-weird-phone.json");
         inputJson.put("addressId", (int) newAddress.getId());
 
         String expectedPhone = "0982004113";
 
-        given().
+        String newUuid = given().
                 contentType(APPLICATION_JSON_VALUE).
-                queryParam("token", user.getToken()).
+                queryParam("token", newCounterparty.getUser().getToken()).
                 body(inputJson.toString()).
-                when().
+        when().
                 post("/clients").
-                then().
+        then().
                 statusCode(SC_OK).
-                body("phoneNumber", equalTo(expectedPhone));
+                body("phoneNumber", equalTo(expectedPhone)).extract().path("uuid");
+
+        UUID newClientUuid = UUID.fromString(newUuid);
+        Client createdClient = clientService.getEntityByUuid(newClientUuid, newCounterparty.getUser());
+        testHelper.deleteClient(createdClient);
     }
 
     @Test
@@ -350,5 +356,24 @@ public class ClientControllerIT extends BaseControllerIT {
         then().
                 body("phoneNumber", equalTo(expectedPhone)).
                 statusCode(SC_OK);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void savingPhoneWithNotValidSymbolsReturnsBadRequest() throws Exception {
+        Address newAddress = testHelper.createAddress();
+
+        JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client-with-weird-phone.json");
+        inputJson.put("addressId", (int) newAddress.getId());
+        inputJson.put("phoneNumber", "09820041s24");
+
+        given().
+                contentType(APPLICATION_JSON_VALUE).
+                queryParam("token", user.getToken()).
+                body(inputJson.toString()).
+        when().
+                post("/clients").
+        then().
+                statusCode(SC_BAD_REQUEST);
     }
 }

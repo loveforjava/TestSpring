@@ -10,5 +10,5 @@ public class RegexPattern {
     public static final String BARCODE_REGEX = "^$|\\d{" + BARCODE_LENGTH + "}";
 
     public static final String REMOVE_NON_DIGIT_SYMBOLS_REGEX = "[^\\d]";
-    public static final String PHONE_NUMBER_SYMBOLS_REGEX = "^[0-9()_ -]*$";
+    public static final String PHONE_NUMBER_SYMBOLS_REGEX = "^[0-9()+_ -]*$";
 }

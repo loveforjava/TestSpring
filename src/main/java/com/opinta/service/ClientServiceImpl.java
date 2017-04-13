@@ -8,7 +8,6 @@ import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.exception.PerformProcessFailedException;
 import java.util.List;
 import java.util.UUID;
-import java.util.regex.Pattern;
 
 import javax.transaction.Transactional;
 
@@ -20,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.opinta.constraint.RegexPattern.PHONE_NUMBER_SYMBOLS_REGEX;
 import static com.opinta.util.EnhancedBeanUtilsBean.copyNotNullProperties;
 import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
@@ -30,6 +28,7 @@ import static com.opinta.util.LogMessageUtil.getByIdLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.saveLogEndpoint;
 import static com.opinta.util.LogMessageUtil.updateLogEndpoint;
+import static com.opinta.util.PhoneUtil.phoneNumberIsValid;
 
 @Service
 @Slf4j
@@ -146,7 +145,7 @@ public class ClientServiceImpl implements ClientService {
     @Override
     @Transactional
     public ClientDto save(ClientDto clientDto, User user) throws AuthException, IncorrectInputDataException {
-        if(!phoneIsValid(clientDto.getPhoneNumber())) {
+        if(!phoneNumberIsValid(clientDto.getPhoneNumber())) {
             throw new IncorrectInputDataException("Phone contains not allowed symbols");
         }
         Client client = clientMapper.toEntity(clientDto);
@@ -162,7 +161,7 @@ public class ClientServiceImpl implements ClientService {
     @Transactional
     public ClientDto update(UUID uuid, ClientDto clientDto, User user) throws AuthException,
             IncorrectInputDataException, PerformProcessFailedException {
-        if(!phoneIsValid(clientDto.getPhoneNumber())) {
+        if(!phoneNumberIsValid(clientDto.getPhoneNumber())) {
             throw new IncorrectInputDataException("Phone contains not allowed symbols");
         }
         Client source = clientMapper.toEntity(clientDto);
@@ -205,11 +204,5 @@ public class ClientServiceImpl implements ClientService {
         if (forceDiscountInheritance || client.getDiscount() < 0) {
             client.setDiscount(client.getCounterparty().getDiscount());
         }
-    }
-
-    private boolean phoneIsValid(String phoneNumber) {
-        return Pattern.compile(PHONE_NUMBER_SYMBOLS_REGEX)
-                .matcher(phoneNumber)
-                .matches();
     }
 }
