@@ -78,6 +78,8 @@ public class DiscountPerCounterpartyController {
             return new ResponseEntity<>(authorizationOnErrorLogEndpoint(token, e), UNAUTHORIZED);
         } catch (IncorrectInputDataException e) {
             return new ResponseEntity<>(saveOnErrorLogEndpoint(DiscountPerCounterparty.class, e), NOT_FOUND);
+        } catch (PerformProcessFailedException e) {
+            return new ResponseEntity<>(saveOnErrorLogEndpoint(DiscountPerCounterparty.class, e), BAD_REQUEST);
         }
     }
     
@@ -92,7 +94,8 @@ public class DiscountPerCounterpartyController {
         } catch (IncorrectInputDataException e) {
             return new ResponseEntity<>(updateOnErrorLogEndpoint(DiscountPerCounterparty.class, e), NOT_FOUND);
         } catch (PerformProcessFailedException e) {
-            return new ResponseEntity<>(updateOnErrorLogEndpoint(DiscountPerCounterparty.class, discountPerCounterpartyDto, e), BAD_REQUEST);
+            return new ResponseEntity<>(
+                    updateOnErrorLogEndpoint(DiscountPerCounterparty.class, discountPerCounterpartyDto, e), BAD_REQUEST);
         }
     }
     

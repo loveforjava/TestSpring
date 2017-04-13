@@ -39,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 import static java.time.LocalDateTime.now;
 
@@ -384,6 +385,13 @@ public class TestHelper {
         Discount discount = new Discount("one more discount",
                 Date.from(now().minusMonths(2).toInstant(ZoneOffset.UTC)),
                 Date.from(now().plusMonths(4).toInstant(ZoneOffset.UTC)), 5F);
+        return discountService.saveEntity(discount);
+    }
+    
+    public Discount createExpiredDiscount() {
+        Discount discount = new Discount("one more discount",
+                Date.from(now().minusMonths(6).toInstant(ZoneOffset.UTC)),
+                Date.from(now().minusMonths(2).toInstant(ZoneOffset.UTC)), 5F);
         return discountService.saveEntity(discount);
     }
     

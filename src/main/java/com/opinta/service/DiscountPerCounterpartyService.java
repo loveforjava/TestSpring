@@ -16,10 +16,10 @@ public interface DiscountPerCounterpartyService {
     DiscountPerCounterparty getEntityByUuid(UUID uuid, User user) throws IncorrectInputDataException, AuthException;
 
     DiscountPerCounterparty saveEntity(DiscountPerCounterparty discountPerCounterparty, User user)
-            throws AuthException, IncorrectInputDataException;
+            throws AuthException, IncorrectInputDataException, PerformProcessFailedException;
     
     DiscountPerCounterparty updateEntity(DiscountPerCounterparty discountPerCounterparty, User user)
-            throws AuthException ;
+            throws AuthException, IncorrectInputDataException, PerformProcessFailedException ;
 
     List<DiscountPerCounterpartyDto> getAll(User user);
 
@@ -27,7 +27,7 @@ public interface DiscountPerCounterpartyService {
             AuthException;
 
     DiscountPerCounterpartyDto save(DiscountPerCounterpartyDto discountPerCounterpartyDto, User user)
-            throws IncorrectInputDataException, AuthException;
+            throws IncorrectInputDataException, AuthException, PerformProcessFailedException;
 
     DiscountPerCounterpartyDto update(UUID uuid, DiscountPerCounterpartyDto discountPerCounterpartyDto, User user)
             throws IncorrectInputDataException, AuthException, PerformProcessFailedException;

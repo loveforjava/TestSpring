@@ -43,6 +43,10 @@ public class DiscountPerCounterparty {
         return (requestDate.after(fromDate) && requestDate.before(toDate));
     }
     
+    public boolean isDiscountPerCounterpartyValidForAssignedDiscount() {
+        return discount.getFromDate().before(fromDate) && discount.getToDate().after(toDate);
+    }
+    
     public boolean isDiscountValidNow() {
         return isDiscountPerCounterpartyValidFor(new Date());
     }

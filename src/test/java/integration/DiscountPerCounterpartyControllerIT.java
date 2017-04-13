@@ -23,6 +23,8 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static java.util.TimeZone.getTimeZone;
+
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
@@ -154,6 +156,90 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
                 .getEntityByUuid(discountPerCounterparty.getUuid(), discountPerCounterparty.getCounterparty().getUser());
         
         assertEquals(updatedDiscountPerCounterparty.getDiscount().getUuid().toString(), newDiscount.getUuid().toString());
+    }
+    
+    @Test
+    public void updateDiscountPerCounterparty_invalidTime() throws Exception {
+        Discount newDiscount = testHelper.createDiscount();
+        DiscountPerCounterparty discountPerCounterparty = discountsPerCounterparty.get(0);
+        
+        JSONObject inputJson = testHelper.getJsonObjectFromFile("json/discount-per-counterparty.json");
+        inputJson.put("discountUuid", newDiscount.getUuid().toString());
+        inputJson.put("counterpartyUuid", discountPerCounterparty.getCounterparty().getUuid().toString());
+        inputJson.put("fromDate", "2016-06-01T18:25:43.511Z");
+        inputJson.put("toDate", "2016-09-01T18:25:43.511Z");
+        
+        given().
+                queryParam("token", discountPerCounterparty.getCounterparty().getUser().getToken().toString()).
+                contentType(APPLICATION_JSON_VALUE).
+                body(inputJson.toString()).
+        when().
+                put("/discounts-per-counterparty/{uuid}", discountPerCounterparty.getUuid().toString()).
+        then().
+                statusCode(SC_BAD_REQUEST);
+        
+        DiscountPerCounterparty existedDiscountPerCounterparty = discountPerCounterpartyService
+                .getEntityByUuid(discountPerCounterparty.getUuid(), discountPerCounterparty.getCounterparty().getUser());
+        
+        // make sure entity has not been updated.
+        assertEquals(
+                discountPerCounterparty.getDiscount().getUuid().toString(),
+                existedDiscountPerCounterparty.getDiscount().getUuid().toString());
+    }
+    
+    @Test
+    public void updateDiscountPerCounterparty_invalidTimeExpiredDiscount() throws Exception {
+        Discount newDiscount = testHelper.createExpiredDiscount();
+        DiscountPerCounterparty discountPerCounterparty = discountsPerCounterparty.get(0);
+        
+        JSONObject inputJson = testHelper.getJsonObjectFromFile("json/discount-per-counterparty.json");
+        inputJson.put("discountUuid", newDiscount.getUuid().toString());
+        inputJson.put("counterpartyUuid", discountPerCounterparty.getCounterparty().getUuid().toString());
+        
+        given().
+                queryParam("token", discountPerCounterparty.getCounterparty().getUser().getToken().toString()).
+                contentType(APPLICATION_JSON_VALUE).
+                body(inputJson.toString()).
+        when().
+                put("/discounts-per-counterparty/{uuid}", discountPerCounterparty.getUuid().toString()).
+        then().
+                statusCode(SC_BAD_REQUEST);
+        
+        DiscountPerCounterparty existedDiscountPerCounterparty = discountPerCounterpartyService
+                .getEntityByUuid(discountPerCounterparty.getUuid(), discountPerCounterparty.getCounterparty().getUser());
+        
+        // make sure entity has not been updated.
+        assertEquals(
+                discountPerCounterparty.getDiscount().getUuid().toString(),
+                existedDiscountPerCounterparty.getDiscount().getUuid().toString());
+    }
+    
+    @Test
+    public void updateDiscountPerCounterparty_discountTimesAreValidButNotMatches() throws Exception {
+        Discount newDiscount = testHelper.createDiscount();
+        DiscountPerCounterparty discountPerCounterparty = discountsPerCounterparty.get(0);
+        
+        JSONObject inputJson = testHelper.getJsonObjectFromFile("json/discount-per-counterparty.json");
+        inputJson.put("discountUuid", newDiscount.getUuid().toString());
+        inputJson.put("counterpartyUuid", discountPerCounterparty.getCounterparty().getUuid().toString());
+        inputJson.put("toDate", "2028-09-01T18:25:43.511Z");
+        
+        given().
+                queryParam("token", discountPerCounterparty.getCounterparty().getUser().getToken().toString()).
+                contentType(APPLICATION_JSON_VALUE).
+                body(inputJson.toString()).
+        when().
+                put("/discounts-per-counterparty/{uuid}", discountPerCounterparty.getUuid().toString()).
+        then().
+                statusCode(SC_BAD_REQUEST);
+        
+        DiscountPerCounterparty existedDiscountPerCounterparty = discountPerCounterpartyService
+                .getEntityByUuid(discountPerCounterparty.getUuid(), discountPerCounterparty.getCounterparty().getUser());
+        
+        // make sure entity has not been updated.
+        assertEquals(
+                discountPerCounterparty.getDiscount().getUuid().toString(),
+                existedDiscountPerCounterparty.getDiscount().getUuid().toString());
     }
     
     @Test
