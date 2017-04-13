@@ -257,7 +257,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
     public void removeShipmentGroup() throws Exception {
         ShipmentGroup shipmentGroup = testHelper.createShipmentGroup();
         Shipment shipment = testHelper.createShipment(shipmentGroup);
-        // update
+
         given().
                 contentType(APPLICATION_JSON_VALUE).
                 queryParam("token", shipment.getSender().getCounterparty().getUser().getToken()).
@@ -268,7 +268,6 @@ public class ShipmentControllerIT extends BaseControllerIT {
                 statusCode(SC_OK);
 
         testHelper.deleteShipment(shipment);
-        testHelper.deleteShipmentGroup(shipmentGroup);
     }
 
     @Test
