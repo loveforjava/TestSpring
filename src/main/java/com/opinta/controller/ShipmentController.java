@@ -137,4 +137,16 @@ public class ShipmentController {
             return new ResponseEntity<>(deleteOnErrorLogEndpoint(Shipment.class, uuid, e), NOT_FOUND);
         }
     }
+
+    @DeleteMapping("{uuid}/shipment-group")
+    public ResponseEntity<?> removeShipmentGroupFromShipment(@PathVariable UUID uuid, @RequestParam UUID token) {
+        try {
+            User user = userService.authenticate(token);
+            return new ResponseEntity<>(shipmentService.removeShipmentGroupFromShipment(uuid, user), OK);
+        } catch (AuthException e) {
+            return new ResponseEntity<>(deleteOnErrorLogEndpoint(Shipment.class, uuid, e), UNAUTHORIZED);
+        } catch (IncorrectInputDataException e) {
+            return new ResponseEntity<>(deleteOnErrorLogEndpoint(Shipment.class, uuid, e), NOT_FOUND);
+        }
+    }
 }
