@@ -3,6 +3,7 @@ package com.opinta.service;
 import com.opinta.dao.UserDao;
 import com.opinta.entity.Client;
 import com.opinta.entity.Counterparty;
+import com.opinta.entity.DiscountPerCounterparty;
 import com.opinta.entity.Shipment;
 import com.opinta.entity.ShipmentGroup;
 import com.opinta.entity.User;
@@ -86,5 +87,10 @@ public class UserServiceImpl implements UserService {
             log.error(authorizationOnErrorLogEndpoint(user.getToken(), shipmentGroup));
             throw new AuthException(authorizationOnErrorLogEndpoint(user.getToken(), shipmentGroup));
         }
+    }
+
+    @Override
+    public void authorizeForAction(DiscountPerCounterparty discountPerCounterparty, User user) throws AuthException {
+        authorizeForAction(discountPerCounterparty.getCounterparty(), user);
     }
 }

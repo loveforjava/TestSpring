@@ -3,15 +3,20 @@ package integration.helper;
 import com.opinta.entity.Address;
 import com.opinta.entity.Client;
 import com.opinta.entity.Counterparty;
+import com.opinta.entity.Discount;
+import com.opinta.entity.DiscountPerCounterparty;
 import com.opinta.entity.Phone;
 import com.opinta.entity.PostOffice;
 import com.opinta.entity.PostcodePool;
 import com.opinta.entity.Shipment;
 import com.opinta.entity.ShipmentGroup;
+import com.opinta.exception.AuthException;
 import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.service.AddressService;
 import com.opinta.service.ClientService;
 import com.opinta.service.CounterpartyService;
+import com.opinta.service.DiscountPerCounterpartyService;
+import com.opinta.service.DiscountService;
 import com.opinta.service.PhoneService;
 import com.opinta.service.PostOfficeService;
 import com.opinta.service.PostcodePoolService;
@@ -21,6 +26,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Random;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
@@ -30,6 +39,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+
+import static java.time.LocalDateTime.now;
 
 import static com.opinta.entity.DeliveryType.D2D;
 import static com.opinta.util.LogMessageUtil.deleteOnErrorLogEndpoint;
@@ -49,13 +60,16 @@ public class TestHelper {
     private final PostOfficeService postOfficeService;
     private final PhoneService phoneService;
     private final ShipmentGroupService shipmentGroupService;
+    private final DiscountService discountService;
+    private final DiscountPerCounterpartyService discountPerCounterpartyService;
 
     @Autowired
     public TestHelper(ClientService clientService, AddressService addressService,
                       CounterpartyService counterpartyService, PostcodePoolService postcodePoolService,
                       ShipmentService shipmentService, PostOfficeService postOfficeService,
-                      PhoneService phoneService,
-                      ShipmentGroupService shipmentGroupService) {
+                      PhoneService phoneService, DiscountService discountService,
+                      ShipmentGroupService shipmentGroupService,
+                      DiscountPerCounterpartyService discountPerCounterpartyService) {
         this.clientService = clientService;
         this.addressService = addressService;
         this.counterpartyService = counterpartyService;
@@ -64,6 +78,8 @@ public class TestHelper {
         this.postOfficeService = postOfficeService;
         this.phoneService = phoneService;
         this.shipmentGroupService = shipmentGroupService;
+        this.discountService = discountService;
+        this.discountPerCounterpartyService = discountPerCounterpartyService;
     }
 
     public PostOffice createPostOffice() {
@@ -139,13 +155,15 @@ public class TestHelper {
             }
         }
     }
-    
+
+    @SuppressWarnings("unchecked")
     public JSONObject toJsonWithUuid(Client client) {
         JSONObject clientUuidJsonObject = new JSONObject();
         clientUuidJsonObject.put("uuid", client.getUuid().toString());
         return clientUuidJsonObject;
     }
-    
+
+    @SuppressWarnings("unchecked")
     public void mergeClientNames(JSONObject target, Client source) {
         target.put("uuid", source.getUuid().toString());
         target.put("name", source.getName());
@@ -153,7 +171,8 @@ public class TestHelper {
         target.put("middleName", source.getMiddleName());
         target.put("lastName", source.getLastName());
     }
-    
+
+    @SuppressWarnings("unchecked")
     public void adjustClientData(JSONObject target, Address address) {
         target.put("addressId", address.getId());
         target.remove("uuid");
@@ -283,32 +302,28 @@ public class TestHelper {
     }
 
     public Address createAddress() {
-        Address address = new Address("00001", "Ternopil", "Monastiriska",
-                "Monastiriska", "Sadova", "51", "");
+        Address address = new Address("00001", "Ternopil", "Monastiriska", "Monastiriska", "Sadova", "51", "");
         return addressService.saveEntity(address);
     }
 
     public Address createAddressSameRegion() {
-        Address address = new Address("00002", "Ternopil", "Berezhany",
-                "Berezhany", "Rogatynska", "107", "");
+        Address address = new Address("00002", "Ternopil", "Berezhany", "Berezhany", "Rogatynska", "107", "");
         return addressService.saveEntity(address);
     }
 
     public Address createAddressOtherRegion() {
-        Address address = new Address("01001", "Kiev", "Kiev",
-                "Kiev", "Khreschatik", "21", "7");
+        Address address = new Address("01001", "Kiev", "Kiev", "Kiev", "Khreschatik", "21", "7");
         return addressService.saveEntity(address);
     }
 
     public Address createAddressSameRegionCountryside() {
-        Address address = new Address(SAME_REGION_COUNTRYSIDE, "Ternopil", "Monastiriska",
-                "Goryglyady", "Shevchenka", "8", "");
+        Address address = new Address(SAME_REGION_COUNTRYSIDE, "Ternopil", "Monastiriska", "Goryglyady", "Shevchenka",
+                "8", "");
         return addressService.saveEntity(address);
     }
 
     public Address createAddressOtherRegionCountryside() {
-        Address address = new Address(OTHER_REGION_COUNTRYSIDE, "Kiev", "Boyarka",
-                "Vesele", "Franka", "21", "");
+        Address address = new Address(OTHER_REGION_COUNTRYSIDE, "Kiev", "Boyarka", "Vesele", "Franka", "21", "");
         return addressService.saveEntity(address);
     }
 
@@ -327,7 +342,7 @@ public class TestHelper {
         return postcodePoolService.saveEntity(new PostcodePool("12345", false));
     }
 
-    public void deleteCounterparty(Counterparty counterparty) throws Exception {
+    public void deleteCounterparty(Counterparty counterparty) {
         try {
             counterpartyService.delete(counterparty.getUuid(), counterparty.getUser());
         } catch (Exception e) {
@@ -346,5 +361,82 @@ public class TestHelper {
 
     public File getFileFromResources(String path) {
         return new File(getClass().getClassLoader().getResource(path).getFile());
+    }
+    
+    public List<Discount> createDiscounts() {
+        List<Discount> created = new ArrayList<>();
+        
+        Discount discount1 = new Discount("first",
+                Date.from(now().minusMonths(1).toInstant(ZoneOffset.UTC)),
+                Date.from(now().plusMonths(3).toInstant(ZoneOffset.UTC)), 10F);
+        Discount discount2 = new Discount("second",
+                Date.from(now().minusMonths(3).toInstant(ZoneOffset.UTC)),
+                Date.from(now().plusMonths(1).toInstant(ZoneOffset.UTC)), 10F);
+        Discount discount3 = new Discount("third",
+                Date.from(now().minusMonths(1).toInstant(ZoneOffset.UTC)),
+                Date.from(now().plusMonths(6).toInstant(ZoneOffset.UTC)), 10F);
+
+        created.add(discountService.saveEntity(discount1));
+        created.add(discountService.saveEntity(discount2));
+        created.add(discountService.saveEntity(discount3));
+        
+        return created;
+    }
+    
+    public Discount createDiscount() {
+        Discount discount = new Discount("one more discount",
+                Date.from(now().minusMonths(2).toInstant(ZoneOffset.UTC)),
+                Date.from(now().plusMonths(4).toInstant(ZoneOffset.UTC)), 5F);
+        return discountService.saveEntity(discount);
+    }
+    
+    public Discount createExpiredDiscount() {
+        Discount discount = new Discount("one more discount",
+                Date.from(now().minusMonths(6).toInstant(ZoneOffset.UTC)),
+                Date.from(now().minusMonths(2).toInstant(ZoneOffset.UTC)), 5F);
+        return discountService.saveEntity(discount);
+    }
+    
+    public DiscountPerCounterparty createDiscountPerCounterparty(Discount discount,
+            Counterparty counterparty) throws Exception {
+        DiscountPerCounterparty discountPerCounterparty = new DiscountPerCounterparty(counterparty, discount,
+                Date.from(now().minusDays(20).toInstant(ZoneOffset.UTC)),
+                Date.from(now().plusDays(20).toInstant(ZoneOffset.UTC)));
+        return discountPerCounterpartyService.saveEntity(discountPerCounterparty, counterparty.getUser());
+    }
+    
+    public DiscountPerCounterparty createDiscountPerCounterparty(Counterparty counterparty, Discount discount)
+            throws Exception {
+        DiscountPerCounterparty discountPerCounterparty = new DiscountPerCounterparty(counterparty, discount,
+                Date.from(now().minusDays(15).toInstant(ZoneOffset.UTC)),
+                Date.from(now().plusDays(25).toInstant(ZoneOffset.UTC)));
+        return discountPerCounterpartyService.saveEntity(discountPerCounterparty, counterparty.getUser());
+    }
+
+    public void deleteDiscounts(List<Discount> discounts) {
+        discounts.forEach((this::deleteDiscount));
+    }
+    
+    public void deleteDiscount(Discount discount) {
+        try {
+            discountService.delete(discount.getUuid());
+        } catch (IncorrectInputDataException e) {
+            log.debug(e.getMessage());
+        }
+    }
+    
+    public void deleteDiscountPerCounterparty(DiscountPerCounterparty discountPerCounterparty) {
+        try {
+            discountPerCounterpartyService.delete(discountPerCounterparty.getUuid(),
+                    discountPerCounterparty.getCounterparty().getUser());
+        } catch (AuthException | IncorrectInputDataException e) {
+            log.debug(e.getMessage());
+        }
+        if (discountPerCounterparty.getDiscount() != null) {
+            deleteDiscount(discountPerCounterparty.getDiscount());
+        }
+        if (discountPerCounterparty.getCounterparty() != null) {
+            deleteCounterparty(discountPerCounterparty.getCounterparty());
+        }
     }
 }
