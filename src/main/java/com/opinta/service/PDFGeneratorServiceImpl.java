@@ -422,7 +422,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             String priceInText = moneyToTextConverter.convert(postPay, false);
             //Populating text field for the price
             populateField(acroForm, field, "priceInText", priceInText);
-            populateField(acroForm, field, "barcodeText", getBarcode(shipment));
+            populateField(acroForm, field, "barcodeText", shipment.getBarcodeInnerNumber().stringify());
 
             //Removing acrofields
             acroForm.flatten();
@@ -485,7 +485,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
                     new PDPageContentStream(template, page, APPEND, true);
 
             //Constructing 13 digits of the barcodeInnerNumber
-            String barcode = getBarcode(shipment);
+            String barcode = shipment.getBarcodeInnerNumber().stringify();
 
             //Generating first barcodeInnerNumber
             BitMatrix bitMatrix = new Code128Writer().encode(barcode, CODE_128, 170, 32, null);
@@ -551,11 +551,6 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             checkBox = (PDCheckBox) acroForm.getField("recipientIsEntity");
             checkBox.check();
         }
-    }
-
-    private String getBarcode(Shipment shipment) {
-        return shipment.getBarcodeInnerNumber().getPostcodePool().getPostcode() +
-                shipment.getBarcodeInnerNumber().getInnerNumber();
     }
 
     private void generateClientsData(Shipment shipment, PDAcroForm acroForm, boolean swapSenderWithRecipient,
