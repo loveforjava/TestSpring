@@ -83,7 +83,7 @@ public class AddressControllerIT extends BaseControllerIT {
 
         int newAddressId =
                 given().
-                        contentType("application/json;charset=UTF-8").
+                        contentType(APPLICATION_JSON_VALUE).
                         body(expectedJson.toString()).
                 when().
                         post("/addresses").
@@ -159,8 +159,8 @@ public class AddressControllerIT extends BaseControllerIT {
 
     @Test
     public void deleteAddress() throws Exception {
-        when()
-                .delete("/addresses/{id}", addressId).
+        when().
+                delete("/addresses/{id}", addressId).
         then().
                 statusCode(SC_OK);
         addressId = -1;
@@ -168,8 +168,8 @@ public class AddressControllerIT extends BaseControllerIT {
 
     @Test
     public void deleteAddress_notFound() throws Exception {
-        when()
-                .delete("/addresses/{id}", addressId + 1).
+        when().
+                delete("/addresses/{id}", addressId + 1).
         then().
                 statusCode(SC_NOT_FOUND);
     }

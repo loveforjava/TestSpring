@@ -6,12 +6,14 @@ import java.util.UUID;
 import com.opinta.entity.Discount;
 
 public interface DiscountDao {
-    
-    Discount saveEntity(Discount entity);
-    
-    Discount getEntityByUuid(UUID uuid);
-    
-    List<Discount> getAllEntities();
-    
-    void delete(Discount entity);
+
+    List<Discount> getAll();
+
+    Discount getByUuid(UUID uuid);
+
+    Discount save(Discount discount);
+
+    void update(Discount discount);
+
+    void delete(Discount discount);
 }

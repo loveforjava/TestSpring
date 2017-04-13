@@ -128,7 +128,7 @@ public class ShipmentGroupControllerIT extends BaseControllerIT {
                         post("/shipment-groups").
                 then().
                         statusCode(SC_OK).
-                        extract().
+                extract().
                         path("uuid");
         
         UUID newShipmentGroupId = UUID.fromString(newShipmentGroupIdString);

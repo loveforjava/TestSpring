@@ -1,10 +1,10 @@
 {
-  "city":"Kyiv",
-  "street":"Yaltinskaya",
-  "district":"Darnitskyi",
-  "postcode":"02099",
-  "houseNumber":"51",
-  "description":"none",
-  "region":"Kyiv",
-  "apartmentNumber":"32"
+  "city": "Kyiv",
+  "street": "Yaltinskaya",
+  "district": "Darnitskyi",
+  "postcode": "02099",
+  "houseNumber": "51",
+  "description": "none",
+  "region": "Kyiv",
+  "apartmentNumber": "32"
 }

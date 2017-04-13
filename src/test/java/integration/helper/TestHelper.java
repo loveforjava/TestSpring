@@ -23,8 +23,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import lombok.extern.slf4j.Slf4j;
@@ -141,13 +142,15 @@ public class TestHelper {
             log.debug(e.getMessage());
         }
     }
-    
+
+    @SuppressWarnings("unchecked")
     public JSONObject toJsonWithUuid(Client client) {
         JSONObject clientUuidJsonObject = new JSONObject();
         clientUuidJsonObject.put("uuid", client.getUuid().toString());
         return clientUuidJsonObject;
     }
-    
+
+    @SuppressWarnings("unchecked")
     public void mergeClientNames(JSONObject target, Client source) {
         target.put("uuid", source.getUuid().toString());
         target.put("name", source.getName());
@@ -155,7 +158,8 @@ public class TestHelper {
         target.put("middleName", source.getMiddleName());
         target.put("lastName", source.getLastName());
     }
-    
+
+    @SuppressWarnings("unchecked")
     public void adjustClientData(JSONObject target, Address address) {
         target.put("addressId", address.getId());
         target.remove("uuid");
@@ -353,14 +357,27 @@ public class TestHelper {
     public List<Discount> createDiscounts() {
         List<Discount> created = new ArrayList<>();
         
-        Discount discount1 = new Discount("first", now().minusMonths(1), now().plusMonths(3), 10F);
-        Discount discount2 = new Discount("second", now().minusMonths(3), now().plusMonths(1), 15F);
-        Discount discount3 = new Discount("third", now().minusMonths(1), now().plusMonths(6), 5F);
-            
+        Discount discount1 = new Discount("first", Date.from(now().minusMonths(1).toInstant(ZoneOffset.UTC)),
+                Date.from(now().plusMonths(3).toInstant(ZoneOffset.UTC)), 10F);
+        Discount discount2 = new Discount("first", Date.from(now().minusMonths(3).toInstant(ZoneOffset.UTC)),
+                Date.from(now().plusMonths(1).toInstant(ZoneOffset.UTC)), 10F);
+        Discount discount3 = new Discount("first", Date.from(now().minusMonths(1).toInstant(ZoneOffset.UTC)),
+                Date.from(now().plusMonths(6).toInstant(ZoneOffset.UTC)), 10F);
+
         created.add(discountService.saveEntity(discount1));
         created.add(discountService.saveEntity(discount2));
         created.add(discountService.saveEntity(discount3));
         
         return created;
+    }
+
+    public void deleteDiscounts(List<Discount> discounts) {
+        discounts.forEach((discount -> {
+            try {
+                discountService.delete(discount.getUuid());
+            } catch (IncorrectInputDataException e) {
+                log.debug(e.getMessage());
+            }
+        }));
     }
 }

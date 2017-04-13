@@ -1,9 +1,11 @@
 package com.opinta.dao;
 
+import com.opinta.entity.User;
+import java.util.List;
 import java.util.UUID;
 
-import com.opinta.entity.Counterparty;
 import com.opinta.entity.DiscountPerCounterparty;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
@@ -18,31 +20,39 @@ public class DiscountPerCounterpartyDaoImpl implements DiscountPerCounterpartyDa
     public DiscountPerCounterpartyDaoImpl(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
-    
+
     @Override
-    public DiscountPerCounterparty saveEntity(DiscountPerCounterparty entity) {
-        Session session = this.sessionFactory.getCurrentSession();
-        return (DiscountPerCounterparty) session.merge(entity);
+    @SuppressWarnings("unchecked")
+    public List<DiscountPerCounterparty> getAll(User user) {
+        Session session = sessionFactory.getCurrentSession();
+        return session.createCriteria(DiscountPerCounterparty.class, "discountPerCounterparty")
+                .createCriteria("discountPerCounterparty.counterparty", "counterparty")
+                .add(Restrictions.eq("counterparty.user", user))
+                .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
+                .list();
     }
-    
+
     @Override
-    public DiscountPerCounterparty getEntityByUuid(UUID uuid) {
-        Session session = this.sessionFactory.getCurrentSession();
+    public DiscountPerCounterparty getByUuid(UUID uuid) {
+        Session session = sessionFactory.getCurrentSession();
         return (DiscountPerCounterparty) session.get(DiscountPerCounterpartyDao.class, uuid);
     }
-    
+
     @Override
-    public DiscountPerCounterparty getEntityByCounterparty(Counterparty counterparty) {
-        Session session = this.sessionFactory.getCurrentSession();
-        return (DiscountPerCounterparty) session.createCriteria(DiscountPerCounterparty.class)
-                .add(Restrictions.eq("counterparty", counterparty))
-                .setMaxResults(1)
-                .uniqueResult();
+    public DiscountPerCounterparty save(DiscountPerCounterparty discountPerCounterparty) {
+        Session session = sessionFactory.getCurrentSession();
+        return (DiscountPerCounterparty) session.merge(discountPerCounterparty);
     }
-    
+
     @Override
-    public void delete(DiscountPerCounterparty entity) {
-        Session session = this.sessionFactory.getCurrentSession();
-        session.delete(entity);
+    public void update(DiscountPerCounterparty discountPerCounterparty) {
+        Session session = sessionFactory.getCurrentSession();
+        session.update(discountPerCounterparty);
+    }
+
+    @Override
+    public void delete(DiscountPerCounterparty discountPerCounterparty) {
+        Session session = sessionFactory.getCurrentSession();
+        session.delete(discountPerCounterparty);
     }
 }

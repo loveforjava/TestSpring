@@ -18,30 +18,37 @@ public class DiscountDaoImpl implements DiscountDao {
     public DiscountDaoImpl(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
-    
+
     @Override
-    public Discount saveEntity(Discount entity) {
-        Session session = this.sessionFactory.getCurrentSession();
-        return (Discount) session.merge(entity);
-    }
-    
-    @Override
-    public Discount getEntityByUuid(UUID uuid) {
-        Session session = this.sessionFactory.getCurrentSession();
-        return (Discount) session.get(Discount.class, uuid);
-    }
-    
-    @Override
-    public List<Discount> getAllEntities() {
-        Session session = this.sessionFactory.getCurrentSession();
+    @SuppressWarnings("unchecked")
+    public List<Discount> getAll() {
+        Session session = sessionFactory.getCurrentSession();
         return session.createCriteria(Discount.class)
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                 .list();
     }
-    
+
+    @Override
+    public Discount getByUuid(UUID uuid) {
+        Session session = sessionFactory.getCurrentSession();
+        return (Discount) session.get(Discount.class, uuid);
+    }
+
+    @Override
+    public Discount save(Discount entity) {
+        Session session = sessionFactory.getCurrentSession();
+        return (Discount) session.merge(entity);
+    }
+
+    @Override
+    public void update(Discount discount) {
+        Session session = sessionFactory.getCurrentSession();
+        session.update(discount);
+    }
+
     @Override
     public void delete(Discount entity) {
-        Session session = this.sessionFactory.getCurrentSession();
+        Session session = sessionFactory.getCurrentSession();
         session.delete(entity);
     }
 }

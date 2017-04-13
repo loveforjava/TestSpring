@@ -1,6 +1,6 @@
 package com.opinta.entity;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.UUID;
 
 import javax.persistence.Entity;
@@ -12,8 +12,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
-import static java.time.LocalDateTime.now;
-
 @Entity
 @Data
 @NoArgsConstructor
@@ -24,22 +22,22 @@ public class Discount {
     private UUID uuid;
     @Size(max = 255)
     private String name;
-    private LocalDateTime fromDate;
-    private LocalDateTime toDate;
+    private Date fromDate;
+    private Date toDate;
     private float value;
     
-    public Discount(String name, LocalDateTime from, LocalDateTime to, float value) {
+    public Discount(String name, Date from, Date to, float value) {
         this.name = name;
         this.fromDate = from;
         this.toDate = to;
         this.value = value;
     }
     
-    public boolean isDiscountValidFor(LocalDateTime currentDate) {
-        return (currentDate.isAfter(fromDate) && currentDate.isBefore(toDate));
+    public boolean isDiscountValidFor(Date currentDate) {
+        return (currentDate.after(fromDate) && currentDate.before(toDate));
     }
     
     public boolean isDiscountValidNow() {
-        return isDiscountValidFor(now());
+        return isDiscountValidFor(new Date());
     }
 }

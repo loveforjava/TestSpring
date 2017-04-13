@@ -2,6 +2,7 @@ package com.opinta.service;
 
 import com.opinta.entity.Client;
 import com.opinta.entity.Counterparty;
+import com.opinta.entity.DiscountPerCounterparty;
 import com.opinta.entity.Shipment;
 import com.opinta.entity.ShipmentGroup;
 import com.opinta.entity.User;
@@ -21,4 +22,6 @@ public interface UserService {
     void authorizeForAction(Shipment shipment, User user) throws AuthException;
 
     void authorizeForAction(ShipmentGroup shipmentGroup, User user) throws AuthException;
+
+    void authorizeForAction(DiscountPerCounterparty discountPerCounterparty, User user) throws AuthException;
 }
