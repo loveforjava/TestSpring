@@ -28,7 +28,6 @@ import static com.opinta.util.LogMessageUtil.getByIdLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.saveLogEndpoint;
 import static com.opinta.util.LogMessageUtil.updateLogEndpoint;
-import static com.opinta.util.PhoneUtil.phoneNumberIsValid;
 
 @Service
 @Slf4j
@@ -145,9 +144,6 @@ public class ClientServiceImpl implements ClientService {
     @Override
     @Transactional
     public ClientDto save(ClientDto clientDto, User user) throws AuthException, IncorrectInputDataException {
-        if(!phoneNumberIsValid(clientDto.getPhoneNumber())) {
-            throw new IncorrectInputDataException("Phone contains not allowed symbols");
-        }
         Client client = clientMapper.toEntity(clientDto);
         Counterparty counterparty = counterpartyService.getEntityByUser(user);
         client.setCounterparty(counterparty);
@@ -161,9 +157,6 @@ public class ClientServiceImpl implements ClientService {
     @Transactional
     public ClientDto update(UUID uuid, ClientDto clientDto, User user) throws AuthException,
             IncorrectInputDataException, PerformProcessFailedException {
-        if(!phoneNumberIsValid(clientDto.getPhoneNumber())) {
-            throw new IncorrectInputDataException("Phone contains not allowed symbols");
-        }
         Client source = clientMapper.toEntity(clientDto);
         source.setCounterparty(null);
         Client target = getEntityByUuid(uuid, user);

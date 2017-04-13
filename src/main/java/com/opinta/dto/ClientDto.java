@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import static com.opinta.constraint.RegexPattern.PHONE_NUMBER_SYMBOLS_REGEX;
+import static com.opinta.constraint.RegexPattern.PHONE_NUMBER_SYMBOLS_VALIDATION_REGEX;
 
 @Getter
 @Setter
@@ -33,7 +33,7 @@ public class ClientDto {
     private UUID counterpartyUuid;
     private long addressId;
     @Size(max = 25)
-    @Pattern(message = "Phone contains not allowed symbols", regexp = PHONE_NUMBER_SYMBOLS_REGEX)
+    @Pattern(message = "Phone contains not allowed symbols", regexp = PHONE_NUMBER_SYMBOLS_VALIDATION_REGEX)
     private String phoneNumber;
     private boolean individual;
     private Float discount;

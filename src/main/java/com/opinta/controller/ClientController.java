@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 import static com.opinta.util.LogMessageUtil.deleteOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByFieldOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getAllOnErrorLogEndpoint;
@@ -87,13 +89,13 @@ public class ClientController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createClient(@RequestBody ClientDto clientDto, @RequestParam UUID token) {
+    public ResponseEntity<?> createClient(@RequestBody @Valid ClientDto clientDto, @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
             return new ResponseEntity<>(clientService.save(clientDto, user), OK);
         } catch (AuthException e) {
             return new ResponseEntity<>(saveOnErrorLogEndpoint(Client.class, clientDto, e), UNAUTHORIZED);
-        } catch (IncorrectInputDataException e) {
+        } catch (Exception e) {
             return new ResponseEntity<>(saveOnErrorLogEndpoint(Client.class, clientDto, e), BAD_REQUEST);
         }
     }
