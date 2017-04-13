@@ -35,7 +35,7 @@ public class DiscountPerCounterpartyDaoImpl implements DiscountPerCounterpartyDa
     @Override
     public DiscountPerCounterparty getByUuid(UUID uuid) {
         Session session = sessionFactory.getCurrentSession();
-        return (DiscountPerCounterparty) session.get(DiscountPerCounterpartyDao.class, uuid);
+        return (DiscountPerCounterparty) session.get(DiscountPerCounterparty.class, uuid);
     }
 
     @Override

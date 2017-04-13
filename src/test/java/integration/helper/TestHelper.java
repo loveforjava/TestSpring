@@ -4,15 +4,18 @@ import com.opinta.entity.Address;
 import com.opinta.entity.Client;
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.Discount;
+import com.opinta.entity.DiscountPerCounterparty;
 import com.opinta.entity.Phone;
 import com.opinta.entity.PostOffice;
 import com.opinta.entity.PostcodePool;
 import com.opinta.entity.Shipment;
 import com.opinta.entity.ShipmentGroup;
+import com.opinta.entity.User;
 import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.service.AddressService;
 import com.opinta.service.ClientService;
 import com.opinta.service.CounterpartyService;
+import com.opinta.service.DiscountPerCounterpartyService;
 import com.opinta.service.DiscountService;
 import com.opinta.service.PhoneService;
 import com.opinta.service.PostOfficeService;
@@ -58,13 +61,15 @@ public class TestHelper {
     private final PhoneService phoneService;
     private final ShipmentGroupService shipmentGroupService;
     private final DiscountService discountService;
+    private final DiscountPerCounterpartyService discountPerCounterpartyService;
 
     @Autowired
     public TestHelper(ClientService clientService, AddressService addressService,
                       CounterpartyService counterpartyService, PostcodePoolService postcodePoolService,
                       ShipmentService shipmentService, PostOfficeService postOfficeService,
                       PhoneService phoneService, DiscountService discountService,
-                      ShipmentGroupService shipmentGroupService) {
+                      ShipmentGroupService shipmentGroupService,
+                      DiscountPerCounterpartyService discountPerCounterpartyService) {
         this.clientService = clientService;
         this.addressService = addressService;
         this.counterpartyService = counterpartyService;
@@ -74,6 +79,7 @@ public class TestHelper {
         this.phoneService = phoneService;
         this.shipmentGroupService = shipmentGroupService;
         this.discountService = discountService;
+        this.discountPerCounterpartyService = discountPerCounterpartyService;
     }
 
     public PostOffice createPostOffice() {
@@ -357,11 +363,14 @@ public class TestHelper {
     public List<Discount> createDiscounts() {
         List<Discount> created = new ArrayList<>();
         
-        Discount discount1 = new Discount("first", Date.from(now().minusMonths(1).toInstant(ZoneOffset.UTC)),
+        Discount discount1 = new Discount("first",
+                Date.from(now().minusMonths(1).toInstant(ZoneOffset.UTC)),
                 Date.from(now().plusMonths(3).toInstant(ZoneOffset.UTC)), 10F);
-        Discount discount2 = new Discount("first", Date.from(now().minusMonths(3).toInstant(ZoneOffset.UTC)),
+        Discount discount2 = new Discount("second",
+                Date.from(now().minusMonths(3).toInstant(ZoneOffset.UTC)),
                 Date.from(now().plusMonths(1).toInstant(ZoneOffset.UTC)), 10F);
-        Discount discount3 = new Discount("first", Date.from(now().minusMonths(1).toInstant(ZoneOffset.UTC)),
+        Discount discount3 = new Discount("third",
+                Date.from(now().minusMonths(1).toInstant(ZoneOffset.UTC)),
                 Date.from(now().plusMonths(6).toInstant(ZoneOffset.UTC)), 10F);
 
         created.add(discountService.saveEntity(discount1));
@@ -369,6 +378,30 @@ public class TestHelper {
         created.add(discountService.saveEntity(discount3));
         
         return created;
+    }
+    
+    public Discount createDiscount() {
+        Discount discount = new Discount("one more discount",
+                Date.from(now().minusMonths(2).toInstant(ZoneOffset.UTC)),
+                Date.from(now().plusMonths(4).toInstant(ZoneOffset.UTC)), 5F);
+        return discountService.saveEntity(discount);
+    }
+    
+    public List<DiscountPerCounterparty> createDiscountsPerCounterparty(List<Discount> discounts,
+            Counterparty counterparty) throws Exception {
+        List<DiscountPerCounterparty> discountsPerCounterparty = new ArrayList<>();
+    
+        DiscountPerCounterparty discountPerCounterparty;
+        for (Discount discount : discounts) {
+            discountPerCounterparty = new DiscountPerCounterparty(counterparty, discount,
+                    Date.from(now().minusDays(20).toInstant(ZoneOffset.UTC)),
+                    Date.from(now().plusDays(20).toInstant(ZoneOffset.UTC)));
+            discountPerCounterparty = discountPerCounterpartyService.saveEntity(discountPerCounterparty,
+                    counterparty.getUser());
+            discountsPerCounterparty.add(discountPerCounterparty);
+        }
+        
+        return discountsPerCounterparty;
     }
 
     public void deleteDiscounts(List<Discount> discounts) {
@@ -379,5 +412,16 @@ public class TestHelper {
                 log.debug(e.getMessage());
             }
         }));
+    }
+    
+    public void deleteDiscount(Discount discount) throws Exception {
+        discountService.delete(discount.getUuid());
+    }
+    
+    public void deleteDiscountsPerCounterparty(List<DiscountPerCounterparty> discountsPerCounterparty, User user)
+            throws Exception {
+        for (DiscountPerCounterparty discountPerCounterparty : discountsPerCounterparty) {
+            discountPerCounterpartyService.delete(discountPerCounterparty.getUuid(), user);
+        }
     }
 }

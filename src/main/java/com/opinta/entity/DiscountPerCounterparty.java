@@ -27,9 +27,11 @@ public class DiscountPerCounterparty {
     private Date fromDate;
     private Date toDate;
     
-    public DiscountPerCounterparty(Counterparty counterparty, Discount discount) {
+    public DiscountPerCounterparty(Counterparty counterparty, Discount discount, Date fromDate, Date toDate) {
         this.counterparty = counterparty;
         this.discount = discount;
+        this.fromDate = fromDate;
+        this.toDate = toDate;
     }
     
     public boolean isDiscountPerCounterpartyValidFor(Discount discount) {

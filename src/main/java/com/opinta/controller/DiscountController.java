@@ -55,7 +55,7 @@ public class DiscountController {
     }
 
     @PutMapping("{uuid}")
-    public ResponseEntity<?> updateClient(@PathVariable UUID uuid, @RequestBody DiscountDto discountDto) {
+    public ResponseEntity<?> updateDiscount(@PathVariable UUID uuid, @RequestBody DiscountDto discountDto) {
         try {
             return new ResponseEntity<>(discountService.update(uuid, discountDto), OK);
         } catch (IncorrectInputDataException e) {

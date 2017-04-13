@@ -74,7 +74,7 @@ public class DiscountPerCounterpartyServiceImpl implements DiscountPerCounterpar
             throws AuthException, IncorrectInputDataException {
         Counterparty counterparty = counterpartyService.getEntityByUuid(
                 discountPerCounterparty.getCounterparty().getUuid(), user);
-        Discount discount = discountService.getEntityByUuid(discountPerCounterparty.getUuid());
+        Discount discount = discountService.getEntityByUuid(discountPerCounterparty.getDiscount().getUuid());
 
         discountPerCounterparty.setCounterparty(counterparty);
         discountPerCounterparty.setDiscount(discount);
