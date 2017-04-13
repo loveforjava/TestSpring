@@ -131,6 +131,13 @@ public class TestHelper {
         } catch (Exception e) {
             log.debug(e.getMessage());
         }
+        if(shipment.getShipmentGroup() != null) {
+            try {
+                deleteShipmentGroup(shipment.getShipmentGroup());
+            } catch (Exception e) {
+                log.debug(e.getMessage());
+            }
+        }
     }
     
     public JSONObject toJsonWithUuid(Client client) {

@@ -175,6 +175,16 @@ public class ShipmentServiceImpl implements ShipmentService {
         shipmentDao.delete(shipment);
     }
 
+    @Override
+    @Transactional
+    public ShipmentDto removeShipmentGroupFromShipment(UUID uuid, User user) throws IncorrectInputDataException, AuthException {
+        Shipment shipment = getEntityByUuid(uuid, user);
+        shipment.setShipmentGroup(null);
+        log.info(updateLogEndpoint(Shipment.class, shipment));
+        shipmentDao.update(shipment);
+        return shipmentMapper.toDto(shipment);
+    }
+
     private void fillSenderAndRecipient(Shipment target, User user) throws AuthException, IncorrectInputDataException {
         target.setSender(clientService.getEntityByUuid(target.getSender().getUuid(), user));
         target.setRecipient(clientService.getEntityByUuidAnonymous(target.getRecipient().getUuid()));
