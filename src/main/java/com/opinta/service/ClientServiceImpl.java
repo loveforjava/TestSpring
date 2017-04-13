@@ -170,8 +170,9 @@ public class ClientServiceImpl implements ClientService {
             throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(Client.class, source, target, e));
         }
         target.setUuid(uuid);
+        target.getPhone().removeNonNumericalCharacters();
         setDiscount(target, false);
-        target.setPhone(phoneService.getOrCreateEntityByPhoneNumber(clientDto.getPhoneNumber()));
+        target.setPhone(phoneService.getOrCreateEntityByPhoneNumber(target.getPhone().getPhoneNumber()));
         target.setAddress(source.getAddress());
         updateEntity(target, user);
         return clientMapper.toDto(target);

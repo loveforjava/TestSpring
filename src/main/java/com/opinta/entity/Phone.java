@@ -8,6 +8,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.validation.constraints.Size;
 
+import static com.opinta.constraint.RegexPattern.DIGIT_REGEX;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -20,5 +22,10 @@ public class Phone {
 
     public Phone(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public Phone removeNonNumericalCharacters() {
+        this.phoneNumber = this.phoneNumber.replaceAll(DIGIT_REGEX, "");
+        return this;
     }
 }

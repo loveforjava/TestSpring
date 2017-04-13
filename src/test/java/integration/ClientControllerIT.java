@@ -319,8 +319,10 @@ public class ClientControllerIT extends BaseControllerIT {
         Address newAddress = testHelper.createAddress();
         Counterparty newCounterparty = testHelper.createCounterparty();
 
-        JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client-with-weird-phone.json");
+        JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client.json");
+        inputJson.put("phoneNumber", "+(098)-2004-113");
         inputJson.put("addressId", (int) newAddress.getId());
+        inputJson.put("individual", false);
 
         String expectedPhone = "0982004113";
 
@@ -342,8 +344,10 @@ public class ClientControllerIT extends BaseControllerIT {
     @Test
     @SuppressWarnings("unchecked")
     public void updatingPhoneRemovesAllNonNumericalDigits() throws Exception {
-        JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client-with-weird-phone.json");
+        JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client.json");
+        inputJson.put("phoneNumber", "+(098)-2004-113");
         inputJson.put("addressId", (int) client.getAddress().getId());
+        inputJson.put("individual", false);
 
         String expectedPhone = "0982004113";
 
@@ -363,9 +367,11 @@ public class ClientControllerIT extends BaseControllerIT {
     public void savingPhoneWithNotValidSymbolsReturnsBadRequest() throws Exception {
         Address newAddress = testHelper.createAddress();
 
-        JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client-with-weird-phone.json");
+        JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client.json");
+        inputJson.put("phoneNumber", "+(098)-2004-113");
         inputJson.put("addressId", (int) newAddress.getId());
         inputJson.put("phoneNumber", "09820041s24");
+        inputJson.put("individual", false);
 
         given().
                 contentType(APPLICATION_JSON_VALUE).

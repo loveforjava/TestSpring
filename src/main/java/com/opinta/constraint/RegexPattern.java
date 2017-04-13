@@ -9,6 +9,6 @@ public class RegexPattern {
     public static final String BARCODE_INNER_NUMBER_REGEX = "^$|\\d{" + BARCODE_INNER_NUMBER_LENGTH + "}";
     public static final String BARCODE_REGEX = "^$|\\d{" + BARCODE_LENGTH + "}";
 
-    public static final String REMOVE_NON_DIGIT_SYMBOLS_REGEX = "[^\\d]";
-    public static final String PHONE_NUMBER_SYMBOLS_VALIDATION_REGEX = "^[0-9()+ -]*$";
+    public static final String DIGIT_REGEX = "[^\\d]";
+    public static final String PHONE_NUMBER_REGEX = "^[0-9()+ -]*$";
 }

@@ -5,7 +5,6 @@ import com.opinta.dto.PhoneDto;
 import com.opinta.entity.Phone;
 import com.opinta.mapper.PhoneMapper;
 import com.opinta.util.LogMessageUtil;
-import com.opinta.util.PhoneUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.List;
 
-import static com.opinta.constraint.RegexPattern.REMOVE_NON_DIGIT_SYMBOLS_REGEX;
 import static com.opinta.util.EnhancedBeanUtilsBean.copyNotNullProperties;
 import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
@@ -23,7 +21,6 @@ import static com.opinta.util.LogMessageUtil.getByIdLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.saveLogEndpoint;
 import static com.opinta.util.LogMessageUtil.updateLogEndpoint;
-import static com.opinta.util.PhoneUtil.removeNonNumericalCharactersFromPhone;
 
 @Service
 @Slf4j
@@ -67,18 +64,16 @@ public class PhoneServiceImpl implements PhoneService {
         }
         Phone phone = phoneDao.getByPhoneNumber(phoneNumber);
         if (phone != null) {
-            removeNonNumericalCharactersFromPhone(phone);
             return phone;
         }
         phone = new Phone(phoneNumber);
-        removeNonNumericalCharactersFromPhone(phone);
-        return phoneDao.save(phone);
+        return phoneDao.save(phone.removeNonNumericalCharacters());
     }
 
     @Override
     @Transactional
     public Phone saveEntity(Phone phone) {
-        removeNonNumericalCharactersFromPhone(phone);
+        phone.removeNonNumericalCharacters();
         log.info(saveLogEndpoint(Phone.class, phone));
         return phoneDao.save(phone);
     }
@@ -98,8 +93,7 @@ public class PhoneServiceImpl implements PhoneService {
         }
         target.setId(id);
         log.info(updateLogEndpoint(Phone.class, target));
-        removeNonNumericalCharactersFromPhone(target);
-        phoneDao.update(target);
+        phoneDao.update(target.removeNonNumericalCharacters());
         return target;
     }
 
