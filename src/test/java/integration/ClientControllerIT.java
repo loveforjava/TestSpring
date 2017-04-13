@@ -334,7 +334,9 @@ public class ClientControllerIT extends BaseControllerIT {
                 post("/clients").
         then().
                 statusCode(SC_OK).
-                body("phoneNumber", equalTo(expectedPhone)).extract().path("uuid");
+                body("phoneNumber", equalTo(expectedPhone)).
+        extract().
+                path("uuid");
         UUID newClientUuid = UUID.fromString(newUuid);
         Client createdClient = clientService.getEntityByUuid(newClientUuid, newCounterparty.getUser());
         testHelper.deleteClient(createdClient);
