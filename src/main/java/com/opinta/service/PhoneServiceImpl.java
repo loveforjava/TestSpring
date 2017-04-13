@@ -66,8 +66,7 @@ public class PhoneServiceImpl implements PhoneService {
         if (phone != null) {
             return phone;
         }
-        phone = new Phone(phoneNumber);
-        return phoneDao.save(phone.removeNonNumericalCharacters());
+        return phoneDao.save(new Phone(phoneNumber));
     }
 
     @Override
