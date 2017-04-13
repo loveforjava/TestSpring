@@ -32,12 +32,4 @@ public class Discount {
         this.toDate = to;
         this.value = value;
     }
-    
-    public boolean isDiscountValidFor(Date currentDate) {
-        return (currentDate.after(fromDate) && currentDate.before(toDate));
-    }
-    
-    public boolean isDiscountValidNow() {
-        return isDiscountValidFor(new Date());
-    }
 }

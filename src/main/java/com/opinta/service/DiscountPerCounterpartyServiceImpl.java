@@ -12,16 +12,12 @@ import com.opinta.exception.PerformProcessFailedException;
 import com.opinta.mapper.DiscountPerCounterpartyMapper;
 import com.opinta.util.LogMessageUtil;
 
-import java.text.Format;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.UUID;
 import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import static java.lang.String.format;
 
 import static com.opinta.util.EnhancedBeanUtilsBean.copyNotNullProperties;
 import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
@@ -37,7 +33,6 @@ public class DiscountPerCounterpartyServiceImpl implements DiscountPerCounterpar
     private final CounterpartyService counterpartyService;
     private final DiscountService discountService;
     private final UserService userService;
-    private final Format dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
     @Autowired
     public DiscountPerCounterpartyServiceImpl(DiscountPerCounterpartyDao discountPerCounterpartyDao,
@@ -84,20 +79,29 @@ public class DiscountPerCounterpartyServiceImpl implements DiscountPerCounterpar
 
         discountPerCounterparty.setCounterparty(counterparty);
         discountPerCounterparty.setDiscount(discount);
-        validateDiscountTime(discountPerCounterparty);
+        discountPerCounterparty.validate();
         log.info(LogMessageUtil.saveLogEndpoint(DiscountPerCounterparty.class, discountPerCounterparty));
         return discountPerCounterpartyDao.save(discountPerCounterparty);
     }
-    
+
     @Override
-    public DiscountPerCounterparty updateEntity(DiscountPerCounterparty discountPerCounterparty, User user)
-            throws AuthException, IncorrectInputDataException, PerformProcessFailedException {
-        userService.authorizeForAction(discountPerCounterparty, user);
-        validateDiscountTime(discountPerCounterparty);
-        discountPerCounterpartyDao.update(discountPerCounterparty);
-        return discountPerCounterparty;
+    @Transactional
+    public DiscountPerCounterparty updateEntity(UUID uuid, DiscountPerCounterparty source, User user)
+            throws IncorrectInputDataException, PerformProcessFailedException, AuthException {
+        source.setDiscount(discountService.getEntityByUuid(source.getDiscount().getUuid()));
+        source.validate();
+        DiscountPerCounterparty target = getEntityByUuid(uuid, user);
+        try {
+            copyNotNullProperties(target, source);
+        } catch (Exception e) {
+            log.error(copyPropertiesOnErrorLogEndpoint(Discount.class, source, target, e));
+            throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(Discount.class, source, target, e));
+        }
+        target.setUuid(uuid);
+        log.info(updateLogEndpoint(Discount.class, target));
+        discountPerCounterpartyDao.update(target);
+        return target;
     }
-    
     
     @Override
     @Transactional
@@ -116,62 +120,23 @@ public class DiscountPerCounterpartyServiceImpl implements DiscountPerCounterpar
     @Transactional
     public DiscountPerCounterpartyDto save(DiscountPerCounterpartyDto discountPerCounterpartyDto, User user)
             throws IncorrectInputDataException, AuthException, PerformProcessFailedException {
-        DiscountPerCounterparty discountPerCounterparty = discountPerCounterpartyMapper
-                .toEntity(discountPerCounterpartyDto);
-        discountPerCounterparty.setDiscount(discountService.getEntityByUuid(discountPerCounterpartyDto.getDiscountUuid()));
-        validateDiscountTime(discountPerCounterparty);
-        return discountPerCounterpartyMapper.toDto(saveEntity(discountPerCounterparty, user));
-    }
-    
-    private void validateDiscountTime(DiscountPerCounterparty discountPerCounterparty)
-            throws PerformProcessFailedException {
-        if (!discountPerCounterparty.isDiscountValidNow()) {
-            throw new PerformProcessFailedException(format(
-                    "DiscountPerCounterparty time from: %s to: %s is not valid!",
-                    dateFormat.format(discountPerCounterparty.getFromDate()),
-                    dateFormat.format(discountPerCounterparty.getToDate())));
-        }
-        if (!discountPerCounterparty.isDiscountPerCounterpartyValidForAssignedDiscount()) {
-            throw new PerformProcessFailedException(format(
-                    "DiscountPerCounterparty time from %s to: %s is not valid for assigned " +
-                            "Discount %s time from %s to: %s ",
-                    dateFormat.format(discountPerCounterparty.getFromDate()),
-                    dateFormat.format(discountPerCounterparty.getToDate()),
-                    discountPerCounterparty.getDiscount().getUuid().toString(),
-                    dateFormat.format(discountPerCounterparty.getDiscount().getFromDate()),
-                    dateFormat.format(discountPerCounterparty.getDiscount().getToDate())));
-        }
+        return discountPerCounterpartyMapper
+                .toDto(saveEntity(discountPerCounterpartyMapper.toEntity(discountPerCounterpartyDto), user));
     }
 
     @Override
     @Transactional
     public DiscountPerCounterpartyDto update(UUID uuid, DiscountPerCounterpartyDto discountPerCounterpartyDto,
-                                             User user) throws IncorrectInputDataException, AuthException,
-            PerformProcessFailedException {
-        DiscountPerCounterparty source = discountPerCounterpartyMapper.toEntity(discountPerCounterpartyDto);
-        source.setDiscount(discountService.getEntityByUuid(source.getDiscount().getUuid()));
-        DiscountPerCounterparty target = getEntityByUuid(uuid, user);
-        validateDiscountTime(source);
-        source.setCounterparty(target.getCounterparty());
-
-        try {
-            copyNotNullProperties(target, source);
-        } catch (Exception e) {
-            log.error(copyPropertiesOnErrorLogEndpoint(DiscountPerCounterparty.class, source, target, e));
-            throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(
-                    DiscountPerCounterparty.class, source, target, e));
-        }
-        target.setUuid(uuid);
-        log.info(updateLogEndpoint(DiscountPerCounterparty.class, target));
-        discountPerCounterpartyDao.update(target);
-        return discountPerCounterpartyMapper.toDto(target);
+                                             User user)
+            throws IncorrectInputDataException, AuthException, PerformProcessFailedException {
+        return discountPerCounterpartyMapper
+                .toDto(updateEntity(uuid, discountPerCounterpartyMapper.toEntity(discountPerCounterpartyDto), user));
     }
 
     @Override
     @Transactional
     public void delete(UUID uuid, User user) throws AuthException, IncorrectInputDataException {
         log.info(deleteLogEndpoint(DiscountPerCounterparty.class, uuid));
-        DiscountPerCounterparty discountPerCounterparty = getEntityByUuid(uuid, user);
-        discountPerCounterpartyDao.delete(discountPerCounterparty);
+        discountPerCounterpartyDao.delete(getEntityByUuid(uuid, user));
     }
 }

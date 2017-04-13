@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import static com.opinta.util.EnhancedBeanUtilsBean.copyNotNullProperties;
 import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.updateLogEndpoint;
 
@@ -43,9 +44,8 @@ public class DiscountServiceImpl implements DiscountService {
     public Discount getEntityByUuid(UUID uuid) throws IncorrectInputDataException {
         Discount discount = discountDao.getByUuid(uuid);
         if (discount == null) {
-            String errorMessage = getByIdOnErrorLogEndpoint(Discount.class, uuid.toString());
-            log.error(errorMessage);
-            throw new IncorrectInputDataException(errorMessage);
+            log.error(getByIdOnErrorLogEndpoint(Discount.class, uuid.toString()));
+            throw new IncorrectInputDataException(getByIdOnErrorLogEndpoint(Discount.class, uuid.toString()));
         }
         return discount;
     }
@@ -65,7 +65,8 @@ public class DiscountServiceImpl implements DiscountService {
             copyNotNullProperties(target, source);
         } catch (Exception e) {
             log.error(copyPropertiesOnErrorLogEndpoint(Discount.class, source, target, e));
-            throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(Discount.class, source, target, e));
+            throw new PerformProcessFailedException(
+                    copyPropertiesOnErrorLogEndpoint(Discount.class, source, target, e));
         }
         target.setUuid(uuid);
         log.info(updateLogEndpoint(Discount.class, target));
@@ -89,7 +90,7 @@ public class DiscountServiceImpl implements DiscountService {
     @Override
     @Transactional
     public void delete(UUID uuid) throws IncorrectInputDataException {
-        Discount discount = getEntityByUuid(uuid);
-        discountDao.delete(discount);
+        log.info(deleteLogEndpoint(Discount.class, uuid));
+        discountDao.delete(getEntityByUuid(uuid));
     }
 }

@@ -1,10 +1,7 @@
 package integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.opinta.entity.Address;
 import com.opinta.entity.Discount;
-import com.opinta.exception.IncorrectInputDataException;
-import com.opinta.service.AddressService;
 import com.opinta.service.DiscountService;
 import integration.helper.TestHelper;
 import java.text.SimpleDateFormat;
@@ -20,6 +17,7 @@ import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static com.opinta.util.FormatterUtil.DATE_FORMAT_ISO_8601_24H;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
 import static java.util.TimeZone.getTimeZone;
@@ -32,7 +30,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
 public class DiscountControllerIT extends BaseControllerIT {
-    private static final String ISO_8601_24H_FULL_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
     private static final TimeZone UTC = getTimeZone("UTC");
 
     @Autowired
@@ -47,7 +44,7 @@ public class DiscountControllerIT extends BaseControllerIT {
     public void setUp() {
         discounts = testHelper.createDiscounts();
         TimeZone.setDefault(UTC);
-        simpleDateFormat = new SimpleDateFormat(ISO_8601_24H_FULL_FORMAT);
+        simpleDateFormat = new SimpleDateFormat(DATE_FORMAT_ISO_8601_24H);
         simpleDateFormat.setTimeZone(UTC);
     }
     

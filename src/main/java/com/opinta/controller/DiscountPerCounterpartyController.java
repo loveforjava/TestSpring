@@ -34,7 +34,7 @@ import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @RestController
-@RequestMapping("/discounts-per-counterparty")
+@RequestMapping("/counterparty-discounts")
 public class DiscountPerCounterpartyController {
     private final DiscountPerCounterpartyService discountPerCounterpartyService;
     private final UserService userService;
@@ -45,7 +45,7 @@ public class DiscountPerCounterpartyController {
         this.discountPerCounterpartyService = discountPerCounterpartyService;
         this.userService = userService;
     }
-    
+
     @GetMapping
     public ResponseEntity<?> getAllDiscountsPerCounterparty(@RequestParam UUID token) {
         try {
@@ -55,7 +55,7 @@ public class DiscountPerCounterpartyController {
             return new ResponseEntity<>(getAllOnErrorLogEndpoint(DiscountPerCounterparty.class, e), UNAUTHORIZED);
         }
     }
-    
+
     @GetMapping("{uuid}")
     public ResponseEntity<?> getDiscountPerCounterpartyByUuid(@PathVariable UUID uuid, @RequestParam UUID token) {
         try {
@@ -77,9 +77,11 @@ public class DiscountPerCounterpartyController {
         } catch (AuthException e) {
             return new ResponseEntity<>(authorizationOnErrorLogEndpoint(token, e), UNAUTHORIZED);
         } catch (IncorrectInputDataException e) {
-            return new ResponseEntity<>(saveOnErrorLogEndpoint(DiscountPerCounterparty.class, e), NOT_FOUND);
+            return new ResponseEntity<>(saveOnErrorLogEndpoint(DiscountPerCounterparty.class,
+                    discountPerCounterpartyDto, e), NOT_FOUND);
         } catch (PerformProcessFailedException e) {
-            return new ResponseEntity<>(saveOnErrorLogEndpoint(DiscountPerCounterparty.class, e), BAD_REQUEST);
+            return new ResponseEntity<>(saveOnErrorLogEndpoint(DiscountPerCounterparty.class,
+                    discountPerCounterpartyDto, e), BAD_REQUEST);
         }
     }
     
@@ -88,14 +90,16 @@ public class DiscountPerCounterpartyController {
             @RequestBody DiscountPerCounterpartyDto discountPerCounterpartyDto, @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
-            return new ResponseEntity<>(discountPerCounterpartyService.update(uuid, discountPerCounterpartyDto, user), OK);
+            return new ResponseEntity<>(discountPerCounterpartyService
+                    .update(uuid, discountPerCounterpartyDto, user), OK);
         } catch (AuthException e) {
             return new ResponseEntity<>(authorizationOnErrorLogEndpoint(token, e), UNAUTHORIZED);
         } catch (IncorrectInputDataException e) {
-            return new ResponseEntity<>(updateOnErrorLogEndpoint(DiscountPerCounterparty.class, e), NOT_FOUND);
+            return new ResponseEntity<>(updateOnErrorLogEndpoint(DiscountPerCounterparty.class,
+                    discountPerCounterpartyDto, e), NOT_FOUND);
         } catch (PerformProcessFailedException e) {
-            return new ResponseEntity<>(
-                    updateOnErrorLogEndpoint(DiscountPerCounterparty.class, discountPerCounterpartyDto, e), BAD_REQUEST);
+            return new ResponseEntity<>(updateOnErrorLogEndpoint(DiscountPerCounterparty.class,
+                    discountPerCounterpartyDto, e), BAD_REQUEST);
         }
     }
     
@@ -108,7 +112,7 @@ public class DiscountPerCounterpartyController {
         } catch (AuthException e) {
             return new ResponseEntity<>(authorizationOnErrorLogEndpoint(token, e), UNAUTHORIZED);
         } catch (IncorrectInputDataException e) {
-            return new ResponseEntity<>(deleteOnErrorLogEndpoint(DiscountPerCounterparty.class, e), NOT_FOUND);
+            return new ResponseEntity<>(deleteOnErrorLogEndpoint(DiscountPerCounterparty.class, uuid, e), NOT_FOUND);
         }
     }
 }
