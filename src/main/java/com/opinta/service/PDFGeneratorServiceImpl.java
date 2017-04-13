@@ -122,7 +122,6 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         createHeaderRow(font, table);
 
         Row<PDPage> row;
-        Cell<PDPage> cell;
         PDPageContentStream contentStream;
 
         int index = 0;
@@ -207,11 +206,11 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         return data;
     }
 
-    private void createCell(PDType0Font font, Row<PDPage> row, int fontSize, float columnWidth, String value) {
-        Cell<PDPage> cell;
-        cell = row.createCell(columnWidth, value);
+    private Cell<PDPage> createCell(PDType0Font font, Row<PDPage> row, int fontSize, float columnWidth, String value) {
+        Cell<PDPage> cell = row.createCell(columnWidth, value);
         cell.setFont(font);
         cell.setFontSize(fontSize);
+        return cell;
     }
 
     private void generateFooter(PDType0Font font, PDPageContentStream contentStream, float footerStartY,
@@ -298,9 +297,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
                 "Особливі відмітки", "Маса (г)", "Оголошена цінність відправлення, (грн.)", "Сума післяплати, (грн.)",
                 "Плата за пересилання з ПДВ, (грн.)", "№ відправлення (ШКІ)"};
         for (int i = 0; i < header.length; i++) {
-            cell = headerRow.createCell(COLUMN_WIDTHS[i], header[i]);
-            cell.setFont(font);
-            cell.setFontSize(7);
+            cell = createCell(font, headerRow, 7, COLUMN_WIDTHS[i], header[i]);
             cell.setFillColor(LIGHT_GRAY);
         }
         table.addHeaderRow(headerRow);
@@ -425,6 +422,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             String priceInText = moneyToTextConverter.convert(postPay, false);
             //Populating text field for the price
             populateField(acroForm, field, "priceInText", priceInText);
+            populateField(acroForm, field, "barcodeText", shipment.getBarcodeInnerNumber().stringify());
 
             //Removing acrofields
             acroForm.flatten();
@@ -487,8 +485,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
                     new PDPageContentStream(template, page, APPEND, true);
 
             //Constructing 13 digits of the barcodeInnerNumber
-            String barcode = shipment.getBarcodeInnerNumber().getPostcodePool().getPostcode() +
-                    shipment.getBarcodeInnerNumber().getInnerNumber();
+            String barcode = shipment.getBarcodeInnerNumber().stringify();
 
             //Generating first barcodeInnerNumber
             BitMatrix bitMatrix = new Code128Writer().encode(barcode, CODE_128, 170, 32, null);
@@ -504,7 +501,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
 
             contentStream.close();
 
-            //Generating barcodeInnerNumber digits
+            //Generating barcode digits
             field = (PDTextField) acroForm.getField("barcodeText");
             field.setDefaultAppearance(format("/%s 14 Tf 0 g", fontName));
             field.setValue(barcode);
