@@ -223,26 +223,6 @@ public class ShipmentControllerIT extends BaseControllerIT {
         // delete
         testHelper.deleteShipment(createdShipment);
     }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void removeShipmentGroup() throws Exception {
-        ShipmentGroup shipmentGroup = testHelper.createShipmentGroup();
-        Shipment shipment = testHelper.createShipment(shipmentGroup);
-        // update
-        given().
-                contentType(APPLICATION_JSON_VALUE).
-                queryParam("token", shipment.getSender().getCounterparty().getUser().getToken()).
-        when().
-        delete("/shipments/{uuid}/shipment-group", shipment.getUuid().toString()).
-                then().
-                body("shipmentGroupUuid", equalTo(null)).
-                statusCode(SC_OK);
-
-        testHelper.deleteShipment(shipment);
-        testHelper.deleteShipmentGroup(shipmentGroup);
-    }
-
     
     @Test
     @SuppressWarnings("unchecked")
@@ -270,6 +250,25 @@ public class ShipmentControllerIT extends BaseControllerIT {
         String actualJson = mapper.writeValueAsString(shipmentDto);
 
         JSONAssert.assertEquals(expectedJson, actualJson, false);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void removeShipmentGroup() throws Exception {
+        ShipmentGroup shipmentGroup = testHelper.createShipmentGroup();
+        Shipment shipment = testHelper.createShipment(shipmentGroup);
+        // update
+        given().
+                contentType(APPLICATION_JSON_VALUE).
+                queryParam("token", shipment.getSender().getCounterparty().getUser().getToken()).
+        when().
+                delete("/shipments/{uuid}/shipment-group", shipment.getUuid().toString()).
+        then().
+                body("shipmentGroupUuid", equalTo(null)).
+                statusCode(SC_OK);
+
+        testHelper.deleteShipment(shipment);
+        testHelper.deleteShipmentGroup(shipmentGroup);
     }
 
     @Test
