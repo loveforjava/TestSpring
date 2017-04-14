@@ -12,6 +12,7 @@ import com.opinta.exception.PerformProcessFailedException;
 import com.opinta.mapper.DiscountPerCounterpartyMapper;
 import com.opinta.util.LogMessageUtil;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import javax.transaction.Transactional;
@@ -23,7 +24,9 @@ import static com.opinta.util.EnhancedBeanUtilsBean.copyNotNullProperties;
 import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
+import static com.opinta.util.LogMessageUtil.saveLogEndpoint;
 import static com.opinta.util.LogMessageUtil.updateLogEndpoint;
+import static java.lang.String.format;
 
 @Service
 @Slf4j
@@ -71,6 +74,13 @@ public class DiscountPerCounterpartyServiceImpl implements DiscountPerCounterpar
 
     @Override
     @Transactional
+    public DiscountPerCounterparty getEntityWithHighestDiscount(User user, Date date) {
+        log.info(format("Get the highest value of DiscountPerCounterparty for the %s for user %s", date, user));
+        return discountPerCounterpartyDao.getHighestDiscount(user, date);
+    }
+
+    @Override
+    @Transactional
     public DiscountPerCounterparty saveEntity(DiscountPerCounterparty discountPerCounterparty, User user)
             throws AuthException, IncorrectInputDataException, PerformProcessFailedException {
         Counterparty counterparty = counterpartyService.getEntityByUuid(
@@ -80,7 +90,7 @@ public class DiscountPerCounterpartyServiceImpl implements DiscountPerCounterpar
         discountPerCounterparty.setCounterparty(counterparty);
         discountPerCounterparty.setDiscount(discount);
         discountPerCounterparty.validate();
-        log.info(LogMessageUtil.saveLogEndpoint(DiscountPerCounterparty.class, discountPerCounterparty));
+        log.info(saveLogEndpoint(DiscountPerCounterparty.class, discountPerCounterparty));
         return discountPerCounterpartyDao.save(discountPerCounterparty);
     }
 

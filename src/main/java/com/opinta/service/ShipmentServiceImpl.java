@@ -12,6 +12,7 @@ import com.opinta.exception.PerformProcessFailedException;
 import com.opinta.util.AddressUtil;
 import com.opinta.util.LogMessageUtil;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,12 +46,14 @@ public class ShipmentServiceImpl implements ShipmentService {
     private final ShipmentMapper shipmentMapper;
     private final BarcodeInnerNumberService barcodeInnerNumberService;
     private final ShipmentGroupService shipmentGroupService;
+    private final DiscountPerCounterpartyService discountPerCounterpartyService;
 
     @Autowired
     public ShipmentServiceImpl(ShipmentDao shipmentDao, ClientService clientService, UserService userService,
                                TariffGridService tariffGridService, ShipmentMapper shipmentMapper,
                                BarcodeInnerNumberService barcodeInnerNumberService,
-                               ShipmentGroupService shipmentGroupService) {
+                               ShipmentGroupService shipmentGroupService,
+                               DiscountPerCounterpartyService discountPerCounterpartyService) {
         this.shipmentDao = shipmentDao;
         this.clientService = clientService;
         this.userService = userService;
@@ -58,6 +61,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         this.shipmentMapper = shipmentMapper;
         this.barcodeInnerNumberService = barcodeInnerNumberService;
         this.shipmentGroupService = shipmentGroupService;
+        this.discountPerCounterpartyService = discountPerCounterpartyService;
     }
 
     @Override
@@ -85,12 +89,13 @@ public class ShipmentServiceImpl implements ShipmentService {
     @Override
     @Transactional
     public Shipment saveEntity(Shipment shipment, User user) throws AuthException, IncorrectInputDataException {
-        Client sender = clientService.getEntityByUuid(shipment.getSender().getUuid(), user);
-        PostcodePool postcodePool = sender.getCounterparty().getPostcodePool();
-
-        shipment.setSender(sender);
-        shipment.setRecipient(clientService.getEntityByUuidAnonymous(shipment.getRecipient().getUuid()));
+        shipment.setSender(clientService.saveOrGet(shipment.getSender(), user));
+        shipment.setRecipient(clientService.saveOrGet(shipment.getRecipient(), user));
+        PostcodePool postcodePool = shipment.getSender().getCounterparty().getPostcodePool();
         shipment.setBarcodeInnerNumber(barcodeInnerNumberService.generateBarcodeInnerNumber(postcodePool));
+        shipment.setLastModified(new Date());
+        shipment.setDiscountPerCounterparty(discountPerCounterpartyService
+                .getEntityWithHighestDiscount(user, shipment.getLastModified()));
         shipment.setPrice(calculatePrice(shipment));
 
         log.info(LogMessageUtil.saveLogEndpoint(Shipment.class, shipment));
@@ -138,10 +143,7 @@ public class ShipmentServiceImpl implements ShipmentService {
     @Override
     @Transactional
     public ShipmentDto save(ShipmentDto shipmentDto, User user) throws AuthException, IncorrectInputDataException {
-        Shipment shipment = shipmentMapper.toEntity(shipmentDto);
-        shipment.setSender(clientService.saveOrGet(shipment.getSender(), user));
-        shipment.setRecipient(clientService.saveOrGet(shipment.getRecipient(), user));
-        return shipmentMapper.toDto(saveEntity(shipment, user));
+        return shipmentMapper.toDto(saveEntity(shipmentMapper.toEntity(shipmentDto), user));
     }
 
     @Override
@@ -160,7 +162,11 @@ public class ShipmentServiceImpl implements ShipmentService {
         }
 
         target.setUuid(uuid);
-        fillSenderAndRecipient(target, user);
+        target.setSender(clientService.getEntityByUuid(target.getSender().getUuid(), user));
+        target.setRecipient(clientService.getEntityByUuid(target.getRecipient().getUuid(), user));
+        target.setLastModified(new Date());
+        target.setDiscountPerCounterparty(discountPerCounterpartyService
+                .getEntityWithHighestDiscount(user, target.getLastModified()));
         target.setPrice(calculatePrice(target));
         log.info(updateLogEndpoint(Shipment.class, target));
         shipmentDao.update(target);
@@ -183,11 +189,6 @@ public class ShipmentServiceImpl implements ShipmentService {
         log.info(updateLogEndpoint(Shipment.class, shipment));
         shipmentDao.update(shipment);
         return shipmentMapper.toDto(shipment);
-    }
-
-    private void fillSenderAndRecipient(Shipment target, User user) throws AuthException, IncorrectInputDataException {
-        target.setSender(clientService.getEntityByUuid(target.getSender().getUuid(), user));
-        target.setRecipient(clientService.getEntityByUuidAnonymous(target.getRecipient().getUuid()));
     }
 
     private BigDecimal calculatePrice(Shipment shipment) {
@@ -227,10 +228,17 @@ public class ShipmentServiceImpl implements ShipmentService {
             log.info("Shipment length exceeds 70 cm - using tariff grid: " + maxTariffGrid);
             log.info(format("Overpay ratio for exceeding length is: %s, price is: %s ", overpayForLength, price));
         }
-        float sumOfDiscount = price * shipment.getSender().getDiscount() / 100;
-        price -= sumOfDiscount;
+
+        price -= getSumOfDiscount(shipment, price);
 
         return new BigDecimal(Float.toString(price));
+    }
+
+    private float getSumOfDiscount(Shipment shipment, float price) {
+        if (shipment.getDiscountPerCounterparty() == null) {
+            return 0.0f;
+        }
+        return price * shipment.getDiscountPerCounterparty().getDiscount().getValue() / 100;
     }
 
     private float getSurcharges(Shipment shipment) {

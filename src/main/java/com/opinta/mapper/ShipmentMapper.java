@@ -9,7 +9,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 
-@Mapper(componentModel = "spring", uses = ClientMapper.class)
+@Mapper(componentModel = "spring", uses = {ClientMapper.class, DiscountPerCounterpartyMapper.class})
 public interface ShipmentMapper extends BaseMapper<ShipmentDto, Shipment> {
 
     @Override
@@ -21,7 +21,9 @@ public interface ShipmentMapper extends BaseMapper<ShipmentDto, Shipment> {
     @Override
     @Mappings({
             @Mapping(target = "shipmentGroup",
-                    expression = "java(ShipmentGroupUuidToShipmentGroupEntity(shipmentDto.getShipmentGroupUuid()))")})
+                    expression = "java(ShipmentGroupUuidToShipmentGroupEntity(shipmentDto.getShipmentGroupUuid()))"),
+            @Mapping(target="barcodeInnerNumber", ignore=true),
+            @Mapping(target="discountPerCounterparty", ignore=true)})
     Shipment toEntity(ShipmentDto shipmentDto);
 
     default ShipmentGroup ShipmentGroupUuidToShipmentGroupEntity(UUID uuid) {

@@ -148,26 +148,6 @@ public class CounterpartyServiceImpl implements CounterpartyService {
 
     @Override
     @Transactional
-    public CounterpartyDto updateDiscount(UUID uuid, CounterpartyDto counterpartyDto, User user)
-            throws IncorrectInputDataException, AuthException, PerformProcessFailedException {
-        Counterparty source = counterpartyMapper.toEntity(counterpartyDto);
-        Counterparty target = getEntityByUuid(uuid, user);
-
-        target.setDiscount(source.getDiscount());
-        log.info(updateLogEndpoint(Counterparty.class, target));
-        counterpartyDao.update(target);
-
-        List<Client> clients = clientDao.getAllByCounterparty(target);
-        for (Client client : clients) {
-            client.setDiscount(target.getDiscount());
-            clientDao.update(client);
-        }
-
-        return counterpartyMapper.toDto(target);
-    }
-
-    @Override
-    @Transactional
     public void delete(UUID uuid, User user) throws AuthException, IncorrectInputDataException {
         log.info(deleteLogEndpoint(Counterparty.class, uuid));
         Counterparty counterparty = getEntityByUuid(uuid, user);

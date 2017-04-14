@@ -6,6 +6,7 @@ import com.opinta.entity.User;
 import com.opinta.exception.AuthException;
 import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.exception.PerformProcessFailedException;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,6 +15,8 @@ public interface DiscountPerCounterpartyService {
     List<DiscountPerCounterparty> getAllEntities(User user);
 
     DiscountPerCounterparty getEntityByUuid(UUID uuid, User user) throws IncorrectInputDataException, AuthException;
+
+    DiscountPerCounterparty getEntityWithHighestDiscount(User user, Date date);
 
     DiscountPerCounterparty saveEntity(DiscountPerCounterparty discountPerCounterparty, User user)
             throws AuthException, IncorrectInputDataException, PerformProcessFailedException;

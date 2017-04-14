@@ -1,6 +1,8 @@
 package com.opinta.dto;
 
+import com.opinta.entity.DiscountPerCounterparty;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.UUID;
 
 import com.opinta.entity.DeliveryType;
@@ -30,6 +32,8 @@ public class ShipmentDto {
     private BigDecimal declaredPrice;
     private BigDecimal price;
     private BigDecimal postPay;
+    private DiscountPerCounterpartyDto discountPerCounterpartyDto;
+    private Date lastModified;
     @Size(max = 255)
     private String description;
 }
