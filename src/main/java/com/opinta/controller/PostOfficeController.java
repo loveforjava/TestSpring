@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 import static com.opinta.util.LogMessageUtil.deleteOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.updateOnErrorLogEndpoint;
@@ -29,7 +31,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 @RestController
 @RequestMapping("/post-offices")
-public class PostOfficeController {
+public class PostOfficeController extends BaseController {
     private PostOfficeService postOfficeService;
 
     @Autowired
@@ -54,12 +56,12 @@ public class PostOfficeController {
 
     @PostMapping
     @ResponseStatus(OK)
-    public ResponseEntity<?> createPostOffice(@RequestBody PostOfficeDto postOfficeDto) {
+    public ResponseEntity<?> createPostOffice(@RequestBody @Valid PostOfficeDto postOfficeDto) {
         return new ResponseEntity<>(postOfficeService.save(postOfficeDto), OK);
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<?> updatePostOffice(@PathVariable long id, @RequestBody PostOfficeDto postOfficeDto) {
+    public ResponseEntity<?> updatePostOffice(@PathVariable @Valid long id, @RequestBody PostOfficeDto postOfficeDto) {
         try {
             return new ResponseEntity<>(postOfficeService.update(id, postOfficeDto), OK);
         } catch (IncorrectInputDataException e) {

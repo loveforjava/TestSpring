@@ -37,7 +37,7 @@ public class ClientDto {
     private String phoneNumber;
     private boolean individual;
     private Float discount;
-    @Size(min = 6, max = 6)
+    @Size(message = "Bank code should contain 6 digits", min = 6, max = 6)
     private String bankCode;
     @Size(max = 255)
     private String bankAccount;

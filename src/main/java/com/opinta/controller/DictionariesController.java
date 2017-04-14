@@ -25,7 +25,7 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 @RestController
 @RequestMapping("/dictionaries")
-public class DictionariesController {
+public class DictionariesController extends BaseController {
     private final TariffGridService tariffGridService;
     private final CountrysidePostcodeService countrysidePostcodeService;
     private final CityService cityService;

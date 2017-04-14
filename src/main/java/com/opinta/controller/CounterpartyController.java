@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 import static com.opinta.util.LogMessageUtil.deleteOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.saveOnErrorLogEndpoint;
@@ -38,7 +40,7 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 @RestController
 @RequestMapping("/counterparties")
-public class CounterpartyController {
+public class CounterpartyController extends BaseController {
     private final CounterpartyService counterpartyService;
     private final ClientService clientService;
     private final UserService userService;
@@ -70,7 +72,7 @@ public class CounterpartyController {
     }
 
     @PostMapping(produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createCounterparty(@RequestBody CounterpartyDto counterpartyDto) {
+    public ResponseEntity<?> createCounterparty(@RequestBody @Valid CounterpartyDto counterpartyDto) {
         try {
             return new ResponseEntity<>(counterpartyService.save(counterpartyDto), OK);
         } catch (IncorrectInputDataException e) {
@@ -80,7 +82,7 @@ public class CounterpartyController {
 
     @PutMapping(value = "{uuid}", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<?> updateCounterpartyByUuid(@PathVariable UUID uuid,
-                                                      @RequestBody CounterpartyDto counterpartyDto,
+                                                      @RequestBody @Valid CounterpartyDto counterpartyDto,
                                                       @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
@@ -94,7 +96,7 @@ public class CounterpartyController {
 
     @PutMapping(value = "{uuid}/discount", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<?> updateCounterpartyDiscountByUuid(@PathVariable UUID uuid,
-                                                              @RequestBody CounterpartyDto counterpartyDto,
+                                                              @RequestBody @Valid CounterpartyDto counterpartyDto,
                                                               @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);

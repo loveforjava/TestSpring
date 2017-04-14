@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 import static com.opinta.util.LogMessageUtil.deleteOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getAllOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
@@ -33,7 +35,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 @RestController
 @RequestMapping("/postcodes")
-public class PostcodePoolController {
+public class PostcodePoolController extends BaseController {
     private PostcodePoolService postcodePoolService;
     private BarcodeInnerNumberService barcodeInnerNumberService;
 
@@ -61,12 +63,13 @@ public class PostcodePoolController {
 
     @PostMapping
     @ResponseStatus(OK)
-    public PostcodePoolDto createPostcodePool(@RequestBody PostcodePoolDto postcodePoolDto) {
+    public PostcodePoolDto createPostcodePool(@RequestBody @Valid PostcodePoolDto postcodePoolDto) {
         return postcodePoolService.save(postcodePoolDto);
     }
 
     @PutMapping("{uuid}")
-    public ResponseEntity<?> updatePostcodePool(@PathVariable UUID uuid, @RequestBody PostcodePoolDto postcodePoolDto) {
+    public ResponseEntity<?> updatePostcodePool(@PathVariable UUID uuid,
+                                                @RequestBody @Valid PostcodePoolDto postcodePoolDto) {
         try {
             return new ResponseEntity<>(postcodePoolService.update(uuid, postcodePoolDto), OK);
         } catch (IncorrectInputDataException e) {

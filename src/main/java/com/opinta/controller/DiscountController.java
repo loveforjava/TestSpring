@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 import static com.opinta.util.LogMessageUtil.deleteOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.updateOnErrorLogEndpoint;
@@ -27,7 +29,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 @RestController
 @RequestMapping("/discounts")
-public class DiscountController {
+public class DiscountController extends BaseController{
     private final DiscountService discountService;
     
     @Autowired
@@ -50,12 +52,12 @@ public class DiscountController {
     }
     
     @PostMapping
-    public ResponseEntity<?> createDiscount(@RequestBody DiscountDto discountDto) {
+    public ResponseEntity<?> createDiscount(@RequestBody @Valid DiscountDto discountDto) {
         return new ResponseEntity<>(discountService.save(discountDto), OK);
     }
 
     @PutMapping("{uuid}")
-    public ResponseEntity<?> updateDiscount(@PathVariable UUID uuid, @RequestBody DiscountDto discountDto) {
+    public ResponseEntity<?> updateDiscount(@PathVariable @Valid UUID uuid, @RequestBody DiscountDto discountDto) {
         try {
             return new ResponseEntity<>(discountService.update(uuid, discountDto), OK);
         } catch (IncorrectInputDataException e) {

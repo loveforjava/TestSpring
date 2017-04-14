@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 import static com.opinta.util.LogMessageUtil.generatePdfFormOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.saveOnErrorLogEndpoint;
@@ -43,7 +45,7 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 @Slf4j
 @RestController
 @RequestMapping("/shipments")
-public class ShipmentController {
+public class ShipmentController extends BaseController {
     private final ShipmentService shipmentService;
     private final PDFGeneratorService pdfGeneratorService;
     private final UserService userService;
@@ -100,7 +102,7 @@ public class ShipmentController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createShipment(@RequestBody ShipmentDto shipmentDto, @RequestParam UUID token) {
+    public ResponseEntity<?> createShipment(@RequestBody @Valid ShipmentDto shipmentDto, @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
             return new ResponseEntity<>(shipmentService.save(shipmentDto, user), OK);
@@ -113,7 +115,7 @@ public class ShipmentController {
 
     @PutMapping("{uuid}")
     public ResponseEntity<?> updateShipment(@PathVariable UUID uuid,
-                                            @RequestBody ShipmentDto shipmentDto,
+                                            @RequestBody @Valid ShipmentDto shipmentDto,
                                             @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);

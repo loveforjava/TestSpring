@@ -20,13 +20,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
 @RestController
 @RequestMapping("/shipment-tracking")
-public class ShipmentTrackingDetailController {
+public class ShipmentTrackingDetailController extends BaseController {
     private ShipmentTrackingDetailService shipmentTrackingDetailService;
 
     @Autowired
@@ -52,13 +54,13 @@ public class ShipmentTrackingDetailController {
 
     @PostMapping
     @ResponseStatus(OK)
-    public void createShipmentTrackingDetail(@RequestBody ShipmentTrackingDetailDto shipmentTrackingDetailDto) {
+    public void createShipmentTrackingDetail(@RequestBody @Valid ShipmentTrackingDetailDto shipmentTrackingDetailDto) {
         shipmentTrackingDetailService.save(shipmentTrackingDetailDto);
     }
 
     @PutMapping("{id}")
     public ResponseEntity<?> updateShipmentTrackingDetail(
-            @PathVariable long id, @RequestBody ShipmentTrackingDetailDto shipmentTrackingDetailDto) {
+            @PathVariable long id, @RequestBody @Valid ShipmentTrackingDetailDto shipmentTrackingDetailDto) {
         try {
             return new ResponseEntity<>(shipmentTrackingDetailService.update(id, shipmentTrackingDetailDto), OK);
         } catch (IncorrectInputDataException e) {

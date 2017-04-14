@@ -35,7 +35,6 @@ public class Shipment {
     private ShipmentGroup shipmentGroup;
     @OneToOne
     private BarcodeInnerNumber barcodeInnerNumber;
-    @Enumerated(EnumType.STRING)
     private DeliveryType deliveryType;
     private float weight;
     private float length;
