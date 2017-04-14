@@ -1,6 +1,7 @@
 package com.opinta.entity;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.UUID;
 
 import javax.persistence.Entity;
@@ -12,6 +13,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
@@ -44,6 +47,11 @@ public class Shipment {
     private BigDecimal declaredPrice;
     private BigDecimal price;
     private BigDecimal postPay;
+    @ManyToOne
+    @JoinColumn(name = "discount_per_counterparty_uuid")
+    private DiscountPerCounterparty discountPerCounterparty;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastModified;
     private String description;
 
     public Shipment(Client sender, Client recipient, DeliveryType deliveryType, float weight, float length,

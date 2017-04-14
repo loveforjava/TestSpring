@@ -91,22 +91,11 @@ public class ClientServiceImpl implements ClientService {
         return client;
     }
 
-    @Override
-    @Transactional
-    public Client getEntityByUuidAnonymous(UUID uuid) throws IncorrectInputDataException {
-        log.info("Getting client by uuid without token check ", uuid);
-        Client client = clientDao.getByUuid(uuid);
-        if (client == null) {
-            log.error(getByIdOnErrorLogEndpoint(Client.class, uuid));
-            throw new IncorrectInputDataException(getByIdOnErrorLogEndpoint(Client.class, uuid));
-        }
-        return client;
-    }
-
     @Transactional
     public Client saveEntity(Client client, User user) throws IncorrectInputDataException, AuthException {
         validateInnerReferencesAndFillObjectFromDB(client, user);
-        setDiscount(client, false);
+
+//        setDiscount(client, false);
         client.setPhone(phoneService.getOrCreateEntityByPhoneNumber(client.getPhone().getPhoneNumber())
                 .removeNonNumericalCharacters());
         userService.authorizeForAction(client, user);
@@ -148,9 +137,6 @@ public class ClientServiceImpl implements ClientService {
         Client client = clientMapper.toEntity(clientDto);
         Counterparty counterparty = counterpartyService.getEntityByUser(user);
         client.setCounterparty(counterparty);
-        if (clientDto.getDiscount() == null) {
-            client.setDiscount(-1.0f);
-        }
         return clientMapper.toDto(saveEntity(client, user));
     }
 
@@ -172,7 +158,6 @@ public class ClientServiceImpl implements ClientService {
         }
         target.setUuid(uuid);
         target.getPhone().removeNonNumericalCharacters();
-        setDiscount(target, false);
         target.setPhone(phoneService.getOrCreateEntityByPhoneNumber(target.getPhone().getPhoneNumber()));
         target.setAddress(source.getAddress());
         updateEntity(target, user);
@@ -193,11 +178,5 @@ public class ClientServiceImpl implements ClientService {
         Address address = addressService.getEntityById(source.getAddress().getId());
         source.setCounterparty(counterparty);
         source.setAddress(address);
-    }
-    
-    private void setDiscount(Client client, boolean forceDiscountInheritance) {
-        if (forceDiscountInheritance || client.getDiscount() < 0) {
-            client.setDiscount(client.getCounterparty().getDiscount());
-        }
     }
 }

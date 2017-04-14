@@ -42,7 +42,6 @@ public class Client {
     @JoinColumn(name = "counterparty_uuid")
     private Counterparty counterparty;
     private boolean individual;
-    private float discount;
     @Size(min = 6, max = 6)
     private String bankCode;
     @Size(max = 255)

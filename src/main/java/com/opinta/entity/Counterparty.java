@@ -33,7 +33,6 @@ public class Counterparty {
     @OneToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "user_id")
     private User user;
-    private float discount;
     private String description;
 
     public Counterparty(String name, PostcodePool postcodePool) {

@@ -9,6 +9,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
@@ -27,7 +29,9 @@ public class DiscountPerCounterparty {
     private Counterparty counterparty;
     @ManyToOne
     private Discount discount;
+    @Temporal(TemporalType.DATE)
     private Date fromDate;
+    @Temporal(TemporalType.DATE)
     private Date toDate;
 
     public DiscountPerCounterparty(Counterparty counterparty, Discount discount, Date fromDate, Date toDate) {
