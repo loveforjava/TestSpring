@@ -209,10 +209,8 @@ public class TestHelper {
     }
 
     public Client createSenderWithDiscount() throws Exception {
-        Client client = new Client("FOP Ivanov", "001", createAddress(), createPhone(),
-                createCounterparty());
-        // TODO opinta
-//        client.setDiscount(10f);
+        Client client = new Client("FOP Ivanov", "001", createAddress(), createPhone(), createCounterparty());
+        createDiscountPerCounterparty(createDiscount(), client.getCounterparty());
         return clientService.saveEntity(client, client.getCounterparty().getUser());
     }
 
@@ -393,7 +391,8 @@ public class TestHelper {
     public Discount createDiscount() {
         Discount discount = new Discount("one more discount",
                 Date.from(now().minusMonths(2).toInstant(ZoneOffset.UTC)),
-                Date.from(now().plusMonths(4).toInstant(ZoneOffset.UTC)), 5F);
+                Date.from(now().plusMonths(4).toInstant(ZoneOffset.UTC)),
+                DISCOUNT);
         return discountService.saveEntity(discount);
     }
     

@@ -376,8 +376,9 @@ public class CalculationPriceIT extends BaseControllerIT {
     @SuppressWarnings("unchecked")
     public void calcPrice_D2W_weight1_length25_insideRegion_countryside_declaredPriceSurcharges_discount()
             throws Exception {
-        Client senderWithDiscount = testHelper.createSenderWithDiscount();
         // create
+        Client senderWithDiscount = testHelper.createSenderWithDiscount();
+
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
         jsonObject.put("shipmentGroupUuid", shipmentGroup.getUuid().toString());
         jsonObject.put("sender", testHelper.toJsonWithUuid(senderWithDiscount));
@@ -398,7 +399,7 @@ public class CalculationPriceIT extends BaseControllerIT {
                         post("/shipments").
                 then().
                         statusCode(SC_OK).
-                        body("price", equalTo(37.8f)).
+                        body("price", equalTo(31.71f)).
                 extract().
                         path("uuid");
 

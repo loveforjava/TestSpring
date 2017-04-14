@@ -219,47 +219,6 @@ public class CounterpartyControllerIT extends BaseControllerIT {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    public void updateCounterpartyDiscount() throws Exception {
-        float newDiscount = 8.0f;
-
-        Client client1 = testHelper.createClient(counterparty);
-        Client client2 = testHelper.createClient(counterparty);
-
-        // update
-        JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/counterparty.json");
-        jsonObject.put("postcodePoolUuid", counterparty.getPostcodePool().getUuid().toString());
-        jsonObject.put("discount", newDiscount);
-        String expectedJson = jsonObject.toString();
-
-        given().
-                contentType(APPLICATION_JSON_VALUE).
-                queryParam("token", user.getToken()).
-                body(expectedJson).
-        when().
-                put("/counterparties/{uuid}/discount", counterpartyUuid.toString()).
-        then().
-                contentType(APPLICATION_JSON_VALUE).
-                statusCode(SC_OK).
-                body("discount", equalTo(newDiscount));
-
-        // check updated data
-        CounterpartyDto counterpartyDto = counterpartyMapper.toDto(counterpartyService.getEntityByUuid(
-                counterpartyUuid, user));
-        assertThat(newDiscount, equalTo(counterpartyDto.getDiscount()));
-
-        List<Client> clients = clientService.getAllEntitiesByCounterpartyUuid(counterpartyUuid, user);
-        for (Client client : clients) {
-            // TODO opinta
-//            assertThat(newDiscount, equalTo(client.getDiscount()));
-        }
-
-        // delete
-        testHelper.deleteClient(client1);
-        testHelper.deleteClient(client2);
-    }
-
-    @Test
     public void deleteCounterparty() throws Exception {
         testHelper.deleteClientWithoutDeletingCounterparty(sender);
         testHelper.deleteClientWithoutDeletingCounterparty(recipient);
