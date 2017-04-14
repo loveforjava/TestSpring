@@ -1,6 +1,7 @@
 package com.opinta.dao;
 
 import com.opinta.entity.User;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -8,6 +9,7 @@ import com.opinta.entity.DiscountPerCounterparty;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -36,6 +38,21 @@ public class DiscountPerCounterpartyDaoImpl implements DiscountPerCounterpartyDa
     public DiscountPerCounterparty getByUuid(UUID uuid) {
         Session session = sessionFactory.getCurrentSession();
         return (DiscountPerCounterparty) session.get(DiscountPerCounterparty.class, uuid);
+    }
+
+    @Override
+    public DiscountPerCounterparty getHighestDiscount(User user, Date date) {
+        Session session = sessionFactory.getCurrentSession();
+        return (DiscountPerCounterparty) session
+                .createCriteria(DiscountPerCounterparty.class, "discountPerCounterparty")
+                .createCriteria("discountPerCounterparty.counterparty", "counterparty")
+                .createCriteria("discountPerCounterparty.discount", "discount")
+                .add(Restrictions.eq("counterparty.user", user))
+                .add(Restrictions.ge("discountPerCounterparty.fromDate", date))
+                .add(Restrictions.le("discountPerCounterparty.toDate", date))
+                .addOrder(Order.desc("discount.value"))
+                .setMaxResults(1)
+                .uniqueResult();
     }
 
     @Override

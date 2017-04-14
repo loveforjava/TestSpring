@@ -21,8 +21,6 @@ public interface ClientService {
 
     Client getEntityByUuid(UUID uuid, User user) throws IncorrectInputDataException, AuthException;
 
-    Client getEntityByUuidAnonymous(UUID uuid) throws IncorrectInputDataException;
-
     Client saveEntity(Client client, User user) throws IncorrectInputDataException, AuthException;
 
     Client updateEntity(Client client, User user) throws IncorrectInputDataException, AuthException;

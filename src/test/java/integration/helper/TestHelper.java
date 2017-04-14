@@ -109,16 +109,18 @@ public class TestHelper {
     }
 
     public Shipment createShipment() throws Exception {
-        Shipment shipment = new Shipment(createClient(), createClient(),
+        Counterparty counterparty = createCounterparty();
+        Shipment shipment = new Shipment(createSenderFor(counterparty), createRecipientFor(counterparty),
                 D2D, 4.0F, 3.8F, new BigDecimal(200), new BigDecimal(30), new BigDecimal(35.2));
-        return shipmentService.saveEntity(shipment, shipment.getSender().getCounterparty().getUser());
+        return shipmentService.saveEntity(shipment, counterparty.getUser());
     }
 
     public Shipment createShipment(ShipmentGroup shipmentGroup) throws Exception {
-        Shipment shipment = new Shipment(createClient(), createClient(),
+        Counterparty counterparty = shipmentGroup.getCounterparty();
+        Shipment shipment = new Shipment(createSenderFor(counterparty), createRecipientFor(counterparty),
                 D2D, 4.0F, 3.8F, new BigDecimal(200), new BigDecimal(30), new BigDecimal(35.2));
         shipment.setShipmentGroup(shipmentGroup);
-        return shipmentService.saveEntity(shipment, shipment.getSender().getCounterparty().getUser());
+        return shipmentService.saveEntity(shipment, counterparty.getUser());
     }
 
     public Shipment createShipmentWithSameCounterparty(ShipmentGroup shipmentGroup, Counterparty counterparty) throws Exception {
@@ -189,7 +191,7 @@ public class TestHelper {
                 createCounterpartyWithoutDiscount());
         return clientService.saveEntity(client, client.getCounterparty().getUser());
     }
-    
+
     public Client createSenderFor(Counterparty counterparty) throws Exception {
         Client client = new Client("FOP Sidorov", "456", createAddress(), createPhone(), counterparty);
         return clientService.saveEntity(client, client.getCounterparty().getUser());
@@ -209,7 +211,8 @@ public class TestHelper {
     public Client createSenderWithDiscount() throws Exception {
         Client client = new Client("FOP Ivanov", "001", createAddress(), createPhone(),
                 createCounterparty());
-        client.setDiscount(10f);
+        // TODO opinta
+//        client.setDiscount(10f);
         return clientService.saveEntity(client, client.getCounterparty().getUser());
     }
 
@@ -269,11 +272,14 @@ public class TestHelper {
     }
 
     public ShipmentGroup createShipmentGroup() throws Exception {
+        return createShipmentGroupFor(createCounterparty());
+    }
+
+    public ShipmentGroup createShipmentGroupFor(Counterparty counterparty) throws Exception {
         ShipmentGroup shipmentGroup = new ShipmentGroup();
         shipmentGroup.setName("Group 1");
-        shipmentGroup.setCounterparty(createCounterparty());
-        ShipmentGroup newShipmentGroup = shipmentGroupService.saveEntity(shipmentGroup, shipmentGroup.getCounterparty().getUser());
-        return newShipmentGroup;
+        shipmentGroup.setCounterparty(counterparty);
+        return shipmentGroupService.saveEntity(shipmentGroup, shipmentGroup.getCounterparty().getUser());
     }
 
     public void deleteShipmentGroup(ShipmentGroup shipmentGroup) throws Exception {
@@ -329,7 +335,8 @@ public class TestHelper {
 
     public Counterparty createCounterparty() throws Exception {
         Counterparty counterparty = new Counterparty("Modna kasta", createPostcodePool());
-        counterparty.setDiscount(DISCOUNT);
+        // TODO opinta
+//        counterparty.setDiscount(DISCOUNT);
         return counterpartyService.saveEntity(counterparty);
     }
     
