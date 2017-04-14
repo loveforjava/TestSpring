@@ -94,8 +94,6 @@ public class ClientServiceImpl implements ClientService {
     @Transactional
     public Client saveEntity(Client client, User user) throws IncorrectInputDataException, AuthException {
         validateInnerReferencesAndFillObjectFromDB(client, user);
-
-//        setDiscount(client, false);
         client.setPhone(phoneService.getOrCreateEntityByPhoneNumber(client.getPhone().getPhoneNumber())
                 .removeNonNumericalCharacters());
         userService.authorizeForAction(client, user);
