@@ -17,9 +17,13 @@ public interface ClientService {
     List<Client> getAllEntitiesByCounterpartyUuid(UUID counterpartyUuid, User user)
             throws IncorrectInputDataException, AuthException;
     
-    Client saveOrGet(Client client, User user) throws IncorrectInputDataException, AuthException;
+    Client saveOrGetEntity(Client client, User user) throws IncorrectInputDataException, AuthException;
+
+    Client saveOrGetEntityAnonymous(Client recipient, User user) throws IncorrectInputDataException, AuthException;
 
     Client getEntityByUuid(UUID uuid, User user) throws IncorrectInputDataException, AuthException;
+
+    Client getEntityByUuidAnonymous(UUID uuid) throws IncorrectInputDataException;
 
     Client saveEntity(Client client, User user) throws IncorrectInputDataException, AuthException;
 

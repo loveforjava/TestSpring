@@ -89,8 +89,8 @@ public class ShipmentServiceImpl implements ShipmentService {
     @Override
     @Transactional
     public Shipment saveEntity(Shipment shipment, User user) throws AuthException, IncorrectInputDataException {
-        shipment.setSender(clientService.saveOrGet(shipment.getSender(), user));
-        shipment.setRecipient(clientService.saveOrGet(shipment.getRecipient(), user));
+        shipment.setSender(clientService.saveOrGetEntity(shipment.getSender(), user));
+        shipment.setRecipient(clientService.saveOrGetEntityAnonymous(shipment.getRecipient(), user));
         PostcodePool postcodePool = shipment.getSender().getCounterparty().getPostcodePool();
         shipment.setBarcodeInnerNumber(barcodeInnerNumberService.generateBarcodeInnerNumber(postcodePool));
         shipment.setLastModified(new Date());
@@ -163,7 +163,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         target.setUuid(uuid);
         target.setSender(clientService.getEntityByUuid(target.getSender().getUuid(), user));
-        target.setRecipient(clientService.getEntityByUuid(target.getRecipient().getUuid(), user));
+        target.setRecipient(clientService.getEntityByUuidAnonymous(target.getRecipient().getUuid()));
         target.setLastModified(new Date());
         target.setDiscountPerCounterparty(discountPerCounterpartyService
                 .getEntityWithHighestDiscount(user, target.getLastModified()));

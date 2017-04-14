@@ -99,7 +99,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
     public void createShipment_presavedSenderAndRecipient() throws Exception {
         Counterparty counterparty = testHelper.createCounterparty();
         Client sender = testHelper.createSenderFor(counterparty);
-        Client recipient = testHelper.createRecipientFor(counterparty);
+        Client recipient = testHelper.createRecipient();
         ShipmentGroup shipmentGroup = testHelper.createShipmentGroup();
         
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");

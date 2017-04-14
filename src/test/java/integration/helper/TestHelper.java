@@ -110,7 +110,7 @@ public class TestHelper {
 
     public Shipment createShipment() throws Exception {
         Counterparty counterparty = createCounterparty();
-        Shipment shipment = new Shipment(createSenderFor(counterparty), createRecipientFor(counterparty),
+        Shipment shipment = new Shipment(createSenderFor(counterparty), createRecipient(),
                 D2D, 4.0F, 3.8F, new BigDecimal(200), new BigDecimal(30), new BigDecimal(35.2));
         return shipmentService.saveEntity(shipment, counterparty.getUser());
     }
@@ -196,9 +196,14 @@ public class TestHelper {
         Client client = new Client("FOP Sidorov", "456", createAddress(), createPhone(), counterparty);
         return clientService.saveEntity(client, client.getCounterparty().getUser());
     }
-    
+
     public Client createRecipientFor(Counterparty counterparty) throws Exception {
         Client client = new Client("FOP Petrov", "123", createAddress(), createPhone(), counterparty);
+        return clientService.saveEntity(client, client.getCounterparty().getUser());
+    }
+
+    public Client createRecipient() throws Exception {
+        Client client = new Client("FOP Petrov Anonimous", "123", createAddress(), createPhone(), createCounterparty());
         return clientService.saveEntity(client, client.getCounterparty().getUser());
     }
 

@@ -68,14 +68,23 @@ public class ClientServiceImpl implements ClientService {
     
     @Override
     @Transactional
-    public Client saveOrGet(Client client, User user) throws IncorrectInputDataException, AuthException {
+    public Client saveOrGetEntity(Client client, User user) throws IncorrectInputDataException, AuthException {
         if (client.getUuid() == null) {
             return saveEntity(client, user);
         } else {
             return getEntityByUuid(client.getUuid(), user);
         }
     }
-    
+
+    @Override
+    public Client saveOrGetEntityAnonymous(Client client, User user) throws IncorrectInputDataException, AuthException {
+        if (client.getUuid() == null) {
+            return saveEntity(client, user);
+        } else {
+            return getEntityByUuidAnonymous(client.getUuid());
+        }
+    }
+
     @Override
     @Transactional
     public Client getEntityByUuid(UUID uuid, User user) throws AuthException, IncorrectInputDataException {
@@ -88,6 +97,18 @@ public class ClientServiceImpl implements ClientService {
 
         userService.authorizeForAction(client, user);
 
+        return client;
+    }
+
+    @Override
+    @Transactional
+    public Client getEntityByUuidAnonymous(UUID uuid) throws IncorrectInputDataException {
+        log.info("Getting client by uuid without token check. Client ", uuid);
+        Client client = clientDao.getByUuid(uuid);
+        if (client == null) {
+            log.error(getByIdOnErrorLogEndpoint(Client.class, uuid));
+            throw new IncorrectInputDataException(getByIdOnErrorLogEndpoint(Client.class, uuid));
+        }
         return client;
     }
 
