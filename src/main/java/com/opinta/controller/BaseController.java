@@ -25,7 +25,6 @@ public class BaseController {
 
     private ValidationErrorDto processFieldErrors(List<FieldError> fieldErrors) {
         ValidationErrorDto validationErrorDto = new ValidationErrorDto();
-
         for (FieldError fieldError : fieldErrors) {
             validationErrorDto.addFieldError(fieldError.getField(), fieldError.getDefaultMessage());
         }
