@@ -188,7 +188,7 @@ public class TestHelper {
     
     public Client createSenderWithoutDiscount() throws Exception {
         Client client = new Client("FOP Ivanov", "001", createAddress(), createPhone(),
-                createCounterpartyWithoutDiscount());
+                createCounterparty());
         return clientService.saveEntity(client, client.getCounterparty().getUser());
     }
 
@@ -332,17 +332,9 @@ public class TestHelper {
     }
 
     public Counterparty createCounterparty() throws Exception {
-        Counterparty counterparty = new Counterparty("Modna kasta", createPostcodePool());
-        // TODO opinta
-//        counterparty.setDiscount(DISCOUNT);
-        return counterpartyService.saveEntity(counterparty);
+        return counterpartyService.saveEntity(new Counterparty("Modna kasta", createPostcodePool()));
     }
     
-    public Counterparty createCounterpartyWithoutDiscount() throws Exception {
-        Counterparty counterparty = new Counterparty("Modna kasta", createPostcodePool());
-        return counterpartyService.saveEntity(counterparty);
-    }
-
     public PostcodePool createPostcodePool() {
         return postcodePoolService.saveEntity(new PostcodePool("12345", false));
     }

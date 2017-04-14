@@ -31,9 +31,5 @@ public interface CounterpartyService {
     
     CounterpartyDto save(CounterpartyDto counterpartyDto) throws IncorrectInputDataException;
 
-    // TODO opinta
-//    CounterpartyDto updateDiscount(UUID uuid, CounterpartyDto counterpartyDto, User user)
-//            throws IncorrectInputDataException, AuthException, PerformProcessFailedException;
-
     void delete(UUID uuid, User user) throws AuthException, IncorrectInputDataException;
 }

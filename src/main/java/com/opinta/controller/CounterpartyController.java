@@ -92,21 +92,6 @@ public class CounterpartyController {
         }
     }
 
-    // TODO opinta
-//    @PutMapping(value = "{uuid}/discount", produces = APPLICATION_JSON_VALUE)
-//    public ResponseEntity<?> updateCounterpartyDiscountByUuid(@PathVariable UUID uuid,
-//                                                              @RequestBody CounterpartyDto counterpartyDto,
-//                                                              @RequestParam UUID token) {
-//        try {
-//            User user = userService.authenticate(token);
-//            return new ResponseEntity<>(counterpartyService.updateDiscount(uuid, counterpartyDto, user), OK);
-//        } catch (AuthException e) {
-//            return new ResponseEntity<>(updateOnErrorLogEndpoint(Counterparty.class, uuid, e), UNAUTHORIZED);
-//        } catch (Exception e) {
-//            return new ResponseEntity<>(updateOnErrorLogEndpoint(Counterparty.class, uuid, e), NOT_FOUND);
-//        }
-//    }
-
     @DeleteMapping("{uuid}")
     public ResponseEntity<?> deletePostOfficeById(@PathVariable UUID uuid, @RequestParam UUID token) {
         try {

@@ -26,7 +26,7 @@ public class CalculationPriceIT extends BaseControllerIT {
 
     @Before
     public void setUp() throws Exception {
-        shipmentGroup = testHelper.createShipmentGroupFor(testHelper.createCounterpartyWithoutDiscount());
+        shipmentGroup = testHelper.createShipmentGroupFor(testHelper.createCounterparty());
         sender = testHelper.createSenderFor(shipmentGroup.getCounterparty());
     }
 

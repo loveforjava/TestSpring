@@ -137,10 +137,6 @@ public class ClientServiceImpl implements ClientService {
         Client client = clientMapper.toEntity(clientDto);
         Counterparty counterparty = counterpartyService.getEntityByUser(user);
         client.setCounterparty(counterparty);
-        // TODO opinta
-//        if (clientDto.getDiscount() == null) {
-//            client.setDiscount(-1.0f);
-//        }
         return clientMapper.toDto(saveEntity(client, user));
     }
 
@@ -162,8 +158,6 @@ public class ClientServiceImpl implements ClientService {
         }
         target.setUuid(uuid);
         target.getPhone().removeNonNumericalCharacters();
-        // TODO opinta
-//        setDiscount(target, false);
         target.setPhone(phoneService.getOrCreateEntityByPhoneNumber(target.getPhone().getPhoneNumber()));
         target.setAddress(source.getAddress());
         updateEntity(target, user);
@@ -185,11 +179,4 @@ public class ClientServiceImpl implements ClientService {
         source.setCounterparty(counterparty);
         source.setAddress(address);
     }
-
-    // TODO opinta
-//    private void setDiscount(Client client, boolean forceDiscountInheritance) {
-//        if (forceDiscountInheritance || client.getDiscount() < 0) {
-//            client.setDiscount(client.getCounterparty().getDiscount());
-//        }
-//    }
 }
