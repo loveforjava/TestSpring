@@ -16,6 +16,8 @@ import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
 
+import static com.opinta.constraint.RegexPattern.BANK_CODE_LENGTH;
+
 import static java.lang.String.join;
 
 @Entity
@@ -42,7 +44,7 @@ public class Client {
     @JoinColumn(name = "counterparty_uuid")
     private Counterparty counterparty;
     private boolean individual;
-    @Size(min = 6, max = 6)
+    @Size(min = BANK_CODE_LENGTH, max = BANK_CODE_LENGTH)
     private String bankCode;
     @Size(max = 255)
     private String bankAccount;

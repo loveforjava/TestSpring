@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import static com.opinta.constraint.RegexPattern.BANK_CODE_LENGTH;
 import static com.opinta.constraint.RegexPattern.PHONE_NUMBER_REGEX;
 
 @Getter
@@ -37,7 +38,7 @@ public class ClientDto {
     private String phoneNumber;
     private boolean individual;
     private Float discount;
-    @Size(message = "Bank code should contain 6 digits", min = 6, max = 6)
+    @Size(message = "Bank code should contain 6 digits", min = BANK_CODE_LENGTH, max = BANK_CODE_LENGTH)
     private String bankCode;
     @Size(max = 255)
     private String bankAccount;
