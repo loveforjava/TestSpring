@@ -55,11 +55,11 @@ public class HibernateConfig {
     }
 
     @Bean(name = "flyway", initMethod = "migrate")
-    @Profile("prod")
+    @Profile("stage")
     public Flyway flyway() {
         Flyway flyway = new Flyway();
         flyway.setBaselineOnMigrate(true);
-        flyway.setLocations("db/migration/common", "db/migration/prod");
+        flyway.setLocations("db/migration/common", "db/migration/stage");
         flyway.setDataSource(dataSource());
         // if the problem with checksum or failed migration run app with key -Dflyway.repair=true
         String repair = environment.getProperty("flyway.repair");
@@ -85,7 +85,7 @@ public class HibernateConfig {
     }
 
     @Bean(name = "sessionFactory") @DependsOn("flyway")
-    @Profile("prod")
+    @Profile("stage")
     public LocalSessionFactoryBean sessionFactory() {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(dataSource());
@@ -115,17 +115,17 @@ public class HibernateConfig {
     }
 
     @Bean(name = "dataSource")
-    @Profile("prod")
+    @Profile("stage")
     public DataSource dataSource() {
         log.info("-----------------------------------------");
         log.info("----------ACTIVE SPRING PROFILE----------");
-        log.info("-------------------PROD------------------");
+        log.info("-------------------STAGE------------------");
         log.info("-----------------------------------------");
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName(environment.getRequiredProperty("prod.jdbc.driverClassName"));
-        dataSource.setUrl(environment.getRequiredProperty("prod.jdbc.url"));
-        dataSource.setUsername(environment.getRequiredProperty("prod.jdbc.username"));
-        dataSource.setPassword(environment.getRequiredProperty("prod.jdbc.password"));
+        dataSource.setDriverClassName(environment.getRequiredProperty("stage.jdbc.driverClassName"));
+        dataSource.setUrl(environment.getRequiredProperty("stage.jdbc.url"));
+        dataSource.setUsername(environment.getRequiredProperty("stage.jdbc.username"));
+        dataSource.setPassword(environment.getRequiredProperty("stage.jdbc.password"));
         return dataSource;
     }
 
@@ -161,10 +161,10 @@ public class HibernateConfig {
 
     private Properties hibernatePropertiesProduction() {
         Properties properties = new Properties();
-        properties.put("hibernate.dialect", environment.getRequiredProperty("prod.hibernate.dialect"));
-        properties.put("hibernate.format_sql", environment.getRequiredProperty("prod.hibernate.format_sql"));
-        properties.put("hibernate.show_sql", environment.getRequiredProperty("prod.hibernate.show_sql"));
-        properties.put("hibernate.hbm2ddl.auto", environment.getRequiredProperty("prod.hibernate.hbm2ddl.auto"));
+        properties.put("hibernate.dialect", environment.getRequiredProperty("stage.hibernate.dialect"));
+        properties.put("hibernate.format_sql", environment.getRequiredProperty("stage.hibernate.format_sql"));
+        properties.put("hibernate.show_sql", environment.getRequiredProperty("stage.hibernate.show_sql"));
+        properties.put("hibernate.hbm2ddl.auto", environment.getRequiredProperty("stage.hibernate.hbm2ddl.auto"));
         return properties;
     }
 

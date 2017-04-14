@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-@Profile({"prod", "dev"})
+@Profile({"stage", "dev"})
 public class BarcodeInnerNumberGeneratorImpl implements BarcodeInnerNumberGenerator {
     private BarcodeInnerNumberDao barcodeInnerNumberDao;
 
