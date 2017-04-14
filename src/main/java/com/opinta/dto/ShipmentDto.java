@@ -5,8 +5,8 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.UUID;
 
-import com.opinta.constraint.EnumString;
 import com.opinta.entity.DeliveryType;
+
 import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,7 +22,6 @@ public class ShipmentDto {
     private ClientDto sender;
     private ClientDto recipient;
     private UUID shipmentGroupUuid;
-    @EnumString(source = DeliveryType.class)
     private DeliveryType deliveryType;
     @Size(min = BARCODE_LENGTH, max = BARCODE_LENGTH)
     private String barcode;

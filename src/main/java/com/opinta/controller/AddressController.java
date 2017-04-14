@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 import static com.opinta.util.LogMessageUtil.deleteOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.updateOnErrorLogEndpoint;
@@ -29,7 +31,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 @RestController
 @RequestMapping("/addresses")
-public class AddressController {
+public class AddressController extends BaseController {
     private AddressService addressService;
 
     @Autowired
@@ -54,12 +56,12 @@ public class AddressController {
 
     @PostMapping
     @ResponseStatus(OK)
-    public ResponseEntity<?> createAddress(@RequestBody AddressDto addressDto) {
+    public ResponseEntity<?> createAddress(@RequestBody @Valid AddressDto addressDto) {
         return new ResponseEntity<>(addressService.save(addressDto), OK);
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<?> updateAddress(@PathVariable long id, @RequestBody AddressDto addressDto) {
+    public ResponseEntity<?> updateAddress(@PathVariable @Valid long id, @RequestBody AddressDto addressDto) {
         try {
             return new ResponseEntity<>(addressService.update(id, addressDto), OK);
         } catch (IncorrectInputDataException e) {

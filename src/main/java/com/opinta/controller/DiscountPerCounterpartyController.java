@@ -35,7 +35,7 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @RestController
 @RequestMapping("/counterparty-discounts")
-public class DiscountPerCounterpartyController {
+public class DiscountPerCounterpartyController extends BaseController {
     private final DiscountPerCounterpartyService discountPerCounterpartyService;
     private final UserService userService;
     

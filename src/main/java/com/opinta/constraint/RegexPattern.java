@@ -2,6 +2,7 @@ package com.opinta.constraint;
 
 public class RegexPattern {
     public static final int POSTCODE_LENGTH = 5;
+    public static final int BANK_CODE_LENGTH = 6;
     public static final int BARCODE_INNER_NUMBER_LENGTH = 8;
     public static final int BARCODE_LENGTH = POSTCODE_LENGTH + BARCODE_INNER_NUMBER_LENGTH;
 

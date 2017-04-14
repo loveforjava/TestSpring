@@ -40,7 +40,7 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @RestController
 @RequestMapping("/clients")
-public class ClientController {
+public class ClientController extends BaseController {
     private final ClientService clientService;
     private final ShipmentService shipmentService;
     private final UserService userService;

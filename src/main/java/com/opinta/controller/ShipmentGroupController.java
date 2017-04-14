@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -45,7 +46,7 @@ import static org.springframework.http.MediaType.parseMediaType;
 
 @RestController
 @RequestMapping("/shipment-groups")
-public class ShipmentGroupController {
+public class ShipmentGroupController extends BaseController {
     private final ShipmentGroupService shipmentGroupService;
     private final ShipmentService shipmentService;
     private final UserService userService;
@@ -138,7 +139,7 @@ public class ShipmentGroupController {
     }
     
     @PostMapping
-    public ResponseEntity<?> createShipmentGroup(@RequestBody ShipmentGroupDto shipmentGroupDto,
+    public ResponseEntity<?> createShipmentGroup(@RequestBody @Valid ShipmentGroupDto shipmentGroupDto,
                                                  @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
@@ -153,7 +154,7 @@ public class ShipmentGroupController {
     
     @PutMapping("{uuid}")
     public ResponseEntity<?> updateShipmentGroup(@PathVariable UUID uuid,
-                                                 @RequestBody ShipmentGroupDto shipmentGroupDto,
+                                                 @RequestBody @Valid ShipmentGroupDto shipmentGroupDto,
                                                  @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
