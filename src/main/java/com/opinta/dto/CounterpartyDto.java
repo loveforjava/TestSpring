@@ -21,7 +21,6 @@ public class CounterpartyDto {
     private String name;
     private UUID postcodePoolUuid;
     private UUID token;
-    private Float discount;
     @Size(max = 255)
     private String description;
 }
