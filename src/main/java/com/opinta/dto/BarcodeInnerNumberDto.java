@@ -1,6 +1,5 @@
 package com.opinta.dto;
 
-import com.opinta.constraint.EnumString;
 import com.opinta.entity.BarcodeStatus;
 import javax.validation.constraints.Pattern;
 import lombok.Getter;
@@ -16,6 +15,5 @@ public class BarcodeInnerNumberDto {
     private long id;
     @Pattern(regexp = BARCODE_INNER_NUMBER_REGEX)
     private String number;
-    @EnumString(source = BarcodeStatus.class)
     private BarcodeStatus status;
 }

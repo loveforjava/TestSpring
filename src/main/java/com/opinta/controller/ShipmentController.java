@@ -114,8 +114,7 @@ public class ShipmentController extends BaseController {
     }
 
     @PutMapping("{uuid}")
-    public ResponseEntity<?> updateShipment(@PathVariable UUID uuid,
-                                            @RequestBody @Valid ShipmentDto shipmentDto,
+    public ResponseEntity<?> updateShipment(@PathVariable UUID uuid, @RequestBody @Valid ShipmentDto shipmentDto,
                                             @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
