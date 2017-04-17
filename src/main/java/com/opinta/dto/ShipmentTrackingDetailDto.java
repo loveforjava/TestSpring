@@ -1,6 +1,5 @@
 package com.opinta.dto;
 
-import com.opinta.constraint.EnumString;
 import com.opinta.entity.ShipmentStatus;
 import java.util.Date;
 import java.util.UUID;
@@ -16,7 +15,6 @@ public class ShipmentTrackingDetailDto {
     private long id;
     private UUID shipmentUuid;
     private long postOfficeId;
-    @EnumString(source = ShipmentStatus.class)
     private ShipmentStatus shipmentStatus;
     private Date date;
 }
