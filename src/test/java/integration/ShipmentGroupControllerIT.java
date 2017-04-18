@@ -8,6 +8,7 @@ import com.opinta.entity.ShipmentGroup;
 import com.opinta.entity.User;
 import com.opinta.mapper.ShipmentGroupMapper;
 import com.opinta.service.ShipmentGroupService;
+import com.opinta.service.UserService;
 import integration.helper.TestHelper;
 import org.json.simple.JSONObject;
 import org.junit.After;
@@ -33,13 +34,15 @@ public class ShipmentGroupControllerIT extends BaseControllerIT {
     @Autowired
     private ShipmentGroupMapper shipmentGroupMapper;
     @Autowired
+    private UserService userService;
+    @Autowired
     private TestHelper testHelper;
 
     @Before
     public void setUp() throws Exception {
         shipmentGroup = testHelper.createShipmentGroup();
         shipmentGroupUuid = shipmentGroup.getUuid();
-        user = shipmentGroup.getCounterparty().getUser();
+        user = userService.getUsersByCounterparty(shipmentGroup.getCounterparty()).get(0);
     }
 
     @After
@@ -122,7 +125,7 @@ public class ShipmentGroupControllerIT extends BaseControllerIT {
         String newShipmentGroupIdString =
                 given().
                         contentType("application/json;charset=UTF-8").
-                        queryParam("token", newCounterparty.getUser().getToken()).
+                        queryParam("token", userService.getUsersByCounterparty(newCounterparty).get(0).getToken()).
                         body(expectedJson).
                 when().
                         post("/shipment-groups").
@@ -134,7 +137,8 @@ public class ShipmentGroupControllerIT extends BaseControllerIT {
         UUID newShipmentGroupId = UUID.fromString(newShipmentGroupIdString);
 
         // check created data
-        ShipmentGroup createdShipmentGroup = shipmentGroupService.getEntityById(newShipmentGroupId, newCounterparty.getUser());
+        ShipmentGroup createdShipmentGroup = shipmentGroupService.getEntityById(newShipmentGroupId,
+                userService.getUsersByCounterparty(newCounterparty).get(0));
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(shipmentGroupMapper.toDto(createdShipmentGroup));
 

@@ -11,6 +11,7 @@ import com.opinta.entity.Discount;
 import com.opinta.entity.DiscountPerCounterparty;
 import com.opinta.mapper.DiscountPerCounterpartyMapper;
 import com.opinta.service.DiscountPerCounterpartyService;
+import com.opinta.service.UserService;
 import integration.helper.TestHelper;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -42,6 +43,8 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
     @Autowired
     private DiscountPerCounterpartyMapper discountPerCounterpartyMapper;
     @Autowired
+    private UserService userService;
+    @Autowired
     private TestHelper testHelper;
     private DiscountPerCounterparty discountPerCounterparty;
     private Counterparty counterparty;
@@ -66,7 +69,7 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
     @Test
     public void getDiscountsPerCounterparty() {
         given().
-                queryParam("token", counterparty.getUser().getToken()).
+                queryParam("token", userService.getUsersByCounterparty(counterparty).get(0).getToken()).
         when().
                 get("/counterparty-discounts").
         then().
@@ -77,7 +80,7 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
     @Test
     public void getDiscountPerCounterparty() {
         given().
-                queryParam("token", counterparty.getUser().getToken()).
+                queryParam("token", userService.getUsersByCounterparty(counterparty).get(0).getToken()).
         when().
                 get("/counterparty-discounts/{uuid}", discountPerCounterparty.getUuid()).
         then().
@@ -95,7 +98,7 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
 
         String newUuid =
                 given().
-                        queryParam("token", counterparty.getUser().getToken()).
+                        queryParam("token", userService.getUsersByCounterparty(counterparty).get(0).getToken()).
                         contentType(APPLICATION_JSON_VALUE).
                         body(inputJson.toString()).
                 when().
@@ -108,7 +111,7 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
         UUID newDiscountUuid = UUID.fromString(newUuid);
 
         DiscountPerCounterparty discountPerCounterparty = discountPerCounterpartyService.
-                getEntityByUuid(newDiscountUuid, counterparty.getUser());
+                getEntityByUuid(newDiscountUuid, userService.getUsersByCounterparty(counterparty).get(0));
         DiscountPerCounterpartyDto discountPerCounterpartyDto = discountPerCounterpartyMapper.
                 toDto(discountPerCounterparty);
 
@@ -134,7 +137,7 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
         inputJson.put("counterpartyUuid", counterparty.getUuid().toString());
         
         given().
-                queryParam("token", counterparty.getUser().getToken()).
+                queryParam("token", userService.getUsersByCounterparty(counterparty).get(0).getToken()).
                 contentType(APPLICATION_JSON_VALUE).
                 body(inputJson.toString()).
         when().
@@ -144,7 +147,7 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
                 statusCode(SC_OK);
     
         DiscountPerCounterparty updatedDiscountPerCounterparty = discountPerCounterpartyService
-                .getEntityByUuid(discountPerCounterparty.getUuid(), counterparty.getUser());
+                .getEntityByUuid(discountPerCounterparty.getUuid(), userService.getUsersByCounterparty(counterparty).get(0));
 
         assertEquals(updatedDiscountPerCounterparty.getDiscount().getUuid(), newDiscount.getUuid());
     }
@@ -161,7 +164,7 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
         inputJson.put("toDate", "2016-09-01T18:25:43.511Z");
         
         given().
-                queryParam("token", counterparty.getUser().getToken()).
+                queryParam("token", userService.getUsersByCounterparty(counterparty).get(0).getToken()).
                 contentType(APPLICATION_JSON_VALUE).
                 body(inputJson.toString()).
         when().
@@ -170,7 +173,8 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
                 statusCode(SC_BAD_REQUEST);
         
         DiscountPerCounterparty existedDiscountPerCounterparty = discountPerCounterpartyService
-                .getEntityByUuid(discountPerCounterparty.getUuid(), discountPerCounterparty.getCounterparty().getUser());
+                .getEntityByUuid(discountPerCounterparty.getUuid(),
+                        userService.getUsersByCounterparty(discountPerCounterparty.getCounterparty()).get(0));
         
         // make sure entity has not been updated.
         assertEquals(
@@ -181,7 +185,7 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
     @Test
     public void deleteDiscountPerCounterparty() throws Exception {
         given().
-                queryParam("token", counterparty.getUser().getToken()).
+                queryParam("token", userService.getUsersByCounterparty(counterparty).get(0).getToken()).
                 contentType(APPLICATION_JSON_VALUE).
         when().
                 delete("/counterparty-discounts/{uuid}", discountPerCounterparty.getUuid()).

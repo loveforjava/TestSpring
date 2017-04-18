@@ -96,10 +96,10 @@ public class CounterpartyServiceImpl implements CounterpartyService {
     @Override
     @Transactional
     public Counterparty saveEntity(Counterparty counterparty) throws IncorrectInputDataException {
-        User user = new User();
-        user.setUsername(counterparty.getName());
-        user.setToken(UUID.randomUUID());
-        counterparty.setUser(user);
+//        User user = new User();
+//        user.setUsername(counterparty.getName());
+//        user.setToken(UUID.randomUUID());
+//        user.setCounterparty(counterparty);
 
         log.info(saveLogEndpoint(Counterparty.class, counterparty));
         return counterpartyDao.save(counterparty);
@@ -130,7 +130,7 @@ public class CounterpartyServiceImpl implements CounterpartyService {
         Counterparty source = counterpartyMapper.toEntity(counterpartyDto);
         Counterparty target = getEntityByUuid(uuid, user);
 
-        source.setUser(target.getUser());
+//        source.setUser(target.getUser());
         source.setPostcodePool(target.getPostcodePool());
 
         try {

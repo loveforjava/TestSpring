@@ -1,7 +1,12 @@
 package com.opinta.dao;
 
+import com.opinta.entity.Counterparty;
 import com.opinta.entity.User;
+
+import java.util.List;
 import java.util.UUID;
+
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
@@ -24,5 +29,21 @@ public class UserDaoImpl implements UserDao {
                 .add(Restrictions.eq("token", token))
                 .setMaxResults(1)
                 .uniqueResult();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<User> getAllByCounterparty(Counterparty counterparty) {
+        Session session = sessionFactory.getCurrentSession();
+        return session.createCriteria(User.class, "user")
+                .add(Restrictions.eq("user.counterparty", counterparty))
+                .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
+                .list();
+    }
+
+    @Override
+    public User save(User user) {
+        Session session = sessionFactory.getCurrentSession();
+        return (User) session.merge(user);
     }
 }

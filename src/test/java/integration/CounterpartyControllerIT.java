@@ -61,7 +61,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
         sender = testHelper.createSenderFor(counterparty);
         recipient = testHelper.createRecipientFor(counterparty);
         counterpartyUuid = counterparty.getUuid();
-        user = counterparty.getUser();
+        user = userService.getUsersByCounterparty(counterparty).get(0);
     }
 
     @After

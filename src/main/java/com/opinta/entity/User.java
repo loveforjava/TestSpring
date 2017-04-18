@@ -1,9 +1,8 @@
 package com.opinta.entity;
 
 import java.util.UUID;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -16,5 +15,8 @@ public class User {
     private long id;
     private String username;
     private String password;
+    @ManyToOne
+    @JoinColumn(name = "counterparty_id")
+    private Counterparty counterparty;
     private UUID token;
 }

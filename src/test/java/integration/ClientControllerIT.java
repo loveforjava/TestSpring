@@ -9,6 +9,7 @@ import com.opinta.entity.Counterparty;
 import com.opinta.entity.User;
 import com.opinta.mapper.ClientMapper;
 import com.opinta.service.ClientService;
+import com.opinta.service.UserService;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.After;
@@ -38,13 +39,15 @@ public class ClientControllerIT extends BaseControllerIT {
     @Autowired
     private ClientMapper clientMapper;
     @Autowired
+    private UserService userService;
+    @Autowired
     private TestHelper testHelper;
 
     @Before
     public void setUp() throws Exception {
         client = testHelper.createClient();
         clientUuid = client.getUuid();
-        user = client.getCounterparty().getUser();
+        user = userService.getUsersByCounterparty(client.getCounterparty()).get(0);
     }
 
     @After
@@ -102,7 +105,7 @@ public class ClientControllerIT extends BaseControllerIT {
         String newUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
-                        queryParam("token", newCounterparty.getUser().getToken()).
+                        queryParam("token", userService.getUsersByCounterparty(newCounterparty).get(0).getToken()).
                         body(inputJson.toString()).
                 when().
                         post("/clients").
@@ -122,7 +125,8 @@ public class ClientControllerIT extends BaseControllerIT {
         UUID newClientUuid = UUID.fromString(newUuid);
 
         // check created data
-        Client createdClient = clientService.getEntityByUuid(newClientUuid, newCounterparty.getUser());
+        Client createdClient = clientService.getEntityByUuid(newClientUuid,
+                userService.getUsersByCounterparty(newCounterparty).get(0));
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientMapper.toDto(createdClient));
         assertEquals(expectedJson.toJSONString(), actualJson, false);
@@ -147,7 +151,7 @@ public class ClientControllerIT extends BaseControllerIT {
         String newUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
-                        queryParam("token", newCounterparty.getUser().getToken()).
+                        queryParam("token", userService.getUsersByCounterparty(newCounterparty).get(0).getToken()).
                         body(inputJson.toString()).
                 when().
                         post("/clients").
@@ -170,7 +174,8 @@ public class ClientControllerIT extends BaseControllerIT {
         UUID newClientUuid = UUID.fromString(newUuid);
 
         // check created data
-        Client createdClient = clientService.getEntityByUuid(newClientUuid, newCounterparty.getUser());
+        Client createdClient = clientService.getEntityByUuid(newClientUuid,
+                userService.getUsersByCounterparty(newCounterparty).get(0));
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientMapper.toDto(createdClient));
         assertEquals(expectedJson.toJSONString(), actualJson, false);
@@ -291,7 +296,7 @@ public class ClientControllerIT extends BaseControllerIT {
 
         String newUuid = given().
                 contentType(APPLICATION_JSON_VALUE).
-                queryParam("token", newCounterparty.getUser().getToken()).
+                queryParam("token", userService.getUsersByCounterparty(newCounterparty).get(0).getToken()).
                 body(inputJson.toString()).
         when().
                 post("/clients").
@@ -301,7 +306,8 @@ public class ClientControllerIT extends BaseControllerIT {
         extract().
                 path("uuid");
         UUID newClientUuid = UUID.fromString(newUuid);
-        Client createdClient = clientService.getEntityByUuid(newClientUuid, newCounterparty.getUser());
+        Client createdClient = clientService.getEntityByUuid(newClientUuid,
+                userService.getUsersByCounterparty(newCounterparty).get(0));
         testHelper.deleteClient(createdClient);
     }
 

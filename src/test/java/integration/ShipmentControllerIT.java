@@ -13,6 +13,7 @@ import com.opinta.entity.ShipmentGroup;
 import com.opinta.entity.User;
 import com.opinta.mapper.ShipmentMapper;
 import com.opinta.service.ShipmentService;
+import com.opinta.service.UserService;
 import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -39,12 +40,14 @@ public class ShipmentControllerIT extends BaseControllerIT {
     private ShipmentService shipmentService;
     @Autowired
     private TestHelper testHelper;
+    @Autowired
+    private UserService userService;
 
     @Before
     public void setUp() throws Exception {
         shipment = testHelper.createShipment();
         shipmentUuid = shipment.getUuid();
-        user = shipment.getSender().getCounterparty().getUser();
+        user = userService.getUsersByCounterparty(shipment.getSender().getCounterparty()).get(0);
     }
 
     @After
@@ -112,7 +115,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         String newShipmentUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
-                        queryParam("token", sender.getCounterparty().getUser().getToken()).
+                        queryParam("token", userService.getUsersByCounterparty(sender.getCounterparty()).get(0).getToken()).
                         body(expectedJson).
                 when().
                         post("/shipments").
@@ -124,7 +127,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
 
         // check created data
         Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
-                sender.getCounterparty().getUser());
+                userService.getUsersByCounterparty(sender.getCounterparty()).get(0));
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(shipmentMapper.toDto(createdShipment));
 
@@ -150,7 +153,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         String newShipmentUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
-                        queryParam("token", counterparty.getUser().getToken()).
+                        queryParam("token", userService.getUsersByCounterparty(counterparty).get(0).getToken()).
                         body(inputJson).
                 when().
                         post("/shipments").
@@ -163,7 +166,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         
         // check created data
         Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
-                counterparty.getUser());
+                userService.getUsersByCounterparty(counterparty).get(0));
         // adjust jsonObject with actual data, modified in server
         testHelper.mergeClientNames((JSONObject) jsonObject.get("sender"), createdShipment.getSender());
         testHelper.mergeClientNames((JSONObject) jsonObject.get("recipient"), createdShipment.getRecipient());
@@ -194,7 +197,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         String newShipmentUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
-                        queryParam("token", counterparty.getUser().getToken()).
+                        queryParam("token", userService.getUsersByCounterparty(counterparty).get(0).getToken()).
                         body(inputJson).
                 when().
                         post("/shipments").
@@ -207,7 +210,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         
         // check created data
         Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
-                counterparty.getUser());
+                userService.getUsersByCounterparty(counterparty).get(0));
         // adjust jsonObject with actual data, modified into
         testHelper.mergeClientNames((JSONObject) jsonObject.get("sender"), createdShipment.getSender());
         testHelper.mergeClientNames((JSONObject) jsonObject.get("recipient"), createdShipment.getRecipient());
@@ -258,7 +261,8 @@ public class ShipmentControllerIT extends BaseControllerIT {
 
         given().
                 contentType(APPLICATION_JSON_VALUE).
-                queryParam("token", shipment.getSender().getCounterparty().getUser().getToken()).
+                queryParam("token",
+                        userService.getUsersByCounterparty(shipment.getSender().getCounterparty()).get(0).getToken()).
         when().
                 delete("/shipments/{uuid}/shipment-group", shipment.getUuid().toString()).
         then().

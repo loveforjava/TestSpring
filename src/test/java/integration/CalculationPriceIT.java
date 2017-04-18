@@ -4,6 +4,7 @@ import com.opinta.entity.Client;
 import com.opinta.entity.Shipment;
 import com.opinta.entity.ShipmentGroup;
 import com.opinta.service.ShipmentService;
+import com.opinta.service.UserService;
 import integration.helper.TestHelper;
 import java.util.UUID;
 import org.json.simple.JSONObject;
@@ -21,6 +22,8 @@ public class CalculationPriceIT extends BaseControllerIT {
     private ShipmentGroup shipmentGroup;
     @Autowired
     private ShipmentService shipmentService;
+    @Autowired
+    private UserService userService;
     @Autowired
     private TestHelper testHelper;
 
@@ -47,7 +50,8 @@ public class CalculationPriceIT extends BaseControllerIT {
         String newShipmentUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
-                        queryParam("token", sender.getCounterparty().getUser().getToken()).
+                        queryParam("token",
+                                userService.getUsersByCounterparty(sender.getCounterparty()).get(0).getToken()).
                         body(expectedJson).
                 when().
                         post("/shipments").
@@ -58,7 +62,7 @@ public class CalculationPriceIT extends BaseControllerIT {
                         path("uuid");
 
                 Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
-                        sender.getCounterparty().getUser());
+                        userService.getUsersByCounterparty(sender.getCounterparty()).get(0));
 
         // delete
         testHelper.deleteShipment(createdShipment);
@@ -81,7 +85,7 @@ public class CalculationPriceIT extends BaseControllerIT {
         String newShipmentUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
-                        queryParam("token", sender.getCounterparty().getUser().getToken()).
+                        queryParam("token", userService.getUsersByCounterparty(sender.getCounterparty()).get(0).getToken()).
                         body(expectedJson).
                 when().
                         post("/shipments").
@@ -92,7 +96,7 @@ public class CalculationPriceIT extends BaseControllerIT {
                         path("uuid");
 
         Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
-                sender.getCounterparty().getUser());
+                userService.getUsersByCounterparty(sender.getCounterparty()).get(0));
 
         // delete
         testHelper.deleteShipment(createdShipment);
@@ -115,7 +119,7 @@ public class CalculationPriceIT extends BaseControllerIT {
         String newShipmentUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
-                        queryParam("token", sender.getCounterparty().getUser().getToken()).
+                        queryParam("token", userService.getUsersByCounterparty(sender.getCounterparty()).get(0).getToken()).
                         body(expectedJson).
                 when().
                         post("/shipments").
@@ -126,7 +130,7 @@ public class CalculationPriceIT extends BaseControllerIT {
                         path("uuid");
 
         Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
-                sender.getCounterparty().getUser());
+                userService.getUsersByCounterparty(sender.getCounterparty()).get(0));
 
         // delete
         testHelper.deleteShipment(createdShipment);
@@ -149,7 +153,7 @@ public class CalculationPriceIT extends BaseControllerIT {
         String newShipmentUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
-                        queryParam("token", sender.getCounterparty().getUser().getToken()).
+                        queryParam("token", userService.getUsersByCounterparty(sender.getCounterparty()).get(0).getToken()).
                         body(expectedJson).
                 when().
                         post("/shipments").
@@ -160,7 +164,7 @@ public class CalculationPriceIT extends BaseControllerIT {
                         path("uuid");
 
         Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
-                sender.getCounterparty().getUser());
+                userService.getUsersByCounterparty(sender.getCounterparty()).get(0));
 
         // delete
         testHelper.deleteShipment(createdShipment);
@@ -183,7 +187,7 @@ public class CalculationPriceIT extends BaseControllerIT {
         String newShipmentUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
-                        queryParam("token", sender.getCounterparty().getUser().getToken()).
+                        queryParam("token", userService.getUsersByCounterparty(sender.getCounterparty()).get(0).getToken()).
                         body(expectedJson).
                 when().
                         post("/shipments").
@@ -194,7 +198,7 @@ public class CalculationPriceIT extends BaseControllerIT {
                         path("uuid");
         
         Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
-                sender.getCounterparty().getUser());
+                userService.getUsersByCounterparty(sender.getCounterparty()).get(0));
         
         // delete
         testHelper.deleteShipment(createdShipment);
@@ -217,7 +221,7 @@ public class CalculationPriceIT extends BaseControllerIT {
         String newShipmentUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
-                        queryParam("token", sender.getCounterparty().getUser().getToken()).
+                        queryParam("token", userService.getUsersByCounterparty(sender.getCounterparty()).get(0).getToken()).
                         body(expectedJson).
                 when().
                         post("/shipments").
@@ -228,7 +232,7 @@ public class CalculationPriceIT extends BaseControllerIT {
                         path("uuid");
 
         Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
-                sender.getCounterparty().getUser());
+                userService.getUsersByCounterparty(sender.getCounterparty()).get(0));
 
         // delete
         testHelper.deleteShipment(createdShipment);
@@ -251,7 +255,7 @@ public class CalculationPriceIT extends BaseControllerIT {
         String newShipmentUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
-                        queryParam("token", sender.getCounterparty().getUser().getToken()).
+                        queryParam("token", userService.getUsersByCounterparty(sender.getCounterparty()).get(0).getToken()).
                         body(expectedJson).
                 when().
                         post("/shipments").
@@ -262,7 +266,7 @@ public class CalculationPriceIT extends BaseControllerIT {
                         path("uuid");
 
         Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
-                sender.getCounterparty().getUser());
+                userService.getUsersByCounterparty(sender.getCounterparty()).get(0));
 
         // delete
         testHelper.deleteShipment(createdShipment);
@@ -285,7 +289,7 @@ public class CalculationPriceIT extends BaseControllerIT {
         String newShipmentUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
-                        queryParam("token", sender.getCounterparty().getUser().getToken()).
+                        queryParam("token", userService.getUsersByCounterparty(sender.getCounterparty()).get(0).getToken()).
                         body(expectedJson).
                 when().
                         post("/shipments").
@@ -296,7 +300,7 @@ public class CalculationPriceIT extends BaseControllerIT {
                         path("uuid");
 
         Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
-                sender.getCounterparty().getUser());
+                userService.getUsersByCounterparty(sender.getCounterparty()).get(0));
 
         // delete
         testHelper.deleteShipment(createdShipment);
@@ -320,7 +324,7 @@ public class CalculationPriceIT extends BaseControllerIT {
         String newShipmentUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
-                        queryParam("token", sender.getCounterparty().getUser().getToken()).
+                        queryParam("token", userService.getUsersByCounterparty(sender.getCounterparty()).get(0).getToken()).
                         body(expectedJson).
                 when().
                         post("/shipments").
@@ -331,7 +335,7 @@ public class CalculationPriceIT extends BaseControllerIT {
                         path("uuid");
 
         Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
-                sender.getCounterparty().getUser());
+                userService.getUsersByCounterparty(sender.getCounterparty()).get(0));
 
         // delete
         testHelper.deleteShipment(createdShipment);
@@ -355,7 +359,7 @@ public class CalculationPriceIT extends BaseControllerIT {
         String newShipmentUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
-                        queryParam("token", sender.getCounterparty().getUser().getToken()).
+                        queryParam("token", userService.getUsersByCounterparty(sender.getCounterparty()).get(0).getToken()).
                         body(expectedJson).
                 when().
                         post("/shipments").
@@ -366,7 +370,7 @@ public class CalculationPriceIT extends BaseControllerIT {
                         path("uuid");
 
         Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
-                sender.getCounterparty().getUser());
+                userService.getUsersByCounterparty(sender.getCounterparty()).get(0));
 
         // delete
         testHelper.deleteShipment(createdShipment);
@@ -393,7 +397,7 @@ public class CalculationPriceIT extends BaseControllerIT {
         String newShipmentUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
-                        queryParam("token", senderWithDiscount.getCounterparty().getUser().getToken()).
+                        queryParam("token", userService.getUsersByCounterparty(senderWithDiscount.getCounterparty()).get(0).getToken()).
                         body(expectedJson).
                 when().
                         post("/shipments").
@@ -404,7 +408,7 @@ public class CalculationPriceIT extends BaseControllerIT {
                         path("uuid");
 
         Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
-                senderWithDiscount.getCounterparty().getUser());
+                userService.getUsersByCounterparty(senderWithDiscount.getCounterparty()).get(0));
 
         // delete
         testHelper.deleteShipment(createdShipment);

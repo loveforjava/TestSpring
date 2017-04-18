@@ -40,10 +40,7 @@ public class CounterpartyDaoImpl implements CounterpartyDao {
     @Override
     public Counterparty getByUser(User user) {
         Session session = this.sessionFactory.getCurrentSession();
-        return (Counterparty) session.createCriteria(Counterparty.class)
-                .add(Restrictions.eq("user", user))
-                .setMaxResults(1)
-                .uniqueResult();
+        return (Counterparty) session.get(Counterparty.class, user.getCounterparty().getUuid());
     }
     
     @Override

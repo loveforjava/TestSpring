@@ -1,5 +1,6 @@
 package com.opinta.service;
 
+import com.opinta.dto.UserDto;
 import com.opinta.entity.Client;
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.DiscountPerCounterparty;
@@ -7,11 +8,21 @@ import com.opinta.entity.Shipment;
 import com.opinta.entity.ShipmentGroup;
 import com.opinta.entity.User;
 import com.opinta.exception.AuthException;
+import com.opinta.exception.IncorrectInputDataException;
+
+import javax.transaction.Transactional;
+import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
 
     User getEntityByToken(UUID token);
+
+    List<User> getUsersByCounterparty(Counterparty counterparty);
+
+    UserDto save(UserDto userDto) throws IncorrectInputDataException;
+
+    User saveEntity(User user) throws IncorrectInputDataException;
 
     User authenticate(UUID token) throws AuthException;
 

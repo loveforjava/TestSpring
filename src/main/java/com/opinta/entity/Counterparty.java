@@ -30,9 +30,9 @@ public class Counterparty {
     @ManyToOne
     @NotNull
     private PostcodePool postcodePool;
-    @OneToOne(cascade = CascadeType.MERGE)
-    @JoinColumn(name = "user_id")
-    private User user;
+//    @OneToOne(cascade = CascadeType.MERGE)
+//    @JoinColumn(name = "user_id")
+//    private User user;
     private String description;
 
     public Counterparty(String name, PostcodePool postcodePool) {
