@@ -1,5 +1,7 @@
 package com.opinta.service;
 
+import com.opinta.dto.postid.PostIdDto;
+import com.opinta.entity.ClientType;
 import com.opinta.entity.User;
 import com.opinta.exception.AuthException;
 import com.opinta.exception.IncorrectInputDataException;
@@ -22,11 +24,15 @@ public interface ClientService {
     Client saveOrGetEntityAnonymous(Client recipient, User user) throws IncorrectInputDataException, AuthException;
 
     Client getEntityByUuid(UUID uuid, User user) throws IncorrectInputDataException, AuthException;
-
+    
+    Client getEntityByPostId(String postId, User user) throws IncorrectInputDataException, AuthException;
+    
     Client getEntityByUuidAnonymous(UUID uuid) throws IncorrectInputDataException;
 
     Client saveEntity(Client client, User user) throws IncorrectInputDataException, AuthException;
-
+    
+    PostIdDto assignPostIdFor(UUID uuid, ClientType clientType, User user) throws IncorrectInputDataException, AuthException;
+    
     Client updateEntity(Client client, User user) throws IncorrectInputDataException, AuthException;
     
     List<ClientDto> getAll(User user);

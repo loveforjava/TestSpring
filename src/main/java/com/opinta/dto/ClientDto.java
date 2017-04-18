@@ -29,6 +29,10 @@ public class ClientDto {
     private String middleName;
     @Size(max = 255)
     private String lastName;
+    @Size(max = 36)
+    private String postId;
+    @Size(max = 64)
+    private String customId;
     @Size(max = 25)
     private String uniqueRegistrationNumber;
     private UUID counterpartyUuid;

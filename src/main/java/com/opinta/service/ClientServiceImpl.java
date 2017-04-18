@@ -1,12 +1,15 @@
 package com.opinta.service;
 
+import com.opinta.dto.postid.PostIdDto;
 import com.opinta.entity.Address;
+import com.opinta.entity.ClientType;
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.User;
 import com.opinta.exception.AuthException;
 import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.exception.PerformProcessFailedException;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 import javax.transaction.Transactional;
@@ -19,6 +22,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static java.lang.String.valueOf;
+import static java.time.LocalDate.now;
+import static java.util.Locale.ENGLISH;
+
 import static com.opinta.util.EnhancedBeanUtilsBean.copyNotNullProperties;
 import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
@@ -28,6 +35,7 @@ import static com.opinta.util.LogMessageUtil.getByIdLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.saveLogEndpoint;
 import static com.opinta.util.LogMessageUtil.updateLogEndpoint;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 @Service
 @Slf4j
@@ -38,17 +46,19 @@ public class ClientServiceImpl implements ClientService {
     private final AddressService addressService;
     private final UserService userService;
     private final ClientMapper clientMapper;
+    private final PostIdNumberGenerator postIdNumberGenerator;
 
     @Autowired
     public ClientServiceImpl(ClientDao clientDao, ClientMapper clientMapper, PhoneService phoneService,
                              AddressService addressService, CounterpartyService counterpartyService,
-                             UserService userService) {
+                             UserService userService, PostIdNumberGenerator postIdSequenceNumberGenerator) {
         this.clientDao = clientDao;
         this.counterpartyService = counterpartyService;
         this.phoneService = phoneService;
         this.addressService = addressService;
         this.clientMapper = clientMapper;
         this.userService = userService;
+        this.postIdNumberGenerator = postIdSequenceNumberGenerator;
     }
 
     @Override
@@ -70,7 +80,11 @@ public class ClientServiceImpl implements ClientService {
     @Transactional
     public Client saveOrGetEntity(Client client, User user) throws IncorrectInputDataException, AuthException {
         if (client.getUuid() == null) {
-            return saveEntity(client, user);
+            if (isEmpty(client.getPostId())) {
+                return saveEntity(client, user);
+            } else {
+                return getEntityByPostId(client.getPostId(), user);
+            }
         } else {
             return getEntityByUuid(client.getUuid(), user);
         }
@@ -99,7 +113,22 @@ public class ClientServiceImpl implements ClientService {
 
         return client;
     }
-
+    
+    @Override
+    @Transactional
+    public Client getEntityByPostId(String postId, User user) throws IncorrectInputDataException, AuthException {
+        log.info(getByIdLogEndpoint(Client.class, postId));
+        Client client = clientDao.getByPostId(postId);
+        if (client == null) {
+            log.error(getByIdOnErrorLogEndpoint(Client.class, postId));
+            throw new IncorrectInputDataException(getByIdOnErrorLogEndpoint(Client.class, postId));
+        }
+        
+        userService.authorizeForAction(client, user);
+    
+        return client;
+    }
+    
     @Override
     @Transactional
     public Client getEntityByUuidAnonymous(UUID uuid) throws IncorrectInputDataException {
@@ -121,7 +150,38 @@ public class ClientServiceImpl implements ClientService {
         log.info(saveLogEndpoint(Client.class, client));
         return clientDao.save(client);
     }
-
+    
+    @Override
+    public PostIdDto assignPostIdFor(UUID uuid, ClientType clientType, User user) throws IncorrectInputDataException, AuthException {
+        Client client = getEntityByUuid(uuid, user);
+        PostIdDto postIdDto = new PostIdDto(generatePostIdUsing(clientType));
+        client.setPostId(postIdDto.getPostId());
+        clientDao.update(client);
+        return postIdDto;
+    }
+    
+    private String generatePostIdUsing(ClientType clientType) {
+        return clientType.postIdLetter() + yearDigitChars() + postIdNumberGenerator.generateNextNumber() + saltChars();
+    }
+    
+    private String yearDigitChars() {
+        return valueOf(now().getYear()).substring(2);
+    }
+    
+    private String saltChars() {
+        Random random = new Random();
+        return new StringBuilder()
+                .append(generateAlphabeticCharUsing(random))
+                .append(generateAlphabeticCharUsing(random))
+                .append(generateAlphabeticCharUsing(random))
+                .toString()
+                .toUpperCase(ENGLISH);
+    }
+    
+    private char generateAlphabeticCharUsing(Random random) {
+        return (char) (random.nextInt(26) + 'a');
+    }
+    
     @Override
     @Transactional
     public Client updateEntity(Client client, User user) throws IncorrectInputDataException, AuthException {

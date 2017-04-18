@@ -33,6 +33,10 @@ public class Client {
     private String firstName;
     private String middleName;
     private String lastName;
+    @Size(max = 36)
+    private String postId;
+    @Size(max = 64)
+    private String customId;
     private String uniqueRegistrationNumber;
     @ManyToOne
     @JoinColumn(name = "address_id")

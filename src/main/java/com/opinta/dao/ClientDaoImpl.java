@@ -48,7 +48,16 @@ public class ClientDaoImpl implements ClientDao {
         Session session = sessionFactory.getCurrentSession();
         return (Client) session.get(Client.class, uuid);
     }
-
+    
+    @Override
+    public Client getByPostId(String postId) {
+        Session session = sessionFactory.getCurrentSession();
+        return (Client) session.createCriteria(Client.class)
+                .add(Restrictions.eq("postId", postId))
+                .setMaxResults(1)
+                .uniqueResult();
+    }
+    
     @Override
     public Client save(Client client) {
         Session session = sessionFactory.getCurrentSession();
