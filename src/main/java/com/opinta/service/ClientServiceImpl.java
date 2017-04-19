@@ -140,7 +140,8 @@ public class ClientServiceImpl implements ClientService {
         }
         return client;
     }
-
+    
+    @Override
     @Transactional
     public Client saveEntity(Client client, User user) throws IncorrectInputDataException, AuthException {
         validateInnerReferencesAndFillObjectFromDB(client, user);
@@ -152,6 +153,7 @@ public class ClientServiceImpl implements ClientService {
     }
     
     @Override
+    @Transactional
     public PostIdDto assignPostIdFor(UUID uuid, ClientType clientType, User user) throws IncorrectInputDataException, AuthException {
         Client client = getEntityByUuid(uuid, user);
         PostIdDto postIdDto = new PostIdDto(generatePostIdUsing(clientType));
@@ -165,7 +167,8 @@ public class ClientServiceImpl implements ClientService {
     }
     
     private String yearDigitChars() {
-        return valueOf(now().getYear()).substring(2);
+        String yearString = valueOf(now().getYear());
+        return yearString.substring(yearString.length() - 2);
     }
     
     private String saltChars() {
@@ -226,6 +229,7 @@ public class ClientServiceImpl implements ClientService {
         Client source = clientMapper.toEntity(clientDto);
         source.setCounterparty(null);
         Client target = getEntityByUuid(uuid, user);
+        String postId = target.getPostId();
 
         validateInnerReferencesAndFillObjectFromDB(source, user);
 
@@ -235,6 +239,8 @@ public class ClientServiceImpl implements ClientService {
             log.error(copyPropertiesOnErrorLogEndpoint(Client.class, source, target, e));
             throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(Client.class, source, target, e));
         }
+        
+        target.setPostId(postId);
         target.setUuid(uuid);
         target.getPhone().removeNonNumericalCharacters();
         target.setPhone(phoneService.getOrCreateEntityByPhoneNumber(target.getPhone().getPhoneNumber()));

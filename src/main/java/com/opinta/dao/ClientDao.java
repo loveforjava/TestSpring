@@ -16,6 +16,8 @@ public interface ClientDao {
     Client getByUuid(UUID uuid);
     
     Client getByPostId(String postId);
+    
+    String getNextPostIdNumber();
 
     Client save(Client client);
 

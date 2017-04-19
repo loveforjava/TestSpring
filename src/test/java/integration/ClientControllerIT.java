@@ -12,13 +12,16 @@ import com.opinta.service.ClientService;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import integration.helper.TestHelper;
 
 import static java.lang.String.join;
+import static java.lang.String.valueOf;
 
+import static com.opinta.entity.ClientType.INDIVIDUAL;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
@@ -191,6 +194,7 @@ public class ClientControllerIT extends BaseControllerIT {
         inputJson.put("middleName", "Jakson [edited]");
         inputJson.put("phoneNumber", "0934314522");
         inputJson.put("individual", true);
+        inputJson.put("customId", "11111-fffff-xxx-9876");
 
         String firstName = (String) inputJson.get("firstName");
         String middleName = (String) inputJson.get("middleName");
@@ -211,6 +215,7 @@ public class ClientControllerIT extends BaseControllerIT {
         String expectedFullName = join(" ", lastName, firstName, middleName);
         expectedJson.put("name", expectedFullName);
         expectedJson.put("middleName", inputJson.get("middleName"));
+        expectedJson.put("customId", "11111-fffff-xxx-9876");
 
         // check updated data
         Client updatedClient = clientService.getEntityByUuid(clientUuid, user);
@@ -345,5 +350,29 @@ public class ClientControllerIT extends BaseControllerIT {
                 post("/clients").
         then().
                 statusCode(SC_BAD_REQUEST);
+    }
+    
+    @Test
+    public void verifyExistingClientAndAssignPostId() throws Exception {
+        JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client-type.json");
+        inputJson.put("type", INDIVIDUAL.name());
+    
+        String postId =
+                given().
+                        contentType(APPLICATION_JSON_VALUE).
+                        queryParam("token", user.getToken()).
+                        body(inputJson.toString()).
+                when().
+                        put("/clients/{uuid}/post-id", client.getUuid().toString()).
+                then().
+                        statusCode(SC_OK).
+                extract().
+                        path("postId");
+        
+        Assert.assertEquals(13, postId.length());
+        Assert.assertEquals(INDIVIDUAL.postIdLetter(), valueOf(postId.charAt(0)));
+        
+        Client saved = clientService.getEntityByUuid(client.getUuid(), user);
+        Assert.assertEquals(postId, saved.getPostId());
     }
 }

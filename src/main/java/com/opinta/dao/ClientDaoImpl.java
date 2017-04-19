@@ -2,6 +2,9 @@ package com.opinta.dao;
 
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.User;
+
+import java.sql.CallableStatement;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,6 +15,8 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
+import static java.lang.String.format;
 
 @Repository
 public class ClientDaoImpl implements ClientDao {
@@ -56,6 +61,22 @@ public class ClientDaoImpl implements ClientDao {
                 .add(Restrictions.eq("postId", postId))
                 .setMaxResults(1)
                 .uniqueResult();
+    }
+    
+    private static final String POST_ID_NEXT_NUMBER_CALL =
+            "";
+    @Override
+    public String getNextPostIdNumber() {
+        Session session = sessionFactory.getCurrentSession();
+        int nextNumber = session.doReturningWork((connection) -> {
+            try (CallableStatement call = connection.prepareCall(POST_ID_NEXT_NUMBER_CALL)) {
+                // TODO call
+                return -1;
+            } catch (SQLException e) {
+                throw new RuntimeException("Can't generate next postid number from stored procedure: ", e);
+            }
+        });
+        return format("%07d", nextNumber);
     }
     
     @Override

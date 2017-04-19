@@ -1,7 +1,9 @@
 package integration.helper;
 
+import com.opinta.dto.postid.PostIdDto;
 import com.opinta.entity.Address;
 import com.opinta.entity.Client;
+import com.opinta.entity.ClientType;
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.Discount;
 import com.opinta.entity.DiscountPerCounterparty;
@@ -42,6 +44,8 @@ import java.math.BigDecimal;
 
 import static java.time.LocalDateTime.now;
 
+import static com.opinta.entity.ClientType.COMPANY;
+import static com.opinta.entity.ClientType.INDIVIDUAL;
 import static com.opinta.entity.DeliveryType.D2D;
 import static com.opinta.util.LogMessageUtil.deleteOnErrorLogEndpoint;
 
@@ -164,6 +168,12 @@ public class TestHelper {
         clientUuidJsonObject.put("uuid", client.getUuid().toString());
         return clientUuidJsonObject;
     }
+    
+    public JSONObject toJsonWithPostId(Client client) {
+        JSONObject clientPostIdJsonObject = new JSONObject();
+        clientPostIdJsonObject.put("postId", client.getPostId());
+        return clientPostIdJsonObject;
+    }
 
     @SuppressWarnings("unchecked")
     public void mergeClientNames(JSONObject target, Client source) {
@@ -183,6 +193,7 @@ public class TestHelper {
     public Client createClient() throws Exception {
         Client client = new Client("FOP Ivanov", "001", createAddress(), createPhone(),
                 createCounterparty());
+        client.setCustomId("123-fff-000-888-zxc");
         return clientService.saveEntity(client, client.getCounterparty().getUser());
     }
     
@@ -195,6 +206,17 @@ public class TestHelper {
     public Client createSenderFor(Counterparty counterparty) throws Exception {
         Client client = new Client("FOP Sidorov", "456", createAddress(), createPhone(), counterparty);
         return clientService.saveEntity(client, client.getCounterparty().getUser());
+    }
+    
+    public void assignPostIdTo(Client client) throws Exception {
+        ClientType type;
+        if (client.isIndividual()) {
+            type = INDIVIDUAL;
+        } else {
+            type = COMPANY;
+        }
+        PostIdDto postId = clientService.assignPostIdFor(client.getUuid(), type, client.getCounterparty().getUser());
+        client.setPostId(postId.getPostId());
     }
 
     public Client createRecipientFor(Counterparty counterparty) throws Exception {

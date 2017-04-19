@@ -133,6 +133,47 @@ public class ShipmentControllerIT extends BaseControllerIT {
         // delete
         testHelper.deleteShipment(createdShipment);
     }
+    
+    @Test
+    @SuppressWarnings("unchecked")
+    public void createShipment_presavedSenderAndRecipient_senderByPostId() throws Exception {
+        Counterparty counterparty = testHelper.createCounterparty();
+        Client sender = testHelper.createSenderFor(counterparty);
+        testHelper.assignPostIdTo(sender);
+        Client recipient = testHelper.createRecipient();
+        ShipmentGroup shipmentGroup = testHelper.createShipmentGroup();
+        
+        JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
+        // populate input json with sender and recipient uuid
+        jsonObject.put("sender", testHelper.toJsonWithPostId(sender));
+        jsonObject.put("recipient", testHelper.toJsonWithUuid(recipient));
+        jsonObject.put("shipmentGroupUuid", shipmentGroup.getUuid().toString());
+        String expectedJson = jsonObject.toString();
+        
+        String newShipmentUuid =
+                given().
+                        contentType(APPLICATION_JSON_VALUE).
+                        queryParam("token", sender.getCounterparty().getUser().getToken()).
+                        body(expectedJson).
+                when().
+                        post("/shipments").
+                then().
+                        statusCode(SC_OK).
+                        body("barcode", RegexMatcher.matches(BARCODE_REGEX)).
+                extract().
+                        path("uuid");
+        
+        // check created data
+        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
+                sender.getCounterparty().getUser());
+        ObjectMapper mapper = new ObjectMapper();
+        String actualJson = mapper.writeValueAsString(shipmentMapper.toDto(createdShipment));
+        
+        JSONAssert.assertEquals(expectedJson, actualJson, false);
+        
+        // delete
+        testHelper.deleteShipment(createdShipment);
+    }
 
     @Test
     @SuppressWarnings("unchecked")

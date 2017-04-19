@@ -12,6 +12,6 @@ public enum ClientType {
     }
     
     public String postIdLetter() {
-        return this.postIdLetter;
+        return postIdLetter;
     }
 }
