@@ -121,11 +121,14 @@ public class ClientControllerIT extends BaseControllerIT {
         JSONParser parser = new JSONParser();
         JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
         expectedJson.put("name", expectedFullName);
-
+        expectedJson.remove("customId");
+        
         UUID newClientUuid = UUID.fromString(newUuid);
 
         // check created data
         Client createdClient = clientService.getEntityByUuid(newClientUuid, newCounterparty.getUser());
+        Assert.assertEquals(inputJson.get("customId"), createdClient.getCustomId());
+        
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientMapper.toDto(createdClient));
         assertEquals(expectedJson.toJSONString(), actualJson, false);
@@ -169,11 +172,14 @@ public class ClientControllerIT extends BaseControllerIT {
         expectedJson.remove("firstName");
         expectedJson.remove("middleName");
         expectedJson.remove("lastName");
+        expectedJson.remove("customId");
 
         UUID newClientUuid = UUID.fromString(newUuid);
 
         // check created data
         Client createdClient = clientService.getEntityByUuid(newClientUuid, newCounterparty.getUser());
+        Assert.assertEquals(inputJson.get("customId"), createdClient.getCustomId());
+        
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientMapper.toDto(createdClient));
         assertEquals(expectedJson.toJSONString(), actualJson, false);
@@ -215,10 +221,12 @@ public class ClientControllerIT extends BaseControllerIT {
         String expectedFullName = join(" ", lastName, firstName, middleName);
         expectedJson.put("name", expectedFullName);
         expectedJson.put("middleName", inputJson.get("middleName"));
-        expectedJson.put("customId", "11111-fffff-xxx-9876");
+        expectedJson.remove("customId");
 
         // check updated data
         Client updatedClient = clientService.getEntityByUuid(clientUuid, user);
+        Assert.assertEquals(inputJson.get("customId"), updatedClient.getCustomId());
+        
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientMapper.toDto(updatedClient));
         assertEquals(expectedJson.toJSONString(), actualJson, false);
@@ -250,9 +258,12 @@ public class ClientControllerIT extends BaseControllerIT {
         expectedJson.remove("firstName");
         expectedJson.remove("middleName");
         expectedJson.remove("lastName");
-
+        expectedJson.remove("customId");
+        
         // check updated data
         Client updatedClient = clientService.getEntityByUuid(clientUuid, user);
+        Assert.assertEquals(inputJson.get("customId"), updatedClient.getCustomId());
+    
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientMapper.toDto(updatedClient));
         assertEquals(expectedJson.toJSONString(), actualJson, false);

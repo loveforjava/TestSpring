@@ -5,12 +5,16 @@ import java.util.UUID;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import static com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY;
 import static com.opinta.constraint.RegexPattern.BANK_CODE_LENGTH;
 import static com.opinta.constraint.RegexPattern.PHONE_NUMBER_REGEX;
 
@@ -32,6 +36,7 @@ public class ClientDto {
     @Size(max = 36)
     private String postId;
     @Size(max = 64)
+    @JsonProperty(access = WRITE_ONLY)
     private String customId;
     @Size(max = 25)
     private String uniqueRegistrationNumber;
