@@ -32,6 +32,12 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
+    public User getById(long id) {
+        Session session = sessionFactory.getCurrentSession();
+        return (User) session.get(User.class, id);
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public List<User> getAllByCounterparty(Counterparty counterparty) {
         Session session = sessionFactory.getCurrentSession();
@@ -51,12 +57,6 @@ public class UserDaoImpl implements UserDao {
     public void update(User user) {
         Session session = this.sessionFactory.getCurrentSession();
         session.update(user);
-    }
-
-    @Override
-    public User getById(long id) {
-        Session session = sessionFactory.getCurrentSession();
-        return (User) session.get(User.class, id);
     }
 
     @Override

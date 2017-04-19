@@ -29,6 +29,12 @@ public class LogMessageUtil {
         return format("Deleting %s %s", clazz.getSimpleName(), value);
     }
 
+    public static String deleteWithForeignReferencesOnErrorEndpoint(Class clazz, Class foreignClazz) {
+        return format("Deleting %s is not possible, the references from instances of %s are still exist!",
+                clazz.getSimpleName(), foreignClazz.getSimpleName());
+
+    }
+
     public static String getAllOnErrorLogEndpoint(Class clazz) {
         return format("List of %s has not been got!", clazz.getSimpleName());
     }

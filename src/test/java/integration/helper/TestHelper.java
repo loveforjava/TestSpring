@@ -373,7 +373,7 @@ public class TestHelper {
 
     public void deleteCounterparty(Counterparty counterparty) {
         try {
-            counterpartyService.deleteAnomymous(counterparty.getUuid());
+            counterpartyService.deleteAnonymous(counterparty.getUuid());
         } catch (Exception e) {
             log.debug(e.getMessage());
         }

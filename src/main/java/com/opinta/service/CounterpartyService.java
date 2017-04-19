@@ -35,5 +35,5 @@ public interface CounterpartyService {
 
     Counterparty getEntityByUuidAnonymous(UUID uuid) throws IncorrectInputDataException;
 
-    void deleteAnomymous(UUID uuid) throws IncorrectInputDataException;
+    void deleteAnonymous(UUID uuid) throws IncorrectInputDataException;
 }

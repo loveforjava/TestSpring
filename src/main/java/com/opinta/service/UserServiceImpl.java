@@ -73,13 +73,23 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserDto removeCounterpartyFromUser(User userEntity)
-            throws IncorrectInputDataException, AuthException {
+    public UserDto removeCounterpartyFromUser(User userEntity) throws IncorrectInputDataException {
         userEntity = getEntityById(userEntity.getId());
         userEntity.setCounterparty(null);
         log.info(updateLogEndpoint(User.class, userEntity));
         userDao.update(userEntity);
         return userMapper.toDto(userEntity);
+    }
+
+    @Override
+    @Transactional
+    public void removeCounterpartyFromAllUsers(Counterparty counterparty) throws IncorrectInputDataException {
+        List<User> users = userDao.getAllByCounterparty(counterparty);
+        for(User user : users) {
+            user.setCounterparty(null);
+            log.info(updateLogEndpoint(User.class, user));
+            userDao.update(user);
+        }
     }
 
     @Override

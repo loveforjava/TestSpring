@@ -10,13 +10,13 @@ public interface UserDao {
 
     User getByToken(UUID token);
 
+    User getById(long id);
+
     List<User> getAllByCounterparty(Counterparty counterparty);
 
     User save(User user);
 
     void update(User user);
-
-    User getById(long id);
 
     void delete(User user);
 }

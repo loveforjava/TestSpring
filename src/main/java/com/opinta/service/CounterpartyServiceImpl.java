@@ -31,6 +31,7 @@ import static com.opinta.util.LogMessageUtil.getByIdLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.saveLogEndpoint;
 import static com.opinta.util.LogMessageUtil.updateLogEndpoint;
+import static com.opinta.util.LogMessageUtil.deleteWithForeignReferencesOnErrorEndpoint;
 
 @Service
 @Slf4j
@@ -108,11 +109,6 @@ public class CounterpartyServiceImpl implements CounterpartyService {
     @Override
     @Transactional
     public Counterparty saveEntity(Counterparty counterparty) throws IncorrectInputDataException {
-//        User user = new User();
-//        user.setUsername(counterparty.getName());
-//        user.setToken(UUID.randomUUID());
-//        user.setCounterparty(counterparty);
-
         log.info(saveLogEndpoint(Counterparty.class, counterparty));
         return counterpartyDao.save(counterparty);
     }
@@ -141,8 +137,6 @@ public class CounterpartyServiceImpl implements CounterpartyService {
             throws IncorrectInputDataException, AuthException, PerformProcessFailedException {
         Counterparty source = counterpartyMapper.toEntity(counterpartyDto);
         Counterparty target = getEntityByUuid(uuid, user);
-
-//        source.setUser(target.getUser());
         source.setPostcodePool(target.getPostcodePool());
 
         try {
@@ -163,19 +157,16 @@ public class CounterpartyServiceImpl implements CounterpartyService {
     public void delete(UUID uuid, User user) throws AuthException, IncorrectInputDataException {
         log.info(deleteLogEndpoint(Counterparty.class, uuid));
         Counterparty counterparty = getEntityByUuid(uuid, user);
-        userService.removeCounterpartyFromUser(user);
+        userService.removeCounterpartyFromAllUsers(counterparty);
         counterpartyDao.delete(counterparty);
     }
 
     @Override
     @Transactional
-    public void deleteAnomymous(UUID uuid) throws IncorrectInputDataException {
-        if (!userService.getUsersByCounterparty(counterpartyDao.getByUuid(uuid)).isEmpty()) {
-            //TODO: add proper logging
-            throw new IncorrectInputDataException(deleteLogEndpoint(Counterparty.class, uuid));
-        }
+    public void deleteAnonymous(UUID uuid) throws IncorrectInputDataException {
         log.info(deleteLogEndpoint(Counterparty.class, uuid));
         Counterparty counterparty = getEntityByUuidAnonymous(uuid);
+        userService.removeCounterpartyFromAllUsers(counterparty);
         counterpartyDao.delete(counterparty);
     }
 }

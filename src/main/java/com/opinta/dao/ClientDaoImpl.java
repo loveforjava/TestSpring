@@ -27,7 +27,6 @@ public class ClientDaoImpl implements ClientDao {
     public List<Client> getAll(User user) {
         Session session = sessionFactory.getCurrentSession();
         return session.createCriteria(Client.class, "client")
-//                .createCriteria("client.counterparty", "counterparty")
                 .add(Restrictions.eq("client.counterparty", user.getCounterparty()))
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                 .list();
