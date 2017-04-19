@@ -10,7 +10,6 @@ import com.opinta.entity.User;
 import com.opinta.exception.AuthException;
 import com.opinta.exception.IncorrectInputDataException;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,14 +21,11 @@ public interface UserService {
 
     List<User> getUsersByCounterparty(Counterparty counterparty);
 
-    UserDto save(UserDto userDto) throws IncorrectInputDataException;
-
     User saveEntity(User user) throws IncorrectInputDataException;
 
-    @Transactional
     User updateEntity(User user) throws IncorrectInputDataException, AuthException;
 
-    void removeCounterpartyFromAllUsers(Counterparty counterparty) throws IncorrectInputDataException;
+    UserDto save(UserDto userDto) throws IncorrectInputDataException;
 
     void delete(long id) throws IncorrectInputDataException;
 

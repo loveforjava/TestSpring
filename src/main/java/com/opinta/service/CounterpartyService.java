@@ -15,6 +15,8 @@ public interface CounterpartyService {
     List<Counterparty> getAllEntities();
 
     Counterparty getEntityByUuid(UUID uuid, User user) throws IncorrectInputDataException, AuthException;
+
+    Counterparty getEntityByUuidAnonymous(UUID uuid) throws IncorrectInputDataException;
     
     List<Counterparty> getAllEntitiesByPostcodePoolUuid(UUID postcodePoolUuid) throws IncorrectInputDataException;
 
@@ -28,8 +30,6 @@ public interface CounterpartyService {
             AuthException, PerformProcessFailedException;
     
     CounterpartyDto save(CounterpartyDto counterpartyDto) throws IncorrectInputDataException;
-
-    Counterparty getEntityByUuidAnonymous(UUID uuid) throws IncorrectInputDataException;
 
     void delete(UUID uuid) throws IncorrectInputDataException;
 }
