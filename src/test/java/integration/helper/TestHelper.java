@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+import static com.opinta.util.LogMessageUtil.updateLogEndpoint;
 import static java.time.LocalDateTime.now;
 
 import static com.opinta.entity.DeliveryType.D2D;
@@ -388,7 +389,7 @@ public class TestHelper {
     }
 
     public User createUser(Counterparty counterparty) throws Exception {
-        return userService.saveEntity(new User("Sameperson", "123456", counterparty, UUID.randomUUID()));
+        return userService.saveEntity(new User("Sameperson", counterparty, UUID.randomUUID()));
     }
     
     public PostcodePool createPostcodePool() {
@@ -397,7 +398,13 @@ public class TestHelper {
 
     public void deleteCounterparty(Counterparty counterparty) {
         try {
-            counterpartyService.deleteAnonymous(counterparty.getUuid());
+            List<User> users = userService.getUsersByCounterparty(counterparty);
+            for(User user : users) {
+                user.setCounterparty(null);
+                log.info(updateLogEndpoint(User.class, user));
+                userService.updateEntity(user);
+            }
+            counterpartyService.delete(counterparty.getUuid());
         } catch (Exception e) {
             log.debug(e.getMessage());
         }
