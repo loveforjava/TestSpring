@@ -120,8 +120,9 @@ public class CounterpartyControllerIT extends BaseControllerIT {
                 then().
                         contentType(APPLICATION_JSON_VALUE).
                         statusCode(SC_OK).
-                extract().response();
-
+                extract()
+                        .response();
+        //check created data
         Counterparty createdCounterparty = counterpartyService.getEntityByUuidAnonymous(UUID.fromString(response.path("uuid")));
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(counterpartyMapper.toDto(createdCounterparty));
@@ -139,7 +140,6 @@ public class CounterpartyControllerIT extends BaseControllerIT {
         MockMvcResponse response;
         String expectedJson;
         JSONObject inputJson;
-        User user;
         Counterparty createdCounterparty;
         List<Counterparty> createdCounterparties = new ArrayList<>();
         String actualJson;

@@ -13,7 +13,6 @@ import com.opinta.entity.ShipmentGroup;
 import com.opinta.entity.User;
 import com.opinta.mapper.ShipmentMapper;
 import com.opinta.service.ShipmentService;
-import com.opinta.service.UserService;
 import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -46,7 +45,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
     public void setUp() throws Exception {
         counterparty = testHelper.createCounterparty();
         user = testHelper.createUser(counterparty);
-        shipment = testHelper.createShipment(counterparty);
+        shipment = testHelper.createShipmentFor(counterparty);
         shipmentUuid = shipment.getUuid();
     }
 

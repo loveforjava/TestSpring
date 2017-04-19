@@ -124,17 +124,17 @@ public class TestHelper {
         return shipmentService.saveEntity(shipment, userService.getUsersByCounterparty(counterparty).get(0));
     }
 
-    public Shipment createShipment(Counterparty counterparty) throws Exception {
-        Shipment shipment = new Shipment(createSenderFor(counterparty), createRecipientFor(counterparty),
-                D2D, 4.0F, 3.8F, new BigDecimal(200), new BigDecimal(30), new BigDecimal(35.2));
-        return shipmentService.saveEntity(shipment, userService.getUsersByCounterparty(counterparty).get(0));
-    }
-
     public Shipment createShipment(ShipmentGroup shipmentGroup) throws Exception {
         Counterparty counterparty = shipmentGroup.getCounterparty();
         Shipment shipment = new Shipment(createSenderFor(counterparty), createRecipientFor(counterparty),
                 D2D, 4.0F, 3.8F, new BigDecimal(200), new BigDecimal(30), new BigDecimal(35.2));
         shipment.setShipmentGroup(shipmentGroup);
+        return shipmentService.saveEntity(shipment, userService.getUsersByCounterparty(counterparty).get(0));
+    }
+
+    public Shipment createShipmentFor(Counterparty counterparty) throws Exception {
+        Shipment shipment = new Shipment(createSenderFor(counterparty), createRecipientFor(counterparty),
+                D2D, 4.0F, 3.8F, new BigDecimal(200), new BigDecimal(30), new BigDecimal(35.2));
         return shipmentService.saveEntity(shipment, userService.getUsersByCounterparty(counterparty).get(0));
     }
 
