@@ -22,8 +22,8 @@ public interface ShipmentMapper extends BaseMapper<ShipmentDto, Shipment> {
     @Mappings({
             @Mapping(target = "shipmentGroup",
                     expression = "java(ShipmentGroupUuidToShipmentGroupEntity(shipmentDto.getShipmentGroupUuid()))"),
-            @Mapping(target="barcodeInnerNumber", ignore=true),
-            @Mapping(target="discountPerCounterparty", ignore=true)})
+            @Mapping(target = "barcodeInnerNumber", ignore = true),
+            @Mapping(target = "discountPerCounterparty", ignore = true)})
     Shipment toEntity(ShipmentDto shipmentDto);
 
     default ShipmentGroup ShipmentGroupUuidToShipmentGroupEntity(UUID uuid) {

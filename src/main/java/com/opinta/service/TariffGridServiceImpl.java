@@ -7,6 +7,7 @@ import com.opinta.entity.W2wVariation;
 import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.exception.PerformProcessFailedException;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import javax.transaction.Transactional;
 
@@ -102,7 +103,7 @@ public class TariffGridServiceImpl implements TariffGridService {
         }
         try {
             copyNotNullProperties(target, source);
-        } catch (Exception e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             log.error(copyPropertiesOnErrorLogEndpoint(TariffGrid.class, source, target, e));
             throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(
                     TariffGrid.class, source, target, e));

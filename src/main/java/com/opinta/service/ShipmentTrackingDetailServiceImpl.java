@@ -6,6 +6,7 @@ import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.exception.PerformProcessFailedException;
 import com.opinta.mapper.ShipmentTrackingDetailMapper;
 import com.opinta.entity.ShipmentTrackingDetail;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -74,7 +75,7 @@ public class ShipmentTrackingDetailServiceImpl implements ShipmentTrackingDetail
         ShipmentTrackingDetail target = getEntityByUuid(id);
         try {
             copyNotNullProperties(target, source);
-        } catch (Exception e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             log.error(copyPropertiesOnErrorLogEndpoint(ShipmentTrackingDetail.class, source, target, e));
             throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(
                     ShipmentTrackingDetail.class, source, target, e));

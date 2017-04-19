@@ -12,6 +12,7 @@ import com.opinta.exception.PerformProcessFailedException;
 import com.opinta.mapper.DiscountPerCounterpartyMapper;
 import com.opinta.util.LogMessageUtil;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -103,9 +104,10 @@ public class DiscountPerCounterpartyServiceImpl implements DiscountPerCounterpar
         DiscountPerCounterparty target = getEntityByUuid(uuid, user);
         try {
             copyNotNullProperties(target, source);
-        } catch (Exception e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             log.error(copyPropertiesOnErrorLogEndpoint(Discount.class, source, target, e));
-            throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(Discount.class, source, target, e));
+            throw new PerformProcessFailedException(
+                    copyPropertiesOnErrorLogEndpoint(Discount.class, source, target, e));
         }
         target.setUuid(uuid);
         log.info(updateLogEndpoint(Discount.class, target));

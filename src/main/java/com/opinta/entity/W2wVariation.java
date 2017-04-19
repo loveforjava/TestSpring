@@ -7,11 +7,11 @@ public enum W2wVariation {
 
     private String name;
 
-    W2wVariation(String name){
+    W2wVariation(String name) {
         this.name = name;
     }
 
-    public String getName(){
+    public String getName() {
         return name;
     }
 }

@@ -1,6 +1,7 @@
 package com.opinta.service;
 
 import com.opinta.exception.PerformProcessFailedException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.UUID;
 
@@ -63,7 +64,7 @@ public class DiscountServiceImpl implements DiscountService {
         Discount target = getEntityByUuid(uuid);
         try {
             copyNotNullProperties(target, source);
-        } catch (Exception e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             log.error(copyPropertiesOnErrorLogEndpoint(Discount.class, source, target, e));
             throw new PerformProcessFailedException(
                     copyPropertiesOnErrorLogEndpoint(Discount.class, source, target, e));

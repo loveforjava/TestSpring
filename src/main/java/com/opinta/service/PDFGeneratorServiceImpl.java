@@ -156,7 +156,8 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
 
             createCell(font, row, fontSize, COLUMN_WIDTHS[0], String.valueOf(index));
             //recipient address
-            createCell(font, row, fontSize, COLUMN_WIDTHS[1], processAddress(shipment.getRecipient().getAddress(), false));
+            createCell(font, row, fontSize, COLUMN_WIDTHS[1],
+                    processAddress(shipment.getRecipient().getAddress(), false));
             //recipient name
             createCell(font, row, fontSize, COLUMN_WIDTHS[2], shipment.getRecipient().getName());
             //recipient phone
@@ -172,7 +173,8 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             //price
             createCell(font, row, fontSize, COLUMN_WIDTHS[8], String.valueOf(shipment.getPrice()));
             //barcode number
-            createCell(font, row, fontSize, COLUMN_WIDTHS[9], String.valueOf(shipment.getBarcodeInnerNumber().stringify()));
+            createCell(font, row, fontSize, COLUMN_WIDTHS[9],
+                    String.valueOf(shipment.getBarcodeInnerNumber().stringify()));
         }
         //Check if we are still on the first page, if yes, draw header and count header space as part of the table size
         if (firstPage) {
@@ -216,7 +218,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
     private void generateFooter(PDType0Font font, PDPageContentStream contentStream, float footerStartY,
                                 List<Shipment> shipments) throws IOException {
         BigDecimal totalPrice = new BigDecimal("0");
-        for(Shipment shipment : shipments) {
+        for (Shipment shipment : shipments) {
             totalPrice = totalPrice.add(shipment.getPrice());
         }
         float priceTextWidth = font.getStringWidth(totalPrice.toString()) / 1000 * 10; //10 is font size
@@ -282,7 +284,8 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         drawText(font, contentStream, 8, 320, 682, "(повне найменування відправника)");
     }
 
-    private void drawText(PDType0Font font, PDPageContentStream contentStream, int fontSize, float x, float y, String text) throws IOException {
+    private void drawText(PDType0Font font, PDPageContentStream contentStream, int fontSize, float x, float y,
+                          String text) throws IOException {
         contentStream.beginText();
         contentStream.setFont(font, fontSize);
         contentStream.newLineAtOffset(x, y);
@@ -304,7 +307,8 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
     }
 
     @Override
-    public byte[] generateShipmentForm(UUID shipmentId, User user) throws AuthException, IncorrectInputDataException, IOException {
+    public byte[] generateShipmentForm(UUID shipmentId, User user)
+            throws AuthException, IncorrectInputDataException, IOException {
         byte[] output = generateLabelAndPostpayForms(shipmentId, user);
         ByteArrayOutputStream compressedOutput = compress(output);
         return compressedOutput.toByteArray();
@@ -354,7 +358,8 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         return compressedOutput;
     }
 
-    private byte[] generateLabelAndPostpayForms(UUID shipmentId, User user) throws AuthException, IncorrectInputDataException, IOException {
+    private byte[] generateLabelAndPostpayForms(UUID shipmentId, User user)
+            throws AuthException, IncorrectInputDataException, IOException {
         Shipment shipment = shipmentService.getEntityByUuid(shipmentId, user);
 
         userService.authorizeForAction(shipment, user);
@@ -372,7 +377,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
                 merger.mergeDocuments(null);
             } catch (IOException e) {
                 log.error("Got an error while merging the documents, {}", e.getMessage());
-                throw new IOException("Error while merging templates");
+                throw new IOException("Error while merging templates", e);
             }
             output = outputStream.toByteArray();
         }
@@ -434,7 +439,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             outputStream.close();
         } catch (IOException e) {
             log.error("Error while parsing and populating PDF template: {}", e.getMessage());
-            throw new IOException("Error while parsing and populating PDF template");
+            throw new IOException("Error while parsing and populating PDF template", e);
         } finally {
             template.close();
         }
@@ -516,10 +521,10 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             outputStream.close();
         } catch (IOException e) {
             log.error("Error while parsing and populating PDF template: {}", e);
-            throw new IOException("Error while parsing and populating PDF template");
+            throw new IOException("Error while parsing and populating PDF template", e);
         } catch (WriterException e) {
             log.error("Error while generating barcodeInnerNumber: {}", e);
-            throw new IOException("Error during barcodeInnerNumber generating.");
+            throw new IOException("Error during barcodeInnerNumber generating.", e);
         } finally {
             template.close();
         }
