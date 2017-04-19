@@ -28,8 +28,7 @@ public class DiscountPerCounterpartyDaoImpl implements DiscountPerCounterpartyDa
     public List<DiscountPerCounterparty> getAll(User user) {
         Session session = sessionFactory.getCurrentSession();
         return session.createCriteria(DiscountPerCounterparty.class, "discountPerCounterparty")
-                .createCriteria("discountPerCounterparty.counterparty", "counterparty")
-                .add(Restrictions.eq("counterparty.user", user))
+                .add(Restrictions.eq("discountPerCounterparty.counterparty", user.getCounterparty()))
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                 .list();
     }
@@ -45,9 +44,8 @@ public class DiscountPerCounterpartyDaoImpl implements DiscountPerCounterpartyDa
         Session session = sessionFactory.getCurrentSession();
         return (DiscountPerCounterparty) session
                 .createCriteria(DiscountPerCounterparty.class, "discountPerCounterparty")
-                .createCriteria("discountPerCounterparty.counterparty", "counterparty")
                 .createCriteria("discountPerCounterparty.discount", "discount")
-                .add(Restrictions.eq("counterparty.user", user))
+                .add(Restrictions.eq("discountPerCounterparty.counterparty", user.getCounterparty()))
                 .add(Restrictions.le("discountPerCounterparty.fromDate", date))
                 .add(Restrictions.ge("discountPerCounterparty.toDate", date))
                 .addOrder(Order.desc("discount.value"))

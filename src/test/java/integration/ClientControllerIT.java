@@ -9,6 +9,7 @@ import com.opinta.entity.Counterparty;
 import com.opinta.entity.User;
 import com.opinta.mapper.ClientMapper;
 import com.opinta.service.ClientService;
+import com.opinta.service.UserService;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.After;
@@ -38,13 +39,15 @@ public class ClientControllerIT extends BaseControllerIT {
     @Autowired
     private ClientMapper clientMapper;
     @Autowired
+    private UserService userService;
+    @Autowired
     private TestHelper testHelper;
 
     @Before
     public void setUp() throws Exception {
-        client = testHelper.createClient();
+        user = testHelper.createUser(testHelper.createCounterparty());
+        client = testHelper.createClientFor(user);
         clientUuid = client.getUuid();
-        user = client.getCounterparty().getUser();
     }
 
     @After
@@ -87,7 +90,7 @@ public class ClientControllerIT extends BaseControllerIT {
     @SuppressWarnings("unchecked")
     public void createClientAsIndividual() throws Exception {
         // create
-        Counterparty newCounterparty = testHelper.createCounterparty();
+        user = testHelper.createUser(testHelper.createCounterparty());
         Address newAddress = testHelper.createAddress();
 
         JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client.json");
@@ -102,7 +105,7 @@ public class ClientControllerIT extends BaseControllerIT {
         String newUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
-                        queryParam("token", newCounterparty.getUser().getToken()).
+                        queryParam("token", user.getToken()).
                         body(inputJson.toString()).
                 when().
                         post("/clients").
@@ -122,7 +125,7 @@ public class ClientControllerIT extends BaseControllerIT {
         UUID newClientUuid = UUID.fromString(newUuid);
 
         // check created data
-        Client createdClient = clientService.getEntityByUuid(newClientUuid, newCounterparty.getUser());
+        Client createdClient = clientService.getEntityByUuid(newClientUuid, user);
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientMapper.toDto(createdClient));
         assertEquals(expectedJson.toJSONString(), actualJson, false);
@@ -135,7 +138,7 @@ public class ClientControllerIT extends BaseControllerIT {
     @SuppressWarnings("unchecked")
     public void createClientAsCompany() throws Exception {
         // create
-        Counterparty newCounterparty = testHelper.createCounterparty();
+        user = testHelper.createUser(testHelper.createCounterparty());
         Address newAddress = testHelper.createAddress();
 
         JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client.json");
@@ -147,7 +150,7 @@ public class ClientControllerIT extends BaseControllerIT {
         String newUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
-                        queryParam("token", newCounterparty.getUser().getToken()).
+                        queryParam("token", user.getToken()).
                         body(inputJson.toString()).
                 when().
                         post("/clients").
@@ -170,7 +173,8 @@ public class ClientControllerIT extends BaseControllerIT {
         UUID newClientUuid = UUID.fromString(newUuid);
 
         // check created data
-        Client createdClient = clientService.getEntityByUuid(newClientUuid, newCounterparty.getUser());
+        Client createdClient = clientService.getEntityByUuid(newClientUuid,
+                user);
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientMapper.toDto(createdClient));
         assertEquals(expectedJson.toJSONString(), actualJson, false);
@@ -280,7 +284,7 @@ public class ClientControllerIT extends BaseControllerIT {
     @SuppressWarnings("unchecked")
     public void savingPhoneRemovesAllNonNumericalDigits() throws Exception {
         Address newAddress = testHelper.createAddress();
-        Counterparty newCounterparty = testHelper.createCounterparty();
+        user = testHelper.createUser(testHelper.createCounterparty());
 
         JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client.json");
         inputJson.put("phoneNumber", "+(098)-2004-113");
@@ -291,7 +295,7 @@ public class ClientControllerIT extends BaseControllerIT {
 
         String newUuid = given().
                 contentType(APPLICATION_JSON_VALUE).
-                queryParam("token", newCounterparty.getUser().getToken()).
+                queryParam("token", user.getToken()).
                 body(inputJson.toString()).
         when().
                 post("/clients").
@@ -301,7 +305,8 @@ public class ClientControllerIT extends BaseControllerIT {
         extract().
                 path("uuid");
         UUID newClientUuid = UUID.fromString(newUuid);
-        Client createdClient = clientService.getEntityByUuid(newClientUuid, newCounterparty.getUser());
+        Client createdClient = clientService.getEntityByUuid(newClientUuid,
+                user);
         testHelper.deleteClient(createdClient);
     }
 

@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
-
 import static com.opinta.util.LogMessageUtil.generatePdfFormOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getAllOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;

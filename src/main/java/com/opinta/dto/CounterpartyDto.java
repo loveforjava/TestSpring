@@ -20,7 +20,6 @@ public class CounterpartyDto {
     @Size(max = 255)
     private String name;
     private UUID postcodePoolUuid;
-    private UUID token;
     @Size(max = 255)
     private String description;
 }

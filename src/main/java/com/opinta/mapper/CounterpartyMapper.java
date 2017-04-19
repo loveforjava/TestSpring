@@ -11,8 +11,7 @@ public interface CounterpartyMapper extends BaseMapper<CounterpartyDto, Counterp
 
     @Override
     @Mappings({
-            @Mapping(source = "postcodePool.uuid", target = "postcodePoolUuid"),
-            @Mapping(source = "user.token", target = "token")})
+            @Mapping(source = "postcodePool.uuid", target = "postcodePoolUuid")})
     CounterpartyDto toDto(Counterparty entity);
 
     @Override

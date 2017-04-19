@@ -8,6 +8,7 @@ import com.opinta.entity.ShipmentGroup;
 import com.opinta.entity.User;
 import com.opinta.mapper.ShipmentGroupMapper;
 import com.opinta.service.ShipmentGroupService;
+import com.opinta.service.UserService;
 import integration.helper.TestHelper;
 import org.json.simple.JSONObject;
 import org.junit.After;
@@ -28,18 +29,22 @@ public class ShipmentGroupControllerIT extends BaseControllerIT {
     private ShipmentGroup shipmentGroup;
     private UUID shipmentGroupUuid;
     private User user;
+    private Counterparty counterparty;
     @Autowired
     private ShipmentGroupService shipmentGroupService;
     @Autowired
     private ShipmentGroupMapper shipmentGroupMapper;
     @Autowired
+    private UserService userService;
+    @Autowired
     private TestHelper testHelper;
 
     @Before
     public void setUp() throws Exception {
-        shipmentGroup = testHelper.createShipmentGroup();
+        counterparty = testHelper.createCounterparty();
+        user = testHelper.createUser(counterparty);
+        shipmentGroup = testHelper.createShipmentGroupFor(counterparty);
         shipmentGroupUuid = shipmentGroup.getUuid();
-        user = shipmentGroup.getCounterparty().getUser();
     }
 
     @After
@@ -114,6 +119,7 @@ public class ShipmentGroupControllerIT extends BaseControllerIT {
     public void createShipmentGroup() throws Exception {
         // create
         Counterparty newCounterparty = testHelper.createCounterparty();
+        user = testHelper.createUser(newCounterparty);
 
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment-group.json");
         jsonObject.put("counterpartyUuid", newCounterparty.getUuid().toString());
@@ -122,7 +128,7 @@ public class ShipmentGroupControllerIT extends BaseControllerIT {
         String newShipmentGroupIdString =
                 given().
                         contentType("application/json;charset=UTF-8").
-                        queryParam("token", newCounterparty.getUser().getToken()).
+                        queryParam("token", user.getToken()).
                         body(expectedJson).
                 when().
                         post("/shipment-groups").
@@ -134,7 +140,8 @@ public class ShipmentGroupControllerIT extends BaseControllerIT {
         UUID newShipmentGroupId = UUID.fromString(newShipmentGroupIdString);
 
         // check created data
-        ShipmentGroup createdShipmentGroup = shipmentGroupService.getEntityById(newShipmentGroupId, newCounterparty.getUser());
+        ShipmentGroup createdShipmentGroup = shipmentGroupService.getEntityById(newShipmentGroupId,
+                userService.getUsersByCounterparty(newCounterparty).get(0));
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(shipmentGroupMapper.toDto(createdShipmentGroup));
 

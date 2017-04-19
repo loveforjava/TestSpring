@@ -8,6 +8,7 @@ import com.opinta.exception.AuthException;
 import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.exception.PerformProcessFailedException;
 import com.opinta.util.LogMessageUtil;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.UUID;
@@ -25,7 +26,6 @@ import static com.opinta.util.EnhancedBeanUtilsBean.copyNotNullProperties;
 import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getAllByFieldLogEndpoint;
-import static com.opinta.util.LogMessageUtil.getByFieldOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.saveLogEndpoint;
@@ -67,23 +67,22 @@ public class CounterpartyServiceImpl implements CounterpartyService {
             log.error(getByIdOnErrorLogEndpoint(Counterparty.class, uuid));
             throw new IncorrectInputDataException(getByIdOnErrorLogEndpoint(Counterparty.class, uuid));
         }
-
         userService.authorizeForAction(counterparty, user);
-
         return counterparty;
     }
-    
+
     @Override
-    public Counterparty getEntityByUser(User user) throws IncorrectInputDataException {
-        Counterparty counterparty = counterpartyDao.getByUser(user);
+    @Transactional
+    public Counterparty getEntityByUuidAnonymous(UUID uuid) throws IncorrectInputDataException {
+        log.info(getByIdLogEndpoint(Counterparty.class, uuid));
+        Counterparty counterparty = counterpartyDao.getByUuid(uuid);
         if (counterparty == null) {
-            String errorMessage = getByFieldOnErrorLogEndpoint(Counterparty.class, User.class, user.getId());
-            log.error(errorMessage);
-            throw new IncorrectInputDataException(errorMessage);
+            log.error(getByIdOnErrorLogEndpoint(Counterparty.class, uuid));
+            throw new IncorrectInputDataException(getByIdOnErrorLogEndpoint(Counterparty.class, uuid));
         }
         return counterparty;
     }
-    
+
     @Override
     @Transactional
     public List<Counterparty> getAllEntitiesByPostcodePoolUuid(UUID postcodePoolUuid)
@@ -96,11 +95,6 @@ public class CounterpartyServiceImpl implements CounterpartyService {
     @Override
     @Transactional
     public Counterparty saveEntity(Counterparty counterparty) throws IncorrectInputDataException {
-        User user = new User();
-        user.setUsername(counterparty.getName());
-        user.setToken(UUID.randomUUID());
-        counterparty.setUser(user);
-
         log.info(saveLogEndpoint(Counterparty.class, counterparty));
         return counterpartyDao.save(counterparty);
     }
@@ -129,8 +123,6 @@ public class CounterpartyServiceImpl implements CounterpartyService {
             throws IncorrectInputDataException, AuthException, PerformProcessFailedException {
         Counterparty source = counterpartyMapper.toEntity(counterpartyDto);
         Counterparty target = getEntityByUuid(uuid, user);
-
-        source.setUser(target.getUser());
         source.setPostcodePool(target.getPostcodePool());
 
         try {
@@ -148,9 +140,9 @@ public class CounterpartyServiceImpl implements CounterpartyService {
 
     @Override
     @Transactional
-    public void delete(UUID uuid, User user) throws AuthException, IncorrectInputDataException {
+    public void delete(UUID uuid) throws IncorrectInputDataException {
         log.info(deleteLogEndpoint(Counterparty.class, uuid));
-        Counterparty counterparty = getEntityByUuid(uuid, user);
+        Counterparty counterparty = getEntityByUuidAnonymous(uuid);
         counterpartyDao.delete(counterparty);
     }
 }
