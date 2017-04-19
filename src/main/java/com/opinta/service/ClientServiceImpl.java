@@ -52,14 +52,14 @@ public class ClientServiceImpl implements ClientService {
     @Autowired
     public ClientServiceImpl(ClientDao clientDao, ClientMapper clientMapper, PhoneService phoneService,
                              AddressService addressService, CounterpartyService counterpartyService,
-                             UserService userService, PostIdNumberGenerator postIdSequenceNumberGenerator) {
+                             UserService userService, PostIdNumberGenerator postIdNumberGenerator) {
         this.clientDao = clientDao;
         this.counterpartyService = counterpartyService;
         this.phoneService = phoneService;
         this.addressService = addressService;
         this.clientMapper = clientMapper;
         this.userService = userService;
-        this.postIdNumberGenerator = postIdSequenceNumberGenerator;
+        this.postIdNumberGenerator = postIdNumberGenerator;
     }
 
     @Override
