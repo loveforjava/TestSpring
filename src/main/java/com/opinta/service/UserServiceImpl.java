@@ -63,16 +63,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserDto save(UserDto userDto) throws IncorrectInputDataException {
-        userDto.setToken(UUID.randomUUID());
-        return userMapper.toDto(saveEntity(userMapper.toEntity(userDto)));
+    public User saveEntity(User user) throws IncorrectInputDataException {
+        user.setCounterparty(counterpartyDao.getByUuid(user.getCounterparty().getUuid()));
+        return userDao.save(user);
     }
 
     @Override
     @Transactional
-    public User saveEntity(User user) throws IncorrectInputDataException {
-        user.setCounterparty(counterpartyDao.getByUuid(user.getCounterparty().getUuid()));
-        return userDao.save(user);
+    public UserDto save(UserDto userDto) throws IncorrectInputDataException {
+        userDto.setToken(UUID.randomUUID());
+        return userMapper.toDto(saveEntity(userMapper.toEntity(userDto)));
     }
 
     @Override
