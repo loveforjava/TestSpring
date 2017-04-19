@@ -150,6 +150,7 @@ public class ClientServiceImpl implements ClientService {
                 .removeNonNumericalCharacters());
         userService.authorizeForAction(client, user);
         log.info(saveLogEndpoint(Client.class, client));
+        client.setPostId(null);
         return clientDao.save(client);
     }
     

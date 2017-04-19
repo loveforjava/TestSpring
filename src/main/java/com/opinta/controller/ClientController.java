@@ -1,7 +1,6 @@
 package com.opinta.controller;
 
 import com.opinta.dto.postid.ClientTypeDto;
-import com.opinta.dto.postid.PostIdDto;
 import com.opinta.entity.Client;
 import com.opinta.entity.Shipment;
 import com.opinta.entity.User;
