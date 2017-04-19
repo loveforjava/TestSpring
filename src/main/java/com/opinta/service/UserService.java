@@ -18,7 +18,6 @@ public interface UserService {
 
     User getEntityByToken(UUID token);
 
-    @Transactional
     User getEntityById(long id);
 
     List<User> getUsersByCounterparty(Counterparty counterparty);

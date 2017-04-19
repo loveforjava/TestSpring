@@ -107,8 +107,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void authorizeForAction(Counterparty counterparty, User user) throws AuthException {
-        if (user == null || user.getCounterparty() == null || user.getToken() == null ||
-                !user.getCounterparty().getUuid().equals(counterparty.getUuid())) {
+        if (user == null || user.getCounterparty() == null || user.getToken() == null
+                || !user.getCounterparty().getUuid().equals(counterparty.getUuid())) {
             assert user != null;
             log.error(authorizationOnErrorLogEndpoint(user.getToken(), counterparty));
             throw new AuthException(authorizationOnErrorLogEndpoint(user.getToken(), counterparty));
@@ -128,10 +128,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void authorizeForAction(Shipment shipment, User user) throws AuthException {
-        if (user == null || user.getCounterparty() == null|| shipment == null ||
-                shipment.getSender().getCounterparty() == null || shipment.getSender().getCounterparty() == null ||
-                user.getToken() == null ||
-                !shipment.getSender().getCounterparty().getUuid().equals(user.getCounterparty().getUuid())) {
+        if (user == null || user.getCounterparty() == null|| shipment == null
+                || shipment.getSender().getCounterparty() == null || shipment.getSender().getCounterparty() == null
+                || user.getToken() == null
+                || !shipment.getSender().getCounterparty().getUuid().equals(user.getCounterparty().getUuid())) {
             assert user != null;
             log.error(authorizationOnErrorLogEndpoint(user.getToken(), shipment));
             throw new AuthException(authorizationOnErrorLogEndpoint(user.getToken(), shipment));
@@ -140,10 +140,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void authorizeForAction(ShipmentGroup shipmentGroup, User user) throws AuthException {
-        if (user == null || user.getCounterparty() == null ||
-                shipmentGroup == null || shipmentGroup.getCounterparty() == null ||
-                shipmentGroup.getCounterparty() == null || user.getToken() == null ||
-                !shipmentGroup.getCounterparty().getUuid().equals(user.getCounterparty().getUuid())) {
+        if (user == null || user.getCounterparty() == null
+                || shipmentGroup == null || shipmentGroup.getCounterparty() == null
+                || shipmentGroup.getCounterparty() == null || user.getToken() == null
+                || !shipmentGroup.getCounterparty().getUuid().equals(user.getCounterparty().getUuid())) {
             assert user != null;
             log.error(authorizationOnErrorLogEndpoint(user.getToken(), shipmentGroup));
             throw new AuthException(authorizationOnErrorLogEndpoint(user.getToken(), shipmentGroup));
