@@ -27,8 +27,8 @@ public class ShipmentGroupDaoImpl implements ShipmentGroupDao {
     public List<ShipmentGroup> getAll(User user) {
         Session session = sessionFactory.getCurrentSession();
         return session.createCriteria(ShipmentGroup.class, "shipmentGroup")
-                .createCriteria("shipmentGroup.counterparty", "counterparty")
-                .add(Restrictions.eq("counterparty.user", user))
+//                .createCriteria("shipmentGroup.counterparty", "counterparty")
+                .add(Restrictions.eq("shipmentGroup.counterparty", user.getCounterparty()))
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                 .list();
     }

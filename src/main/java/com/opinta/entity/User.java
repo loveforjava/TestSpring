@@ -19,4 +19,11 @@ public class User {
     @JoinColumn(name = "counterparty_id")
     private Counterparty counterparty;
     private UUID token;
+
+    public User(String username, String password, Counterparty counterparty, UUID token) {
+        this.username = username;
+        this.password = password;
+        this.counterparty = counterparty;
+        this.token = token;
+    }
 }

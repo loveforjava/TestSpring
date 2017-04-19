@@ -58,10 +58,10 @@ public class CounterpartyControllerIT extends BaseControllerIT {
     @Before
     public void setUp() throws Exception {
         counterparty = testHelper.createCounterparty();
+        user = testHelper.createUser(counterparty);
         sender = testHelper.createSenderFor(counterparty);
         recipient = testHelper.createRecipientFor(counterparty);
         counterpartyUuid = counterparty.getUuid();
-        user = userService.getUsersByCounterparty(counterparty).get(0);
     }
 
     @After

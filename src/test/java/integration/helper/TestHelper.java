@@ -1,15 +1,6 @@
 package integration.helper;
 
-import com.opinta.entity.Address;
-import com.opinta.entity.Client;
-import com.opinta.entity.Counterparty;
-import com.opinta.entity.Discount;
-import com.opinta.entity.DiscountPerCounterparty;
-import com.opinta.entity.Phone;
-import com.opinta.entity.PostOffice;
-import com.opinta.entity.PostcodePool;
-import com.opinta.entity.Shipment;
-import com.opinta.entity.ShipmentGroup;
+import com.opinta.entity.*;
 import com.opinta.exception.AuthException;
 import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.service.*;
@@ -19,10 +10,8 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
+
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -337,6 +326,10 @@ public class TestHelper {
 
     public Counterparty createCounterparty() throws Exception {
         return counterpartyService.saveEntity(new Counterparty("Modna kasta", createPostcodePool()));
+    }
+
+    public User createUser(Counterparty counterparty) throws Exception {
+        return userService.saveEntity(new User("Sameperson", "123456", counterparty, UUID.randomUUID()));
     }
     
     public PostcodePool createPostcodePool() {
