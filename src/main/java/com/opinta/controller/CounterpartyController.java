@@ -4,6 +4,7 @@ import com.opinta.entity.Counterparty;
 import com.opinta.entity.User;
 import com.opinta.exception.AuthException;
 import com.opinta.exception.IncorrectInputDataException;
+import com.opinta.exception.PerformProcessFailedException;
 import com.opinta.service.UserService;
 import java.util.List;
 import java.util.UUID;
@@ -36,7 +37,6 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
-
 
 @RestController
 @RequestMapping("/counterparties")
@@ -89,7 +89,7 @@ public class CounterpartyController extends BaseController {
             return new ResponseEntity<>(counterpartyService.update(uuid, counterpartyDto, user), OK);
         } catch (AuthException e) {
             return new ResponseEntity<>(updateOnErrorLogEndpoint(Counterparty.class, uuid, e), UNAUTHORIZED);
-        } catch (Exception e) {
+        } catch (IncorrectInputDataException | PerformProcessFailedException e) {
             return new ResponseEntity<>(updateOnErrorLogEndpoint(Counterparty.class, uuid, e), NOT_FOUND);
         }
     }
@@ -102,7 +102,7 @@ public class CounterpartyController extends BaseController {
             return new ResponseEntity<>(OK);
         } catch (AuthException e) {
             return new ResponseEntity<>(deleteOnErrorLogEndpoint(Counterparty.class, uuid, e), UNAUTHORIZED);
-        } catch (Exception e) {
+        } catch (IncorrectInputDataException e) {
             return new ResponseEntity<>(deleteOnErrorLogEndpoint(Counterparty.class, uuid, e), NOT_FOUND);
         }
     }

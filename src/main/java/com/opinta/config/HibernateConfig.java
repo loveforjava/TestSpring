@@ -198,7 +198,8 @@ public class HibernateConfig {
     @Bean
     @Autowired
     @Profile("memory")
-    public DataSourceInitializer dataSourceInitializer(final DataSource dataSource, DatabasePopulator databasePopulator) {
+    public DataSourceInitializer dataSourceInitializer(
+            final DataSource dataSource, DatabasePopulator databasePopulator) {
         final DataSourceInitializer initializer = new DataSourceInitializer();
         initializer.setDataSource(dataSource);
         initializer.setDatabasePopulator(databasePopulator);

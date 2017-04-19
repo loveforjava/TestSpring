@@ -118,7 +118,8 @@
 //        // create Address
 //        List<AddressDto> addresses = new ArrayList<>();
 //        List<AddressDto> addressesSaved = new ArrayList<>();
-//        addresses.add(addressMapper.toDto(new Address("00001", "Ternopil", "Monastiriska", "Monastiriska", "Sadova", "51", "")));
+//        addresses.add(addressMapper.toDto(
+//                new Address("00001", "Ternopil", "Monastiriska", "Monastiriska", "Sadova", "51", "")));
 //        addresses.add(addressMapper.toDto(new Address("00002", "Kiev", "Kiev", "Kiev", "Khreschatik", "121", "37")));
 //        addresses.forEach((AddressDto addressDto) -> addressesSaved.add(addressService.save(addressDto)));
 //
@@ -161,13 +162,16 @@
 //        List<ShipmentDto> shipmentsSaved = new ArrayList<>();
 //        Shipment shipment = new Shipment(clientsSaved.get(0), clientsSaved.get(1), DeliveryType.W2W, 1, 1,
 //                new BigDecimal("12.5"), new BigDecimal("2.5"), new BigDecimal("15"));
-//        shipmentsSaved.add(shipmentService.save(shipmentMapper.toDto(shipment), shipment.getSender().getCounterparty().getUser()));
+//        shipmentsSaved.add(shipmentService.save(
+//                shipmentMapper.toDto(shipment), shipment.getSender().getCounterparty().getUser()));
 //        shipment = new Shipment(clientsSaved.get(0), clientsSaved.get(0), DeliveryType.W2D, 2, 2,
 //                new BigDecimal("19.5"), new BigDecimal("0.5"), new BigDecimal("20.5"));
-//        shipmentsSaved.add(shipmentService.save(shipmentMapper.toDto(shipment), shipment.getSender().getCounterparty().getUser()));
+//        shipmentsSaved.add(shipmentService.save(
+//                shipmentMapper.toDto(shipment), shipment.getSender().getCounterparty().getUser()));
 //        shipment = new Shipment(clientsSaved.get(1), clientsSaved.get(0), DeliveryType.D2D, 3, 3,
 //                new BigDecimal("8.5"), new BigDecimal("2.25"), new BigDecimal("13.5"));
-//        shipmentsSaved.add(shipmentService.save(shipmentMapper.toDto(shipment), shipment.getSender().getCounterparty().getUser()));
+//        shipmentsSaved.add(shipmentService.save(
+//                shipmentMapper.toDto(shipment), shipment.getSender().getCounterparty().getUser()));
 //
 //        // create PostOffice
 //        PostcodePoolDto postcodePoolDto2 = postcodePoolMapper.toDto(new PostcodePool("00002", false));

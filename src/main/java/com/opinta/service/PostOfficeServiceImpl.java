@@ -7,6 +7,7 @@ import com.opinta.exception.PerformProcessFailedException;
 import com.opinta.mapper.PostOfficeMapper;
 import com.opinta.entity.PostOffice;
 import com.opinta.util.LogMessageUtil;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -85,7 +86,7 @@ public class PostOfficeServiceImpl implements PostOfficeService {
         PostOffice target = getEntityById(id);
         try {
             copyNotNullProperties(target, source);
-        } catch (Exception e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             log.error(copyPropertiesOnErrorLogEndpoint(PostOffice.class, source, target, e));
             throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(
                     PostOffice.class, source, target, e));

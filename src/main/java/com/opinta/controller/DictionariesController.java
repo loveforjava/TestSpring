@@ -1,6 +1,5 @@
 package com.opinta.controller;
 
-import com.opinta.dto.CityDto;
 import com.opinta.dto.classifier.TariffGridDto;
 import com.opinta.entity.W2wVariation;
 import com.opinta.entity.classifier.TariffGrid;
@@ -15,8 +14,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -33,7 +30,7 @@ public class DictionariesController extends BaseController {
     @Autowired
     public DictionariesController(TariffGridService tariffGridService, CityService cityService,
             CountrysidePostcodeService countrysidePostcodeService) {
-        this.tariffGridService  = tariffGridService;
+        this.tariffGridService = tariffGridService;
         this.cityService = cityService;
         this.countrysidePostcodeService = countrysidePostcodeService;
     }

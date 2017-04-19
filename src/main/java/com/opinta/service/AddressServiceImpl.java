@@ -4,6 +4,7 @@ import com.opinta.dao.CountrysidePostcodeDao;
 import com.opinta.entity.classifier.CountrysidePostcode;
 import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.exception.PerformProcessFailedException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -75,7 +76,7 @@ public class AddressServiceImpl implements AddressService {
         Address target = getEntityById(id);
         try {
             copyNotNullProperties(target, source);
-        } catch (Exception e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             log.error(copyPropertiesOnErrorLogEndpoint(Address.class, source, target, e));
             throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(Address.class, source, target, e));
         }

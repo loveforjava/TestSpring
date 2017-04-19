@@ -23,10 +23,10 @@ public class MoneyToTextConverter {
     public String convert(BigDecimal amount, boolean stripKopiyky) {
         // Separating hryvnas and kopiykas
         long hryvnasLong = amount.longValue();
-        if(hryvnasLong > 999999999999L) return (amount.toPlainString());
+        if (hryvnasLong > 999_999_999_999L) return (amount.toPlainString());
         String[] splittedAmount = amount.toString().split("\\.");
         long kopiykyLong = 0;
-        if(splittedAmount.length > 1) {
+        if (splittedAmount.length > 1) {
             kopiykyLong = Long.valueOf(splittedAmount[1]);
             if (!splittedAmount[1].substring(0, 1).equals("0")) { //doesn't start with zero
                 if (kopiykyLong < 10)
@@ -48,7 +48,7 @@ public class MoneyToTextConverter {
         Collections.reverse(segments);
         // Analyzing segments
         String output = "";
-        if (hryvnasLong == 0) {// if zero
+        if (hryvnasLong == 0) { // if zero
             output = "нуль " + morph(0, forms[1][0], forms[1][1], forms[1][2]);
             if (stripKopiyky)
                 return output;
@@ -57,9 +57,9 @@ public class MoneyToTextConverter {
         }
         // More than zero
         int lev = segments.size();
-        for (int i = 0; i < segments.size(); i++) {// looking on segments
+        for (int i = 0; i < segments.size(); i++) { // looking on segments
             int currentSegment = Integer.valueOf(segments.get(i).toString());// current segment
-            if (currentSegment == 0 && lev > 1) {// is segment ==0 and not the last level
+            if (currentSegment == 0 && lev > 1) { // is segment ==0 and not the last level
                 lev--;
                 continue;
             }
@@ -74,7 +74,7 @@ public class MoneyToTextConverter {
             int secondAndThirdDigits = Integer.valueOf(rs.substring(1, 3)); //second and third
             // Analyze digits
             if (currentSegment > 99) output += str100[firstDigit] + " "; // hundreds
-            if (secondAndThirdDigits > 20) {// >20
+            if (secondAndThirdDigits > 20) { // >20
                 output += str10[secondDigit] + " ";
                 output += strBase[thirdDigit] + " ";
             } else { // <=20

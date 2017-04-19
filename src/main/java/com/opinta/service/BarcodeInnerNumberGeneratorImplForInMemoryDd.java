@@ -25,8 +25,8 @@ public class BarcodeInnerNumberGeneratorImplForInMemoryDd implements BarcodeInne
     @Override
     public BarcodeInnerNumber generate(PostcodePool postcodePool) {
         Random random = new Random();
-        int min = 11111111;
-        int max = 99999999;
+        int min = 11_111_111;
+        int max = 99_999_999;
         Integer randomNum = random.nextInt((max - min) + 1) + min;
         BarcodeInnerNumber barcodeInnerNumber = new BarcodeInnerNumber();
         barcodeInnerNumber.setPostcodePool(postcodePool);

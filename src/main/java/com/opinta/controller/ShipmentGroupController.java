@@ -2,7 +2,6 @@ package com.opinta.controller;
 
 import com.opinta.dto.ShipmentDto;
 import com.opinta.dto.ShipmentGroupDto;
-import com.opinta.entity.Shipment;
 import com.opinta.entity.ShipmentGroup;
 import com.opinta.entity.User;
 import com.opinta.exception.AuthException;
@@ -60,7 +59,7 @@ public class ShipmentGroupController extends BaseController {
         this.userService = userService;
         this.pdfGeneratorService = pdfGeneratorService;
     }
-    
+
     @GetMapping
     public ResponseEntity<?> getAllShipmentGroups(@RequestParam UUID token) {
         try {
@@ -137,7 +136,7 @@ public class ShipmentGroupController extends BaseController {
             return new ResponseEntity<>(getByIdOnErrorLogEndpoint(ShipmentGroup.class, uuid), UNAUTHORIZED);
         }
     }
-    
+
     @PostMapping
     public ResponseEntity<?> createShipmentGroup(@RequestBody @Valid ShipmentGroupDto shipmentGroupDto,
                                                  @RequestParam UUID token) {
@@ -151,7 +150,7 @@ public class ShipmentGroupController extends BaseController {
             return new ResponseEntity<>(saveOnErrorLogEndpoint(ShipmentGroup.class, shipmentGroupDto), UNAUTHORIZED);
         }
     }
-    
+
     @PutMapping("{uuid}")
     public ResponseEntity<?> updateShipmentGroup(@PathVariable UUID uuid,
                                                  @RequestBody @Valid ShipmentGroupDto shipmentGroupDto,
@@ -168,7 +167,7 @@ public class ShipmentGroupController extends BaseController {
             return new ResponseEntity<>(updateOnErrorLogEndpoint(ShipmentGroup.class, uuid), UNAUTHORIZED);
         }
     }
-    
+
     @DeleteMapping("{uuid}")
     public ResponseEntity<?> deleteShipmentGroup(@PathVariable UUID uuid, @RequestParam UUID token) {
         try {
