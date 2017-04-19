@@ -3,9 +3,8 @@ package com.opinta.dao;
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.User;
 
-import java.sql.CallableStatement;
-import java.sql.SQLException;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 import com.opinta.entity.Client;
@@ -64,18 +63,21 @@ public class ClientDaoImpl implements ClientDao {
     }
     
     private static final String POST_ID_NEXT_NUMBER_CALL =
-            "";
+            "TODO CALL PROCEDURE";
     @Override
     public String getNextPostIdNumber() {
         Session session = sessionFactory.getCurrentSession();
-        int nextNumber = session.doReturningWork((connection) -> {
-            try (CallableStatement call = connection.prepareCall(POST_ID_NEXT_NUMBER_CALL)) {
-                // TODO call
-                return -1;
-            } catch (SQLException e) {
-                throw new RuntimeException("Can't generate next postid number from stored procedure: ", e);
-            }
-        });
+        // TODO implement real DB storage procedure call
+//        int nextNumber = session.doReturningWork((connection) -> {
+//            try (CallableStatement call = connection.prepareCall(POST_ID_NEXT_NUMBER_CALL)) {
+//                // ...
+//            } catch (SQLException e) {
+//                throw new RuntimeException("Can't generate next postid number from stored procedure: ", e);
+//            }
+//        });
+        int min = 1_111_111;
+        int max = 9_999_999;
+        int nextNumber = new Random().nextInt((max - min) + 1) + min;
         return format("%07d", nextNumber);
     }
     
