@@ -87,18 +87,6 @@ public class CounterpartyServiceImpl implements CounterpartyService {
 
     @Override
     @Transactional
-    public Counterparty getEntityByUser(User user) throws IncorrectInputDataException {
-        Counterparty counterparty = counterpartyDao.getByUser(user);
-        if (counterparty == null) {
-            String errorMessage = getByFieldOnErrorLogEndpoint(Counterparty.class, User.class, user.getId());
-            log.error(errorMessage);
-            throw new IncorrectInputDataException(errorMessage);
-        }
-        return counterparty;
-    }
-
-    @Override
-    @Transactional
     public List<Counterparty> getAllEntitiesByPostcodePoolUuid(UUID postcodePoolUuid)
             throws IncorrectInputDataException {
         PostcodePool postcodePool = postcodePoolService.getEntityByUuid(postcodePoolUuid);

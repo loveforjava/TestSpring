@@ -38,12 +38,6 @@ public class CounterpartyDaoImpl implements CounterpartyDao {
     }
     
     @Override
-    public Counterparty getByUser(User user) {
-        Session session = this.sessionFactory.getCurrentSession();
-        return (Counterparty) session.get(Counterparty.class, user.getCounterparty().getUuid());
-    }
-    
-    @Override
     @SuppressWarnings("unchecked")
     public List<Counterparty> getByPostcodePool(PostcodePool postcodePool) {
         Session session = this.sessionFactory.getCurrentSession();
