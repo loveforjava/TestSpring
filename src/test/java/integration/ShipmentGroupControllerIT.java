@@ -29,6 +29,7 @@ public class ShipmentGroupControllerIT extends BaseControllerIT {
     private ShipmentGroup shipmentGroup;
     private UUID shipmentGroupUuid;
     private User user;
+    private Counterparty counterparty;
     @Autowired
     private ShipmentGroupService shipmentGroupService;
     @Autowired
@@ -40,9 +41,10 @@ public class ShipmentGroupControllerIT extends BaseControllerIT {
 
     @Before
     public void setUp() throws Exception {
-        shipmentGroup = testHelper.createShipmentGroup();
+        counterparty = testHelper.createCounterparty();
+        user = testHelper.createUser(counterparty);
+        shipmentGroup = testHelper.createShipmentGroupFor(counterparty);
         shipmentGroupUuid = shipmentGroup.getUuid();
-        user = userService.getUsersByCounterparty(shipmentGroup.getCounterparty()).get(0);
     }
 
     @After
@@ -117,6 +119,7 @@ public class ShipmentGroupControllerIT extends BaseControllerIT {
     public void createShipmentGroup() throws Exception {
         // create
         Counterparty newCounterparty = testHelper.createCounterparty();
+        user = testHelper.createUser(newCounterparty);
 
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment-group.json");
         jsonObject.put("counterpartyUuid", newCounterparty.getUuid().toString());
@@ -125,7 +128,7 @@ public class ShipmentGroupControllerIT extends BaseControllerIT {
         String newShipmentGroupIdString =
                 given().
                         contentType("application/json;charset=UTF-8").
-                        queryParam("token", userService.getUsersByCounterparty(newCounterparty).get(0).getToken()).
+                        queryParam("token", user.getToken()).
                         body(expectedJson).
                 when().
                         post("/shipment-groups").

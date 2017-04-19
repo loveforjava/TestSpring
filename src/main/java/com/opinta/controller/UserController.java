@@ -13,10 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
-import static com.opinta.util.LogMessageUtil.deleteOnErrorLogEndpoint;
-import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.saveOnErrorLogEndpoint;
-import static com.opinta.util.LogMessageUtil.updateOnErrorLogEndpoint;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.OK;

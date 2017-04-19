@@ -122,10 +122,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
                         statusCode(SC_OK).
                 extract().response();
 
-        // check created data
-        User user = userService.authenticate(UUID.fromString(response.path("token")));
-        Counterparty createdCounterparty = counterpartyService.getEntityByUuid(UUID.fromString(response.path("uuid")),
-                user);
+        Counterparty createdCounterparty = counterpartyService.getEntityByUuidAnonymous(UUID.fromString(response.path("uuid")));
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(counterpartyMapper.toDto(createdCounterparty));
         JSONAssert.assertEquals(expectedJson, actualJson, false);
@@ -169,8 +166,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
                             response();
     
             // check created data
-            user = userService.authenticate(UUID.fromString(response.path("token")));
-            createdCounterparty = counterpartyService.getEntityByUuid(UUID.fromString(response.path("uuid")), user);
+            createdCounterparty = counterpartyService.getEntityByUuidAnonymous(UUID.fromString(response.path("uuid")));
             createdCounterparties.add(createdCounterparty);
             actualJson = mapper.writeValueAsString(counterpartyMapper.toDto(createdCounterparty));
             JSONAssert.assertEquals(expectedJson, actualJson, false);
@@ -222,6 +218,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
     public void deleteCounterparty() throws Exception {
         testHelper.deleteClientWithoutDeletingCounterparty(sender);
         testHelper.deleteClientWithoutDeletingCounterparty(recipient);
+        user.setCounterparty(counterpartyService.getEntityByUuidAnonymous(counterpartyUuid));
         given().
                 queryParam("token", user.getToken()).
         when().

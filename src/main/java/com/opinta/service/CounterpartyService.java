@@ -32,4 +32,8 @@ public interface CounterpartyService {
     CounterpartyDto save(CounterpartyDto counterpartyDto) throws IncorrectInputDataException;
 
     void delete(UUID uuid, User user) throws AuthException, IncorrectInputDataException;
+
+    Counterparty getEntityByUuidAnonymous(UUID uuid) throws IncorrectInputDataException;
+
+    void deleteAnomymous(UUID uuid) throws IncorrectInputDataException;
 }

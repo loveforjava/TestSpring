@@ -11,7 +11,6 @@ import java.util.UUID;
 @Setter
 @ToString
 public class UserDto {
-    private long id;
     @Size(max = 32)
     private String username;
     private UUID counterpartyUuid;

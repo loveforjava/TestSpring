@@ -8,6 +8,7 @@ import com.opinta.exception.AuthException;
 import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.exception.PerformProcessFailedException;
 import com.opinta.util.LogMessageUtil;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.UUID;
@@ -67,13 +68,24 @@ public class CounterpartyServiceImpl implements CounterpartyService {
             log.error(getByIdOnErrorLogEndpoint(Counterparty.class, uuid));
             throw new IncorrectInputDataException(getByIdOnErrorLogEndpoint(Counterparty.class, uuid));
         }
-
         userService.authorizeForAction(counterparty, user);
-
         return counterparty;
     }
-    
+
     @Override
+    @Transactional
+    public Counterparty getEntityByUuidAnonymous(UUID uuid) throws IncorrectInputDataException {
+        log.info(getByIdLogEndpoint(Counterparty.class, uuid));
+        Counterparty counterparty = counterpartyDao.getByUuid(uuid);
+        if (counterparty == null) {
+            log.error(getByIdOnErrorLogEndpoint(Counterparty.class, uuid));
+            throw new IncorrectInputDataException(getByIdOnErrorLogEndpoint(Counterparty.class, uuid));
+        }
+        return counterparty;
+    }
+
+    @Override
+    @Transactional
     public Counterparty getEntityByUser(User user) throws IncorrectInputDataException {
         Counterparty counterparty = counterpartyDao.getByUser(user);
         if (counterparty == null) {
@@ -83,7 +95,7 @@ public class CounterpartyServiceImpl implements CounterpartyService {
         }
         return counterparty;
     }
-    
+
     @Override
     @Transactional
     public List<Counterparty> getAllEntitiesByPostcodePoolUuid(UUID postcodePoolUuid)
@@ -151,6 +163,19 @@ public class CounterpartyServiceImpl implements CounterpartyService {
     public void delete(UUID uuid, User user) throws AuthException, IncorrectInputDataException {
         log.info(deleteLogEndpoint(Counterparty.class, uuid));
         Counterparty counterparty = getEntityByUuid(uuid, user);
+        userService.removeCounterpartyFromUser(user);
+        counterpartyDao.delete(counterparty);
+    }
+
+    @Override
+    @Transactional
+    public void deleteAnomymous(UUID uuid) throws IncorrectInputDataException {
+        if (!userService.getUsersByCounterparty(counterpartyDao.getByUuid(uuid)).isEmpty()) {
+            //TODO: add proper logging
+            throw new IncorrectInputDataException(deleteLogEndpoint(Counterparty.class, uuid));
+        }
+        log.info(deleteLogEndpoint(Counterparty.class, uuid));
+        Counterparty counterparty = getEntityByUuidAnonymous(uuid);
         counterpartyDao.delete(counterparty);
     }
 }

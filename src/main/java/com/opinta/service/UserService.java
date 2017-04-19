@@ -18,11 +18,19 @@ public interface UserService {
 
     User getEntityByToken(UUID token);
 
+    @Transactional
+    User getEntityById(long id);
+
     List<User> getUsersByCounterparty(Counterparty counterparty);
 
     UserDto save(UserDto userDto) throws IncorrectInputDataException;
 
     User saveEntity(User user) throws IncorrectInputDataException;
+
+    UserDto removeCounterpartyFromUser(User userEntity)
+            throws IncorrectInputDataException, AuthException;
+
+    void delete(long id) throws IncorrectInputDataException;
 
     User authenticate(UUID token) throws AuthException;
 

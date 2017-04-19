@@ -2,7 +2,6 @@ package com.opinta.service;
 
 import com.opinta.dao.CounterpartyDao;
 import com.opinta.dao.UserDao;
-import com.opinta.dto.CounterpartyDto;
 import com.opinta.dto.UserDto;
 import com.opinta.entity.Client;
 import com.opinta.entity.Counterparty;
@@ -22,9 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.opinta.util.LogMessageUtil.authenticationOnErrorLogEndpoint;
-import static com.opinta.util.LogMessageUtil.authorizationOnErrorLogEndpoint;
-import static com.opinta.util.LogMessageUtil.getByIdLogEndpoint;
+import static com.opinta.util.LogMessageUtil.*;
 
 @Service
 @Slf4j
@@ -49,6 +46,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    public User getEntityById(long id) {
+        log.info(getByIdLogEndpoint(User.class, id));
+        return userDao.getById(id);
+    }
+
+    @Override
+    @Transactional
     public List<User> getUsersByCounterparty(Counterparty counterparty) {
         return userDao.getAllByCounterparty(counterparty);
     }
@@ -69,6 +73,25 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    public UserDto removeCounterpartyFromUser(User userEntity)
+            throws IncorrectInputDataException, AuthException {
+        userEntity = getEntityById(userEntity.getId());
+        userEntity.setCounterparty(null);
+        log.info(updateLogEndpoint(User.class, userEntity));
+        userDao.update(userEntity);
+        return userMapper.toDto(userEntity);
+    }
+
+    @Override
+    @Transactional
+    public void delete(long id) throws IncorrectInputDataException {
+        log.info(deleteLogEndpoint(User.class, id));
+        User user = userDao.getById(id);
+        userDao.delete(user);
+    }
+
+    @Override
+    @Transactional
     public User authenticate(UUID token) throws AuthException {
         User user = getEntityByToken(token);
         if (user == null) {
@@ -77,9 +100,6 @@ public class UserServiceImpl implements UserService {
         }
         return user;
     }
-
-//    if (user == null || counterparty.getUser().getToken() == null || user.getToken() == null
-//            || !counterparty.getUser().getToken().equals(user.getToken())) {
 
     @Override
     public void authorizeForAction(Counterparty counterparty, User user) throws AuthException {
