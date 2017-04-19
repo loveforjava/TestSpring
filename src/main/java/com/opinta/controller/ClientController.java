@@ -95,7 +95,7 @@ public class ClientController extends BaseController {
             return new ResponseEntity<>(clientService.save(clientDto, user), OK);
         } catch (AuthException e) {
             return new ResponseEntity<>(saveOnErrorLogEndpoint(Client.class, clientDto, e), UNAUTHORIZED);
-        } catch (Exception e) {
+        } catch (IncorrectInputDataException e) {
             return new ResponseEntity<>(saveOnErrorLogEndpoint(Client.class, clientDto, e), BAD_REQUEST);
         }
     }

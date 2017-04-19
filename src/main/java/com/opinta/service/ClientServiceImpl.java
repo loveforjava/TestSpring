@@ -6,6 +6,7 @@ import com.opinta.entity.User;
 import com.opinta.exception.AuthException;
 import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.exception.PerformProcessFailedException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.UUID;
 
@@ -171,7 +172,7 @@ public class ClientServiceImpl implements ClientService {
 
         try {
             copyNotNullProperties(target, source);
-        } catch (Exception e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             log.error(copyPropertiesOnErrorLogEndpoint(Client.class, source, target, e));
             throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(Client.class, source, target, e));
         }
@@ -191,8 +192,8 @@ public class ClientServiceImpl implements ClientService {
         clientDao.delete(client);
     }
 
-    private void validateInnerReferencesAndFillObjectFromDB(Client source, User user) throws IncorrectInputDataException,
-            AuthException {
+    private void validateInnerReferencesAndFillObjectFromDB(Client source, User user)
+            throws IncorrectInputDataException, AuthException {
         Counterparty counterparty = counterpartyService.getEntityByUser(user);
         Address address = addressService.getEntityById(source.getAddress().getId());
         source.setCounterparty(counterparty);

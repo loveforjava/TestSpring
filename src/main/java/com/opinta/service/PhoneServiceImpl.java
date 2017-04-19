@@ -5,6 +5,7 @@ import com.opinta.dto.PhoneDto;
 import com.opinta.entity.Phone;
 import com.opinta.mapper.PhoneMapper;
 import com.opinta.util.LogMessageUtil;
+import java.lang.reflect.InvocationTargetException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,7 +88,7 @@ public class PhoneServiceImpl implements PhoneService {
         }
         try {
             copyNotNullProperties(target, source);
-        } catch (Exception e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             log.error(copyPropertiesOnErrorLogEndpoint(Phone.class, source, target, e));
         }
         target.setId(id);
