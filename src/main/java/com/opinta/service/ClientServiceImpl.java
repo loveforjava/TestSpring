@@ -145,12 +145,12 @@ public class ClientServiceImpl implements ClientService {
     @Override
     @Transactional
     public Client saveEntity(Client client, User user) throws IncorrectInputDataException, AuthException {
+        client.setPostId(null);
         validateInnerReferencesAndFillObjectFromDB(client, user);
         client.setPhone(phoneService.getOrCreateEntityByPhoneNumber(client.getPhone().getPhoneNumber())
                 .removeNonNumericalCharacters());
         userService.authorizeForAction(client, user);
         log.info(saveLogEndpoint(Client.class, client));
-        client.setPostId(null);
         return clientDao.save(client);
     }
     
