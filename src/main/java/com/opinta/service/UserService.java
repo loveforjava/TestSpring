@@ -27,8 +27,6 @@ public interface UserService {
 
     User saveEntity(User user) throws IncorrectInputDataException;
 
-    UserDto removeCounterpartyFromUser(User userEntity) throws IncorrectInputDataException;
-
     void removeCounterpartyFromAllUsers(Counterparty counterparty) throws IncorrectInputDataException;
 
     void delete(long id) throws IncorrectInputDataException;

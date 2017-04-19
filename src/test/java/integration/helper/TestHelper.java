@@ -1,17 +1,36 @@
 package integration.helper;
 
-import com.opinta.entity.*;
+import com.opinta.entity.Address;
+import com.opinta.entity.Client;
+import com.opinta.entity.Counterparty;
+import com.opinta.entity.Discount;
+import com.opinta.entity.DiscountPerCounterparty;
+import com.opinta.entity.Phone;
+import com.opinta.entity.PostOffice;
+import com.opinta.entity.PostcodePool;
+import com.opinta.entity.Shipment;
+import com.opinta.entity.ShipmentGroup;
+import com.opinta.entity.User;
 import com.opinta.exception.AuthException;
 import com.opinta.exception.IncorrectInputDataException;
-import com.opinta.service.*;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
 import java.time.ZoneOffset;
-import java.util.*;
 
+import com.opinta.service.AddressService;
+import com.opinta.service.ClientService;
+import com.opinta.service.CounterpartyService;
+import com.opinta.service.DiscountPerCounterpartyService;
+import com.opinta.service.DiscountService;
+import com.opinta.service.PhoneService;
+import com.opinta.service.PostOfficeService;
+import com.opinta.service.PostcodePoolService;
+import com.opinta.service.ShipmentGroupService;
+import com.opinta.service.ShipmentService;
+import com.opinta.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -20,6 +39,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 import static java.time.LocalDateTime.now;
 

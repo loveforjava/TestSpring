@@ -20,7 +20,7 @@ public class User {
     private String username;
     private String password;
     @ManyToOne
-    @JoinColumn(name = "counterparty_id")
+    @JoinColumn(name = "counterparty_uuid")
     private Counterparty counterparty;
     private UUID token;
 
