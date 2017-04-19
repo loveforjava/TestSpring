@@ -8,6 +8,7 @@ import org.mapstruct.Mappings;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper extends BaseMapper<UserDto, User> {
+    
     @Override
     @Mappings({
             @Mapping(source = "counterparty.uuid", target = "counterpartyUuid")})

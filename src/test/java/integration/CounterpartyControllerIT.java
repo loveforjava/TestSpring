@@ -213,27 +213,4 @@ public class CounterpartyControllerIT extends BaseControllerIT {
 
         JSONAssert.assertEquals(expectedJson, actualJson, false);
     }
-
-    @Test
-    public void deleteCounterparty() throws Exception {
-        testHelper.deleteClientWithoutDeletingCounterparty(sender);
-        testHelper.deleteClientWithoutDeletingCounterparty(recipient);
-        user.setCounterparty(counterpartyService.getEntityByUuidAnonymous(counterpartyUuid));
-        given().
-                queryParam("token", user.getToken()).
-        when().
-                delete("/counterparties/{uuid}", counterpartyUuid.toString()).
-        then().
-                statusCode(SC_OK);
-    }
-
-    @Test
-    public void deleteCounterparty_notFound() throws Exception {
-        given().
-                queryParam("token", user.getToken()).
-        when().
-                delete("/counterparties/{uuid}", UUID.randomUUID().toString()).
-        then().
-                statusCode(SC_NOT_FOUND);
-    }
 }

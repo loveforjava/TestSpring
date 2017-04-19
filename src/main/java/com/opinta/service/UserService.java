@@ -26,6 +26,9 @@ public interface UserService {
 
     User saveEntity(User user) throws IncorrectInputDataException;
 
+    @Transactional
+    User updateEntity(User user) throws IncorrectInputDataException, AuthException;
+
     void removeCounterpartyFromAllUsers(Counterparty counterparty) throws IncorrectInputDataException;
 
     void delete(long id) throws IncorrectInputDataException;

@@ -44,8 +44,6 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
     @Autowired
     private DiscountPerCounterpartyMapper discountPerCounterpartyMapper;
     @Autowired
-    private UserService userService;
-    @Autowired
     private TestHelper testHelper;
     private DiscountPerCounterparty discountPerCounterparty;
     private Counterparty counterparty;
@@ -126,8 +124,6 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
         actualJson.put("toDate", simpleDateFormat.format(discountPerCounterpartyDto.getToDate()));
         
         assertEquals(expectedJson.toString(), actualJson.toString(), false);
-        
-        testHelper.deleteDiscountPerCounterparty(discountPerCounterparty);
     }
     
     @Test

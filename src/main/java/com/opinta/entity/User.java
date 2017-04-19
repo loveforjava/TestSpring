@@ -24,9 +24,8 @@ public class User {
     private Counterparty counterparty;
     private UUID token;
 
-    public User(String username, String password, Counterparty counterparty, UUID token) {
+    public User(String username, Counterparty counterparty, UUID token) {
         this.username = username;
-        this.password = password;
         this.counterparty = counterparty;
         this.token = token;
     }

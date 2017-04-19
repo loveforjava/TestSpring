@@ -5,7 +5,6 @@ import com.opinta.entity.PostcodePool;
 import java.util.List;
 import java.util.UUID;
 
-import com.opinta.entity.User;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -25,7 +24,7 @@ public class CounterpartyDaoImpl implements CounterpartyDao {
     @Override
     @SuppressWarnings("unchecked")
     public List<Counterparty> getAll() {
-        Session session = this.sessionFactory.getCurrentSession();
+        Session session = sessionFactory.getCurrentSession();
         return session.createCriteria(Counterparty.class)
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                 .list();
@@ -33,14 +32,14 @@ public class CounterpartyDaoImpl implements CounterpartyDao {
 
     @Override
     public Counterparty getByUuid(UUID uuid) {
-        Session session = this.sessionFactory.getCurrentSession();
+        Session session = sessionFactory.getCurrentSession();
         return (Counterparty) session.get(Counterparty.class, uuid);
     }
     
     @Override
     @SuppressWarnings("unchecked")
     public List<Counterparty> getByPostcodePool(PostcodePool postcodePool) {
-        Session session = this.sessionFactory.getCurrentSession();
+        Session session = sessionFactory.getCurrentSession();
         return session.createCriteria(Counterparty.class)
                 .add(Restrictions.eq("postcodePool", postcodePool))
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
@@ -49,19 +48,19 @@ public class CounterpartyDaoImpl implements CounterpartyDao {
 
     @Override
     public Counterparty save(Counterparty counterparty) {
-        Session session = this.sessionFactory.getCurrentSession();
+        Session session = sessionFactory.getCurrentSession();
         return (Counterparty) session.merge(counterparty);
     }
 
     @Override
     public void update(Counterparty counterparty) {
-        Session session = this.sessionFactory.getCurrentSession();
+        Session session = sessionFactory.getCurrentSession();
         session.update(counterparty);
     }
 
     @Override
     public void delete(Counterparty counterparty) {
-        Session session = this.sessionFactory.getCurrentSession();
+        Session session = sessionFactory.getCurrentSession();
         session.delete(counterparty);
     }
 }

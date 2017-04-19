@@ -43,7 +43,8 @@ public class UserControllerIT extends BaseControllerIT {
                 then().
                         contentType(APPLICATION_JSON_VALUE).
                         statusCode(SC_OK).
-                extract().response();
+                extract()
+                        .response();
 
         User createdUser = userService.getEntityByToken(UUID.fromString(response.path("token")));
         ObjectMapper mapper = new ObjectMapper();

@@ -77,9 +77,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    public User updateEntity(User user) throws IncorrectInputDataException, AuthException {
+        log.info(updateLogEndpoint(User.class, user));
+        userDao.update(user);
+        return user;
+    }
+
+    @Override
+    @Transactional
     public void removeCounterpartyFromAllUsers(Counterparty counterparty) throws IncorrectInputDataException {
         List<User> users = userDao.getAllByCounterparty(counterparty);
-        for(User user : users) {
+        for (User user : users) {
             user.setCounterparty(null);
             log.info(updateLogEndpoint(User.class, user));
             userDao.update(user);
@@ -107,7 +115,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void authorizeForAction(Counterparty counterparty, User user) throws AuthException {
-        if (user == null || user.getCounterparty() == null || user.getToken() == null
+        if (user == null || user.getCounterparty() == null
                 || !user.getCounterparty().getUuid().equals(counterparty.getUuid())) {
             assert user != null;
             log.error(authorizationOnErrorLogEndpoint(user.getToken(), counterparty));
@@ -118,7 +126,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void authorizeForAction(Client client, User user) throws AuthException {
         if (user == null || client == null || user.getCounterparty() == null || client.getCounterparty() == null
-                || client.getCounterparty() == null || user.getToken() == null
+                || client.getCounterparty() == null
                 || !client.getCounterparty().getUuid().equals(user.getCounterparty().getUuid())) {
             assert user != null;
             log.error(authorizationOnErrorLogEndpoint(user.getToken(), client));
@@ -128,9 +136,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void authorizeForAction(Shipment shipment, User user) throws AuthException {
-        if (user == null || user.getCounterparty() == null|| shipment == null
+        if (user == null || user.getCounterparty() == null || shipment == null
                 || shipment.getSender().getCounterparty() == null || shipment.getSender().getCounterparty() == null
-                || user.getToken() == null
                 || !shipment.getSender().getCounterparty().getUuid().equals(user.getCounterparty().getUuid())) {
             assert user != null;
             log.error(authorizationOnErrorLogEndpoint(user.getToken(), shipment));
@@ -142,7 +149,7 @@ public class UserServiceImpl implements UserService {
     public void authorizeForAction(ShipmentGroup shipmentGroup, User user) throws AuthException {
         if (user == null || user.getCounterparty() == null
                 || shipmentGroup == null || shipmentGroup.getCounterparty() == null
-                || shipmentGroup.getCounterparty() == null || user.getToken() == null
+                || shipmentGroup.getCounterparty() == null
                 || !shipmentGroup.getCounterparty().getUuid().equals(user.getCounterparty().getUuid())) {
             assert user != null;
             log.error(authorizationOnErrorLogEndpoint(user.getToken(), shipmentGroup));

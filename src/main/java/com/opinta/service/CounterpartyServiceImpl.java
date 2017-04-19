@@ -26,12 +26,10 @@ import static com.opinta.util.EnhancedBeanUtilsBean.copyNotNullProperties;
 import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getAllByFieldLogEndpoint;
-import static com.opinta.util.LogMessageUtil.getByFieldOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.saveLogEndpoint;
 import static com.opinta.util.LogMessageUtil.updateLogEndpoint;
-import static com.opinta.util.LogMessageUtil.deleteWithForeignReferencesOnErrorEndpoint;
 
 @Service
 @Slf4j
@@ -142,19 +140,9 @@ public class CounterpartyServiceImpl implements CounterpartyService {
 
     @Override
     @Transactional
-    public void delete(UUID uuid, User user) throws AuthException, IncorrectInputDataException {
-        log.info(deleteLogEndpoint(Counterparty.class, uuid));
-        Counterparty counterparty = getEntityByUuid(uuid, user);
-        userService.removeCounterpartyFromAllUsers(counterparty);
-        counterpartyDao.delete(counterparty);
-    }
-
-    @Override
-    @Transactional
-    public void deleteAnonymous(UUID uuid) throws IncorrectInputDataException {
+    public void delete(UUID uuid) throws IncorrectInputDataException {
         log.info(deleteLogEndpoint(Counterparty.class, uuid));
         Counterparty counterparty = getEntityByUuidAnonymous(uuid);
-        userService.removeCounterpartyFromAllUsers(counterparty);
         counterpartyDao.delete(counterparty);
     }
 }

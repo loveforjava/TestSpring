@@ -41,8 +41,6 @@ public class ShipmentControllerIT extends BaseControllerIT {
     private ShipmentService shipmentService;
     @Autowired
     private TestHelper testHelper;
-    @Autowired
-    private UserService userService;
 
     @Before
     public void setUp() throws Exception {
@@ -128,8 +126,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
                         path("uuid");
 
         // check created data
-        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
-                userService.getUsersByCounterparty(sender.getCounterparty()).get(0));
+        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid), user);
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(shipmentMapper.toDto(createdShipment));
 
