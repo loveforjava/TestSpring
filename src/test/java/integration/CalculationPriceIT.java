@@ -96,8 +96,7 @@ public class CalculationPriceIT extends BaseControllerIT {
                 extract().
                         path("uuid");
 
-        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
-                user);
+        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid), user);
 
         // delete
         testHelper.deleteShipment(createdShipment);
@@ -130,8 +129,7 @@ public class CalculationPriceIT extends BaseControllerIT {
                 extract().
                         path("uuid");
 
-        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
-                user);
+        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid), user);
 
         // delete
         testHelper.deleteShipment(createdShipment);
@@ -164,8 +162,7 @@ public class CalculationPriceIT extends BaseControllerIT {
                 extract().
                         path("uuid");
 
-        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
-                user);
+        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid), user);
 
         // delete
         testHelper.deleteShipment(createdShipment);
@@ -198,8 +195,7 @@ public class CalculationPriceIT extends BaseControllerIT {
                 extract().
                         path("uuid");
         
-        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
-                user);
+        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid), user);
         
         // delete
         testHelper.deleteShipment(createdShipment);
@@ -232,8 +228,7 @@ public class CalculationPriceIT extends BaseControllerIT {
                 extract().
                         path("uuid");
 
-        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
-                user);
+        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid), user);
 
         // delete
         testHelper.deleteShipment(createdShipment);
@@ -266,8 +261,7 @@ public class CalculationPriceIT extends BaseControllerIT {
                 extract().
                         path("uuid");
 
-        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
-                user);
+        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid), user);
 
         // delete
         testHelper.deleteShipment(createdShipment);
@@ -300,8 +294,7 @@ public class CalculationPriceIT extends BaseControllerIT {
                 extract().
                         path("uuid");
 
-        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
-                user);
+        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid), user);
 
         // delete
         testHelper.deleteShipment(createdShipment);
@@ -335,8 +328,7 @@ public class CalculationPriceIT extends BaseControllerIT {
                 extract().
                         path("uuid");
 
-        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
-                user);
+        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid), user);
 
         // delete
         testHelper.deleteShipment(createdShipment);
@@ -370,8 +362,7 @@ public class CalculationPriceIT extends BaseControllerIT {
                 extract().
                         path("uuid");
 
-        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
-                user);
+        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid), user);
 
         // delete
         testHelper.deleteShipment(createdShipment);
@@ -408,8 +399,7 @@ public class CalculationPriceIT extends BaseControllerIT {
                 extract().
                         path("uuid");
 
-        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
-                user);
+        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid), user);
 
         // delete
         testHelper.deleteShipment(createdShipment);
