@@ -29,7 +29,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 @RestController
 @RequestMapping("/discounts")
-public class DiscountController extends BaseController{
+public class DiscountController extends BaseController {
     private final DiscountService discountService;
     
     @Autowired

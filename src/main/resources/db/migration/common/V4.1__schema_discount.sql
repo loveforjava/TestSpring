@@ -24,7 +24,7 @@
         references Discount;
 
     alter table Shipment add discount_per_counterparty_uuid RAW(255) null;
-    alter table Shipment add lastModified timestamp not null;
+    alter table Shipment add lastModified timestamp null;
     alter table Shipment
         add constraint FK_j48cpin264o2wfjiqspx7cj6m
         foreign key (discount_per_counterparty_uuid)

@@ -1,7 +1,6 @@
 package com.opinta.service;
 
 import com.opinta.dao.ClientDao;
-import com.opinta.entity.Client;
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.PostcodePool;
 import com.opinta.entity.User;
@@ -9,6 +8,7 @@ import com.opinta.exception.AuthException;
 import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.exception.PerformProcessFailedException;
 import com.opinta.util.LogMessageUtil;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,7 +30,6 @@ import static com.opinta.util.LogMessageUtil.getByIdLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.saveLogEndpoint;
 import static com.opinta.util.LogMessageUtil.updateLogEndpoint;
-import static java.lang.String.format;
 
 @Service
 @Slf4j
@@ -87,7 +86,8 @@ public class CounterpartyServiceImpl implements CounterpartyService {
     
     @Override
     @Transactional
-    public List<Counterparty> getAllEntitiesByPostcodePoolUuid(UUID postcodePoolUuid) throws IncorrectInputDataException {
+    public List<Counterparty> getAllEntitiesByPostcodePoolUuid(UUID postcodePoolUuid)
+            throws IncorrectInputDataException {
         PostcodePool postcodePool = postcodePoolService.getEntityByUuid(postcodePoolUuid);
         log.info(getAllByFieldLogEndpoint(Counterparty.class, PostcodePool.class, postcodePool));
         return counterpartyDao.getByPostcodePool(postcodePool);
@@ -135,7 +135,7 @@ public class CounterpartyServiceImpl implements CounterpartyService {
 
         try {
             copyNotNullProperties(target, source);
-        } catch (Exception e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             log.error(copyPropertiesOnErrorLogEndpoint(Counterparty.class, source, target, e));
             throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(
                     Counterparty.class, source, target, e));

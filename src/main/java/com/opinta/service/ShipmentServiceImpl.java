@@ -11,6 +11,7 @@ import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.exception.PerformProcessFailedException;
 import com.opinta.util.AddressUtil;
 import com.opinta.util.LogMessageUtil;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -155,7 +156,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         
         try {
             copyNotNullProperties(target, source);
-        } catch (Exception e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             log.error(copyPropertiesOnErrorLogEndpoint(Shipment.class, source, target, e));
             throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(
                     Shipment.class, source, target, e));
@@ -183,7 +184,8 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     @Transactional
-    public ShipmentDto removeShipmentGroupFromShipment(UUID uuid, User user) throws IncorrectInputDataException, AuthException {
+    public ShipmentDto removeShipmentGroupFromShipment(UUID uuid, User user)
+            throws IncorrectInputDataException, AuthException {
         Shipment shipment = getEntityByUuid(uuid, user);
         shipment.setShipmentGroup(null);
         log.info(updateLogEndpoint(Shipment.class, shipment));
@@ -211,7 +213,8 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         if (shipment.getWeight() < tariffGrid.getWeight() &&
                 shipment.getLength() < tariffGrid.getLength()) {
-            tariffGrid = tariffGridService.getEntityByDimension(shipment.getWeight(), shipment.getLength(), w2wVariation);
+            tariffGrid = tariffGridService
+                    .getEntityByDimension(shipment.getWeight(), shipment.getLength(), w2wVariation);
         }
 
         log.info("TariffGrid for weight {} per length {} and type {}: {}",

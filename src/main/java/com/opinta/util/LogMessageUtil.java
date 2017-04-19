@@ -38,7 +38,8 @@ public class LogMessageUtil {
     }
 
     public static String getByFieldOnErrorLogEndpoint(Class clazz, Class clazzField, Object value, Exception e) {
-        return format("%s by %s %s not found! %s", clazz.getSimpleName(), clazzField.getSimpleName(), value, e.getMessage());
+        return format("%s by %s %s not found! %s",
+                clazz.getSimpleName(), clazzField.getSimpleName(), value, e.getMessage());
     }
     
     public static String getByFieldOnErrorLogEndpoint(Class clazz, Class clazzField, Object value) {
@@ -78,7 +79,8 @@ public class LogMessageUtil {
     }
 
     public static String copyPropertiesOnErrorLogEndpoint(Class clazz, Object from, Object to, Exception e) {
-        return format("Can't copy properties from %s to %s for %s! %s", from, to, clazz.getSimpleName(), e.getMessage());
+        return format("Can't copy properties from %s to %s for %s! %s",
+                from, to, clazz.getSimpleName(), e.getMessage());
     }
 
     public static String deleteFieldOnErrorLogEndpoint(Class clazz, Class clazzField, Object value, Exception e) {

@@ -7,6 +7,7 @@ import com.opinta.exception.PerformProcessFailedException;
 import com.opinta.mapper.BarcodeInnerNumberMapper;
 import com.opinta.mapper.PostcodePoolMapper;
 import com.opinta.entity.PostcodePool;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.UUID;
 import javax.transaction.Transactional;
@@ -90,7 +91,7 @@ public class PostcodePoolServiceImpl implements PostcodePoolService {
         PostcodePool target = getEntityByUuid(uuid);
         try {
             copyNotNullProperties(target, source);
-        } catch (Exception e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             log.error(copyPropertiesOnErrorLogEndpoint(PostcodePool.class, source, target, e));
             throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(
                     PostcodePool.class, source, target, e));
