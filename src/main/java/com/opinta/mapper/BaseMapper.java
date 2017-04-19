@@ -6,17 +6,17 @@ import org.mapstruct.InheritInverseConfiguration;
 /**
  * Base dto mapper
  *
- * @param <DTO>    type of Dto
- * @param <ENTITY> type of Entity
+ * @param <Dto>    type of Dto
+ * @param <Entity> type of Entity
  */
-public interface BaseMapper<DTO, ENTITY> {
+public interface BaseMapper<Dto, Entity> {
 
-    DTO toDto(ENTITY entity);
+    Dto toDto(Entity entity);
 
-    List<DTO> toDto(List<ENTITY> entities);
+    List<Dto> toDto(List<Entity> entities);
 
     @InheritInverseConfiguration
-    ENTITY toEntity(DTO dto);
+    Entity toEntity(Dto dto);
 
-    List<ENTITY> toEntity(List<DTO> dtos);
+    List<Entity> toEntity(List<Dto> dtos);
 }

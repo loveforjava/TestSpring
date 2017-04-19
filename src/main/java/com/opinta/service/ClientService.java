@@ -31,7 +31,8 @@ public interface ClientService {
 
     Client saveEntity(Client client, User user) throws IncorrectInputDataException, AuthException;
     
-    PostIdDto assignPostIdFor(UUID uuid, ClientType clientType, User user) throws IncorrectInputDataException, AuthException;
+    PostIdDto assignPostIdFor(UUID uuid, ClientType clientType, User user)
+            throws IncorrectInputDataException, AuthException;
     
     Client updateEntity(Client client, User user) throws IncorrectInputDataException, AuthException;
     
