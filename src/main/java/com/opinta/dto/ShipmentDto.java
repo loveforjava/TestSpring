@@ -31,7 +31,7 @@ public class ShipmentDto {
     private BigDecimal declaredPrice;
     private BigDecimal price;
     private BigDecimal postPay;
-    private DiscountPerCounterpartyDto discountPerCounterpartyDto;
+    private DiscountPerCounterpartyDto discountPerCounterparty;
     private Date lastModified;
     @Size(max = 255)
     private String description;
