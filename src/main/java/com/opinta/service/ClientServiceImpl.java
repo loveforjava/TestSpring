@@ -159,6 +159,9 @@ public class ClientServiceImpl implements ClientService {
     public PostIdDto assignPostIdFor(UUID uuid, ClientType clientType, User user)
             throws IncorrectInputDataException, AuthException {
         Client client = getEntityByUuid(uuid, user);
+        if (client.getPostId() != null) {
+            return new PostIdDto(client.getPostId());
+        }
         PostIdDto postIdDto = new PostIdDto(generatePostIdUsing(clientType));
         client.setPostId(postIdDto.getPostId());
         clientDao.update(client);
