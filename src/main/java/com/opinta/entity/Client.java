@@ -1,5 +1,6 @@
 package com.opinta.entity;
 
+import java.util.Date;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
@@ -8,6 +9,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.Size;
 
 import lombok.Data;
@@ -48,6 +51,17 @@ public class Client {
     private String bankCode;
     @Size(max = 255)
     private String bankAccount;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date created;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastModified;
+    @ManyToOne
+    @JoinColumn(name = "creator_id")
+    private User creator;
+    @ManyToOne
+    @JoinColumn(name = "modifier_id")
+    private User lastModifier;
 
     public Client(String name, String uniqueRegistrationNumber, Address address,
                   Counterparty counterparty) {

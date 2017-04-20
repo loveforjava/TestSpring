@@ -5,6 +5,7 @@ import com.opinta.entity.classifier.CountrysidePostcode;
 import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.exception.PerformProcessFailedException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Date;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -64,6 +65,7 @@ public class AddressServiceImpl implements AddressService {
     @Transactional
     public Address saveEntity(Address address) {
         log.info(saveLogEndpoint(Address.class, address));
+        address.setCreated(new Date());
         CountrysidePostcode countrysidePostcode = countrysidePostcodeDao.getByPostcode(address.getPostcode());
         address.setCountryside(countrysidePostcode != null);
         return addressDao.save(address);
@@ -84,6 +86,7 @@ public class AddressServiceImpl implements AddressService {
         CountrysidePostcode countrysidePostcode = countrysidePostcodeDao.getByPostcode(target.getPostcode());
         target.setCountryside(countrysidePostcode != null);
         log.info(updateLogEndpoint(Address.class, target));
+        target.setCreated(new Date());
         addressDao.update(target);
         return target;
     }

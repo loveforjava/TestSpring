@@ -8,6 +8,7 @@ import com.opinta.mapper.BarcodeInnerNumberMapper;
 import com.opinta.mapper.PostcodePoolMapper;
 import com.opinta.entity.PostcodePool;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import javax.transaction.Transactional;
@@ -62,6 +63,9 @@ public class PostcodePoolServiceImpl implements PostcodePoolService {
     @Transactional
     public PostcodePool saveEntity(PostcodePool postcodePool) {
         log.info(saveLogEndpoint(PostcodePool.class, postcodePool));
+        Date date = new Date();
+        postcodePool.setCreated(date);
+        postcodePool.setLastModified(date);
         return postcodePoolDao.save(postcodePool);
     }
 
@@ -97,6 +101,7 @@ public class PostcodePoolServiceImpl implements PostcodePoolService {
                     PostcodePool.class, source, target, e));
         }
         target.setUuid(uuid);
+        target.setLastModified(new Date());
         log.info(updateLogEndpoint(PostcodePool.class, target));
         postcodePoolDao.update(target);
         return postcodePoolMapper.toDto(target);

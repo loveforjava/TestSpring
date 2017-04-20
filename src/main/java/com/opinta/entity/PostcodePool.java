@@ -1,9 +1,12 @@
 package com.opinta.entity;
 
+import java.util.Date;
 import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import lombok.Data;
@@ -29,6 +32,11 @@ public class PostcodePool {
     @Size(min = POSTCODE_LENGTH, max = POSTCODE_LENGTH)
     private String postcode;
     private boolean closed;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date created;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastModified;
 
     public PostcodePool(String postcode, boolean closed) {
         this.postcode = postcode;

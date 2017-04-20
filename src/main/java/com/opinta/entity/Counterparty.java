@@ -1,10 +1,14 @@
 package com.opinta.entity;
 
+import java.util.Date;
 import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 
 import lombok.Data;
@@ -28,6 +32,17 @@ public class Counterparty {
     @NotNull
     private PostcodePool postcodePool;
     private String description;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date created;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastModified;
+    @ManyToOne
+    @JoinColumn(name = "creator_id")
+    private User creator;
+    @ManyToOne
+    @JoinColumn(name = "modifier_id")
+    private User lastModifier;
 
     public Counterparty(String name, PostcodePool postcodePool) {
         this.name = name;

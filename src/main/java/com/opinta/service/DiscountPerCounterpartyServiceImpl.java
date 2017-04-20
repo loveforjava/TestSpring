@@ -91,6 +91,11 @@ public class DiscountPerCounterpartyServiceImpl implements DiscountPerCounterpar
         discountPerCounterparty.setCounterparty(counterparty);
         discountPerCounterparty.setDiscount(discount);
         discountPerCounterparty.validate();
+        Date date = new Date();
+        discountPerCounterparty.setCreated(date);
+        discountPerCounterparty.setLastModified(date);
+        discountPerCounterparty.setCreator(user);
+        discountPerCounterparty.setLastModifier(user);
         log.info(saveLogEndpoint(DiscountPerCounterparty.class, discountPerCounterparty));
         return discountPerCounterpartyDao.save(discountPerCounterparty);
     }
@@ -111,6 +116,8 @@ public class DiscountPerCounterpartyServiceImpl implements DiscountPerCounterpar
         }
         target.setUuid(uuid);
         log.info(updateLogEndpoint(Discount.class, target));
+        target.setLastModified(new Date());
+        target.setLastModifier(user);
         discountPerCounterpartyDao.update(target);
         return target;
     }

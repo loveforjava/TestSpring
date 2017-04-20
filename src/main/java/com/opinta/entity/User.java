@@ -1,11 +1,14 @@
 package com.opinta.entity;
 
+import java.util.Date;
 import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,6 +26,11 @@ public class User {
     @JoinColumn(name = "counterparty_uuid")
     private Counterparty counterparty;
     private UUID token;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date created;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastModified;
 
     public User(String username, Counterparty counterparty, UUID token) {
         this.username = username;

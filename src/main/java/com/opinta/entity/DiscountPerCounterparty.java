@@ -7,6 +7,7 @@ import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import javax.persistence.Temporal;
@@ -33,6 +34,17 @@ public class DiscountPerCounterparty {
     private Date fromDate;
     @Temporal(TemporalType.DATE)
     private Date toDate;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date created;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastModified;
+    @ManyToOne
+    @JoinColumn(name = "creator_id")
+    private User creator;
+    @ManyToOne
+    @JoinColumn(name = "modifier_id")
+    private User lastModifier;
 
     public DiscountPerCounterparty(Counterparty counterparty, Discount discount, Date fromDate, Date toDate) {
         this.counterparty = counterparty;

@@ -1,5 +1,6 @@
 package integration;
 
+import java.util.Date;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,7 +27,10 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.Matchers.lessThan;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -126,6 +130,14 @@ public class ClientControllerIT extends BaseControllerIT {
 
         // check created data
         Client createdClient = clientService.getEntityByUuid(newClientUuid, user);
+        long timeCreated = createdClient.getCreated().getTime();
+        long currentTime = new Date().getTime();
+        assertThat("Shipment was created more than 30 seconds ago!", (currentTime - timeCreated),
+                lessThan(30000L));
+        assertNotNull("Shipment doesn't have a creator", createdClient.getCreator());
+        assertTrue("Shipment was created with wrong user!",
+                createdClient.getCreator().getToken().equals(user.getToken()));
+
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientMapper.toDto(createdClient));
         assertEquals(expectedJson.toJSONString(), actualJson, false);

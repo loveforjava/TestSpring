@@ -29,6 +29,11 @@ public class Discount {
     @Temporal(TemporalType.DATE)
     private Date toDate;
     private float value;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date created;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastModified;
     
     public Discount(String name, Date from, Date to, float value) {
         this.name = name;
