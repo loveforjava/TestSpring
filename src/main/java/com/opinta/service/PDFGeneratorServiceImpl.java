@@ -49,6 +49,7 @@ import static java.awt.Color.GRAY;
 import static java.awt.Color.LIGHT_GRAY;
 import static java.lang.Math.round;
 import static java.lang.String.format;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.rightPad;
 import static org.apache.pdfbox.pdmodel.PDPageContentStream.AppendMode.APPEND;
 
@@ -410,7 +411,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             acroForm.setDefaultResources(res);
 
             //Populating clients data
-            generateClientsData(shipment, acroForm, true, false);
+            generateClientsData(shipment, acroForm, false);
 
             //Splitting price to hryvnas and kopiykas
             BigDecimal postPay = shipment.getPostPay();
@@ -428,6 +429,11 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             //Populating text field for the price
             populateField(acroForm, field, "priceInText", priceInText);
             populateField(acroForm, field, "barcodeText", shipment.getBarcodeInnerNumber().stringify());
+            //Generating bank data
+            String bankCode = shipment.getSender().getBankCode();
+            String bankAccount = shipment.getSender().getBankAccount();
+            populateField(acroForm, field, "bankData", (isEmpty(bankCode) ? "" : "МФО: " + bankCode) +
+                    (isEmpty(bankCode) ? "" : " р/р: " + bankAccount));
 
             //Removing acrofields
             acroForm.flatten();
@@ -472,7 +478,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             acroForm.setDefaultResources(res);
 
             //Populating client data
-            generateClientsData(shipment, acroForm, false, true);
+            generateClientsData(shipment, acroForm, true);
             setCheckBoxes(shipment, acroForm);
 
             //Populating rest of the fields
@@ -558,17 +564,10 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
         }
     }
 
-    private void generateClientsData(Shipment shipment, PDAcroForm acroForm, boolean swapSenderWithRecipient,
-                                     boolean postcodeOnNextLine) throws IOException {
-        Client sender;
-        Client recipient;
-        if (swapSenderWithRecipient) {
-            sender = shipment.getRecipient();
-            recipient = shipment.getSender();
-        } else {
-            sender = shipment.getSender();
-            recipient = shipment.getRecipient();
-        }
+    private void generateClientsData(Shipment shipment, PDAcroForm acroForm, boolean postcodeOnNextLine)
+            throws IOException {
+        Client sender = shipment.getSender();
+        Client recipient = shipment.getRecipient();
 
         populateField(acroForm, field, "senderName", sender.getName());
         populateField(acroForm, field, "senderAddress", processAddress(sender.getAddress(), postcodeOnNextLine));
