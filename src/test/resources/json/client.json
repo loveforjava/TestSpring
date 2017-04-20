@@ -3,7 +3,7 @@
   "firstName": "John",
   "middleName": "Johnson",
   "lastName": "Doe",
-  "customId": "123-098-345-432",
+  "externalId": "123-098-345-432",
   "uniqueRegistrationNumber": "007",
   "phoneNumber": "0982004113",
   "addressId": [],

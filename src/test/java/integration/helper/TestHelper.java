@@ -1,6 +1,5 @@
 package integration.helper;
 
-import com.opinta.dto.postid.PostIdDto;
 import com.opinta.entity.Address;
 import com.opinta.entity.Client;
 import com.opinta.entity.ClientType;
@@ -217,7 +216,7 @@ public class TestHelper {
     public Client createClient() throws Exception {
         Client client = new Client("FOP Ivanov", "001", createAddress(), createPhone(),
                 createCounterparty());
-        client.setCustomId("123-fff-000-888-zxc");
+        client.setExternalId("123-fff-000-888-zxc");
         return clientService.saveEntity(client, userService.getUsersByCounterparty(client.getCounterparty()).get(0));
     }
 
@@ -245,8 +244,8 @@ public class TestHelper {
             type = COMPANY;
         }
         User user = userService.getUsersByCounterparty(client.getCounterparty()).get(0);
-        PostIdDto postId = clientService.assignPostIdFor(client.getUuid(), type, user);
-        client.setPostId(postId.getPostId());
+        String postId = clientService.updatePostId(client.getUuid(), type, user).getPostId();
+        client.setPostId(postId);
     }
 
     public Client createRecipientFor(Counterparty counterparty) throws Exception {

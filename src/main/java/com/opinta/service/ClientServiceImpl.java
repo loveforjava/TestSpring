@@ -1,6 +1,5 @@
 package com.opinta.service;
 
-import com.opinta.dto.postid.PostIdDto;
 import com.opinta.entity.Address;
 import com.opinta.entity.ClientType;
 import com.opinta.entity.Counterparty;
@@ -10,7 +9,6 @@ import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.exception.PerformProcessFailedException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 
 import javax.transaction.Transactional;
@@ -25,18 +23,20 @@ import org.springframework.stereotype.Service;
 
 import static java.lang.String.valueOf;
 import static java.time.LocalDate.now;
-import static java.util.Locale.ENGLISH;
 
+import static com.opinta.util.AlphabetUtil.characterOf;
+import static com.opinta.util.AlphabetUtil.generateRandomChars;
 import static com.opinta.util.EnhancedBeanUtilsBean.copyNotNullProperties;
 import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getAllByFieldLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getAllLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getByFieldLogEndpoint;
+import static com.opinta.util.LogMessageUtil.getByFieldOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.saveLogEndpoint;
 import static com.opinta.util.LogMessageUtil.updateLogEndpoint;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 @Service
 @Slf4j
@@ -47,19 +47,19 @@ public class ClientServiceImpl implements ClientService {
     private final AddressService addressService;
     private final UserService userService;
     private final ClientMapper clientMapper;
-    private final PostIdNumberGenerator postIdNumberGenerator;
+    private final PostIdInnerNumberGenerator postIdInnerNumberGenerator;
 
     @Autowired
     public ClientServiceImpl(ClientDao clientDao, ClientMapper clientMapper, PhoneService phoneService,
                              AddressService addressService, CounterpartyService counterpartyService,
-                             UserService userService, PostIdNumberGenerator postIdNumberGenerator) {
+                             UserService userService, PostIdInnerNumberGenerator postIdInnerNumberGenerator) {
         this.clientDao = clientDao;
         this.counterpartyService = counterpartyService;
         this.phoneService = phoneService;
         this.addressService = addressService;
         this.clientMapper = clientMapper;
         this.userService = userService;
-        this.postIdNumberGenerator = postIdNumberGenerator;
+        this.postIdInnerNumberGenerator = postIdInnerNumberGenerator;
     }
 
     @Override
@@ -80,15 +80,13 @@ public class ClientServiceImpl implements ClientService {
     @Override
     @Transactional
     public Client saveOrGetEntity(Client client, User user) throws IncorrectInputDataException, AuthException {
-        if (client.getUuid() == null) {
-            if (isEmpty(client.getPostId())) {
-                return saveEntity(client, user);
-            } else {
-                return getEntityByPostId(client.getPostId(), user);
-            }
-        } else {
+        if (client.getUuid() != null) {
             return getEntityByUuid(client.getUuid(), user);
         }
+        if (client.getPostId() != null) {
+            return getEntityByPostId(client.getPostId(), user);
+        }
+        return saveEntity(client, user);
     }
 
     @Override
@@ -118,10 +116,10 @@ public class ClientServiceImpl implements ClientService {
     @Override
     @Transactional
     public Client getEntityByPostId(String postId, User user) throws IncorrectInputDataException, AuthException {
-        log.info(getByIdLogEndpoint(Client.class, postId));
+        log.info(getByFieldLogEndpoint(Client.class, String.class, postId));
         Client client = clientDao.getByPostId(postId);
         if (client == null) {
-            log.error(getByIdOnErrorLogEndpoint(Client.class, postId));
+            log.error(getByFieldOnErrorLogEndpoint(Client.class, String.class, postId));
             throw new IncorrectInputDataException(getByIdOnErrorLogEndpoint(Client.class, postId));
         }
         
@@ -156,39 +154,22 @@ public class ClientServiceImpl implements ClientService {
     
     @Override
     @Transactional
-    public PostIdDto assignPostIdFor(UUID uuid, ClientType clientType, User user)
+    public ClientDto updatePostId(UUID uuid, ClientType clientType, User user)
             throws IncorrectInputDataException, AuthException {
         Client client = getEntityByUuid(uuid, user);
         if (client.getPostId() != null) {
-            return new PostIdDto(client.getPostId());
+            return clientMapper.toDto(client);
         }
-        PostIdDto postIdDto = new PostIdDto(generatePostIdUsing(clientType));
-        client.setPostId(postIdDto.getPostId());
+        client.setPostId(generatePostId(clientType));
         clientDao.update(client);
-        return postIdDto;
+        return clientMapper.toDto(client);
     }
     
-    private String generatePostIdUsing(ClientType clientType) {
-        return clientType.postIdLetter() + yearDigitChars() + postIdNumberGenerator.generateNextNumber() + saltChars();
-    }
-    
-    private String yearDigitChars() {
+    private String generatePostId(ClientType clientType) throws IncorrectInputDataException {
         String yearString = valueOf(now().getYear());
-        return yearString.substring(yearString.length() - 2);
-    }
-    
-    private String saltChars() {
-        Random random = new Random();
-        return new StringBuilder()
-                .append(generateAlphabeticCharUsing(random))
-                .append(generateAlphabeticCharUsing(random))
-                .append(generateAlphabeticCharUsing(random))
-                .toString()
-                .toUpperCase(ENGLISH);
-    }
-    
-    private char generateAlphabeticCharUsing(Random random) {
-        return (char) (random.nextInt(26) + 'a');
+        yearString = yearString.substring(yearString.length() - 2);
+        return characterOf(clientType) + yearString +
+                postIdInnerNumberGenerator.generateNextNumber() + generateRandomChars(3, true);
     }
     
     @Override
@@ -233,8 +214,8 @@ public class ClientServiceImpl implements ClientService {
             IncorrectInputDataException, PerformProcessFailedException {
         Client source = clientMapper.toEntity(clientDto);
         source.setCounterparty(null);
+        source.setPostId(null);
         Client target = getEntityByUuid(uuid, user);
-        String postId = target.getPostId();
 
         validateInnerReferencesAndFillObjectFromDB(source, user);
 
@@ -245,7 +226,6 @@ public class ClientServiceImpl implements ClientService {
             throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(Client.class, source, target, e));
         }
         
-        target.setPostId(postId);
         target.setUuid(uuid);
         target.getPhone().removeNonNumericalCharacters();
         target.setPhone(phoneService.getOrCreateEntityByPhoneNumber(target.getPhone().getPhoneNumber()));

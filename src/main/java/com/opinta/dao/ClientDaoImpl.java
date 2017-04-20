@@ -18,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import static java.lang.String.format;
+import static java.sql.Types.INTEGER;
+import static java.sql.Types.VARCHAR;
 
 @Repository
 public class ClientDaoImpl implements ClientDao {
@@ -63,25 +65,23 @@ public class ClientDaoImpl implements ClientDao {
                 .uniqueResult();
     }
     
-    private static final String POST_ID_NEXT_NUMBER_CALL =
-            "BEGIN " +
-            "   GET_CLIENT_POSTID(?, ?); " +
-            "END;";
     @Override
-    public String getNextPostIdNumber() {
+    public String getNextPostIdInnerNumber() {
         java.sql.Date date = new java.sql.Date(new java.util.Date().getTime());
         Session session = sessionFactory.getCurrentSession();
-        int nextNumber = session.doReturningWork(connection -> {
-            try (CallableStatement call = connection.prepareCall(POST_ID_NEXT_NUMBER_CALL)) {
+        return session.doReturningWork(connection -> {
+            try (CallableStatement call = connection.prepareCall(
+                    "BEGIN " +
+                    "   GET_NEXT_CLIENT_POSTID(?, ?); " +
+                    "END;")) {
                 call.setDate(1, date);
-                call.registerOutParameter(2, Types.INTEGER);
+                call.registerOutParameter(2, VARCHAR);
                 call.execute();
-                return call.getInt(2);
+                return call.getString(2);
             } catch (SQLException e) {
                 throw new RuntimeException("Can't generate next postid number from stored procedure: ", e);
             }
         });
-        return format("%07d", nextNumber);
     }
     
     @Override

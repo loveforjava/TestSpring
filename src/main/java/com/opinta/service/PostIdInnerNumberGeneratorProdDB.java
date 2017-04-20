@@ -9,16 +9,16 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @Profile({"stage", "dev"})
-public class PostIdNumberGeneratorProdDB implements PostIdNumberGenerator {
+public class PostIdInnerNumberGeneratorProdDB implements PostIdInnerNumberGenerator {
     private final ClientDao clientDao;
     
     @Autowired
-    public PostIdNumberGeneratorProdDB(ClientDao clientDao) {
+    public PostIdInnerNumberGeneratorProdDB(ClientDao clientDao) {
         this.clientDao = clientDao;
     }
     
     @Override
     public String generateNextNumber() {
-        return clientDao.getNextPostIdNumber();
+        return clientDao.getNextPostIdInnerNumber();
     }
 }

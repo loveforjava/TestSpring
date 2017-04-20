@@ -16,6 +16,10 @@ public class LogMessageUtil {
     public static String getByIdLogEndpoint(Class clazz, Object value) {
         return format("Getting %s %s", clazz.getSimpleName(), value);
     }
+    
+    public static String getByFieldLogEndpoint(Class clazz, Class clazzField, Object value) {
+        return format("Getting %s by %s %s", clazz.getSimpleName(), clazzField.getSimpleName(), value);
+    }
 
     public static String saveLogEndpoint(Class clazz, Object value) {
         return format("Saving %s %s", clazz.getSimpleName(), value);

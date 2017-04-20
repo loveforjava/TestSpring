@@ -1,10 +1,11 @@
-create or replace PROCEDURE get_client_postid
+create or replace PROCEDURE GET_NEXT_CLIENT_POSTID
 (
   DT IN DATE
-, NEXTNUM OUT NUMBER
+, PostId OUT nvarchar2
 )
 AS
 
+NEXTNUM int;
 BEGIN
   SELECT EXTRACT(YEAR FROM dt) INTO nextnum FROM dual;
 
@@ -29,5 +30,5 @@ if NEXTNUM = 2017 then
    else
       select POSTID2026.nextVal into nextNum from dual;
 end if;
-
-END get_client_postid;
+PostId :=  LPAD(nextNum, 7, '0');
+END GET_NEXT_CLIENT_POSTID;

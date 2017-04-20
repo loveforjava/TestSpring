@@ -31,11 +31,11 @@ public class ClientDto {
     private String middleName;
     @Size(max = 255)
     private String lastName;
-    @Size(max = 36)
+    @Size(min = 13, max = 13)
     private String postId;
     @Size(max = 64)
     @JsonProperty(access = WRITE_ONLY)
-    private String customId;
+    private String externalId;
     @Size(max = 25)
     private String uniqueRegistrationNumber;
     private UUID counterpartyUuid;

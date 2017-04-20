@@ -2,7 +2,6 @@ package com.opinta.dao;
 
 import java.sql.CallableStatement;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.List;
 
 import com.opinta.entity.BarcodeInnerNumber;
@@ -16,6 +15,8 @@ import org.springframework.stereotype.Repository;
 
 import static com.opinta.entity.BarcodeStatus.RESERVED;
 import static java.lang.String.format;
+import static java.sql.Types.INTEGER;
+import static java.sql.Types.VARCHAR;
 
 @Repository
 public class BarcodeInnerNumberDaoImpl implements BarcodeInnerNumberDao {
@@ -60,18 +61,17 @@ public class BarcodeInnerNumberDaoImpl implements BarcodeInnerNumberDao {
         session.delete(barcodeInnerNumber);
     }
     
-    private static final String BARCODE_INNER_CALL =
-            "BEGIN " +
-                    "GET_NEXT_BARCODE(?, ?, ?); " +
-            "END;";
     @Override
     public BarcodeInnerNumber generateForPostcodePool(PostcodePool postcodePool) {
         Session session = sessionFactory.getCurrentSession();
         String barcode = session.doReturningWork((connection) -> {
-            try (CallableStatement call = connection.prepareCall(BARCODE_INNER_CALL)) {
+            try (CallableStatement call = connection.prepareCall(
+                    "BEGIN " +
+                    "   GET_NEXT_BARCODE(?, ?, ?); " +
+                    "END;")) {
                 call.setString(1, postcodePool.getUuid().toString().replaceAll("-", ""));
-                call.registerOutParameter(2, Types.VARCHAR);
-                call.registerOutParameter(3, Types.INTEGER);
+                call.registerOutParameter(2, VARCHAR);
+                call.registerOutParameter(3, INTEGER);
                 call.execute();
                 return call.getString(2);
             } catch (SQLException e) {

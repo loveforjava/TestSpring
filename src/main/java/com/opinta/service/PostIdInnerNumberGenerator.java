@@ -1,5 +1,5 @@
 package com.opinta.service;
 
-public interface PostIdNumberGenerator {
+public interface PostIdInnerNumberGenerator {
     String generateNextNumber();
 }
