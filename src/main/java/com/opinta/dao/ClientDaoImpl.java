@@ -6,9 +6,7 @@ import com.opinta.entity.User;
 import java.sql.CallableStatement;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.Date;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 
 import com.opinta.entity.Client;
