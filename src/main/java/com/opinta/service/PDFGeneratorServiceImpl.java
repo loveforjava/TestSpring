@@ -49,7 +49,7 @@ import static java.awt.Color.GRAY;
 import static java.awt.Color.LIGHT_GRAY;
 import static java.lang.Math.round;
 import static java.lang.String.format;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.rightPad;
 import static org.apache.pdfbox.pdmodel.PDPageContentStream.AppendMode.APPEND;
 
@@ -432,8 +432,8 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             //Generating bank data
             String bankCode = shipment.getSender().getBankCode();
             String bankAccount = shipment.getSender().getBankAccount();
-            populateField(acroForm, field, "bankData", (isEmpty(bankCode) ? "" : "МФО: " + bankCode) +
-                    (isEmpty(bankCode) ? "" : " р/р: " + bankAccount));
+            populateField(acroForm, field, "bankData", (isBlank(bankCode) ? "" : "МФО: " + bankCode) +
+                    (isBlank(bankCode) ? "" : " р/р: " + bankAccount));
 
             //Removing acrofields
             acroForm.flatten();
