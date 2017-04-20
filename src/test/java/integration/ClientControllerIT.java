@@ -99,8 +99,6 @@ public class ClientControllerIT extends BaseControllerIT {
         JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client.json");
         inputJson.put("addressId", (int) newAddress.getId());
         inputJson.put("individual", true);
-        // fake postId, cannot be saved
-        inputJson.put("postId", "Z170000001QFR");
         
         String firstName = (String) inputJson.get("firstName");
         String middleName = (String) inputJson.get("middleName");
@@ -127,15 +125,13 @@ public class ClientControllerIT extends BaseControllerIT {
         JSONParser parser = new JSONParser();
         JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
         expectedJson.put("name", expectedFullName);
+        expectedJson.put("postId", null);
         expectedJson.remove("externalId");
         
         UUID newClientUuid = UUID.fromString(newUuid);
 
         // check created data
         Client createdClient = clientService.getEntityByUuid(newClientUuid, user);
-        Assert.assertEquals(inputJson.get("externalId"), createdClient.getExternalId());
-        Assert.assertNull(createdClient.getPostId());
-        
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientMapper.toDto(createdClient));
         assertEquals(expectedJson.toJSONString(), actualJson, false);
@@ -154,8 +150,6 @@ public class ClientControllerIT extends BaseControllerIT {
         JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client.json");
         inputJson.put("addressId", (int) newAddress.getId());
         inputJson.put("individual", false);
-        // fake postId, cannot be saved
-        inputJson.put("postId", "Z170000001QFR");
         
         String expectedFullName = (String) inputJson.get("name");
 
@@ -182,15 +176,13 @@ public class ClientControllerIT extends BaseControllerIT {
         expectedJson.remove("firstName");
         expectedJson.remove("middleName");
         expectedJson.remove("lastName");
+        expectedJson.put("postId", null);
         expectedJson.remove("externalId");
 
         UUID newClientUuid = UUID.fromString(newUuid);
 
         // check created data
         Client createdClient = clientService.getEntityByUuid(newClientUuid, user);
-        Assert.assertEquals(inputJson.get("externalId"), createdClient.getExternalId());
-        Assert.assertNull(createdClient.getPostId());
-        
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientMapper.toDto(createdClient));
         assertEquals(expectedJson.toJSONString(), actualJson, false);
