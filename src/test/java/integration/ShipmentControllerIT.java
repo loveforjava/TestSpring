@@ -33,6 +33,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
     private Shipment shipment;
     private UUID shipmentUuid;
     private User user;
+    private Counterparty counterparty;
     @Autowired
     private ShipmentMapper shipmentMapper;
     @Autowired
@@ -42,9 +43,10 @@ public class ShipmentControllerIT extends BaseControllerIT {
 
     @Before
     public void setUp() throws Exception {
-        shipment = testHelper.createShipment();
+        counterparty = testHelper.createCounterparty();
+        user = testHelper.createUser(counterparty);
+        shipment = testHelper.createShipmentFor(counterparty);
         shipmentUuid = shipment.getUuid();
-        user = shipment.getSender().getCounterparty().getUser();
     }
 
     @After
@@ -97,10 +99,10 @@ public class ShipmentControllerIT extends BaseControllerIT {
     @Test
     @SuppressWarnings("unchecked")
     public void createShipment_presavedSenderAndRecipient() throws Exception {
-        Counterparty counterparty = testHelper.createCounterparty();
-        Client sender = testHelper.createSenderFor(counterparty);
-        Client recipient = testHelper.createRecipient();
-        ShipmentGroup shipmentGroup = testHelper.createShipmentGroup();
+        user = testHelper.createUser(testHelper.createCounterparty());
+        Client sender = testHelper.createSenderFor(user);
+        Client recipient = testHelper.createRecipientFor(user);
+        ShipmentGroup shipmentGroup = testHelper.createShipmentGroupFor(user);
         
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
         // populate input json with sender and recipient uuid
@@ -112,7 +114,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         String newShipmentUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
-                        queryParam("token", sender.getCounterparty().getUser().getToken()).
+                        queryParam("token", user.getToken()).
                         body(expectedJson).
                 when().
                         post("/shipments").
@@ -123,8 +125,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
                         path("uuid");
 
         // check created data
-        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
-                sender.getCounterparty().getUser());
+        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid), user);
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(shipmentMapper.toDto(createdShipment));
 
@@ -137,11 +138,10 @@ public class ShipmentControllerIT extends BaseControllerIT {
     @Test
     @SuppressWarnings("unchecked")
     public void createShipment_presavedSenderAndRecipient_senderByPostId() throws Exception {
-        Counterparty counterparty = testHelper.createCounterparty();
-        Client sender = testHelper.createSenderFor(counterparty);
+        Client sender = testHelper.createSenderFor(user);
         testHelper.assignPostIdTo(sender);
-        Client recipient = testHelper.createRecipient();
-        ShipmentGroup shipmentGroup = testHelper.createShipmentGroup();
+        Client recipient = testHelper.createRecipientFor(user);
+        ShipmentGroup shipmentGroup = testHelper.createShipmentGroupFor(user);
         
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
         // populate input json with sender and recipient uuid
@@ -153,7 +153,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         String newShipmentUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
-                        queryParam("token", sender.getCounterparty().getUser().getToken()).
+                        queryParam("token", user.getToken()).
                         body(expectedJson).
                 when().
                         post("/shipments").
@@ -164,8 +164,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
                         path("uuid");
         
         // check created data
-        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
-                sender.getCounterparty().getUser());
+        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid), user);
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(shipmentMapper.toDto(createdShipment));
         
@@ -179,6 +178,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
     @SuppressWarnings("unchecked")
     public void createShipmentWithoutGroup_unsavedSenderAndRecipient() throws Exception {
         Counterparty counterparty = testHelper.createCounterparty();
+        user = testHelper.createUser(counterparty);
         Address senderAddress = testHelper.createAddress();
         Address recipientAddress = testHelper.createAddressOtherRegion();
         
@@ -191,7 +191,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         String newShipmentUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
-                        queryParam("token", counterparty.getUser().getToken()).
+                        queryParam("token", user.getToken()).
                         body(inputJson).
                 when().
                         post("/shipments").
@@ -203,8 +203,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
 
         
         // check created data
-        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
-                counterparty.getUser());
+        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid), user);
         // adjust jsonObject with actual data, modified in server
         testHelper.mergeClientNames((JSONObject) jsonObject.get("sender"), createdShipment.getSender());
         testHelper.mergeClientNames((JSONObject) jsonObject.get("recipient"), createdShipment.getRecipient());
@@ -223,8 +222,8 @@ public class ShipmentControllerIT extends BaseControllerIT {
     @Test
     @SuppressWarnings("unchecked")
     public void createShipmentWithoutGroup_savedSender_unsavedRecipient() throws Exception {
-        Counterparty counterparty = testHelper.createCounterparty();
-        Client sender = testHelper.createSenderFor(counterparty);
+        user = testHelper.createUser(testHelper.createCounterparty());
+        Client sender = testHelper.createSenderFor(user);
         Address recipientAddress = testHelper.createAddressOtherRegion();
         
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
@@ -235,7 +234,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         String newShipmentUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
-                        queryParam("token", counterparty.getUser().getToken()).
+                        queryParam("token", user.getToken()).
                         body(inputJson).
                 when().
                         post("/shipments").
@@ -247,8 +246,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         
         
         // check created data
-        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid),
-                counterparty.getUser());
+        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid), user);
         // adjust jsonObject with actual data, modified into
         testHelper.mergeClientNames((JSONObject) jsonObject.get("sender"), createdShipment.getSender());
         testHelper.mergeClientNames((JSONObject) jsonObject.get("recipient"), createdShipment.getRecipient());
@@ -294,12 +292,13 @@ public class ShipmentControllerIT extends BaseControllerIT {
     @Test
     @SuppressWarnings("unchecked")
     public void removeShipmentGroup() throws Exception {
-        ShipmentGroup shipmentGroup = testHelper.createShipmentGroup();
-        Shipment shipment = testHelper.createShipment(shipmentGroup);
+        user = testHelper.createUser(testHelper.createCounterparty());
+        ShipmentGroup shipmentGroup = testHelper.createShipmentGroupFor(user);
+        Shipment shipment = testHelper.createShipmentFor(shipmentGroup, user);
 
         given().
                 contentType(APPLICATION_JSON_VALUE).
-                queryParam("token", shipment.getSender().getCounterparty().getUser().getToken()).
+                queryParam("token", user.getToken()).
         when().
                 delete("/shipments/{uuid}/shipment-group", shipment.getUuid().toString()).
         then().

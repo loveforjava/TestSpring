@@ -29,8 +29,7 @@ public class ShipmentDaoImpl implements ShipmentDao {
         Session session = sessionFactory.getCurrentSession();
         return session.createCriteria(Shipment.class, "shipment")
                 .createCriteria("shipment.sender", "sender")
-                .createCriteria("sender.counterparty", "counterparty")
-                .add(Restrictions.eq("counterparty.user", user))
+                .add(Restrictions.eq("sender.counterparty", user.getCounterparty()))
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                 .list();
     }
@@ -42,8 +41,7 @@ public class ShipmentDaoImpl implements ShipmentDao {
         return session.createCriteria(Shipment.class, "shipment")
                 .add(Restrictions.eq("sender", client))
                 .createCriteria("shipment.sender", "sender")
-                .createCriteria("sender.counterparty", "counterparty")
-                .add(Restrictions.eq("counterparty.user", user))
+                .add(Restrictions.eq("sender.counterparty", user.getCounterparty()))
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                 .list();
     }
@@ -55,8 +53,7 @@ public class ShipmentDaoImpl implements ShipmentDao {
         return session.createCriteria(Shipment.class, "shipment")
                 .add(Restrictions.eq("shipmentGroup", shipmentGroup))
                 .createCriteria("shipment.sender", "sender")
-                .createCriteria("sender.counterparty", "counterparty")
-                .add(Restrictions.eq("counterparty.user", user))
+                .add(Restrictions.eq("sender.counterparty", user.getCounterparty()))
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                 .list();
     }

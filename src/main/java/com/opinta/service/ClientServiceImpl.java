@@ -220,8 +220,7 @@ public class ClientServiceImpl implements ClientService {
     @Transactional
     public ClientDto save(ClientDto clientDto, User user) throws AuthException, IncorrectInputDataException {
         Client client = clientMapper.toEntity(clientDto);
-        Counterparty counterparty = counterpartyService.getEntityByUser(user);
-        client.setCounterparty(counterparty);
+        client.setCounterparty(user.getCounterparty());
         return clientMapper.toDto(saveEntity(client, user));
     }
 
@@ -262,7 +261,7 @@ public class ClientServiceImpl implements ClientService {
 
     private void validateInnerReferencesAndFillObjectFromDB(Client source, User user)
             throws IncorrectInputDataException, AuthException {
-        Counterparty counterparty = counterpartyService.getEntityByUser(user);
+        Counterparty counterparty = user.getCounterparty();
         Address address = addressService.getEntityById(source.getAddress().getId());
         source.setCounterparty(counterparty);
         source.setAddress(address);
