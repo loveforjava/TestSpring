@@ -5,7 +5,6 @@ import com.opinta.entity.User;
 
 import java.sql.CallableStatement;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,8 +16,6 @@ import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import static java.lang.String.format;
-import static java.sql.Types.INTEGER;
 import static java.sql.Types.VARCHAR;
 
 @Repository

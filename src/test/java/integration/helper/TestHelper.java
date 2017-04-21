@@ -1,5 +1,6 @@
 package integration.helper;
 
+import com.opinta.dto.postid.ClientTypeDto;
 import com.opinta.entity.Address;
 import com.opinta.entity.Client;
 import com.opinta.entity.ClientType;
@@ -237,14 +238,14 @@ public class TestHelper {
     }
     
     public void assignPostIdTo(Client client) throws Exception {
-        ClientType type;
+        ClientTypeDto clientTypeDto = new ClientTypeDto();
         if (client.isIndividual()) {
-            type = INDIVIDUAL;
+            clientTypeDto.setType(INDIVIDUAL);
         } else {
-            type = COMPANY;
+            clientTypeDto.setType(COMPANY);
         }
         User user = userService.getUsersByCounterparty(client.getCounterparty()).get(0);
-        String postId = clientService.updatePostId(client.getUuid(), type, user).getPostId();
+        String postId = clientService.updatePostId(client.getUuid(), clientTypeDto, user).getPostId();
         client.setPostId(postId);
     }
 

@@ -1,7 +1,6 @@
 package com.opinta.service;
 
 import com.opinta.dto.postid.ClientTypeDto;
-import com.opinta.entity.ClientType;
 import com.opinta.entity.User;
 import com.opinta.exception.AuthException;
 import com.opinta.exception.IncorrectInputDataException;
