@@ -121,11 +121,13 @@ public class ClientController extends BaseController {
                                           @RequestParam UUID token) {
         try {
             User user = userService.authenticate(token);
-            return new ResponseEntity<>(clientService.updatePostId(uuid, clientTypeDto.getType(), user), OK);
+            return new ResponseEntity<>(clientService.updatePostId(uuid, clientTypeDto, user), OK);
         } catch (AuthException e) {
             return new ResponseEntity<>(updateOnErrorLogEndpoint(Client.class, clientTypeDto, e), UNAUTHORIZED);
         } catch (IncorrectInputDataException e) {
             return new ResponseEntity<>(updateOnErrorLogEndpoint(Client.class, clientTypeDto, e), NOT_FOUND);
+        } catch (PerformProcessFailedException e) {
+            return new ResponseEntity<>(updateOnErrorLogEndpoint(Client.class, clientTypeDto, e), BAD_REQUEST);
         }
     }
 

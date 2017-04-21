@@ -1,5 +1,6 @@
 package com.opinta.service;
 
+import com.opinta.dto.postid.ClientTypeDto;
 import com.opinta.entity.Address;
 import com.opinta.entity.ClientType;
 import com.opinta.entity.Counterparty;
@@ -21,11 +22,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.time.LocalDate.now;
 
-import static com.opinta.util.AlphabetUtil.characterOf;
-import static com.opinta.util.AlphabetUtil.generateRandomChars;
+import static com.opinta.util.AlphabetCharactersGenerationUtil.characterOf;
+import static com.opinta.util.AlphabetCharactersGenerationUtil.generateRandomChars;
 import static com.opinta.util.EnhancedBeanUtilsBean.copyNotNullProperties;
 import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
@@ -152,24 +154,11 @@ public class ClientServiceImpl implements ClientService {
         return clientDao.save(client);
     }
     
-    @Override
-    @Transactional
-    public ClientDto updatePostId(UUID uuid, ClientType clientType, User user)
-            throws IncorrectInputDataException, AuthException {
-        Client client = getEntityByUuid(uuid, user);
-        if (client.getPostId() != null) {
-            return clientMapper.toDto(client);
-        }
-        client.setPostId(generatePostId(clientType));
-        clientDao.update(client);
-        return clientMapper.toDto(client);
-    }
-    
     private String generatePostId(ClientType clientType) throws IncorrectInputDataException {
         String yearString = valueOf(now().getYear());
         yearString = yearString.substring(yearString.length() - 2);
-        return characterOf(clientType) + yearString +
-                postIdInnerNumberGenerator.generateNextNumber() + generateRandomChars(3, true);
+        return characterOf(clientType) + yearString + postIdInnerNumberGenerator.generate() +
+                generateRandomChars(3, true);
     }
     
     @Override
@@ -232,6 +221,20 @@ public class ClientServiceImpl implements ClientService {
         target.setAddress(source.getAddress());
         updateEntity(target, user);
         return clientMapper.toDto(target);
+    }
+    
+    @Override
+    @Transactional
+    public ClientDto updatePostId(UUID uuid, ClientTypeDto clientTypeDto, User user)
+            throws IncorrectInputDataException, AuthException, PerformProcessFailedException {
+        Client client = getEntityByUuid(uuid, user);
+        if (client.getPostId() != null) {
+            throw new PerformProcessFailedException(
+                    format("Client %s already has postId: %s", uuid.toString(), client.getPostId()));
+        }
+        client.setPostId(generatePostId(clientTypeDto.getType()));
+        clientDao.update(client);
+        return clientMapper.toDto(client);
     }
 
     @Override

@@ -79,7 +79,7 @@ public class ClientDaoImpl implements ClientDao {
                 call.execute();
                 return call.getString(2);
             } catch (SQLException e) {
-                throw new RuntimeException("Can't generate next postid number from stored procedure: ", e);
+                throw new RuntimeException("Can't generate next postId inner number from stored procedure: ", e);
             }
         });
     }

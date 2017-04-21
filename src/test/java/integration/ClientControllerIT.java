@@ -21,8 +21,9 @@ import integration.helper.TestHelper;
 import static java.lang.String.join;
 import static java.lang.String.valueOf;
 
+import static com.opinta.constraint.RegexPattern.POST_ID_LENGTH;
 import static com.opinta.entity.ClientType.INDIVIDUAL;
-import static com.opinta.util.AlphabetUtil.characterOf;
+import static com.opinta.util.AlphabetCharactersGenerationUtil.characterOf;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
@@ -99,7 +100,7 @@ public class ClientControllerIT extends BaseControllerIT {
         JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client.json");
         inputJson.put("addressId", (int) newAddress.getId());
         inputJson.put("individual", true);
-        
+
         String firstName = (String) inputJson.get("firstName");
         String middleName = (String) inputJson.get("middleName");
         String lastName = (String) inputJson.get("lastName");
@@ -120,7 +121,7 @@ public class ClientControllerIT extends BaseControllerIT {
                         body("lastName", equalTo(lastName)).
                 extract().
                         path("uuid");
-    
+
         inputJson.remove("postId");
         JSONParser parser = new JSONParser();
         JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
@@ -150,7 +151,7 @@ public class ClientControllerIT extends BaseControllerIT {
         JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client.json");
         inputJson.put("addressId", (int) newAddress.getId());
         inputJson.put("individual", false);
-        
+
         String expectedFullName = (String) inputJson.get("name");
 
         String newUuid =
@@ -203,7 +204,7 @@ public class ClientControllerIT extends BaseControllerIT {
         inputJson.put("middleName", "Jakson [edited]");
         inputJson.put("phoneNumber", "0934314522");
         inputJson.put("individual", true);
-        
+
         String firstName = (String) inputJson.get("firstName");
         String middleName = (String) inputJson.get("middleName");
         String lastName = (String) inputJson.get("lastName");
@@ -217,7 +218,7 @@ public class ClientControllerIT extends BaseControllerIT {
         then().
                 body("counterpartyUuid", equalTo(client.getCounterparty().getUuid().toString())).
                 statusCode(SC_OK);
-    
+
         JSONParser parser = new JSONParser();
         JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
         String expectedFullName = join(" ", lastName, firstName, middleName);
@@ -252,9 +253,9 @@ public class ClientControllerIT extends BaseControllerIT {
                 contentType(APPLICATION_JSON_VALUE).
                 queryParam("token", user.getToken()).
                 body(inputJson.toString()).
-                when().
+        when().
                 put("/clients/{uuid}", clientUuid.toString()).
-                then().
+        then().
                 body("counterpartyUuid", equalTo(client.getCounterparty().getUuid().toString())).
                 statusCode(SC_OK);
         
@@ -423,7 +424,7 @@ public class ClientControllerIT extends BaseControllerIT {
                 extract().
                         path("postId");
         
-        Assert.assertEquals(13, postId.length());
+        Assert.assertEquals(POST_ID_LENGTH, postId.length());
         Assert.assertEquals(characterOf(INDIVIDUAL), valueOf(postId.charAt(0)));
         
         Client saved = clientService.getEntityByUuid(client.getUuid(), user);

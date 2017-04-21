@@ -18,7 +18,7 @@ public class PostIdInnerNumberGeneratorProdDB implements PostIdInnerNumberGenera
     }
     
     @Override
-    public String generateNextNumber() {
+    public String generate() {
         return clientDao.getNextPostIdInnerNumber();
     }
 }

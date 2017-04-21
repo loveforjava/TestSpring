@@ -10,11 +10,10 @@ import static java.lang.String.format;
 @Service
 @Profile("memory")
 public class PostIdInnerNumberGeneratorInMemoryDB implements PostIdInnerNumberGenerator {
-    
     private static int number = 0;
     
     @Override
-    public String generateNextNumber() {
+    public String generate() {
         synchronized (this) {
             number++;
         }

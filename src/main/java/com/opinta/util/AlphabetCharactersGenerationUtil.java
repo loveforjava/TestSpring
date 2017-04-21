@@ -12,11 +12,10 @@ import static java.lang.String.valueOf;
 import static java.util.Arrays.asList;
 import static java.util.Locale.ENGLISH;
 
-public class AlphabetUtil {
+public class AlphabetCharactersGenerationUtil {
     private static final List<Character> ALPHABET = asList(
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
-            'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
-            'U', 'V', 'W', 'X', 'Y', 'Z');
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+            'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
     
     public static String characterOf(ClientType clientType) throws IncorrectInputDataException {
         return valueOf(ALPHABET.get(indexOfClientTypeCharacter(clientType)));
