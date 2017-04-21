@@ -282,6 +282,7 @@ public class ClientControllerIT extends BaseControllerIT {
         String middleName = (String) inputJson.get("middleName");
         String lastName = (String) inputJson.get("lastName");
 
+        long timeStarted = System.currentTimeMillis();
         given().
                 contentType(APPLICATION_JSON_VALUE).
                 queryParam("token", user.getToken()).
@@ -291,6 +292,7 @@ public class ClientControllerIT extends BaseControllerIT {
         then().
                 body("counterpartyUuid", equalTo(client.getCounterparty().getUuid().toString())).
                 statusCode(SC_OK);
+        long timeFinished = System.currentTimeMillis();
 
         inputJson.remove("postId");
         JSONParser parser = new JSONParser();
@@ -303,6 +305,13 @@ public class ClientControllerIT extends BaseControllerIT {
 
         // check updated data
         Client updatedClient = clientService.getEntityByUuid(clientUuid, user);
+        long timeModified = updatedClient.getLastModified().getTime();
+
+        assertTrue("Client has wrong modified time", (timeFinished > timeModified && timeModified > timeStarted));
+        assertNotNull("Client doesn't have a modifier", updatedClient.getCreator());
+        assertThat("Client was updated with wrong user!",
+                updatedClient.getLastModifier().getToken(), equalTo(user.getToken()));
+
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientMapper.toDto(updatedClient));
         assertEquals(expectedJson.toJSONString(), actualJson, false);

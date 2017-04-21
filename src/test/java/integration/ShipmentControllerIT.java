@@ -131,17 +131,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
 
         // check created data
         Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid), user);
-        long timeCreated = createdShipment.getCreated().getTime();
-        long timeModified = createdShipment.getLastModified().getTime();
-
-        assertTrue("Shipment has wrong created time", (timeFinished > timeCreated && timeCreated > timeStarted));
-        assertTrue("Shipment has wrong modified time", (timeFinished > timeModified && timeModified > timeStarted));
-        assertNotNull("Shipment doesn't have a creator", createdShipment.getCreator());
-        assertNotNull("Shipment doesn't have a modifier on creation!", createdShipment.getLastModifier());
-        assertThat("Shipment was created with wrong user!",
-                createdShipment.getCreator().getToken(), equalTo(user.getToken()));
-        assertThat("Shipment was created with wrong modifier!",
-                createdShipment.getLastModifier().getToken(), equalTo(user.getToken()));
+        checkDatesModifierAndCreator(timeStarted, timeFinished, createdShipment);
 
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(shipmentMapper.toDto(createdShipment));
@@ -167,6 +157,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         jsonObject.put("shipmentGroupUuid", shipmentGroup.getUuid().toString());
         String expectedJson = jsonObject.toString();
 
+        long timeStarted = System.currentTimeMillis();
         String newShipmentUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
@@ -179,9 +170,12 @@ public class ShipmentControllerIT extends BaseControllerIT {
                         body("barcode", RegexMatcher.matches(BARCODE_REGEX)).
                 extract().
                         path("uuid");
+        long timeFinished = System.currentTimeMillis();
 
         // check created data
         Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid), user);
+        checkDatesModifierAndCreator(timeStarted, timeFinished, createdShipment);
+
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(shipmentMapper.toDto(createdShipment));
 
@@ -223,16 +217,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         
         // check created data
         Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid), user);
-        long timeCreated = createdShipment.getCreated().getTime();
-        long timeModified = createdShipment.getLastModified().getTime();
-        assertTrue("Shipment has wrong created time", (timeFinished > timeCreated && timeCreated > timeStarted));
-        assertTrue("Shipment has wrong modified time", (timeFinished > timeModified && timeModified > timeStarted));
-        assertNotNull("Shipment doesn't have a creator", createdShipment.getCreator());
-        assertNotNull("Shipment doesn't have a modifier on creation!", createdShipment.getLastModifier());
-        assertThat("Shipment was created with wrong user!",
-                createdShipment.getCreator().getToken(), equalTo(user.getToken()));
-        assertThat("Shipment was created with wrong modifier!",
-                createdShipment.getLastModifier().getToken(), equalTo(user.getToken()));
+        checkDatesModifierAndCreator(timeStarted, timeFinished, createdShipment);
         // adjust jsonObject with actual data, modified in server
         testHelper.mergeClientNames((JSONObject) jsonObject.get("sender"), createdShipment.getSender());
         testHelper.mergeClientNames((JSONObject) jsonObject.get("recipient"), createdShipment.getRecipient());
@@ -278,17 +263,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         
         // check created data
         Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid), user);
-        long timeCreated = createdShipment.getCreated().getTime();
-        long timeModified = createdShipment.getLastModified().getTime();
-
-        assertTrue("Shipment has wrong created time", (timeFinished > timeCreated && timeCreated > timeStarted));
-        assertTrue("Shipment has wrong modified time", (timeFinished > timeModified && timeModified > timeStarted));
-        assertNotNull("Shipment doesn't have a creator", createdShipment.getCreator());
-        assertNotNull("Shipment doesn't have a modifier on creation!", createdShipment.getLastModifier());
-        assertThat("Shipment was created with wrong user!",
-                createdShipment.getCreator().getToken(), equalTo(user.getToken()));
-        assertThat("Shipment was created with wrong modifier!",
-                createdShipment.getLastModifier().getToken(), equalTo(user.getToken()));
+        checkDatesModifierAndCreator(timeStarted, timeFinished, createdShipment);
         // adjust jsonObject with actual data, modified into
         testHelper.mergeClientNames((JSONObject) jsonObject.get("sender"), createdShipment.getSender());
         testHelper.mergeClientNames((JSONObject) jsonObject.get("recipient"), createdShipment.getRecipient());
@@ -378,5 +353,19 @@ public class ShipmentControllerIT extends BaseControllerIT {
                 delete("/shipments/{uuid}", UUID.randomUUID().toString()).
         then().
                 statusCode(SC_NOT_FOUND);
+    }
+
+    private void checkDatesModifierAndCreator(long timeStarted, long timeFinished, Shipment createdShipment) {
+        long timeCreated = createdShipment.getCreated().getTime();
+        long timeModified = createdShipment.getLastModified().getTime();
+
+        assertTrue("Shipment has wrong created time", (timeFinished > timeCreated && timeCreated > timeStarted));
+        assertTrue("Shipment has wrong modified time", (timeFinished > timeModified && timeModified > timeStarted));
+        assertNotNull("Shipment doesn't have a creator", createdShipment.getCreator());
+        assertNotNull("Shipment doesn't have a modifier on creation!", createdShipment.getLastModifier());
+        assertThat("Shipment was created with wrong user!",
+                createdShipment.getCreator().getToken(), equalTo(user.getToken()));
+        assertThat("Shipment was created with wrong modifier!",
+                createdShipment.getLastModifier().getToken(), equalTo(user.getToken()));
     }
 }
