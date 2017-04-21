@@ -155,21 +155,4 @@ public class AddressControllerIT extends BaseControllerIT {
 
         JSONAssert.assertEquals(expectedJson.toString(), actualJson, false);
     }
-
-    @Test
-    public void deleteAddress() throws Exception {
-        when().
-                delete("/addresses/{id}", addressId).
-        then().
-                statusCode(SC_OK);
-        addressId = -1;
-    }
-
-    @Test
-    public void deleteAddress_notFound() throws Exception {
-        when().
-                delete("/addresses/{id}", addressId + 1).
-        then().
-                statusCode(SC_NOT_FOUND);
-    }
 }

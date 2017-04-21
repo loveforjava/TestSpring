@@ -10,7 +10,6 @@ import com.opinta.dto.ShipmentTrackingDetailDto;
 import com.opinta.service.ShipmentTrackingDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -69,17 +68,6 @@ public class ShipmentTrackingDetailController extends BaseController {
         } catch (PerformProcessFailedException e) {
             return new ResponseEntity<>(LogMessageUtil.getByIdOnErrorLogEndpoint(ShipmentTrackingDetail.class, id),
                     BAD_REQUEST);
-        }
-    }
-
-    @DeleteMapping("{id}")
-    public ResponseEntity<?> deleteShipmentTrackingDetail(@PathVariable long id) {
-        try {
-            shipmentTrackingDetailService.delete(id);
-            return new ResponseEntity<>(OK);
-        } catch (IncorrectInputDataException e) {
-            return new ResponseEntity<>(LogMessageUtil.getByIdOnErrorLogEndpoint(ShipmentTrackingDetail.class, id),
-                    NOT_FOUND);
         }
     }
 }

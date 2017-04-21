@@ -143,20 +143,4 @@ public class DiscountControllerIT extends BaseControllerIT {
 
         JSONAssert.assertEquals(expectedJson.toString(), actualJson.toString(), false);
     }
-
-    @Test
-    public void deleteDiscount() throws Exception {
-        when().
-                delete("/discounts/{uuid}", discounts.get(0).getUuid()).
-        then().
-                statusCode(SC_OK);
-    }
-
-    @Test
-    public void deleteDiscount_notFound() throws Exception {
-        when().
-                delete("/discounts/{uuid}", UUID.randomUUID()).
-        then().
-                statusCode(SC_NOT_FOUND);
-    }
 }

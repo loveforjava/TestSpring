@@ -120,20 +120,4 @@ public class PostOfficeControllerIT extends BaseControllerIT {
 
         JSONAssert.assertEquals(expectedJson, actualJson, false);
     }
-
-    @Test
-    public void deletePostOffice() throws Exception {
-        when().
-                delete("/post-offices/{id}", postOfficeId).
-        then().
-                statusCode(SC_OK);
-    }
-
-    @Test
-    public void deletePostOffices_notFound() throws Exception {
-        when().
-                delete("/post-offices/{id}", postOfficeId + 1).
-        then().
-                statusCode(SC_NOT_FOUND);
-    }
 }

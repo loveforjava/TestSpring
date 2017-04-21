@@ -12,7 +12,6 @@ import com.opinta.service.DiscountPerCounterpartyService;
 import com.opinta.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import static com.opinta.util.LogMessageUtil.authorizationOnErrorLogEndpoint;
-import static com.opinta.util.LogMessageUtil.deleteOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getAllOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.saveOnErrorLogEndpoint;
@@ -100,19 +98,6 @@ public class DiscountPerCounterpartyController extends BaseController {
         } catch (PerformProcessFailedException e) {
             return new ResponseEntity<>(updateOnErrorLogEndpoint(DiscountPerCounterparty.class,
                     discountPerCounterpartyDto, e), BAD_REQUEST);
-        }
-    }
-    
-    @DeleteMapping("{uuid}")
-    public ResponseEntity<?> deleteDiscount(@PathVariable UUID uuid, @RequestParam UUID token) {
-        try {
-            User user = userService.authenticate(token);
-            discountPerCounterpartyService.delete(uuid, user);
-            return new ResponseEntity<>(OK);
-        } catch (AuthException e) {
-            return new ResponseEntity<>(authorizationOnErrorLogEndpoint(token, e), UNAUTHORIZED);
-        } catch (IncorrectInputDataException e) {
-            return new ResponseEntity<>(deleteOnErrorLogEndpoint(DiscountPerCounterparty.class, uuid, e), NOT_FOUND);
         }
     }
 }

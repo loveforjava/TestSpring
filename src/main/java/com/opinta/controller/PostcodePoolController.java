@@ -12,7 +12,6 @@ import com.opinta.service.PostcodePoolService;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
-import static com.opinta.util.LogMessageUtil.deleteOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getAllOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.updateOnErrorLogEndpoint;
@@ -79,16 +77,6 @@ public class PostcodePoolController extends BaseController {
         }
     }
 
-    @DeleteMapping("{uuid}")
-    public ResponseEntity<?> deletePostcodePool(@PathVariable UUID uuid) {
-        try {
-            postcodePoolService.delete(uuid);
-            return new ResponseEntity<>(OK);
-        } catch (IncorrectInputDataException e) {
-            return new ResponseEntity<>(deleteOnErrorLogEndpoint(PostcodePool.class, uuid, e), NOT_FOUND);
-        }
-    }
-
     @GetMapping("{postcodePoolUuid}/inner-numbers")
     public ResponseEntity<?> getBarcodeInnerNumbers(@PathVariable UUID postcodePoolUuid) {
         try {
@@ -104,16 +92,6 @@ public class PostcodePoolController extends BaseController {
             return new ResponseEntity<>(barcodeInnerNumberService.getById(id), OK);
         } catch (IncorrectInputDataException e) {
             return new ResponseEntity<>(getByIdOnErrorLogEndpoint(BarcodeInnerNumber.class, id, e), NOT_FOUND);
-        }
-    }
-
-    @DeleteMapping("inner-numbers/{id}")
-    public ResponseEntity<?> deleteBarcodeInnerNumber(@PathVariable long id) {
-        try {
-            barcodeInnerNumberService.delete(id);
-            return new ResponseEntity<>(OK);
-        } catch (IncorrectInputDataException e) {
-            return new ResponseEntity<>(deleteOnErrorLogEndpoint(BarcodeInnerNumber.class, id, e), NOT_FOUND);
         }
     }
 }

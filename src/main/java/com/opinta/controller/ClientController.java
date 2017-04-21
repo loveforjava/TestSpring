@@ -15,7 +15,6 @@ import com.opinta.service.ClientService;
 import com.opinta.service.ShipmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,7 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
-import static com.opinta.util.LogMessageUtil.deleteOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByFieldOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getAllOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
@@ -128,19 +126,6 @@ public class ClientController extends BaseController {
             return new ResponseEntity<>(updateOnErrorLogEndpoint(Client.class, clientTypeDto, e), NOT_FOUND);
         } catch (PerformProcessFailedException e) {
             return new ResponseEntity<>(updateOnErrorLogEndpoint(Client.class, clientTypeDto, e), BAD_REQUEST);
-        }
-    }
-
-    @DeleteMapping("{uuid}")
-    public ResponseEntity<?> deleteClient(@PathVariable UUID uuid, @RequestParam UUID token) {
-        try {
-            User user = userService.authenticate(token);
-            clientService.delete(uuid, user);
-            return new ResponseEntity<>(OK);
-        } catch (AuthException e) {
-            return new ResponseEntity<>(deleteOnErrorLogEndpoint(Client.class, uuid, e), UNAUTHORIZED);
-        } catch (IncorrectInputDataException e) {
-            return new ResponseEntity<>(deleteOnErrorLogEndpoint(Client.class, uuid, e), NOT_FOUND);
         }
     }
 }
