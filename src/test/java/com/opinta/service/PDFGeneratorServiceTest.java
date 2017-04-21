@@ -17,6 +17,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+import static java.util.UUID.randomUUID;
+
 import static com.opinta.entity.BarcodeStatus.RESERVED;
 import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Mockito.when;
@@ -34,20 +36,29 @@ public class PDFGeneratorServiceTest {
     private PDFGeneratorService pdfGeneratorService;
 
     private Shipment shipment;
-    private UUID shipmentId;
+    private UUID shipmentUuid;
+    private User user;
 
     @Before
     public void setUp() throws Exception {
-        pdfGeneratorService = new PDFGeneratorServiceImpl(shipmentService, shipmentGroupService, userService);
+        pdfGeneratorService = new PDFGeneratorServiceImpl(shipmentService, shipmentGroupService);
 
         Address senderAddress = new Address("00001", "Ternopil", "Monastiriska", "Monastiriska", "Sadova", "51", "");
+        senderAddress.setId(1);
         Address recipientAddress = new Address("00002", "Kiev", "", "Kiev", "Khreschatik", "121", "37");
+        recipientAddress.setId(2);
         Counterparty counterparty = new Counterparty("Modna kasta", new PostcodePool("00003", false));
+        counterparty.setUuid(randomUUID());
+        user = new User("User", counterparty, randomUUID());
+        user.setId(123);
         Client sender = new Client("FOP Ivanov", "001", senderAddress, counterparty);
+        sender.setUuid(randomUUID());
         Client recipient = new Client("Petrov PP", "002", recipientAddress, counterparty);
+        recipient.setUuid(randomUUID());
         shipment = new Shipment(sender, recipient, DeliveryType.W2W, 1, 1,
                 new BigDecimal("12.5"), new BigDecimal("2.5"), new BigDecimal("15.25"));
-        shipmentId = UUID.randomUUID();
+        shipmentUuid = randomUUID();
+        shipment.setUuid(shipmentUuid);
         BarcodeInnerNumber barcodeInnerNumber = new BarcodeInnerNumber();
         barcodeInnerNumber.setPostcodePool(counterparty.getPostcodePool());
         barcodeInnerNumber.setInnerNumber("12345678");
@@ -57,10 +68,9 @@ public class PDFGeneratorServiceTest {
 
     @Test
     public void generateLabel_and_generatePostpay_ShouldReturnNotEmptyFile() throws Exception {
-        User user = new User();
-        when(shipmentService.getEntityByUuid(shipmentId, user)).thenReturn(shipment);
+        when(shipmentService.getEntityByUuid(shipmentUuid, user)).thenReturn(shipment);
         assertNotEquals("PDFGenerator returned an empty label",
-                pdfGeneratorService.generateShipmentForm(shipmentId, user).length, 0);
-        verify(shipmentService, atLeast(1)).getEntityByUuid(shipmentId, user);
+                pdfGeneratorService.generateShipmentForm(shipmentUuid, user).length, 0);
+        verify(shipmentService, atLeast(1)).getEntityByUuid(shipmentUuid, user);
     }
 }
