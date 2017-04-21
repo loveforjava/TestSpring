@@ -14,10 +14,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
 import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
+
+import static javax.persistence.TemporalType.TIMESTAMP;
 
 @Entity
 @Data
@@ -52,9 +53,9 @@ public class Shipment {
     private DiscountPerCounterparty discountPerCounterparty;
     private String description;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TIMESTAMP)
     private Date created;
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TIMESTAMP)
     private Date lastModified;
     @ManyToOne
     @JoinColumn(name = "creator_id")

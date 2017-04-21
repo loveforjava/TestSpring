@@ -17,6 +17,12 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import integration.helper.TestHelper;
 
+import static integration.helper.TestHelper.NO_CREATOR_MESSAGE;
+import static integration.helper.TestHelper.NO_LAST_MODIFIER_MESSAGE;
+import static integration.helper.TestHelper.WRONG_CREATED_MESSAGE;
+import static integration.helper.TestHelper.WRONG_CREATOR_MESSAGE;
+import static integration.helper.TestHelper.WRONG_LAST_MODIFIED_MESSAGE;
+import static integration.helper.TestHelper.WRONG_LAST_MODIFIER_MESSAGE;
 import static java.lang.String.join;
 import static java.lang.String.valueOf;
 
@@ -136,11 +142,12 @@ public class ClientControllerIT extends BaseControllerIT {
         long timeCreated = createdClient.getCreated().getTime();
         long timeModified = createdClient.getLastModified().getTime();
 
-        assertTrue("Client has wrong created time", (timeFinished > timeCreated && timeCreated > timeStarted));
-        assertTrue("Client has wrong modified time", (timeFinished > timeModified && timeModified > timeStarted));
-        assertNotNull("Client doesn't have a creator", createdClient.getCreator());
-        assertNotNull("Client doesn't have a modifier on creation!", createdClient.getLastModifier());
-        assertThat("Client was created with wrong user!", createdClient.getCreator().getToken(), equalTo(user.getToken()));
+        assertTrue(WRONG_CREATED_MESSAGE, (timeFinished > timeCreated && timeCreated > timeStarted));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
+        assertNotNull(NO_CREATOR_MESSAGE, createdClient.getCreator());
+        assertNotNull(NO_LAST_MODIFIER_MESSAGE, createdClient.getLastModifier());
+        assertThat(WRONG_CREATOR_MESSAGE, createdClient.getCreator().getToken(), equalTo(user.getToken()));
+        assertThat(WRONG_LAST_MODIFIER_MESSAGE, createdClient.getLastModifier().getToken(), equalTo(user.getToken()));
 
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientMapper.toDto(createdClient));
@@ -199,15 +206,13 @@ public class ClientControllerIT extends BaseControllerIT {
         long timeCreated = createdClient.getCreated().getTime();
         long timeModified = createdClient.getLastModified().getTime();
 
-        assertTrue("Client has wrong created time", (timeFinished > timeCreated && timeCreated > timeStarted));
-        assertTrue("Client has wrong modified time on creation",
-                (timeFinished > timeModified && timeModified > timeStarted));
-        assertNotNull("Client doesn't have a creator", createdClient.getCreator());
-        assertNotNull("Client doesn't have a modifier on creation!", createdClient.getLastModifier());
-        assertThat("Client was created with wrong user!",
-                createdClient.getCreator().getToken(), equalTo(user.getToken()));
-        assertThat("Client was created with wrong modifier!",
-                createdClient.getLastModifier().getToken(), equalTo(user.getToken()));
+        assertTrue(WRONG_CREATED_MESSAGE, (timeFinished > timeCreated && timeCreated > timeStarted));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
+        assertNotNull(NO_CREATOR_MESSAGE, createdClient.getCreator());
+        assertNotNull(NO_LAST_MODIFIER_MESSAGE, createdClient.getLastModifier());
+        assertThat(WRONG_CREATOR_MESSAGE, createdClient.getCreator().getToken(), equalTo(user.getToken()));
+        assertThat(WRONG_LAST_MODIFIER_MESSAGE, createdClient.getLastModifier().getToken(), equalTo(user.getToken()));
+
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientMapper.toDto(createdClient));
         assertEquals(expectedJson.toJSONString(), actualJson, false);
@@ -257,9 +262,9 @@ public class ClientControllerIT extends BaseControllerIT {
         Client updatedClient = clientService.getEntityByUuid(clientUuid, user);
         long timeModified = updatedClient.getLastModified().getTime();
 
-        assertTrue("Client has wrong modified time", (timeFinished > timeModified && timeModified > timeStarted));
-        assertNotNull("Client doesn't have a modifier", updatedClient.getCreator());
-        assertThat("Client was updated with wrong user!",
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
+        assertNotNull(NO_LAST_MODIFIER_MESSAGE, updatedClient.getCreator());
+        assertThat(WRONG_LAST_MODIFIER_MESSAGE,
                 updatedClient.getLastModifier().getToken(), equalTo(user.getToken()));
 
         ObjectMapper mapper = new ObjectMapper();
@@ -307,10 +312,9 @@ public class ClientControllerIT extends BaseControllerIT {
         Client updatedClient = clientService.getEntityByUuid(clientUuid, user);
         long timeModified = updatedClient.getLastModified().getTime();
 
-        assertTrue("Client has wrong modified time", (timeFinished > timeModified && timeModified > timeStarted));
-        assertNotNull("Client doesn't have a modifier", updatedClient.getCreator());
-        assertThat("Client was updated with wrong user!",
-                updatedClient.getLastModifier().getToken(), equalTo(user.getToken()));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
+        assertNotNull(NO_LAST_MODIFIER_MESSAGE, updatedClient.getCreator());
+        assertThat(WRONG_LAST_MODIFIER_MESSAGE, updatedClient.getLastModifier().getToken(), equalTo(user.getToken()));
 
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientMapper.toDto(updatedClient));
@@ -353,10 +357,9 @@ public class ClientControllerIT extends BaseControllerIT {
         Client updatedClient = clientService.getEntityByUuid(clientUuid, user);
         long timeModified = updatedClient.getLastModified().getTime();
 
-        assertTrue("Client has wrong modified time", (timeFinished > timeModified && timeModified > timeStarted));
-        assertNotNull("Client doesn't have a modifier", updatedClient.getCreator());
-        assertThat("Client was updated with wrong user!",
-                updatedClient.getLastModifier().getToken(), equalTo(user.getToken()));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
+        assertNotNull(NO_LAST_MODIFIER_MESSAGE, updatedClient.getCreator());
+        assertThat(WRONG_LAST_MODIFIER_MESSAGE, updatedClient.getLastModifier().getToken(), equalTo(user.getToken()));
 
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientMapper.toDto(updatedClient));

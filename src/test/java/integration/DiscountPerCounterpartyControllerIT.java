@@ -17,6 +17,12 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import static com.opinta.util.FormatterUtil.DATE_FORMAT_ISO_8601_24H;
+import static integration.helper.TestHelper.NO_CREATOR_MESSAGE;
+import static integration.helper.TestHelper.NO_LAST_MODIFIER_MESSAGE;
+import static integration.helper.TestHelper.WRONG_CREATED_MESSAGE;
+import static integration.helper.TestHelper.WRONG_CREATOR_MESSAGE;
+import static integration.helper.TestHelper.WRONG_LAST_MODIFIED_MESSAGE;
+import static integration.helper.TestHelper.WRONG_LAST_MODIFIER_MESSAGE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import org.junit.After;
@@ -121,16 +127,12 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
         long timeCreated = createdDiscountPerCounterparty.getCreated().getTime();
         long timeModified = createdDiscountPerCounterparty.getLastModified().getTime();
 
-        assertTrue("DiscountPerCounterparty has wrong created time",
-                (timeFinished > timeCreated && timeCreated > timeStarted));
-        assertTrue("DiscountPerCounterparty has wrong modified time on creation",
-                (timeFinished > timeModified && timeModified > timeStarted));
-        assertNotNull("DiscountPerCounterparty doesn't have a creator", createdDiscountPerCounterparty.getCreator());
-        assertNotNull("DiscountPerCounterparty doesn't have a modifier on creation!",
-                createdDiscountPerCounterparty.getLastModifier());
-        assertThat("DiscountPerCounterparty was created with wrong user!",
-                createdDiscountPerCounterparty.getCreator().getToken(), equalTo(user.getToken()));
-        assertThat("DiscountPerCounterparty was created with wrong modifier!",
+        assertTrue(WRONG_CREATED_MESSAGE, (timeFinished > timeCreated && timeCreated > timeStarted));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
+        assertNotNull(NO_CREATOR_MESSAGE, createdDiscountPerCounterparty.getCreator());
+        assertNotNull(NO_LAST_MODIFIER_MESSAGE, createdDiscountPerCounterparty.getLastModifier());
+        assertThat(WRONG_CREATOR_MESSAGE, createdDiscountPerCounterparty.getCreator().getToken(), equalTo(user.getToken()));
+        assertThat(WRONG_LAST_MODIFIER_MESSAGE,
                 createdDiscountPerCounterparty.getLastModifier().getToken(), equalTo(user.getToken()));
 
         JSONObject expectedJson = (JSONObject) jsonParser.parse(inputJson.toJSONString());
@@ -168,10 +170,10 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
                 .getEntityByUuid(discountPerCounterparty.getUuid(), user);
         long timeModified = updatedDiscountPerCounterparty.getLastModified().getTime();
 
-        assertTrue("DiscountPerCounterparty has wrong modified time",
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE,
                 (timeFinished > timeModified && timeModified > timeStarted));
-        assertNotNull("DiscountPerCounterparty doesn't have a modifier", updatedDiscountPerCounterparty.getCreator());
-        assertThat("DiscountPerCounterparty was updated with wrong user!",
+        assertNotNull(NO_LAST_MODIFIER_MESSAGE, updatedDiscountPerCounterparty.getCreator());
+        assertThat(WRONG_LAST_MODIFIER_MESSAGE,
                 updatedDiscountPerCounterparty.getLastModifier().getToken(), equalTo(user.getToken()));
 
         assertEquals(updatedDiscountPerCounterparty.getDiscount().getUuid(), newDiscount.getUuid());

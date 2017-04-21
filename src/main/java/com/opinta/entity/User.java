@@ -8,10 +8,11 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import static javax.persistence.TemporalType.TIMESTAMP;
 
 @Entity(name = "user_detail")
 @Data
@@ -27,9 +28,9 @@ public class User {
     private Counterparty counterparty;
     private UUID token;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TIMESTAMP)
     private Date created;
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TIMESTAMP)
     private Date lastModified;
 
     public User(String username, Counterparty counterparty, UUID token) {

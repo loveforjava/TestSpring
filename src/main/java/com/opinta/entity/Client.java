@@ -10,7 +10,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.validation.constraints.Size;
 
 import lombok.Data;
@@ -27,6 +26,7 @@ import static com.opinta.constraint.RegexPattern.EXTERNAL_ID_LENGTH;
 import static com.opinta.constraint.RegexPattern.POST_ID_LENGTH;
 
 import static java.lang.String.join;
+import static javax.persistence.TemporalType.TIMESTAMP;
 
 @Entity
 @Data
@@ -66,9 +66,9 @@ public class Client {
     @Size(max = BANK_ACCOUNT_LENGTH)
     private String bankAccount;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TIMESTAMP)
     private Date created;
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TIMESTAMP)
     private Date lastModified;
     @ManyToOne
     @JoinColumn(name = "creator_id")

@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.UUID;
 
+import static integration.helper.TestHelper.WRONG_CREATED_MESSAGE;
+import static integration.helper.TestHelper.WRONG_LAST_MODIFIED_MESSAGE;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.junit.Assert.assertTrue;
@@ -51,8 +53,8 @@ public class UserControllerIT extends BaseControllerIT {
         long timeCreated = createdUser.getCreated().getTime();
         long timeModified = createdUser.getLastModified().getTime();
 
-        assertTrue("User has wrong created time", (timeFinished > timeCreated && timeCreated > timeStarted));
-        assertTrue("User has wrong modified time on creation", (timeFinished > timeModified && timeModified > timeStarted));
+        assertTrue(WRONG_CREATED_MESSAGE, (timeFinished > timeCreated && timeCreated > timeStarted));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
 
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(userMapper.toDto(createdUser));

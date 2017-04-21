@@ -14,6 +14,8 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static integration.helper.TestHelper.SAME_REGION_COUNTRYSIDE;
+import static integration.helper.TestHelper.WRONG_CREATED_MESSAGE;
+import static integration.helper.TestHelper.WRONG_LAST_MODIFIED_MESSAGE;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
 import static java.lang.Integer.MIN_VALUE;
@@ -100,8 +102,8 @@ public class AddressControllerIT extends BaseControllerIT {
         long timeCreated = createdAddress.getCreated().getTime();
         long timeModified = createdAddress.getLastModified().getTime();
 
-        assertTrue("Address has wrong created time", (timeFinished > timeCreated && timeCreated > timeStarted));
-        assertTrue("Address has wrong modified time on creation", (timeFinished > timeModified && timeModified > timeStarted));
+        assertTrue(WRONG_CREATED_MESSAGE, (timeFinished > timeCreated && timeCreated > timeStarted));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
 
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(createdAddress);
@@ -163,7 +165,7 @@ public class AddressControllerIT extends BaseControllerIT {
         Address updatedAddress = addressService.getEntityById(addressId);
         long timeModified = updatedAddress.getLastModified().getTime();
 
-        assertTrue("Address has wrong modified time", (timeFinished > timeModified && timeModified > timeStarted));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
 
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(updatedAddress);

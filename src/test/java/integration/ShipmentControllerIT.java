@@ -21,6 +21,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import integration.helper.TestHelper;
 
 import static com.opinta.constraint.RegexPattern.BARCODE_REGEX;
+import static integration.helper.TestHelper.NO_CREATOR_MESSAGE;
+import static integration.helper.TestHelper.NO_LAST_MODIFIER_MESSAGE;
+import static integration.helper.TestHelper.WRONG_CREATED_MESSAGE;
+import static integration.helper.TestHelper.WRONG_CREATOR_MESSAGE;
+import static integration.helper.TestHelper.WRONG_LAST_MODIFIED_MESSAGE;
+import static integration.helper.TestHelper.WRONG_LAST_MODIFIER_MESSAGE;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
@@ -305,9 +311,9 @@ public class ShipmentControllerIT extends BaseControllerIT {
         ShipmentDto shipmentDto = shipmentMapper.toDto(updatedShipment);
         long timeModified = updatedShipment.getLastModified().getTime();
 
-        assertTrue("Shipment has wrong modified time", (timeFinished > timeModified && timeModified > timeStarted));
-        assertNotNull("Shipment doesn't have a modifier", updatedShipment.getCreator());
-        assertThat("Shipment was updated with wrong user!",
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
+        assertNotNull(NO_LAST_MODIFIER_MESSAGE, updatedShipment.getCreator());
+        assertThat(WRONG_LAST_MODIFIER_MESSAGE,
                 updatedShipment.getLastModifier().getToken(), equalTo(user.getToken()));
 
         ObjectMapper mapper = new ObjectMapper();
@@ -359,13 +365,11 @@ public class ShipmentControllerIT extends BaseControllerIT {
         long timeCreated = createdShipment.getCreated().getTime();
         long timeModified = createdShipment.getLastModified().getTime();
 
-        assertTrue("Shipment has wrong created time", (timeFinished > timeCreated && timeCreated > timeStarted));
-        assertTrue("Shipment has wrong modified time", (timeFinished > timeModified && timeModified > timeStarted));
-        assertNotNull("Shipment doesn't have a creator", createdShipment.getCreator());
-        assertNotNull("Shipment doesn't have a modifier on creation!", createdShipment.getLastModifier());
-        assertThat("Shipment was created with wrong user!",
-                createdShipment.getCreator().getToken(), equalTo(user.getToken()));
-        assertThat("Shipment was created with wrong modifier!",
-                createdShipment.getLastModifier().getToken(), equalTo(user.getToken()));
+        assertTrue(WRONG_CREATED_MESSAGE, (timeFinished > timeCreated && timeCreated > timeStarted));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
+        assertNotNull(NO_CREATOR_MESSAGE, createdShipment.getCreator());
+        assertNotNull(NO_LAST_MODIFIER_MESSAGE, createdShipment.getLastModifier());
+        assertThat(WRONG_CREATOR_MESSAGE, createdShipment.getCreator().getToken(), equalTo(user.getToken()));
+        assertThat(WRONG_LAST_MODIFIER_MESSAGE, createdShipment.getLastModifier().getToken(), equalTo(user.getToken()));
     }
 }

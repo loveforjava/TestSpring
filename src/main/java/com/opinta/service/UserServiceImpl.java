@@ -83,7 +83,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User updateEntity(User user) throws IncorrectInputDataException, AuthException {
         log.info(updateLogEndpoint(User.class, user));
-        user.setCreated(new Date());
+        user.setLastModified(new Date());
         userDao.update(user);
         return user;
     }

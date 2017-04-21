@@ -1,14 +1,12 @@
 package com.opinta.entity;
 
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,6 +14,8 @@ import lombok.NoArgsConstructor;
 import java.util.Date;
 
 import static com.opinta.constraint.RegexPattern.BARCODE_INNER_NUMBER_LENGTH;
+import static javax.persistence.EnumType.STRING;
+import static javax.persistence.TemporalType.TIMESTAMP;
 
 @Entity
 @Data
@@ -26,15 +26,15 @@ public class BarcodeInnerNumber {
     private long id;
     @Size(min = BARCODE_INNER_NUMBER_LENGTH, max = BARCODE_INNER_NUMBER_LENGTH)
     private String innerNumber;
-    @Enumerated(EnumType.STRING)
+    @Enumerated(STRING)
     private BarcodeStatus status;
     @ManyToOne
     @JoinColumn(name = "postcode_pool_uuid")
     private PostcodePool postcodePool;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TIMESTAMP)
     private Date created;
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TIMESTAMP)
     private Date lastModified;
     @ManyToOne
     @JoinColumn(name = "creator_id")

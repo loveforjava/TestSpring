@@ -19,6 +19,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Date;
 import java.util.UUID;
 
+import static integration.helper.TestHelper.NO_CREATOR_MESSAGE;
+import static integration.helper.TestHelper.NO_LAST_MODIFIER_MESSAGE;
+import static integration.helper.TestHelper.WRONG_CREATED_MESSAGE;
+import static integration.helper.TestHelper.WRONG_CREATOR_MESSAGE;
+import static integration.helper.TestHelper.WRONG_LAST_MODIFIED_MESSAGE;
+import static integration.helper.TestHelper.WRONG_LAST_MODIFIER_MESSAGE;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
@@ -147,14 +153,12 @@ public class ShipmentGroupControllerIT extends BaseControllerIT {
         long timeCreated = createdShipmentGroup.getCreated().getTime();
         long timeModified = createdShipmentGroup.getLastModified().getTime();
 
-        assertTrue("Shipment group has wrong created time", (timeFinished > timeCreated && timeCreated > timeStarted));
-        assertTrue("Shipment group has wrong modified time on creation",
-                (timeFinished > timeModified && timeModified > timeStarted));
-        assertNotNull("Shipment group doesn't have a creator!", createdShipmentGroup.getCreator());
-        assertNotNull("Shipment group doesn't have a modifier on creation!", createdShipmentGroup.getLastModifier());
-        assertThat("Shipment group was created with wrong user!",
-                createdShipmentGroup.getCreator().getToken(), equalTo(user.getToken()));
-        assertThat("Shipment group was created with wrong modifier!",
+        assertTrue(WRONG_CREATED_MESSAGE, (timeFinished > timeCreated && timeCreated > timeStarted));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
+        assertNotNull(NO_CREATOR_MESSAGE, createdShipmentGroup.getCreator());
+        assertNotNull(NO_LAST_MODIFIER_MESSAGE, createdShipmentGroup.getLastModifier());
+        assertThat(WRONG_CREATOR_MESSAGE, createdShipmentGroup.getCreator().getToken(), equalTo(user.getToken()));
+        assertThat(WRONG_LAST_MODIFIER_MESSAGE,
                 createdShipmentGroup.getLastModifier().getToken(), equalTo(user.getToken()));
 
         ObjectMapper mapper = new ObjectMapper();
@@ -189,9 +193,9 @@ public class ShipmentGroupControllerIT extends BaseControllerIT {
         ShipmentGroup updatedShipmentGroup = shipmentGroupService.getEntityById(shipmentGroupUuid, user);
         long timeModified = updatedShipmentGroup.getLastModified().getTime();
 
-        assertTrue("Shipment group has wrong modified time", (timeFinished > timeModified && timeModified > timeStarted));
-        assertNotNull("Shipment group doesn't have a modifier", updatedShipmentGroup.getLastModifier());
-        assertThat("Shipment group was updated with wrong user!",
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
+        assertNotNull(NO_LAST_MODIFIER_MESSAGE, updatedShipmentGroup.getLastModifier());
+        assertThat(WRONG_LAST_MODIFIER_MESSAGE,
                 updatedShipmentGroup.getLastModifier().getToken(), equalTo(user.getToken()));
 
         ShipmentGroupDto shipmentGroupDto = shipmentGroupMapper.toDto(updatedShipmentGroup);

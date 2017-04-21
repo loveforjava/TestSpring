@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import static java.lang.String.format;
+import static javax.persistence.TemporalType.TIMESTAMP;
 
 @Entity
 @Data
@@ -35,9 +36,9 @@ public class DiscountPerCounterparty {
     @Temporal(TemporalType.DATE)
     private Date toDate;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TIMESTAMP)
     private Date created;
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TIMESTAMP)
     private Date lastModified;
     @ManyToOne
     @JoinColumn(name = "creator_id")

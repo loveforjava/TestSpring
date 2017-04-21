@@ -10,9 +10,10 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import java.util.Date;
 import java.util.UUID;
+
+import static javax.persistence.TemporalType.TIMESTAMP;
 
 @Entity
 @Data
@@ -27,9 +28,9 @@ public class ShipmentGroup {
     @JoinColumn(name = "counterparty_id")
     private Counterparty counterparty;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TIMESTAMP)
     private Date created;
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TIMESTAMP)
     private Date lastModified;
     @ManyToOne
     @JoinColumn(name = "creator_id")

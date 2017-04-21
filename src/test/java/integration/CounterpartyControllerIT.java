@@ -2,9 +2,7 @@ package integration;
 
 import com.opinta.entity.Client;
 import com.opinta.entity.PostcodePool;
-import com.opinta.service.ClientService;
 import com.opinta.service.PostcodePoolService;
-import com.opinta.service.UserService;
 import io.restassured.module.mockmvc.response.MockMvcResponse;
 
 import java.util.ArrayList;
@@ -25,6 +23,10 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import integration.helper.TestHelper;
 
+import static integration.helper.TestHelper.NO_LAST_MODIFIER_MESSAGE;
+import static integration.helper.TestHelper.WRONG_CREATED_MESSAGE;
+import static integration.helper.TestHelper.WRONG_LAST_MODIFIED_MESSAGE;
+import static integration.helper.TestHelper.WRONG_LAST_MODIFIER_MESSAGE;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
@@ -127,8 +129,8 @@ public class CounterpartyControllerIT extends BaseControllerIT {
         long timeCreated = createdCounterparty.getCreated().getTime();
         long timeModified = createdCounterparty.getLastModified().getTime();
 
-        assertTrue("Counterparty has wrong created time on creation", (timeFinished > timeCreated && timeCreated > timeStarted));
-        assertTrue("Counterparty has wrong modified time", (timeFinished > timeModified && timeModified > timeStarted));
+        assertTrue(WRONG_CREATED_MESSAGE, (timeFinished > timeCreated && timeCreated > timeStarted));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
 
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(counterpartyMapper.toDto(createdCounterparty));
@@ -218,9 +220,9 @@ public class CounterpartyControllerIT extends BaseControllerIT {
         CounterpartyDto counterpartyDto = counterpartyMapper.toDto(updatedCounterparty);
         long timeModified = updatedCounterparty.getLastModified().getTime();
 
-        assertTrue("Counterparty has wrong modified time", (timeFinished > timeModified && timeModified > timeStarted));
-        assertNotNull("Counterparty doesn't have a modifier", updatedCounterparty.getLastModifier());
-        assertThat("Counterparty was updated with wrong user!",
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
+        assertNotNull(NO_LAST_MODIFIER_MESSAGE, updatedCounterparty.getLastModifier());
+        assertThat(WRONG_LAST_MODIFIER_MESSAGE,
                 updatedCounterparty.getLastModifier().getToken(), equalTo(user.getToken()));
 
         ObjectMapper mapper = new ObjectMapper();

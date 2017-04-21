@@ -2,16 +2,17 @@ package com.opinta.entity;
 
 import java.util.Date;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import static javax.persistence.EnumType.STRING;
+import static javax.persistence.TemporalType.TIMESTAMP;
 
 @Entity
 @Data
@@ -26,9 +27,9 @@ public class ShipmentTrackingDetail {
     @ManyToOne
     @JoinColumn(name = "post_office_id")
     private PostOffice postOffice;
-    @Enumerated(EnumType.STRING)
+    @Enumerated(STRING)
     private ShipmentStatus shipmentStatus;
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TIMESTAMP)
     private Date statusDate;
 
     public ShipmentTrackingDetail(Shipment shipment, PostOffice postOffice, ShipmentStatus shipmentStatus,

@@ -18,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.UUID;
 
+import static integration.helper.TestHelper.WRONG_CREATED_MESSAGE;
+import static integration.helper.TestHelper.WRONG_LAST_MODIFIED_MESSAGE;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
@@ -100,8 +102,8 @@ public class PostcodePoolIT extends BaseControllerIT {
         long timeCreated = createdPostcodePool.getCreated().getTime();
         long timeModified = createdPostcodePool.getLastModified().getTime();
 
-        assertTrue("PostcodePool has wrong created time", (timeFinished > timeCreated && timeCreated > timeStarted));
-        assertTrue("PostcodePool has wrong modified time on creation", (timeFinished > timeModified && timeModified > timeStarted));
+        assertTrue(WRONG_CREATED_MESSAGE, (timeFinished > timeCreated && timeCreated > timeStarted));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
 
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(postcodePoolMapper.toDto(createdPostcodePool));
@@ -142,7 +144,7 @@ public class PostcodePoolIT extends BaseControllerIT {
         PostcodePoolDto postcodePoolDto = postcodePoolMapper.toDto(updatedPostcodePool);
         long timeModified = updatedPostcodePool.getLastModified().getTime();
 
-        assertTrue("PostcodePool has wrong modified time", (timeFinished > timeModified && timeModified > timeStarted));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
 
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(postcodePoolDto);

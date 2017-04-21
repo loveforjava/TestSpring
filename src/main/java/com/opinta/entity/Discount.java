@@ -14,6 +14,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
+import static javax.persistence.TemporalType.TIMESTAMP;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -30,9 +32,9 @@ public class Discount {
     private Date toDate;
     private float value;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TIMESTAMP)
     private Date created;
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TIMESTAMP)
     private Date lastModified;
     
     public Discount(String name, Date from, Date to, float value) {

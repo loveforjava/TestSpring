@@ -18,6 +18,8 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.opinta.util.FormatterUtil.DATE_FORMAT_ISO_8601_24H;
+import static integration.helper.TestHelper.WRONG_CREATED_MESSAGE;
+import static integration.helper.TestHelper.WRONG_LAST_MODIFIED_MESSAGE;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
 import static java.util.TimeZone.getTimeZone;
@@ -109,8 +111,8 @@ public class DiscountControllerIT extends BaseControllerIT {
         long timeCreated = createdDiscount.getCreated().getTime();
         long timeModified = createdDiscount.getLastModified().getTime();
 
-        assertTrue("Discount has wrong created time", (timeFinished > timeCreated && timeCreated > timeStarted));
-        assertTrue("Discount has wrong modified time on creation", (timeFinished > timeModified && timeModified > timeStarted));
+        assertTrue(WRONG_CREATED_MESSAGE, (timeFinished > timeCreated && timeCreated > timeStarted));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
 
         ObjectMapper mapper = new ObjectMapper();
         JSONObject actualJson = (JSONObject) parser.parse(mapper.writeValueAsString(createdDiscount));
@@ -148,7 +150,7 @@ public class DiscountControllerIT extends BaseControllerIT {
         Discount updatedDiscount = discountService.getEntityByUuid(discountUuid);
         long timeModified = updatedDiscount.getLastModified().getTime();
 
-        assertTrue("Discount has wrong modified time", (timeFinished > timeModified && timeModified > timeStarted));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
 
         ObjectMapper mapper = new ObjectMapper();
         JSONObject actualJson = (JSONObject) parser.parse(mapper.writeValueAsString(updatedDiscount));
