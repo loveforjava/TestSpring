@@ -1,7 +1,5 @@
 package com.opinta.service;
 
-import com.opinta.dao.CountrysidePostcodeDao;
-import com.opinta.entity.classifier.CountrysidePostcode;
 import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.exception.PerformProcessFailedException;
 import java.lang.reflect.InvocationTargetException;
@@ -31,14 +29,14 @@ import static com.opinta.util.LogMessageUtil.updateLogEndpoint;
 public class AddressServiceImpl implements AddressService {
     private final AddressDao addressDao;
     private final AddressMapper addressMapper;
-    private final CountrysidePostcodeDao countrysidePostcodeDao;
+    private final CountrysidePostcodeService countrysidePostcodeService;
 
     @Autowired
     public AddressServiceImpl(AddressDao addressDao, AddressMapper addressMapper,
-                              CountrysidePostcodeDao countrysidePostcodeDao) {
+                              CountrysidePostcodeService countrysidePostcodeService) {
         this.addressDao = addressDao;
         this.addressMapper = addressMapper;
-        this.countrysidePostcodeDao = countrysidePostcodeDao;
+        this.countrysidePostcodeService = countrysidePostcodeService;
     }
 
     @Override
@@ -64,8 +62,7 @@ public class AddressServiceImpl implements AddressService {
     @Transactional
     public Address saveEntity(Address address) {
         log.info(saveLogEndpoint(Address.class, address));
-        CountrysidePostcode countrysidePostcode = countrysidePostcodeDao.getByPostcode(address.getPostcode());
-        address.setCountryside(countrysidePostcode != null);
+        address.setCountryside(countrysidePostcodeService.isPostcodeInCountryside(address.getPostcode()));
         return addressDao.save(address);
     }
 
@@ -81,8 +78,7 @@ public class AddressServiceImpl implements AddressService {
             throw new PerformProcessFailedException(copyPropertiesOnErrorLogEndpoint(Address.class, source, target, e));
         }
         target.setId(id);
-        CountrysidePostcode countrysidePostcode = countrysidePostcodeDao.getByPostcode(target.getPostcode());
-        target.setCountryside(countrysidePostcode != null);
+        target.setCountryside(countrysidePostcodeService.isPostcodeInCountryside(target.getPostcode()));
         log.info(updateLogEndpoint(Address.class, target));
         addressDao.update(target);
         return target;

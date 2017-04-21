@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 import static java.lang.String.format;
 
+import static com.opinta.util.AuthorizationUtil.authorizeForAction;
 import static com.opinta.util.EnhancedBeanUtilsBean.copyNotNullProperties;
 import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
@@ -42,7 +43,6 @@ import static com.opinta.util.LogMessageUtil.updateLogEndpoint;
 public class ShipmentServiceImpl implements ShipmentService {
     private final ShipmentDao shipmentDao;
     private final ClientService clientService;
-    private final UserService userService;
     private final TariffGridService tariffGridService;
     private final ShipmentMapper shipmentMapper;
     private final BarcodeInnerNumberService barcodeInnerNumberService;
@@ -50,14 +50,13 @@ public class ShipmentServiceImpl implements ShipmentService {
     private final DiscountPerCounterpartyService discountPerCounterpartyService;
 
     @Autowired
-    public ShipmentServiceImpl(ShipmentDao shipmentDao, ClientService clientService, UserService userService,
+    public ShipmentServiceImpl(ShipmentDao shipmentDao, ClientService clientService,
                                TariffGridService tariffGridService, ShipmentMapper shipmentMapper,
                                BarcodeInnerNumberService barcodeInnerNumberService,
                                ShipmentGroupService shipmentGroupService,
                                DiscountPerCounterpartyService discountPerCounterpartyService) {
         this.shipmentDao = shipmentDao;
         this.clientService = clientService;
-        this.userService = userService;
         this.tariffGridService = tariffGridService;
         this.shipmentMapper = shipmentMapper;
         this.barcodeInnerNumberService = barcodeInnerNumberService;
@@ -82,7 +81,7 @@ public class ShipmentServiceImpl implements ShipmentService {
             throw new IncorrectInputDataException(getByIdOnErrorLogEndpoint(Shipment.class, uuid));
         }
 
-        userService.authorizeForAction(shipment, user);
+        authorizeForAction(shipment, user);
 
         return shipmentDao.getByUuid(uuid);
     }

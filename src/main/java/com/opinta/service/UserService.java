@@ -1,11 +1,7 @@
 package com.opinta.service;
 
 import com.opinta.dto.UserDto;
-import com.opinta.entity.Client;
 import com.opinta.entity.Counterparty;
-import com.opinta.entity.DiscountPerCounterparty;
-import com.opinta.entity.Shipment;
-import com.opinta.entity.ShipmentGroup;
 import com.opinta.entity.User;
 import com.opinta.exception.AuthException;
 import com.opinta.exception.IncorrectInputDataException;
@@ -21,23 +17,13 @@ public interface UserService {
 
     List<User> getUsersByCounterparty(Counterparty counterparty);
 
-    User saveEntity(User user) throws IncorrectInputDataException;
+    User saveEntity(User user) throws IncorrectInputDataException, AuthException;
 
     User updateEntity(User user) throws IncorrectInputDataException, AuthException;
 
-    UserDto save(UserDto userDto) throws IncorrectInputDataException;
+    UserDto save(UserDto userDto) throws IncorrectInputDataException, AuthException;
 
     void delete(long id) throws IncorrectInputDataException;
 
     User authenticate(UUID token) throws AuthException;
-
-    void authorizeForAction(Counterparty counterparty, User user) throws AuthException;
-
-    void authorizeForAction(Client client, User user) throws AuthException;
-
-    void authorizeForAction(Shipment shipment, User user) throws AuthException;
-
-    void authorizeForAction(ShipmentGroup shipmentGroup, User user) throws AuthException;
-
-    void authorizeForAction(DiscountPerCounterparty discountPerCounterparty, User user) throws AuthException;
 }
