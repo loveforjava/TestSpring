@@ -6,6 +6,7 @@ import com.opinta.entity.Counterparty;
 import com.opinta.entity.User;
 import com.opinta.exception.AuthException;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import javax.transaction.Transactional;
@@ -59,6 +60,9 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User saveEntity(User user) throws IncorrectInputDataException, AuthException {
         user.setCounterparty(counterpartyService.getEntityByUuid(user.getCounterparty().getUuid(), user));
+        Date date = new Date();
+        user.setCreated(date);
+        user.setLastModified(date);
         return userDao.save(user);
     }
 
@@ -73,6 +77,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User updateEntity(User user) throws IncorrectInputDataException, AuthException {
         log.info(updateLogEndpoint(User.class, user));
+        user.setLastModified(new Date());
         userDao.update(user);
         return user;
     }

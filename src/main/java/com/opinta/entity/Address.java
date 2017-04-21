@@ -6,7 +6,11 @@ import lombok.NoArgsConstructor;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Temporal;
 import java.math.BigDecimal;
+import java.util.Date;
+
+import static javax.persistence.TemporalType.TIMESTAMP;
 
 @Entity
 @Data
@@ -26,6 +30,11 @@ public class Address {
     private BigDecimal latitude;
     private BigDecimal longitude;
     private boolean countryside;
+
+    @Temporal(TIMESTAMP)
+    private Date created;
+    @Temporal(TIMESTAMP)
+    private Date lastModified;
 
     public Address(String postcode, String region, String district, String city, String street, String houseNumber,
                    String apartmentNumber) {

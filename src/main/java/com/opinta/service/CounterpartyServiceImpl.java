@@ -9,6 +9,7 @@ import com.opinta.exception.PerformProcessFailedException;
 import com.opinta.util.LogMessageUtil;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -90,6 +91,9 @@ public class CounterpartyServiceImpl implements CounterpartyService {
     @Override
     @Transactional
     public Counterparty saveEntity(Counterparty counterparty) throws IncorrectInputDataException {
+        Date date = new Date();
+        counterparty.setCreated(date);
+        counterparty.setLastModified(date);
         log.info(saveLogEndpoint(Counterparty.class, counterparty));
         return counterpartyDao.save(counterparty);
     }
@@ -129,6 +133,8 @@ public class CounterpartyServiceImpl implements CounterpartyService {
         }
         target.setUuid(uuid);
         log.info(updateLogEndpoint(Counterparty.class, target));
+        target.setLastModified(new Date());
+        target.setLastModifier(user);
         counterpartyDao.update(target);
         return counterpartyMapper.toDto(target);
     }

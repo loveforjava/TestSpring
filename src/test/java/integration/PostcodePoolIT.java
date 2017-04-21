@@ -18,11 +18,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.UUID;
 
+import static integration.helper.TestHelper.WRONG_CREATED_MESSAGE;
+import static integration.helper.TestHelper.WRONG_LAST_MODIFIED_MESSAGE;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
+import static java.lang.System.currentTimeMillis;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 @Slf4j
@@ -80,6 +84,7 @@ public class PostcodePoolIT extends BaseControllerIT {
         JSONObject inputJson = testHelper.getJsonObjectFromFile("json/postcode-pool.json");
         String postCode = (String) inputJson.get("postcode");
 
+        long timeStarted = currentTimeMillis();
         MockMvcResponse response =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
@@ -91,9 +96,16 @@ public class PostcodePoolIT extends BaseControllerIT {
                         body("postcode", equalTo(postCode)).
                 extract().
                         response();
+        long timeFinished = currentTimeMillis();
 
         // check created data
         PostcodePool createdPostcodePool = postcodePoolService.getEntityByUuid(UUID.fromString(response.path("uuid")));
+        long timeCreated = createdPostcodePool.getCreated().getTime();
+        long timeModified = createdPostcodePool.getLastModified().getTime();
+
+        assertTrue(WRONG_CREATED_MESSAGE, timeFinished >= timeCreated && timeCreated >= timeStarted);
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished >= timeModified && timeModified >= timeStarted);
+
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(postcodePoolMapper.toDto(createdPostcodePool));
 
@@ -112,6 +124,7 @@ public class PostcodePoolIT extends BaseControllerIT {
 
         String postCode = (String) inputJson.get("postcode");
 
+        long timeStarted = currentTimeMillis();
         given().
                 contentType(APPLICATION_JSON_VALUE).
                 body(inputJson).
@@ -120,14 +133,20 @@ public class PostcodePoolIT extends BaseControllerIT {
         then().
                 contentType(APPLICATION_JSON_VALUE).
                 statusCode(SC_OK);
+        long timeFinished = currentTimeMillis();
 
         JSONParser parser = new JSONParser();
         JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
         expectedJson.put("postcode", postCode);
 
         // check updated data
-        PostcodePoolDto postcodePoolDto = postcodePoolMapper.toDto(postcodePoolService.getEntityByUuid(
-                postcodePoolUuid));
+        PostcodePool updatedPostcodePool = postcodePoolService.getEntityByUuid(
+                postcodePoolUuid);
+        PostcodePoolDto postcodePoolDto = postcodePoolMapper.toDto(updatedPostcodePool);
+        long timeModified = updatedPostcodePool.getLastModified().getTime();
+
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished >= timeModified && timeModified >= timeStarted);
+
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(postcodePoolDto);
 

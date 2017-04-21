@@ -7,6 +7,7 @@ import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import javax.persistence.Temporal;
@@ -16,6 +17,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import static java.lang.String.format;
+import static javax.persistence.TemporalType.TIMESTAMP;
 
 @Entity
 @Data
@@ -33,6 +35,17 @@ public class DiscountPerCounterparty {
     private Date fromDate;
     @Temporal(TemporalType.DATE)
     private Date toDate;
+
+    @Temporal(TIMESTAMP)
+    private Date created;
+    @Temporal(TIMESTAMP)
+    private Date lastModified;
+    @ManyToOne
+    @JoinColumn(name = "creator_id")
+    private User creator;
+    @ManyToOne
+    @JoinColumn(name = "lastModifier_id")
+    private User lastModifier;
 
     public DiscountPerCounterparty(Counterparty counterparty, Discount discount, Date fromDate, Date toDate) {
         this.counterparty = counterparty;

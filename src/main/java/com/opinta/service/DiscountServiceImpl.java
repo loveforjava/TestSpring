@@ -2,6 +2,7 @@ package com.opinta.service;
 
 import com.opinta.exception.PerformProcessFailedException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -54,6 +55,9 @@ public class DiscountServiceImpl implements DiscountService {
     @Override
     @Transactional
     public Discount saveEntity(Discount discount) {
+        Date date = new Date();
+        discount.setCreated(date);
+        discount.setLastModified(date);
         return discountDao.save(discount);
     }
 
@@ -71,6 +75,7 @@ public class DiscountServiceImpl implements DiscountService {
         }
         target.setUuid(uuid);
         log.info(updateLogEndpoint(Discount.class, target));
+        target.setLastModified(new Date());
         discountDao.update(target);
         return target;
     }
@@ -78,7 +83,7 @@ public class DiscountServiceImpl implements DiscountService {
     @Override
     @Transactional
     public DiscountDto save(DiscountDto dto) {
-        return discountMapper.toDto(discountDao.save(discountMapper.toEntity(dto)));
+        return discountMapper.toDto(saveEntity(discountMapper.toEntity(dto)));
     }
 
     @Override

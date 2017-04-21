@@ -9,6 +9,7 @@ import com.opinta.exception.AuthException;
 import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.exception.PerformProcessFailedException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -149,6 +150,11 @@ public class ClientServiceImpl implements ClientService {
         client.setPhone(phoneService.getOrCreateEntityByPhoneNumber(client.getPhone().getPhoneNumber())
                 .removeNonNumericalCharacters());
         authorizeForAction(client, user);
+        Date date = new Date();
+        client.setCreated(date);
+        client.setLastModified(date);
+        client.setCreator(user);
+        client.setLastModifier(user);
         log.info(saveLogEndpoint(Client.class, client));
         return clientDao.save(client);
     }
@@ -165,6 +171,8 @@ public class ClientServiceImpl implements ClientService {
     public Client updateEntity(Client client, User user) throws IncorrectInputDataException, AuthException {
         log.info(updateLogEndpoint(Client.class, client));
         authorizeForAction(client, user);
+        client.setLastModified(new Date());
+        client.setLastModifier(user);
         clientDao.update(client);
         return client;
     }

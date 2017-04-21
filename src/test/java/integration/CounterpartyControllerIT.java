@@ -2,9 +2,7 @@ package integration;
 
 import com.opinta.entity.Client;
 import com.opinta.entity.PostcodePool;
-import com.opinta.service.ClientService;
 import com.opinta.service.PostcodePoolService;
-import com.opinta.service.UserService;
 import io.restassured.module.mockmvc.response.MockMvcResponse;
 
 import java.util.ArrayList;
@@ -25,14 +23,20 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import integration.helper.TestHelper;
 
+import static integration.helper.TestHelper.NO_LAST_MODIFIER_MESSAGE;
+import static integration.helper.TestHelper.WRONG_CREATED_MESSAGE;
+import static integration.helper.TestHelper.WRONG_LAST_MODIFIED_MESSAGE;
+import static integration.helper.TestHelper.WRONG_LAST_MODIFIER_MESSAGE;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
+import static java.lang.System.currentTimeMillis;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 public class CounterpartyControllerIT extends BaseControllerIT {
@@ -47,11 +51,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
     @Autowired
     private CounterpartyMapper counterpartyMapper;
     @Autowired
-    private UserService userService;
-    @Autowired
     private TestHelper testHelper;
-    @Autowired
-    private ClientService clientService;
     @Autowired
     private PostcodePoolService postcodePoolService;
 
@@ -111,6 +111,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
         jsonObject.put("postcodePoolUuid", testHelper.createPostcodePool().getUuid().toString());
         String expectedJson = jsonObject.toString();
 
+        long timeStarted = currentTimeMillis();
         MockMvcResponse response =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
@@ -122,8 +123,16 @@ public class CounterpartyControllerIT extends BaseControllerIT {
                         statusCode(SC_OK).
                 extract()
                         .response();
+        long timeFinished = currentTimeMillis();
         //check created data
-        Counterparty createdCounterparty = counterpartyService.getEntityByUuidAnonymous(UUID.fromString(response.path("uuid")));
+        Counterparty createdCounterparty = counterpartyService
+                .getEntityByUuidAnonymous(UUID.fromString(response.path("uuid")));
+        long timeCreated = createdCounterparty.getCreated().getTime();
+        long timeModified = createdCounterparty.getLastModified().getTime();
+
+        assertTrue(WRONG_CREATED_MESSAGE, timeFinished >= timeCreated && timeCreated >= timeStarted);
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished >= timeModified && timeModified >= timeStarted);
+
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(counterpartyMapper.toDto(createdCounterparty));
         JSONAssert.assertEquals(expectedJson, actualJson, false);
@@ -195,6 +204,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
         jsonObject.put("postcodePoolUuid", counterparty.getPostcodePool().getUuid().toString());
         String expectedJson = jsonObject.toString();
 
+        long timeStarted = currentTimeMillis();
         given().
                 contentType(APPLICATION_JSON_VALUE).
                 queryParam("token", user.getToken()).
@@ -204,10 +214,18 @@ public class CounterpartyControllerIT extends BaseControllerIT {
         then().
                 contentType(APPLICATION_JSON_VALUE).
                 statusCode(SC_OK);
+        long timeFinished = currentTimeMillis();
 
         // check updated data
-        CounterpartyDto counterpartyDto = counterpartyMapper.toDto(counterpartyService.getEntityByUuid(
-                counterpartyUuid, user));
+        Counterparty updatedCounterparty = counterpartyService.getEntityByUuid(counterpartyUuid, user);
+        CounterpartyDto counterpartyDto = counterpartyMapper.toDto(updatedCounterparty);
+        long timeModified = updatedCounterparty.getLastModified().getTime();
+
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished >= timeModified && timeModified >= timeStarted);
+        assertNotNull(NO_LAST_MODIFIER_MESSAGE, updatedCounterparty.getLastModifier());
+        assertThat(WRONG_LAST_MODIFIER_MESSAGE,
+                updatedCounterparty.getLastModifier().getToken(), equalTo(user.getToken()));
+
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(counterpartyDto);
 

@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -73,6 +74,11 @@ public class ShipmentGroupServiceImpl implements ShipmentGroupService {
         validateInnerReferenceAndFillObjectFromDB(shipmentGroup, user);
 
         authorizeForAction(shipmentGroup, user);
+        Date date = new Date();
+        shipmentGroup.setCreated(date);
+        shipmentGroup.setLastModified(date);
+        shipmentGroup.setCreator(user);
+        shipmentGroup.setLastModifier(user);
         log.info(saveLogEndpoint(ShipmentGroup.class, shipmentGroup));
         return shipmentGroupDao.save(shipmentGroup);
     }
@@ -95,6 +101,8 @@ public class ShipmentGroupServiceImpl implements ShipmentGroupService {
 
         target.setUuid(uuid);
         target.setCounterparty(source.getCounterparty());
+        target.setLastModified(new Date());
+        target.setLastModifier(user);
 
         log.info(updateOnErrorLogEndpoint(ShipmentGroup.class, target));
         shipmentGroupDao.update(target);
