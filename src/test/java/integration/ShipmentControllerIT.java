@@ -17,7 +17,6 @@ import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import integration.helper.TestHelper;
 
@@ -26,6 +25,7 @@ import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.Matchers.equalTo;
+import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 
@@ -129,8 +129,47 @@ public class ShipmentControllerIT extends BaseControllerIT {
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(shipmentMapper.toDto(createdShipment));
 
-        JSONAssert.assertEquals(expectedJson, actualJson, false);
+        assertEquals(expectedJson, actualJson, false);
 
+        // delete
+        testHelper.deleteShipment(createdShipment);
+    }
+    
+    @Test
+    @SuppressWarnings("unchecked")
+    public void createShipment_presavedSenderAndRecipient_senderByPostId() throws Exception {
+        Client sender = testHelper.createSenderFor(user);
+        testHelper.assignPostIdTo(sender);
+        Client recipient = testHelper.createRecipientFor(user);
+        ShipmentGroup shipmentGroup = testHelper.createShipmentGroupFor(user);
+        
+        JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
+        // populate input json with sender and recipient uuid
+        jsonObject.put("sender", testHelper.toJsonWithPostId(sender));
+        jsonObject.put("recipient", testHelper.toJsonWithUuid(recipient));
+        jsonObject.put("shipmentGroupUuid", shipmentGroup.getUuid().toString());
+        String expectedJson = jsonObject.toString();
+        
+        String newShipmentUuid =
+                given().
+                        contentType(APPLICATION_JSON_VALUE).
+                        queryParam("token", user.getToken()).
+                        body(expectedJson).
+                when().
+                        post("/shipments").
+                then().
+                        statusCode(SC_OK).
+                        body("barcode", RegexMatcher.matches(BARCODE_REGEX)).
+                extract().
+                        path("uuid");
+        
+        // check created data
+        Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid), user);
+        ObjectMapper mapper = new ObjectMapper();
+        String actualJson = mapper.writeValueAsString(shipmentMapper.toDto(createdShipment));
+        
+        assertEquals(expectedJson, actualJson, false);
+        
         // delete
         testHelper.deleteShipment(createdShipment);
     }
@@ -173,7 +212,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         String actualJson = mapper.writeValueAsString(shipmentMapper.toDto(createdShipment));
         
         String expectedJson = jsonObject.toJSONString();
-        JSONAssert.assertEquals(expectedJson, actualJson, false);
+        assertEquals(expectedJson, actualJson, false);
 
         // delete
         testHelper.deleteShipment(createdShipment);
@@ -216,7 +255,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         String actualJson = mapper.writeValueAsString(shipmentMapper.toDto(createdShipment));
         
         String expectedJson = jsonObject.toJSONString();
-        JSONAssert.assertEquals(expectedJson, actualJson, false);
+        assertEquals(expectedJson, actualJson, false);
         
         // delete
         testHelper.deleteShipment(createdShipment);
@@ -247,7 +286,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(shipmentDto);
 
-        JSONAssert.assertEquals(expectedJson, actualJson, false);
+        assertEquals(expectedJson, actualJson, false);
     }
 
     @Test

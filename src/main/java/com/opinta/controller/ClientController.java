@@ -1,5 +1,6 @@
 package com.opinta.controller;
 
+import com.opinta.dto.postid.ClientTypeDto;
 import com.opinta.entity.Client;
 import com.opinta.entity.Shipment;
 import com.opinta.entity.User;
@@ -112,6 +113,21 @@ public class ClientController extends BaseController {
             return new ResponseEntity<>(updateOnErrorLogEndpoint(Client.class, clientDto, e), NOT_FOUND);
         } catch (PerformProcessFailedException e) {
             return new ResponseEntity<>(updateOnErrorLogEndpoint(Client.class, clientDto, e), BAD_REQUEST);
+        }
+    }
+    
+    @PutMapping("{uuid}/post-id")
+    public ResponseEntity<?> updatePostId(@PathVariable UUID uuid, @RequestBody @Valid ClientTypeDto clientTypeDto,
+                                          @RequestParam UUID token) {
+        try {
+            User user = userService.authenticate(token);
+            return new ResponseEntity<>(clientService.updatePostId(uuid, clientTypeDto, user), OK);
+        } catch (AuthException e) {
+            return new ResponseEntity<>(updateOnErrorLogEndpoint(Client.class, clientTypeDto, e), UNAUTHORIZED);
+        } catch (IncorrectInputDataException e) {
+            return new ResponseEntity<>(updateOnErrorLogEndpoint(Client.class, clientTypeDto, e), NOT_FOUND);
+        } catch (PerformProcessFailedException e) {
+            return new ResponseEntity<>(updateOnErrorLogEndpoint(Client.class, clientTypeDto, e), BAD_REQUEST);
         }
     }
 

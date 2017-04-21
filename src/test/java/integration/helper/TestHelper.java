@@ -1,7 +1,9 @@
 package integration.helper;
 
+import com.opinta.dto.postid.ClientTypeDto;
 import com.opinta.entity.Address;
 import com.opinta.entity.Client;
+import com.opinta.entity.ClientType;
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.Discount;
 import com.opinta.entity.DiscountPerCounterparty;
@@ -48,6 +50,8 @@ import java.util.UUID;
 import static com.opinta.util.LogMessageUtil.updateLogEndpoint;
 import static java.time.LocalDateTime.now;
 
+import static com.opinta.entity.ClientType.COMPANY;
+import static com.opinta.entity.ClientType.INDIVIDUAL;
 import static com.opinta.entity.DeliveryType.D2D;
 import static com.opinta.util.LogMessageUtil.deleteOnErrorLogEndpoint;
 
@@ -188,6 +192,12 @@ public class TestHelper {
         clientUuidJsonObject.put("uuid", client.getUuid().toString());
         return clientUuidJsonObject;
     }
+    
+    public JSONObject toJsonWithPostId(Client client) {
+        JSONObject clientPostIdJsonObject = new JSONObject();
+        clientPostIdJsonObject.put("postId", client.getPostId());
+        return clientPostIdJsonObject;
+    }
 
     @SuppressWarnings("unchecked")
     public void mergeClientNames(JSONObject target, Client source) {
@@ -207,6 +217,7 @@ public class TestHelper {
     public Client createClient() throws Exception {
         Client client = new Client("FOP Ivanov", "001", createAddress(), createPhone(),
                 createCounterparty());
+        client.setExternalId("123-fff-000-888-zxc");
         return clientService.saveEntity(client, userService.getUsersByCounterparty(client.getCounterparty()).get(0));
     }
 
@@ -224,6 +235,18 @@ public class TestHelper {
     public Client createSenderFor(Counterparty counterparty) throws Exception {
         Client client = new Client("FOP Sidorov", "456", createAddress(), createPhone(), counterparty);
         return clientService.saveEntity(client, userService.getUsersByCounterparty(client.getCounterparty()).get(0));
+    }
+    
+    public void assignPostIdTo(Client client) throws Exception {
+        ClientTypeDto clientTypeDto = new ClientTypeDto();
+        if (client.isIndividual()) {
+            clientTypeDto.setType(INDIVIDUAL);
+        } else {
+            clientTypeDto.setType(COMPANY);
+        }
+        User user = userService.getUsersByCounterparty(client.getCounterparty()).get(0);
+        String postId = clientService.updatePostId(client.getUuid(), clientTypeDto, user).getPostId();
+        client.setPostId(postId);
     }
 
     public Client createRecipientFor(Counterparty counterparty) throws Exception {
@@ -243,7 +266,8 @@ public class TestHelper {
 
     public Client createRecipient() throws Exception {
         Client client = new Client("FOP Petrov Anonimous", "123", createAddress(), createPhone(), createCounterparty());
-        return clientService.saveEntity(client, userService.getUsersByCounterparty(client.getCounterparty()).get(0));
+        User user = createUser(client.getCounterparty());
+        return clientService.saveEntity(client, user);
     }
 
     public Client createClient(Counterparty counterparty) throws Exception {
