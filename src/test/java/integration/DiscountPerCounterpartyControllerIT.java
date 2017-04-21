@@ -23,6 +23,7 @@ import static integration.helper.TestHelper.WRONG_CREATED_MESSAGE;
 import static integration.helper.TestHelper.WRONG_CREATOR_MESSAGE;
 import static integration.helper.TestHelper.WRONG_LAST_MODIFIED_MESSAGE;
 import static integration.helper.TestHelper.WRONG_LAST_MODIFIER_MESSAGE;
+import static java.lang.System.currentTimeMillis;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import org.junit.After;
@@ -105,7 +106,7 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
         inputJson.put("discountUuid", newDiscount.getUuid().toString());
         inputJson.put("counterpartyUuid", counterparty.getUuid().toString());
 
-        long timeStarted = System.currentTimeMillis();
+        long timeStarted = currentTimeMillis();
         String newUuid =
                 given().
                         queryParam("token", user.getToken()).
@@ -117,7 +118,7 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
                         statusCode(SC_OK).
                 extract().
                         path("uuid");
-        long timeFinished = System.currentTimeMillis();
+        long timeFinished = currentTimeMillis();
         UUID newDiscountUuid = UUID.fromString(newUuid);
 
         DiscountPerCounterparty createdDiscountPerCounterparty = discountPerCounterpartyService.
@@ -154,7 +155,7 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
         inputJson.put("discountUuid", newDiscount.getUuid().toString());
         inputJson.put("counterpartyUuid", counterparty.getUuid().toString());
 
-        long timeStarted = System.currentTimeMillis();
+        long timeStarted = currentTimeMillis();
         given().
                 queryParam("token", user.getToken()).
                 contentType(APPLICATION_JSON_VALUE).
@@ -164,7 +165,7 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
         then().
                 body("discountUuid", equalTo(newDiscount.getUuid().toString())).
                 statusCode(SC_OK);
-        long timeFinished = System.currentTimeMillis();
+        long timeFinished = currentTimeMillis();
 
         DiscountPerCounterparty updatedDiscountPerCounterparty = discountPerCounterpartyService
                 .getEntityByUuid(discountPerCounterparty.getUuid(), user);

@@ -22,6 +22,7 @@ import static integration.helper.TestHelper.WRONG_CREATED_MESSAGE;
 import static integration.helper.TestHelper.WRONG_LAST_MODIFIED_MESSAGE;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
+import static java.lang.System.currentTimeMillis;
 import static java.util.TimeZone.getTimeZone;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
@@ -89,7 +90,7 @@ public class DiscountControllerIT extends BaseControllerIT {
         // create
         JSONObject inputJson = testHelper.getJsonObjectFromFile("json/discount.json");
 
-        long timeStarted = System.currentTimeMillis();
+        long timeStarted = currentTimeMillis();
         String newUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
@@ -100,7 +101,7 @@ public class DiscountControllerIT extends BaseControllerIT {
                         statusCode(SC_OK).
                 extract().
                         path("uuid");
-        long timeFinished = System.currentTimeMillis();
+        long timeFinished = currentTimeMillis();
         UUID newDiscountUuid = UUID.fromString(newUuid);
 
         // check created data
@@ -131,7 +132,7 @@ public class DiscountControllerIT extends BaseControllerIT {
         UUID discountUuid = discounts.get(0).getUuid();
 
         // update data
-        long timeStarted = System.currentTimeMillis();
+        long timeStarted = currentTimeMillis();
         JSONObject inputJson = testHelper.getJsonObjectFromFile("json/discount.json");
 
         given().
@@ -141,7 +142,7 @@ public class DiscountControllerIT extends BaseControllerIT {
                 put("/discounts/{uuid}", discountUuid).
         then().
                 statusCode(SC_OK);
-        long timeFinished = System.currentTimeMillis();
+        long timeFinished = currentTimeMillis();
 
         // check updated data
         JSONParser parser = new JSONParser();

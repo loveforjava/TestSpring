@@ -29,6 +29,7 @@ import static integration.helper.TestHelper.WRONG_LAST_MODIFIED_MESSAGE;
 import static integration.helper.TestHelper.WRONG_LAST_MODIFIER_MESSAGE;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
+import static java.lang.System.currentTimeMillis;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -110,7 +111,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
         jsonObject.put("postcodePoolUuid", testHelper.createPostcodePool().getUuid().toString());
         String expectedJson = jsonObject.toString();
 
-        long timeStarted = System.currentTimeMillis();
+        long timeStarted = currentTimeMillis();
         MockMvcResponse response =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
@@ -122,7 +123,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
                         statusCode(SC_OK).
                 extract()
                         .response();
-        long timeFinished = System.currentTimeMillis();
+        long timeFinished = currentTimeMillis();
         //check created data
         Counterparty createdCounterparty = counterpartyService
                 .getEntityByUuidAnonymous(UUID.fromString(response.path("uuid")));
@@ -203,7 +204,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
         jsonObject.put("postcodePoolUuid", counterparty.getPostcodePool().getUuid().toString());
         String expectedJson = jsonObject.toString();
 
-        long timeStarted = System.currentTimeMillis();
+        long timeStarted = currentTimeMillis();
         given().
                 contentType(APPLICATION_JSON_VALUE).
                 queryParam("token", user.getToken()).
@@ -213,7 +214,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
         then().
                 contentType(APPLICATION_JSON_VALUE).
                 statusCode(SC_OK);
-        long timeFinished = System.currentTimeMillis();
+        long timeFinished = currentTimeMillis();
 
         // check updated data
         Counterparty updatedCounterparty = counterpartyService.getEntityByUuid(counterpartyUuid, user);

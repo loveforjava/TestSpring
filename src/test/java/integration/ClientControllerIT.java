@@ -30,6 +30,7 @@ import static com.opinta.constraint.RegexPattern.POST_ID_LENGTH;
 import static com.opinta.entity.ClientType.INDIVIDUAL;
 import static com.opinta.util.AlphabetCharactersGenerationUtil.characterOf;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
+import static java.lang.System.currentTimeMillis;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
@@ -111,7 +112,7 @@ public class ClientControllerIT extends BaseControllerIT {
         String lastName = (String) inputJson.get("lastName");
         String expectedFullName = join(" ", lastName, firstName, middleName);
 
-        long timeStarted = System.currentTimeMillis();
+        long timeStarted = currentTimeMillis();
         String newUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
@@ -127,7 +128,7 @@ public class ClientControllerIT extends BaseControllerIT {
                         body("lastName", equalTo(lastName)).
                 extract().
                         path("uuid");
-        long timeFinished = System.currentTimeMillis();
+        long timeFinished = currentTimeMillis();
 
         JSONParser parser = new JSONParser();
         JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
@@ -170,7 +171,7 @@ public class ClientControllerIT extends BaseControllerIT {
 
         String expectedFullName = (String) inputJson.get("name");
 
-        long timeStarted = System.currentTimeMillis();
+        long timeStarted = currentTimeMillis();
         String newUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
@@ -186,7 +187,7 @@ public class ClientControllerIT extends BaseControllerIT {
                         body("lastName", equalTo("")).
                 extract().
                         path("uuid");
-        long timeFinished = System.currentTimeMillis();
+        long timeFinished = currentTimeMillis();
 
 
         inputJson.remove("postId");
@@ -238,7 +239,7 @@ public class ClientControllerIT extends BaseControllerIT {
         String middleName = (String) inputJson.get("middleName");
         String lastName = (String) inputJson.get("lastName");
 
-        long timeStarted = System.currentTimeMillis();
+        long timeStarted = currentTimeMillis();
         given().
                 contentType(APPLICATION_JSON_VALUE).
                 queryParam("token", user.getToken()).
@@ -248,7 +249,7 @@ public class ClientControllerIT extends BaseControllerIT {
         then().
                 body("counterpartyUuid", equalTo(client.getCounterparty().getUuid().toString())).
                 statusCode(SC_OK);
-        long timeFinished = System.currentTimeMillis();
+        long timeFinished = currentTimeMillis();
 
         JSONParser parser = new JSONParser();
         JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
@@ -287,7 +288,7 @@ public class ClientControllerIT extends BaseControllerIT {
         String middleName = (String) inputJson.get("middleName");
         String lastName = (String) inputJson.get("lastName");
 
-        long timeStarted = System.currentTimeMillis();
+        long timeStarted = currentTimeMillis();
         given().
                 contentType(APPLICATION_JSON_VALUE).
                 queryParam("token", user.getToken()).
@@ -297,7 +298,7 @@ public class ClientControllerIT extends BaseControllerIT {
         then().
                 body("counterpartyUuid", equalTo(client.getCounterparty().getUuid().toString())).
                 statusCode(SC_OK);
-        long timeFinished = System.currentTimeMillis();
+        long timeFinished = currentTimeMillis();
 
         inputJson.remove("postId");
         JSONParser parser = new JSONParser();
@@ -330,7 +331,7 @@ public class ClientControllerIT extends BaseControllerIT {
         inputJson.put("name", "Rozetka & Roga & Kopyta [edited]");
         inputJson.put("individual", false);
 
-        long timeStarted = System.currentTimeMillis();
+        long timeStarted = currentTimeMillis();
         given().
                 contentType(APPLICATION_JSON_VALUE).
                 queryParam("token", user.getToken()).
@@ -340,7 +341,7 @@ public class ClientControllerIT extends BaseControllerIT {
         then().
                 body("counterpartyUuid", equalTo(client.getCounterparty().getUuid().toString())).
                 statusCode(SC_OK);
-        long timeFinished = System.currentTimeMillis();
+        long timeFinished = currentTimeMillis();
 
         inputJson.remove("postId");
         JSONParser parser = new JSONParser();

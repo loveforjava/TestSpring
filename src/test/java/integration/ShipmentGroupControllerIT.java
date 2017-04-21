@@ -26,6 +26,7 @@ import static integration.helper.TestHelper.WRONG_CREATOR_MESSAGE;
 import static integration.helper.TestHelper.WRONG_LAST_MODIFIED_MESSAGE;
 import static integration.helper.TestHelper.WRONG_LAST_MODIFIER_MESSAGE;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
+import static java.lang.System.currentTimeMillis;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -132,7 +133,7 @@ public class ShipmentGroupControllerIT extends BaseControllerIT {
         jsonObject.put("counterpartyUuid", newCounterparty.getUuid().toString());
         String expectedJson = jsonObject.toString();
 
-        long timeStarted = System.currentTimeMillis();
+        long timeStarted = currentTimeMillis();
         String newShipmentGroupIdString =
                 given().
                         contentType("application/json;charset=UTF-8").
@@ -146,7 +147,7 @@ public class ShipmentGroupControllerIT extends BaseControllerIT {
                         path("uuid");
         
         UUID newShipmentGroupId = UUID.fromString(newShipmentGroupIdString);
-        long timeFinished = System.currentTimeMillis();
+        long timeFinished = currentTimeMillis();
 
         // check created data
         ShipmentGroup createdShipmentGroup = shipmentGroupService.getEntityById(newShipmentGroupId, user);
@@ -178,7 +179,7 @@ public class ShipmentGroupControllerIT extends BaseControllerIT {
         jsonObject.put("counterpartyUuid", shipmentGroup.getCounterparty().getUuid().toString());
         String expectedJson = jsonObject.toString();
 
-        long timeStarted = new Date().getTime();
+        long timeStarted = currentTimeMillis();
         given().
                 contentType("application/json;charset=UTF-8").
                 queryParam("token", user.getToken()).
@@ -187,7 +188,7 @@ public class ShipmentGroupControllerIT extends BaseControllerIT {
                 put("/shipment-groups/{uuid}", shipmentGroupUuid.toString()).
         then().
                 statusCode(SC_OK);
-        long timeFinished = new Date().getTime();
+        long timeFinished = currentTimeMillis();
 
         // check updated data
         ShipmentGroup updatedShipmentGroup = shipmentGroupService.getEntityById(shipmentGroupUuid, user);

@@ -66,8 +66,8 @@ public class TestHelper {
     public static final String WRONG_LAST_MODIFIED_MESSAGE = "Entity has wrong last modified time!";
     public static final String NO_CREATOR_MESSAGE = "Entity doesn't have a creator!";
     public static final String NO_LAST_MODIFIER_MESSAGE = "Entity doesn't have a last modifier!";
-    public static final String WRONG_CREATOR_MESSAGE = "Entity was created with wrong user!";
-    public static final String WRONG_LAST_MODIFIER_MESSAGE = "Entity was created with wrong last modifier!";
+    public static final String WRONG_CREATOR_MESSAGE = "Entity was saved with wrong creator!";
+    public static final String WRONG_LAST_MODIFIER_MESSAGE = "Entity was update with wrong last modifier!";
 
     private final ClientService clientService;
     private final AddressService addressService;

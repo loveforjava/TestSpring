@@ -36,6 +36,6 @@ public class ShipmentGroup {
     @JoinColumn(name = "creator_id")
     private User creator;
     @ManyToOne
-    @JoinColumn(name = "modifier_id")
+    @JoinColumn(name = "lastModifier_id")
     private User lastModifier;
 }

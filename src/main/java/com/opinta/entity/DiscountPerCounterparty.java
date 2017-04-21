@@ -44,7 +44,7 @@ public class DiscountPerCounterparty {
     @JoinColumn(name = "creator_id")
     private User creator;
     @ManyToOne
-    @JoinColumn(name = "modifier_id")
+    @JoinColumn(name = "lastModifier_id")
     private User lastModifier;
 
     public DiscountPerCounterparty(Counterparty counterparty, Discount discount, Date fromDate, Date toDate) {

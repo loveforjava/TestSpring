@@ -74,7 +74,7 @@ public class Client {
     @JoinColumn(name = "creator_id")
     private User creator;
     @ManyToOne
-    @JoinColumn(name = "modifier_id")
+    @JoinColumn(name = "lastModifier_id")
     private User lastModifier;
 
     public Client(String name, String uniqueRegistrationNumber, Address address,

@@ -28,6 +28,7 @@ import static integration.helper.TestHelper.WRONG_CREATOR_MESSAGE;
 import static integration.helper.TestHelper.WRONG_LAST_MODIFIED_MESSAGE;
 import static integration.helper.TestHelper.WRONG_LAST_MODIFIER_MESSAGE;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
+import static java.lang.System.currentTimeMillis;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.Matchers.equalTo;
@@ -120,7 +121,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         jsonObject.put("shipmentGroupUuid", shipmentGroup.getUuid().toString());
         String expectedJson = jsonObject.toString();
 
-        long timeStarted = System.currentTimeMillis();
+        long timeStarted = currentTimeMillis();
         String newShipmentUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
@@ -133,7 +134,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
                         body("barcode", RegexMatcher.matches(BARCODE_REGEX)).
                 extract().
                         path("uuid");
-        long timeFinished = System.currentTimeMillis();
+        long timeFinished = currentTimeMillis();
 
         // check created data
         Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid), user);
@@ -163,7 +164,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         jsonObject.put("shipmentGroupUuid", shipmentGroup.getUuid().toString());
         String expectedJson = jsonObject.toString();
 
-        long timeStarted = System.currentTimeMillis();
+        long timeStarted = currentTimeMillis();
         String newShipmentUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
@@ -176,7 +177,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
                         body("barcode", RegexMatcher.matches(BARCODE_REGEX)).
                 extract().
                         path("uuid");
-        long timeFinished = System.currentTimeMillis();
+        long timeFinished = currentTimeMillis();
 
         // check created data
         Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid), user);
@@ -205,7 +206,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         testHelper.adjustClientData((JSONObject) jsonObject.get("recipient"), recipientAddress);
         String inputJson = jsonObject.toJSONString();
 
-        long timeStarted = System.currentTimeMillis();
+        long timeStarted = currentTimeMillis();
         String newShipmentUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
@@ -218,7 +219,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
                         body("barcode", RegexMatcher.matches(BARCODE_REGEX)).
                 extract().
                         path("uuid");
-        long timeFinished = System.currentTimeMillis();
+        long timeFinished = currentTimeMillis();
 
         
         // check created data
@@ -251,7 +252,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         testHelper.adjustClientData((JSONObject) jsonObject.get("recipient"), recipientAddress);
         String inputJson = jsonObject.toJSONString();
 
-        long timeStarted = System.currentTimeMillis();
+        long timeStarted = currentTimeMillis();
         String newShipmentUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
@@ -264,7 +265,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
                         body("barcode", RegexMatcher.matches(BARCODE_REGEX)).
                 extract().
                         path("uuid");
-        long timeFinished = System.currentTimeMillis();
+        long timeFinished = currentTimeMillis();
 
         
         // check created data
@@ -294,7 +295,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         String expectedJson = jsonObject.toString();
         ShipmentDto shipmentDtoBeforeUpdate = shipmentMapper.toDto(shipmentService.getEntityByUuid(shipmentUuid, user));
 
-        long timeStarted = System.currentTimeMillis();
+        long timeStarted = currentTimeMillis();
         given().
                 contentType(APPLICATION_JSON_VALUE).
                 queryParam("token", user.getToken()).
@@ -304,7 +305,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         then().
                 body("barcode", equalTo(shipmentDtoBeforeUpdate.getBarcode())).
                 statusCode(SC_OK);
-        long timeFinished = System.currentTimeMillis();
+        long timeFinished = currentTimeMillis();
 
         // check updated data
         Shipment updatedShipment = shipmentService.getEntityByUuid(shipmentUuid, user);
@@ -339,26 +340,6 @@ public class ShipmentControllerIT extends BaseControllerIT {
                 statusCode(SC_OK);
 
         testHelper.deleteShipment(shipment);
-    }
-
-    @Test
-    public void deleteShipment() throws Exception {
-        given().
-                queryParam("token", user.getToken()).
-        when().
-                delete("/shipments/{uuid}", shipmentUuid.toString()).
-        then().
-                statusCode(SC_OK);
-    }
-
-    @Test
-    public void deleteShipment_notFound() throws Exception {
-        given().
-                queryParam("token", user.getToken()).
-        when().
-                delete("/shipments/{uuid}", UUID.randomUUID().toString()).
-        then().
-                statusCode(SC_NOT_FOUND);
     }
 
     private void checkDatesModifierAndCreator(long timeStarted, long timeFinished, Shipment createdShipment) {

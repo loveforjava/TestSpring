@@ -16,6 +16,7 @@ import java.util.UUID;
 import static integration.helper.TestHelper.WRONG_CREATED_MESSAGE;
 import static integration.helper.TestHelper.WRONG_LAST_MODIFIED_MESSAGE;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
+import static java.lang.System.currentTimeMillis;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
@@ -35,7 +36,7 @@ public class UserControllerIT extends BaseControllerIT {
         jsonObject.put("counterpartyUuid", testHelper.createCounterparty().getUuid().toString());
         String expectedJson = jsonObject.toString();
 
-        long timeStarted = System.currentTimeMillis();
+        long timeStarted = currentTimeMillis();
         MockMvcResponse response =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
@@ -47,7 +48,7 @@ public class UserControllerIT extends BaseControllerIT {
                         statusCode(SC_OK).
                 extract()
                         .response();
-        long timeFinished = System.currentTimeMillis();
+        long timeFinished = currentTimeMillis();
 
         User createdUser = userService.getEntityByToken(UUID.fromString(response.path("token")));
         long timeCreated = createdUser.getCreated().getTime();

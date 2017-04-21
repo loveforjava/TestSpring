@@ -20,6 +20,7 @@ import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
 import static java.lang.Integer.MIN_VALUE;
 
+import static java.lang.System.currentTimeMillis;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 
@@ -83,7 +84,7 @@ public class AddressControllerIT extends BaseControllerIT {
         // create
         JSONObject expectedJson = testHelper.getJsonObjectFromFile("json/address.json");
 
-        long timeStarted = System.currentTimeMillis();
+        long timeStarted = currentTimeMillis();
         int newAddressId =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
@@ -95,7 +96,7 @@ public class AddressControllerIT extends BaseControllerIT {
                         body("countryside", equalTo(false)).
                 extract().
                         path("id");
-        long timeFinished = System.currentTimeMillis();
+        long timeFinished = currentTimeMillis();
 
         // check created data
         Address createdAddress = addressService.getEntityById(newAddressId);
@@ -151,7 +152,7 @@ public class AddressControllerIT extends BaseControllerIT {
         // update data
         JSONObject expectedJson = testHelper.getJsonObjectFromFile("json/address.json");
 
-        long timeStarted = System.currentTimeMillis();
+        long timeStarted = currentTimeMillis();
         given().
                 contentType(APPLICATION_JSON_VALUE).
                 body(expectedJson.toString()).
@@ -159,7 +160,7 @@ public class AddressControllerIT extends BaseControllerIT {
                 put("/addresses/{id}", addressId).
         then().
                 statusCode(SC_OK);
-        long timeFinished = System.currentTimeMillis();
+        long timeFinished = currentTimeMillis();
 
         // check if updated
         Address updatedAddress = addressService.getEntityById(addressId);
