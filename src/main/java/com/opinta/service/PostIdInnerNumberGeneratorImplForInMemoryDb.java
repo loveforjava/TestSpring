@@ -9,7 +9,7 @@ import static java.lang.String.format;
 @Slf4j
 @Service
 @Profile("memory")
-public class PostIdInnerNumberGeneratorInMemoryDB implements PostIdInnerNumberGenerator {
+public class PostIdInnerNumberGeneratorImplForInMemoryDb implements PostIdInnerNumberGenerator {
     private static int number = 0;
     
     @Override
