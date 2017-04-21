@@ -22,6 +22,7 @@ import static integration.helper.TestHelper.WRONG_CREATED_MESSAGE;
 import static integration.helper.TestHelper.WRONG_LAST_MODIFIED_MESSAGE;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
+import static java.lang.System.currentTimeMillis;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -83,7 +84,7 @@ public class PostcodePoolIT extends BaseControllerIT {
         JSONObject inputJson = testHelper.getJsonObjectFromFile("json/postcode-pool.json");
         String postCode = (String) inputJson.get("postcode");
 
-        long timeStarted = System.currentTimeMillis();
+        long timeStarted = currentTimeMillis();
         MockMvcResponse response =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
@@ -95,7 +96,7 @@ public class PostcodePoolIT extends BaseControllerIT {
                         body("postcode", equalTo(postCode)).
                 extract().
                         response();
-        long timeFinished = System.currentTimeMillis();
+        long timeFinished = currentTimeMillis();
 
         // check created data
         PostcodePool createdPostcodePool = postcodePoolService.getEntityByUuid(UUID.fromString(response.path("uuid")));
@@ -123,7 +124,7 @@ public class PostcodePoolIT extends BaseControllerIT {
 
         String postCode = (String) inputJson.get("postcode");
 
-        long timeStarted = System.currentTimeMillis();
+        long timeStarted = currentTimeMillis();
         given().
                 contentType(APPLICATION_JSON_VALUE).
                 body(inputJson).
@@ -132,7 +133,7 @@ public class PostcodePoolIT extends BaseControllerIT {
         then().
                 contentType(APPLICATION_JSON_VALUE).
                 statusCode(SC_OK);
-        long timeFinished = System.currentTimeMillis();
+        long timeFinished = currentTimeMillis();
 
         JSONParser parser = new JSONParser();
         JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
