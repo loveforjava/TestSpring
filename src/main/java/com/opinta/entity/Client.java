@@ -16,7 +16,12 @@ import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
 
+import static com.opinta.constraint.RegexPattern.BANK_ACCOUNT_LENGTH;
 import static com.opinta.constraint.RegexPattern.BANK_CODE_LENGTH;
+import static com.opinta.constraint.RegexPattern.CLIENT_NAME_LENGTH;
+import static com.opinta.constraint.RegexPattern.CLIENT_UNIQUE_REGISTRATION_NUMBER_LENGTH;
+import static com.opinta.constraint.RegexPattern.EXTERNAL_ID_LENGTH;
+import static com.opinta.constraint.RegexPattern.POST_ID_LENGTH;
 
 import static java.lang.String.join;
 
@@ -29,10 +34,19 @@ public class Client {
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     private UUID uuid;
+    @Size(max = CLIENT_NAME_LENGTH)
     private String name;
+    @Size(max = CLIENT_NAME_LENGTH)
     private String firstName;
+    @Size(max = CLIENT_NAME_LENGTH)
     private String middleName;
+    @Size(max = CLIENT_NAME_LENGTH)
     private String lastName;
+    @Size(min = POST_ID_LENGTH, max = POST_ID_LENGTH)
+    private String postId;
+    @Size(max = EXTERNAL_ID_LENGTH)
+    private String externalId;
+    @Size(max = CLIENT_UNIQUE_REGISTRATION_NUMBER_LENGTH)
     private String uniqueRegistrationNumber;
     @ManyToOne
     @JoinColumn(name = "address_id")
@@ -46,7 +60,7 @@ public class Client {
     private boolean individual;
     @Size(min = BANK_CODE_LENGTH, max = BANK_CODE_LENGTH)
     private String bankCode;
-    @Size(max = 255)
+    @Size(max = BANK_ACCOUNT_LENGTH)
     private String bankAccount;
 
     public Client(String name, String uniqueRegistrationNumber, Address address,

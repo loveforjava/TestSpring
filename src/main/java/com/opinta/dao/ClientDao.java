@@ -14,6 +14,10 @@ public interface ClientDao {
     List<Client> getAllByCounterparty(Counterparty counterparty);
 
     Client getByUuid(UUID uuid);
+    
+    Client getByPostId(String postId);
+    
+    String getNextPostIdInnerNumber();
 
     Client save(Client client);
 
