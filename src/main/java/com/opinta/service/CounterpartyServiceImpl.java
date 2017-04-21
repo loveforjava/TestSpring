@@ -1,6 +1,5 @@
 package com.opinta.service;
 
-import com.opinta.dao.ClientDao;
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.PostcodePool;
 import com.opinta.entity.User;
@@ -22,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static com.opinta.util.AuthorizationUtil.authorizeForAction;
 import static com.opinta.util.EnhancedBeanUtilsBean.copyNotNullProperties;
 import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
@@ -37,18 +37,13 @@ public class CounterpartyServiceImpl implements CounterpartyService {
     private final CounterpartyDao counterpartyDao;
     private final CounterpartyMapper counterpartyMapper;
     private final PostcodePoolService postcodePoolService;
-    private final UserService userService;
-    private final ClientDao clientDao;
 
     @Autowired
     public CounterpartyServiceImpl(CounterpartyDao counterpartyDao, CounterpartyMapper counterpartyMapper,
-                                   PostcodePoolService postcodePoolService, UserService userService,
-                                   ClientDao clientDao) {
+                                   PostcodePoolService postcodePoolService) {
         this.counterpartyDao = counterpartyDao;
         this.counterpartyMapper = counterpartyMapper;
         this.postcodePoolService = postcodePoolService;
-        this.userService = userService;
-        this.clientDao = clientDao;
     }
 
     @Override
@@ -67,7 +62,7 @@ public class CounterpartyServiceImpl implements CounterpartyService {
             log.error(getByIdOnErrorLogEndpoint(Counterparty.class, uuid));
             throw new IncorrectInputDataException(getByIdOnErrorLogEndpoint(Counterparty.class, uuid));
         }
-        userService.authorizeForAction(counterparty, user);
+        authorizeForAction(counterparty, user);
         return counterparty;
     }
 

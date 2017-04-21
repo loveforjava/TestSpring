@@ -1,7 +1,9 @@
 package com.opinta.controller;
 
 import com.opinta.dto.UserDto;
+import com.opinta.entity.Client;
 import com.opinta.entity.User;
+import com.opinta.exception.AuthException;
 import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import static com.opinta.util.LogMessageUtil.saveOnErrorLogEndpoint;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 @RestController
@@ -35,6 +38,8 @@ public class UserController extends BaseController {
             return new ResponseEntity<>(userService.save(userDto), OK);
         } catch (IncorrectInputDataException e) {
             return new ResponseEntity<>(saveOnErrorLogEndpoint(User.class, userDto, e), BAD_REQUEST);
+        } catch (AuthException e) {
+            return new ResponseEntity<>(saveOnErrorLogEndpoint(Client.class, e), UNAUTHORIZED);
         }
     }
 }

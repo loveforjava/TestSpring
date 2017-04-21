@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static com.opinta.util.AuthorizationUtil.authorizeForAction;
 import static com.opinta.util.EnhancedBeanUtilsBean.copyNotNullProperties;
 import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
@@ -36,18 +37,16 @@ public class DiscountPerCounterpartyServiceImpl implements DiscountPerCounterpar
     private final DiscountPerCounterpartyMapper discountPerCounterpartyMapper;
     private final CounterpartyService counterpartyService;
     private final DiscountService discountService;
-    private final UserService userService;
 
     @Autowired
     public DiscountPerCounterpartyServiceImpl(DiscountPerCounterpartyDao discountPerCounterpartyDao,
                                               DiscountPerCounterpartyMapper discountPerCounterpartyMapper,
                                               CounterpartyService counterpartyService,
-                                              DiscountService discountService, UserService userService) {
+                                              DiscountService discountService) {
         this.discountPerCounterpartyDao = discountPerCounterpartyDao;
         this.discountPerCounterpartyMapper = discountPerCounterpartyMapper;
         this.counterpartyService = counterpartyService;
         this.discountService = discountService;
-        this.userService = userService;
     }
 
     @Override
@@ -68,7 +67,7 @@ public class DiscountPerCounterpartyServiceImpl implements DiscountPerCounterpar
             throw new IncorrectInputDataException(getByIdOnErrorLogEndpoint(DiscountPerCounterparty.class, uuid));
         }
 
-        userService.authorizeForAction(discountPerCounterparty, user);
+        authorizeForAction(discountPerCounterparty, user);
 
         return discountPerCounterpartyDao.getByUuid(uuid);
     }

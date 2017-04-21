@@ -35,6 +35,8 @@ import org.apache.pdfbox.pdmodel.interactive.form.PDTextField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.UUID;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -44,17 +46,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 
-import static com.google.zxing.BarcodeFormat.CODE_128;
 import static java.awt.Color.GRAY;
 import static java.awt.Color.LIGHT_GRAY;
 import static java.lang.Math.round;
 import static java.lang.String.format;
+
+import static com.google.zxing.BarcodeFormat.CODE_128;
+import static com.opinta.util.AuthorizationUtil.authorizeForAction;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.rightPad;
 import static org.apache.pdfbox.pdmodel.PDPageContentStream.AppendMode.APPEND;
-
-import java.util.List;
-import java.util.UUID;
 
 @Service
 @Slf4j
@@ -68,18 +69,15 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
 
     private final ShipmentService shipmentService;
     private final ShipmentGroupService shipmentGroupService;
-    private final UserService userService;
 
     private PDDocument template;
     private PDTextField field;
     private String fontName;
 
     @Autowired
-    public PDFGeneratorServiceImpl(ShipmentService shipmentService, ShipmentGroupService shipmentGroupService,
-                                   UserService userService) {
+    public PDFGeneratorServiceImpl(ShipmentService shipmentService, ShipmentGroupService shipmentGroupService) {
         this.shipmentService = shipmentService;
         this.shipmentGroupService = shipmentGroupService;
-        this.userService = userService;
         this.moneyToTextConverter = new MoneyToTextConverter();
     }
 
@@ -363,7 +361,7 @@ public class PDFGeneratorServiceImpl implements PDFGeneratorService {
             throws AuthException, IncorrectInputDataException, IOException {
         Shipment shipment = shipmentService.getEntityByUuid(shipmentId, user);
 
-        userService.authorizeForAction(shipment, user);
+        authorizeForAction(shipment, user);
 
         byte[] output = generateLabel(shipment);
         BigDecimal postPay = shipment.getPostPay();
