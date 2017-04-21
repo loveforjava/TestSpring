@@ -39,9 +39,6 @@ public class BarcodeInnerNumber {
     @ManyToOne
     @JoinColumn(name = "creator_id")
     private User creator;
-    @ManyToOne
-    @JoinColumn(name = "modifier_id")
-    private User lastModifier;
 
     public String stringify() {
         return postcodePool.getPostcode() + innerNumber;
