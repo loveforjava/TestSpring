@@ -65,7 +65,9 @@ public class AddressServiceImpl implements AddressService {
     @Transactional
     public Address saveEntity(Address address) {
         log.info(saveLogEndpoint(Address.class, address));
-        address.setCreated(new Date());
+        Date date = new Date();
+        address.setCreated(date);
+        address.setLastModified(date);
         CountrysidePostcode countrysidePostcode = countrysidePostcodeDao.getByPostcode(address.getPostcode());
         address.setCountryside(countrysidePostcode != null);
         return addressDao.save(address);
@@ -86,7 +88,7 @@ public class AddressServiceImpl implements AddressService {
         CountrysidePostcode countrysidePostcode = countrysidePostcodeDao.getByPostcode(target.getPostcode());
         target.setCountryside(countrysidePostcode != null);
         log.info(updateLogEndpoint(Address.class, target));
-        target.setCreated(new Date());
+        target.setLastModified(new Date());
         addressDao.update(target);
         return target;
     }

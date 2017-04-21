@@ -26,6 +26,7 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
@@ -86,6 +87,7 @@ public class DiscountControllerIT extends BaseControllerIT {
         // create
         JSONObject inputJson = testHelper.getJsonObjectFromFile("json/discount.json");
 
+        long timeStarted = System.currentTimeMillis();
         String newUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
@@ -96,18 +98,24 @@ public class DiscountControllerIT extends BaseControllerIT {
                         statusCode(SC_OK).
                 extract().
                         path("uuid");
-
+        long timeFinished = System.currentTimeMillis();
         UUID newDiscountUuid = UUID.fromString(newUuid);
 
         // check created data
         JSONParser parser = new JSONParser();
         JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
 
-        Discount discount = discountService.getEntityByUuid(newDiscountUuid);
+        Discount createdDiscount = discountService.getEntityByUuid(newDiscountUuid);
+        long timeCreated = createdDiscount.getCreated().getTime();
+        long timeModified = createdDiscount.getLastModified().getTime();
+
+        assertTrue("Discount has wrong created time", (timeFinished > timeCreated && timeCreated > timeStarted));
+        assertTrue("Discount has wrong modified time on creation", (timeFinished > timeModified && timeModified > timeStarted));
+
         ObjectMapper mapper = new ObjectMapper();
-        JSONObject actualJson = (JSONObject) parser.parse(mapper.writeValueAsString(discount));
-        actualJson.put("fromDate", simpleDateFormat.format(discount.getFromDate()));
-        actualJson.put("toDate", simpleDateFormat.format(discount.getToDate()));
+        JSONObject actualJson = (JSONObject) parser.parse(mapper.writeValueAsString(createdDiscount));
+        actualJson.put("fromDate", simpleDateFormat.format(createdDiscount.getFromDate()));
+        actualJson.put("toDate", simpleDateFormat.format(createdDiscount.getToDate()));
 
         JSONAssert.assertEquals(expectedJson.toString(), actualJson.toString(), false);
 
@@ -121,6 +129,7 @@ public class DiscountControllerIT extends BaseControllerIT {
         UUID discountUuid = discounts.get(0).getUuid();
 
         // update data
+        long timeStarted = System.currentTimeMillis();
         JSONObject inputJson = testHelper.getJsonObjectFromFile("json/discount.json");
 
         given().
@@ -130,16 +139,21 @@ public class DiscountControllerIT extends BaseControllerIT {
                 put("/discounts/{uuid}", discountUuid).
         then().
                 statusCode(SC_OK);
+        long timeFinished = System.currentTimeMillis();
 
         // check updated data
         JSONParser parser = new JSONParser();
         JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
 
-        Discount discount = discountService.getEntityByUuid(discountUuid);
+        Discount updatedDiscount = discountService.getEntityByUuid(discountUuid);
+        long timeModified = updatedDiscount.getLastModified().getTime();
+
+        assertTrue("Discount has wrong modified time", (timeFinished > timeModified && timeModified > timeStarted));
+
         ObjectMapper mapper = new ObjectMapper();
-        JSONObject actualJson = (JSONObject) parser.parse(mapper.writeValueAsString(discount));
-        actualJson.put("fromDate", simpleDateFormat.format(discount.getFromDate()));
-        actualJson.put("toDate", simpleDateFormat.format(discount.getToDate()));
+        JSONObject actualJson = (JSONObject) parser.parse(mapper.writeValueAsString(updatedDiscount));
+        actualJson.put("fromDate", simpleDateFormat.format(updatedDiscount.getFromDate()));
+        actualJson.put("toDate", simpleDateFormat.format(updatedDiscount.getToDate()));
 
         JSONAssert.assertEquals(expectedJson.toString(), actualJson.toString(), false);
     }

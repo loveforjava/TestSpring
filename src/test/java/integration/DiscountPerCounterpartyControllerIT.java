@@ -12,12 +12,12 @@ import com.opinta.entity.DiscountPerCounterparty;
 import com.opinta.entity.User;
 import com.opinta.mapper.DiscountPerCounterpartyMapper;
 import com.opinta.service.DiscountPerCounterpartyService;
-import com.opinta.service.UserService;
 import integration.helper.TestHelper;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import static com.opinta.util.FormatterUtil.DATE_FORMAT_ISO_8601_24H;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import org.junit.After;
 import org.junit.Before;
@@ -33,6 +33,8 @@ import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -97,6 +99,7 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
         inputJson.put("discountUuid", newDiscount.getUuid().toString());
         inputJson.put("counterpartyUuid", counterparty.getUuid().toString());
 
+        long timeStarted = System.currentTimeMillis();
         String newUuid =
                 given().
                         queryParam("token", user.getToken()).
@@ -108,13 +111,27 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
                         statusCode(SC_OK).
                 extract().
                         path("uuid");
-    
+        long timeFinished = System.currentTimeMillis();
         UUID newDiscountUuid = UUID.fromString(newUuid);
 
-        DiscountPerCounterparty discountPerCounterparty = discountPerCounterpartyService.
+        DiscountPerCounterparty createdDiscountPerCounterparty = discountPerCounterpartyService.
                 getEntityByUuid(newDiscountUuid, user);
         DiscountPerCounterpartyDto discountPerCounterpartyDto = discountPerCounterpartyMapper.
-                toDto(discountPerCounterparty);
+                toDto(createdDiscountPerCounterparty);
+        long timeCreated = createdDiscountPerCounterparty.getCreated().getTime();
+        long timeModified = createdDiscountPerCounterparty.getLastModified().getTime();
+
+        assertTrue("DiscountPerCounterparty has wrong created time",
+                (timeFinished > timeCreated && timeCreated > timeStarted));
+        assertTrue("DiscountPerCounterparty has wrong modified time on creation",
+                (timeFinished > timeModified && timeModified > timeStarted));
+        assertNotNull("DiscountPerCounterparty doesn't have a creator", createdDiscountPerCounterparty.getCreator());
+        assertNotNull("DiscountPerCounterparty doesn't have a modifier on creation!",
+                createdDiscountPerCounterparty.getLastModifier());
+        assertThat("DiscountPerCounterparty was created with wrong user!",
+                createdDiscountPerCounterparty.getCreator().getToken(), equalTo(user.getToken()));
+        assertThat("DiscountPerCounterparty was created with wrong modifier!",
+                createdDiscountPerCounterparty.getLastModifier().getToken(), equalTo(user.getToken()));
 
         JSONObject expectedJson = (JSONObject) jsonParser.parse(inputJson.toJSONString());
         expectedJson.put("uuid", discountPerCounterpartyDto.getUuid());
@@ -134,7 +151,8 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
         JSONObject inputJson = testHelper.getJsonObjectFromFile("json/discount-per-counterparty.json");
         inputJson.put("discountUuid", newDiscount.getUuid().toString());
         inputJson.put("counterpartyUuid", counterparty.getUuid().toString());
-        
+
+        long timeStarted = System.currentTimeMillis();
         given().
                 queryParam("token", user.getToken()).
                 contentType(APPLICATION_JSON_VALUE).
@@ -144,9 +162,17 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
         then().
                 body("discountUuid", equalTo(newDiscount.getUuid().toString())).
                 statusCode(SC_OK);
-    
+        long timeFinished = System.currentTimeMillis();
+
         DiscountPerCounterparty updatedDiscountPerCounterparty = discountPerCounterpartyService
                 .getEntityByUuid(discountPerCounterparty.getUuid(), user);
+        long timeModified = updatedDiscountPerCounterparty.getLastModified().getTime();
+
+        assertTrue("DiscountPerCounterparty has wrong modified time",
+                (timeFinished > timeModified && timeModified > timeStarted));
+        assertNotNull("DiscountPerCounterparty doesn't have a modifier", updatedDiscountPerCounterparty.getCreator());
+        assertThat("DiscountPerCounterparty was updated with wrong user!",
+                updatedDiscountPerCounterparty.getLastModifier().getToken(), equalTo(user.getToken()));
 
         assertEquals(updatedDiscountPerCounterparty.getDiscount().getUuid(), newDiscount.getUuid());
     }

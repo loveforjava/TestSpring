@@ -12,7 +12,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 
 import static integration.helper.TestHelper.SAME_REGION_COUNTRYSIDE;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
@@ -23,6 +22,7 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
@@ -81,6 +81,7 @@ public class AddressControllerIT extends BaseControllerIT {
         // create
         JSONObject expectedJson = testHelper.getJsonObjectFromFile("json/address.json");
 
+        long timeStarted = System.currentTimeMillis();
         int newAddressId =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
@@ -92,11 +93,18 @@ public class AddressControllerIT extends BaseControllerIT {
                         body("countryside", equalTo(false)).
                 extract().
                         path("id");
+        long timeFinished = System.currentTimeMillis();
 
         // check created data
-        Address address = addressService.getEntityById(newAddressId);
+        Address createdAddress = addressService.getEntityById(newAddressId);
+        long timeCreated = createdAddress.getCreated().getTime();
+        long timeModified = createdAddress.getLastModified().getTime();
+
+        assertTrue("Address has wrong created time", (timeFinished > timeCreated && timeCreated > timeStarted));
+        assertTrue("Address has wrong modified time on creation", (timeFinished > timeModified && timeModified > timeStarted));
+
         ObjectMapper mapper = new ObjectMapper();
-        String actualJson = mapper.writeValueAsString(address);
+        String actualJson = mapper.writeValueAsString(createdAddress);
         expectedJson.put("countryside", false);
 
         JSONAssert.assertEquals(expectedJson.toString(), actualJson, false);
@@ -141,6 +149,7 @@ public class AddressControllerIT extends BaseControllerIT {
         // update data
         JSONObject expectedJson = testHelper.getJsonObjectFromFile("json/address.json");
 
+        long timeStarted = System.currentTimeMillis();
         given().
                 contentType(APPLICATION_JSON_VALUE).
                 body(expectedJson.toString()).
@@ -148,11 +157,16 @@ public class AddressControllerIT extends BaseControllerIT {
                 put("/addresses/{id}", addressId).
         then().
                 statusCode(SC_OK);
+        long timeFinished = System.currentTimeMillis();
 
         // check if updated
-        Address address = addressService.getEntityById(addressId);
+        Address updatedAddress = addressService.getEntityById(addressId);
+        long timeModified = updatedAddress.getLastModified().getTime();
+
+        assertTrue("Address has wrong modified time", (timeFinished > timeModified && timeModified > timeStarted));
+
         ObjectMapper mapper = new ObjectMapper();
-        String actualJson = mapper.writeValueAsString(address);
+        String actualJson = mapper.writeValueAsString(updatedAddress);
 
         JSONAssert.assertEquals(expectedJson.toString(), actualJson, false);
     }

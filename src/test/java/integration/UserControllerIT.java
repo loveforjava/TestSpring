@@ -11,13 +11,11 @@ import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Date;
 import java.util.UUID;
 
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static org.hamcrest.Matchers.lessThan;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 public class UserControllerIT extends BaseControllerIT {
@@ -35,6 +33,7 @@ public class UserControllerIT extends BaseControllerIT {
         jsonObject.put("counterpartyUuid", testHelper.createCounterparty().getUuid().toString());
         String expectedJson = jsonObject.toString();
 
+        long timeStarted = System.currentTimeMillis();
         MockMvcResponse response =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
@@ -46,11 +45,14 @@ public class UserControllerIT extends BaseControllerIT {
                         statusCode(SC_OK).
                 extract()
                         .response();
+        long timeFinished = System.currentTimeMillis();
 
         User createdUser = userService.getEntityByToken(UUID.fromString(response.path("token")));
         long timeCreated = createdUser.getCreated().getTime();
-        long currentTime = new Date().getTime();
-        assertThat("User was created more than 30 seconds ago!", (currentTime - timeCreated), lessThan(30000L));
+        long timeModified = createdUser.getLastModified().getTime();
+
+        assertTrue("User has wrong created time", (timeFinished > timeCreated && timeCreated > timeStarted));
+        assertTrue("User has wrong modified time on creation", (timeFinished > timeModified && timeModified > timeStarted));
 
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(userMapper.toDto(createdUser));

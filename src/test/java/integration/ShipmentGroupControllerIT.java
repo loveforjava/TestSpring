@@ -8,7 +8,6 @@ import com.opinta.entity.ShipmentGroup;
 import com.opinta.entity.User;
 import com.opinta.mapper.ShipmentGroupMapper;
 import com.opinta.service.ShipmentGroupService;
-import com.opinta.service.UserService;
 import integration.helper.TestHelper;
 import org.json.simple.JSONObject;
 import org.junit.After;
@@ -24,7 +23,6 @@ import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -128,6 +126,7 @@ public class ShipmentGroupControllerIT extends BaseControllerIT {
         jsonObject.put("counterpartyUuid", newCounterparty.getUuid().toString());
         String expectedJson = jsonObject.toString();
 
+        long timeStarted = System.currentTimeMillis();
         String newShipmentGroupIdString =
                 given().
                         contentType("application/json;charset=UTF-8").
@@ -141,16 +140,22 @@ public class ShipmentGroupControllerIT extends BaseControllerIT {
                         path("uuid");
         
         UUID newShipmentGroupId = UUID.fromString(newShipmentGroupIdString);
+        long timeFinished = System.currentTimeMillis();
 
         // check created data
         ShipmentGroup createdShipmentGroup = shipmentGroupService.getEntityById(newShipmentGroupId, user);
         long timeCreated = createdShipmentGroup.getCreated().getTime();
-        long currentTime = new Date().getTime();
-        assertThat("Shipment group was created more than 30 seconds ago!", (currentTime - timeCreated),
-                lessThan(30000L));
+        long timeModified = createdShipmentGroup.getLastModified().getTime();
+
+        assertTrue("Shipment group has wrong created time", (timeFinished > timeCreated && timeCreated > timeStarted));
+        assertTrue("Shipment group has wrong modified time on creation",
+                (timeFinished > timeModified && timeModified > timeStarted));
         assertNotNull("Shipment group doesn't have a creator!", createdShipmentGroup.getCreator());
-        assertTrue("Shipment group was created with wrong user!",
-                createdShipmentGroup.getCreator().getToken().equals(user.getToken()));
+        assertNotNull("Shipment group doesn't have a modifier on creation!", createdShipmentGroup.getLastModifier());
+        assertThat("Shipment group was created with wrong user!",
+                createdShipmentGroup.getCreator().getToken(), equalTo(user.getToken()));
+        assertThat("Shipment group was created with wrong modifier!",
+                createdShipmentGroup.getLastModifier().getToken(), equalTo(user.getToken()));
 
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(shipmentGroupMapper.toDto(createdShipmentGroup));
@@ -169,6 +174,7 @@ public class ShipmentGroupControllerIT extends BaseControllerIT {
         jsonObject.put("counterpartyUuid", shipmentGroup.getCounterparty().getUuid().toString());
         String expectedJson = jsonObject.toString();
 
+        long timeStarted = new Date().getTime();
         given().
                 contentType("application/json;charset=UTF-8").
                 queryParam("token", user.getToken()).
@@ -177,16 +183,16 @@ public class ShipmentGroupControllerIT extends BaseControllerIT {
                 put("/shipment-groups/{uuid}", shipmentGroupUuid.toString()).
         then().
                 statusCode(SC_OK);
+        long timeFinished = new Date().getTime();
 
         // check updated data
         ShipmentGroup updatedShipmentGroup = shipmentGroupService.getEntityById(shipmentGroupUuid, user);
-        long timeCreated = updatedShipmentGroup.getLastModified().getTime();
-        long currentTime = new Date().getTime();
-        assertThat("Shipment group was modified more than 30 seconds ago!", (currentTime - timeCreated),
-                lessThan(30000L));
+        long timeModified = updatedShipmentGroup.getLastModified().getTime();
+
+        assertTrue("Shipment group has wrong modified time", (timeFinished > timeModified && timeModified > timeStarted));
         assertNotNull("Shipment group doesn't have a modifier", updatedShipmentGroup.getLastModifier());
-        assertTrue("Shipment group was updated with wrong user!",
-                updatedShipmentGroup.getLastModifier().getToken().equals(user.getToken()));
+        assertThat("Shipment group was updated with wrong user!",
+                updatedShipmentGroup.getLastModifier().getToken(), equalTo(user.getToken()));
 
         ShipmentGroupDto shipmentGroupDto = shipmentGroupMapper.toDto(updatedShipmentGroup);
         ObjectMapper mapper = new ObjectMapper();

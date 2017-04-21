@@ -83,7 +83,7 @@ public class DiscountServiceImpl implements DiscountService {
     @Override
     @Transactional
     public DiscountDto save(DiscountDto dto) {
-        return discountMapper.toDto(discountDao.save(discountMapper.toEntity(dto)));
+        return discountMapper.toDto(saveEntity(discountMapper.toEntity(dto)));
     }
 
     @Override

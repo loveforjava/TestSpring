@@ -33,6 +33,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 public class CounterpartyControllerIT extends BaseControllerIT {
@@ -47,11 +48,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
     @Autowired
     private CounterpartyMapper counterpartyMapper;
     @Autowired
-    private UserService userService;
-    @Autowired
     private TestHelper testHelper;
-    @Autowired
-    private ClientService clientService;
     @Autowired
     private PostcodePoolService postcodePoolService;
 
@@ -111,6 +108,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
         jsonObject.put("postcodePoolUuid", testHelper.createPostcodePool().getUuid().toString());
         String expectedJson = jsonObject.toString();
 
+        long timeStarted = System.currentTimeMillis();
         MockMvcResponse response =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
@@ -122,8 +120,16 @@ public class CounterpartyControllerIT extends BaseControllerIT {
                         statusCode(SC_OK).
                 extract()
                         .response();
+        long timeFinished = System.currentTimeMillis();
         //check created data
-        Counterparty createdCounterparty = counterpartyService.getEntityByUuidAnonymous(UUID.fromString(response.path("uuid")));
+        Counterparty createdCounterparty = counterpartyService
+                .getEntityByUuidAnonymous(UUID.fromString(response.path("uuid")));
+        long timeCreated = createdCounterparty.getCreated().getTime();
+        long timeModified = createdCounterparty.getLastModified().getTime();
+
+        assertTrue("Counterparty has wrong created time on creation", (timeFinished > timeCreated && timeCreated > timeStarted));
+        assertTrue("Counterparty has wrong modified time", (timeFinished > timeModified && timeModified > timeStarted));
+
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(counterpartyMapper.toDto(createdCounterparty));
         JSONAssert.assertEquals(expectedJson, actualJson, false);
@@ -195,6 +201,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
         jsonObject.put("postcodePoolUuid", counterparty.getPostcodePool().getUuid().toString());
         String expectedJson = jsonObject.toString();
 
+        long timeStarted = System.currentTimeMillis();
         given().
                 contentType(APPLICATION_JSON_VALUE).
                 queryParam("token", user.getToken()).
@@ -204,10 +211,18 @@ public class CounterpartyControllerIT extends BaseControllerIT {
         then().
                 contentType(APPLICATION_JSON_VALUE).
                 statusCode(SC_OK);
+        long timeFinished = System.currentTimeMillis();
 
         // check updated data
-        CounterpartyDto counterpartyDto = counterpartyMapper.toDto(counterpartyService.getEntityByUuid(
-                counterpartyUuid, user));
+        Counterparty updatedCounterparty = counterpartyService.getEntityByUuid(counterpartyUuid, user);
+        CounterpartyDto counterpartyDto = counterpartyMapper.toDto(updatedCounterparty);
+        long timeModified = updatedCounterparty.getLastModified().getTime();
+
+        assertTrue("Counterparty has wrong modified time", (timeFinished > timeModified && timeModified > timeStarted));
+        assertNotNull("Counterparty doesn't have a modifier", updatedCounterparty.getLastModifier());
+        assertThat("Counterparty was updated with wrong user!",
+                updatedCounterparty.getLastModifier().getToken(), equalTo(user.getToken()));
+
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(counterpartyDto);
 

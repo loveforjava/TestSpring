@@ -1,12 +1,10 @@
 package integration;
 
-import java.util.Date;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opinta.entity.Address;
 import com.opinta.entity.Client;
-import com.opinta.entity.Counterparty;
 import com.opinta.entity.User;
 import com.opinta.mapper.ClientMapper;
 import com.opinta.service.ClientService;
@@ -42,8 +40,6 @@ public class ClientControllerIT extends BaseControllerIT {
     private ClientService clientService;
     @Autowired
     private ClientMapper clientMapper;
-    @Autowired
-    private UserService userService;
     @Autowired
     private TestHelper testHelper;
 
@@ -106,6 +102,7 @@ public class ClientControllerIT extends BaseControllerIT {
         String lastName = (String) inputJson.get("lastName");
         String expectedFullName = join(" ", lastName, firstName, middleName);
 
+        long timeStarted = System.currentTimeMillis();
         String newUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
@@ -121,6 +118,7 @@ public class ClientControllerIT extends BaseControllerIT {
                         body("lastName", equalTo(lastName)).
                 extract().
                         path("uuid");
+        long timeFinished = System.currentTimeMillis();
 
         JSONParser parser = new JSONParser();
         JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
@@ -131,12 +129,13 @@ public class ClientControllerIT extends BaseControllerIT {
         // check created data
         Client createdClient = clientService.getEntityByUuid(newClientUuid, user);
         long timeCreated = createdClient.getCreated().getTime();
-        long currentTime = new Date().getTime();
-        assertThat("Shipment was created more than 30 seconds ago!", (currentTime - timeCreated),
-                lessThan(30000L));
-        assertNotNull("Shipment doesn't have a creator", createdClient.getCreator());
-        assertTrue("Shipment was created with wrong user!",
-                createdClient.getCreator().getToken().equals(user.getToken()));
+        long timeModified = createdClient.getLastModified().getTime();
+
+        assertTrue("Client has wrong created time", (timeFinished > timeCreated && timeCreated > timeStarted));
+        assertTrue("Client has wrong modified time", (timeFinished > timeModified && timeModified > timeStarted));
+        assertNotNull("Client doesn't have a creator", createdClient.getCreator());
+        assertNotNull("Client doesn't have a modifier on creation!", createdClient.getLastModifier());
+        assertThat("Client was created with wrong user!", createdClient.getCreator().getToken(), equalTo(user.getToken()));
 
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientMapper.toDto(createdClient));
@@ -159,6 +158,7 @@ public class ClientControllerIT extends BaseControllerIT {
 
         String expectedFullName = (String) inputJson.get("name");
 
+        long timeStarted = System.currentTimeMillis();
         String newUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
@@ -174,6 +174,7 @@ public class ClientControllerIT extends BaseControllerIT {
                         body("lastName", equalTo("")).
                 extract().
                         path("uuid");
+        long timeFinished = System.currentTimeMillis();
 
         JSONParser parser = new JSONParser();
         JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
@@ -187,6 +188,19 @@ public class ClientControllerIT extends BaseControllerIT {
         // check created data
         Client createdClient = clientService.getEntityByUuid(newClientUuid,
                 user);
+        long timeCreated = createdClient.getCreated().getTime();
+        long timeModified = createdClient.getLastModified().getTime();
+
+        assertTrue("Client has wrong created time", (timeFinished > timeCreated && timeCreated > timeStarted));
+        assertTrue("Client has wrong modified time on creation",
+                (timeFinished > timeModified && timeModified > timeStarted));
+        assertNotNull("Client doesn't have a creator", createdClient.getCreator());
+        assertNotNull("Client doesn't have a modifier on creation!", createdClient.getLastModifier());
+        assertThat("Client was created with wrong user!",
+                createdClient.getCreator().getToken(), equalTo(user.getToken()));
+        assertThat("Client was created with wrong modifier!",
+                createdClient.getLastModifier().getToken(), equalTo(user.getToken()));
+
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientMapper.toDto(createdClient));
         assertEquals(expectedJson.toJSONString(), actualJson, false);
@@ -212,6 +226,7 @@ public class ClientControllerIT extends BaseControllerIT {
         String middleName = (String) inputJson.get("middleName");
         String lastName = (String) inputJson.get("lastName");
 
+        long timeStarted = System.currentTimeMillis();
         given().
                 contentType(APPLICATION_JSON_VALUE).
                 queryParam("token", user.getToken()).
@@ -221,6 +236,7 @@ public class ClientControllerIT extends BaseControllerIT {
         then().
                 body("counterpartyUuid", equalTo(client.getCounterparty().getUuid().toString())).
                 statusCode(SC_OK);
+        long timeFinished = System.currentTimeMillis();
 
         JSONParser parser = new JSONParser();
         JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
@@ -230,6 +246,13 @@ public class ClientControllerIT extends BaseControllerIT {
 
         // check updated data
         Client updatedClient = clientService.getEntityByUuid(clientUuid, user);
+        long timeModified = updatedClient.getLastModified().getTime();
+
+        assertTrue("Client has wrong modified time", (timeFinished > timeModified && timeModified > timeStarted));
+        assertNotNull("Client doesn't have a modifier", updatedClient.getCreator());
+        assertThat("Client was updated with wrong user!",
+                updatedClient.getLastModifier().getToken(), equalTo(user.getToken()));
+
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientMapper.toDto(updatedClient));
         assertEquals(expectedJson.toJSONString(), actualJson, false);
@@ -244,6 +267,7 @@ public class ClientControllerIT extends BaseControllerIT {
         inputJson.put("name", "Rozetka & Roga & Kopyta [edited]");
         inputJson.put("individual", false);
 
+        long timeStarted = System.currentTimeMillis();
         given().
                 contentType(APPLICATION_JSON_VALUE).
                 queryParam("token", user.getToken()).
@@ -253,6 +277,7 @@ public class ClientControllerIT extends BaseControllerIT {
         then().
                 body("counterpartyUuid", equalTo(client.getCounterparty().getUuid().toString())).
                 statusCode(SC_OK);
+        long timeFinished = System.currentTimeMillis();
 
         JSONParser parser = new JSONParser();
         JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
@@ -264,6 +289,13 @@ public class ClientControllerIT extends BaseControllerIT {
 
         // check updated data
         Client updatedClient = clientService.getEntityByUuid(clientUuid, user);
+        long timeModified = updatedClient.getLastModified().getTime();
+
+        assertTrue("Client has wrong modified time", (timeFinished > timeModified && timeModified > timeStarted));
+        assertNotNull("Client doesn't have a modifier", updatedClient.getCreator());
+        assertThat("Client was updated with wrong user!",
+                updatedClient.getLastModifier().getToken(), equalTo(user.getToken()));
+
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientMapper.toDto(updatedClient));
         assertEquals(expectedJson.toJSONString(), actualJson, false);

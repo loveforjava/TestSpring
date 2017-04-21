@@ -2,7 +2,6 @@ package integration;
 
 import com.opinta.constraint.RegexMatcher;
 
-import java.util.Date;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,7 +27,6 @@ import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -117,6 +115,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         jsonObject.put("shipmentGroupUuid", shipmentGroup.getUuid().toString());
         String expectedJson = jsonObject.toString();
 
+        long timeStarted = System.currentTimeMillis();
         String newShipmentUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
@@ -129,16 +128,21 @@ public class ShipmentControllerIT extends BaseControllerIT {
                         body("barcode", RegexMatcher.matches(BARCODE_REGEX)).
                 extract().
                         path("uuid");
+        long timeFinished = System.currentTimeMillis();
 
         // check created data
         Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid), user);
         long timeCreated = createdShipment.getCreated().getTime();
-        long currentTime = new Date().getTime();
-        assertThat("Shipment was created more than 30 seconds ago!", (currentTime - timeCreated),
-                lessThan(30000L));
+        long timeModified = createdShipment.getLastModified().getTime();
+
+        assertTrue("Shipment has wrong created time", (timeFinished > timeCreated && timeCreated > timeStarted));
+        assertTrue("Shipment has wrong modified time", (timeFinished > timeModified && timeModified > timeStarted));
         assertNotNull("Shipment doesn't have a creator", createdShipment.getCreator());
-        assertTrue("Shipment was created with wrong user!",
-                createdShipment.getCreator().getToken().equals(user.getToken()));
+        assertNotNull("Shipment doesn't have a modifier on creation!", createdShipment.getLastModifier());
+        assertThat("Shipment was created with wrong user!",
+                createdShipment.getCreator().getToken(), equalTo(user.getToken()));
+        assertThat("Shipment was created with wrong modifier!",
+                createdShipment.getLastModifier().getToken(), equalTo(user.getToken()));
 
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(shipmentMapper.toDto(createdShipment));
@@ -163,6 +167,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         testHelper.adjustClientData((JSONObject) jsonObject.get("recipient"), recipientAddress);
         String inputJson = jsonObject.toJSONString();
 
+        long timeStarted = System.currentTimeMillis();
         String newShipmentUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
@@ -175,17 +180,21 @@ public class ShipmentControllerIT extends BaseControllerIT {
                         body("barcode", RegexMatcher.matches(BARCODE_REGEX)).
                 extract().
                         path("uuid");
+        long timeFinished = System.currentTimeMillis();
 
         
         // check created data
         Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid), user);
         long timeCreated = createdShipment.getCreated().getTime();
-        long currentTime = new Date().getTime();
-        assertThat("Shipment was created more than 30 seconds ago!", (currentTime - timeCreated),
-                lessThan(30000L));
+        long timeModified = createdShipment.getLastModified().getTime();
+        assertTrue("Shipment has wrong created time", (timeFinished > timeCreated && timeCreated > timeStarted));
+        assertTrue("Shipment has wrong modified time", (timeFinished > timeModified && timeModified > timeStarted));
         assertNotNull("Shipment doesn't have a creator", createdShipment.getCreator());
-        assertTrue("Shipment was created with wrong user!",
-                createdShipment.getCreator().getToken().equals(user.getToken()));
+        assertNotNull("Shipment doesn't have a modifier on creation!", createdShipment.getLastModifier());
+        assertThat("Shipment was created with wrong user!",
+                createdShipment.getCreator().getToken(), equalTo(user.getToken()));
+        assertThat("Shipment was created with wrong modifier!",
+                createdShipment.getLastModifier().getToken(), equalTo(user.getToken()));
         // adjust jsonObject with actual data, modified in server
         testHelper.mergeClientNames((JSONObject) jsonObject.get("sender"), createdShipment.getSender());
         testHelper.mergeClientNames((JSONObject) jsonObject.get("recipient"), createdShipment.getRecipient());
@@ -212,7 +221,8 @@ public class ShipmentControllerIT extends BaseControllerIT {
         jsonObject.put("sender", testHelper.toJsonWithUuid(sender));
         testHelper.adjustClientData((JSONObject) jsonObject.get("recipient"), recipientAddress);
         String inputJson = jsonObject.toJSONString();
-        
+
+        long timeStarted = System.currentTimeMillis();
         String newShipmentUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
@@ -225,17 +235,22 @@ public class ShipmentControllerIT extends BaseControllerIT {
                         body("barcode", RegexMatcher.matches(BARCODE_REGEX)).
                 extract().
                         path("uuid");
+        long timeFinished = System.currentTimeMillis();
         
         
         // check created data
         Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid), user);
         long timeCreated = createdShipment.getCreated().getTime();
-        long currentTime = new Date().getTime();
-        assertThat("Shipment was created more than 30 seconds ago!", (currentTime - timeCreated),
-                lessThan(30000L));
+        long timeModified = createdShipment.getLastModified().getTime();
+
+        assertTrue("Shipment has wrong created time", (timeFinished > timeCreated && timeCreated > timeStarted));
+        assertTrue("Shipment has wrong modified time", (timeFinished > timeModified && timeModified > timeStarted));
         assertNotNull("Shipment doesn't have a creator", createdShipment.getCreator());
-        assertTrue("Shipment was created with wrong user!",
-                createdShipment.getCreator().getToken().equals(user.getToken()));
+        assertNotNull("Shipment doesn't have a modifier on creation!", createdShipment.getLastModifier());
+        assertThat("Shipment was created with wrong user!",
+                createdShipment.getCreator().getToken(), equalTo(user.getToken()));
+        assertThat("Shipment was created with wrong modifier!",
+                createdShipment.getLastModifier().getToken(), equalTo(user.getToken()));
         // adjust jsonObject with actual data, modified into
         testHelper.mergeClientNames((JSONObject) jsonObject.get("sender"), createdShipment.getSender());
         testHelper.mergeClientNames((JSONObject) jsonObject.get("recipient"), createdShipment.getRecipient());
@@ -259,7 +274,8 @@ public class ShipmentControllerIT extends BaseControllerIT {
         jsonObject.put("recipient", testHelper.toJsonWithUuid(shipment.getRecipient()));
         String expectedJson = jsonObject.toString();
         ShipmentDto shipmentDtoBeforeUpdate = shipmentMapper.toDto(shipmentService.getEntityByUuid(shipmentUuid, user));
-        
+
+        long timeStarted = System.currentTimeMillis();
         given().
                 contentType(APPLICATION_JSON_VALUE).
                 queryParam("token", user.getToken()).
@@ -269,17 +285,17 @@ public class ShipmentControllerIT extends BaseControllerIT {
         then().
                 body("barcode", equalTo(shipmentDtoBeforeUpdate.getBarcode())).
                 statusCode(SC_OK);
+        long timeFinished = System.currentTimeMillis();
 
         // check updated data
         Shipment updatedShipment = shipmentService.getEntityByUuid(shipmentUuid, user);
         ShipmentDto shipmentDto = shipmentMapper.toDto(updatedShipment);
-        long timeCreated = updatedShipment.getCreated().getTime();
-        long currentTime = new Date().getTime();
-        assertThat("Shipment was modified more than 30 seconds ago!", (currentTime - timeCreated),
-                lessThan(30000L));
+        long timeModified = updatedShipment.getLastModified().getTime();
+
+        assertTrue("Shipment has wrong modified time", (timeFinished > timeModified && timeModified > timeStarted));
         assertNotNull("Shipment doesn't have a modifier", updatedShipment.getCreator());
-        assertTrue("Shipment was updated with wrong user!",
-                updatedShipment.getCreator().getToken().equals(user.getToken()));
+        assertThat("Shipment was updated with wrong user!",
+                updatedShipment.getLastModifier().getToken(), equalTo(user.getToken()));
 
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(shipmentDto);
