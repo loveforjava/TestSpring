@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static com.opinta.util.AuthorizationUtil.authorizeForAction;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.time.LocalDate.now;
@@ -48,20 +49,18 @@ public class ClientServiceImpl implements ClientService {
     private final CounterpartyService counterpartyService;
     private final PhoneService phoneService;
     private final AddressService addressService;
-    private final UserService userService;
     private final ClientMapper clientMapper;
     private final PostIdInnerNumberGenerator postIdInnerNumberGenerator;
 
     @Autowired
     public ClientServiceImpl(ClientDao clientDao, ClientMapper clientMapper, PhoneService phoneService,
                              AddressService addressService, CounterpartyService counterpartyService,
-                             UserService userService, PostIdInnerNumberGenerator postIdInnerNumberGenerator) {
+                             PostIdInnerNumberGenerator postIdInnerNumberGenerator) {
         this.clientDao = clientDao;
         this.counterpartyService = counterpartyService;
         this.phoneService = phoneService;
         this.addressService = addressService;
         this.clientMapper = clientMapper;
-        this.userService = userService;
         this.postIdInnerNumberGenerator = postIdInnerNumberGenerator;
     }
 
@@ -111,7 +110,7 @@ public class ClientServiceImpl implements ClientService {
             throw new IncorrectInputDataException(getByIdOnErrorLogEndpoint(Client.class, uuid));
         }
 
-        userService.authorizeForAction(client, user);
+        authorizeForAction(client, user);
 
         return client;
     }
@@ -126,7 +125,7 @@ public class ClientServiceImpl implements ClientService {
             throw new IncorrectInputDataException(getByIdOnErrorLogEndpoint(Client.class, postId));
         }
         
-        userService.authorizeForAction(client, user);
+        authorizeForAction(client, user);
     
         return client;
     }
@@ -150,7 +149,7 @@ public class ClientServiceImpl implements ClientService {
         validateInnerReferencesAndFillObjectFromDB(client, user);
         client.setPhone(phoneService.getOrCreateEntityByPhoneNumber(client.getPhone().getPhoneNumber())
                 .removeNonNumericalCharacters());
-        userService.authorizeForAction(client, user);
+        authorizeForAction(client, user);
         Date date = new Date();
         client.setCreated(date);
         client.setLastModified(date);
@@ -171,7 +170,7 @@ public class ClientServiceImpl implements ClientService {
     @Transactional
     public Client updateEntity(Client client, User user) throws IncorrectInputDataException, AuthException {
         log.info(updateLogEndpoint(Client.class, client));
-        userService.authorizeForAction(client, user);
+        authorizeForAction(client, user);
         client.setLastModified(new Date());
         client.setLastModifier(user);
         clientDao.update(client);

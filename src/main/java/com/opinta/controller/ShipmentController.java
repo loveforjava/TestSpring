@@ -33,7 +33,6 @@ import static com.opinta.util.LogMessageUtil.generatePdfFormOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.saveOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.updateOnErrorLogEndpoint;
-import static com.opinta.util.LogMessageUtil.deleteOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.deleteFieldOnErrorLogEndpoint;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -125,19 +124,6 @@ public class ShipmentController extends BaseController {
             return new ResponseEntity<>(updateOnErrorLogEndpoint(Shipment.class, uuid, e), NOT_FOUND);
         } catch (PerformProcessFailedException e) {
             return new ResponseEntity<>(updateOnErrorLogEndpoint(Shipment.class, uuid, e), BAD_REQUEST);
-        }
-    }
-
-    @DeleteMapping("{uuid}")
-    public ResponseEntity<?> deleteShipment(@PathVariable UUID uuid, @RequestParam UUID token) {
-        try {
-            User user = userService.authenticate(token);
-            shipmentService.delete(uuid, user);
-            return new ResponseEntity<>(OK);
-        } catch (AuthException e) {
-            return new ResponseEntity<>(deleteOnErrorLogEndpoint(Shipment.class, uuid, e), UNAUTHORIZED);
-        } catch (IncorrectInputDataException e) {
-            return new ResponseEntity<>(deleteOnErrorLogEndpoint(Shipment.class, uuid, e), NOT_FOUND);
         }
     }
 

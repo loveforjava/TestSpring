@@ -14,7 +14,6 @@ import com.opinta.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,7 +33,6 @@ import static com.opinta.util.LogMessageUtil.getAllOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.saveOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.updateOnErrorLogEndpoint;
-import static com.opinta.util.LogMessageUtil.deleteOnErrorLogEndpoint;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
@@ -164,19 +162,6 @@ public class ShipmentGroupController extends BaseController {
             return new ResponseEntity<>(updateOnErrorLogEndpoint(ShipmentGroup.class, uuid), NOT_FOUND);
         } catch (AuthException e) {
             return new ResponseEntity<>(updateOnErrorLogEndpoint(ShipmentGroup.class, uuid), UNAUTHORIZED);
-        }
-    }
-
-    @DeleteMapping("{uuid}")
-    public ResponseEntity<?> deleteShipmentGroup(@PathVariable UUID uuid, @RequestParam UUID token) {
-        try {
-            User user = userService.authenticate(token);
-            shipmentGroupService.delete(uuid, user);
-            return new ResponseEntity<>(OK);
-        } catch (IncorrectInputDataException e) {
-            return new ResponseEntity<>(deleteOnErrorLogEndpoint(ShipmentGroup.class, uuid), NOT_FOUND);
-        } catch (AuthException e) {
-            return new ResponseEntity<>(deleteOnErrorLogEndpoint(ShipmentGroup.class, uuid), UNAUTHORIZED);
         }
     }
 }

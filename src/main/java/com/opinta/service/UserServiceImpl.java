@@ -1,13 +1,8 @@
 package com.opinta.service;
 
-import com.opinta.dao.CounterpartyDao;
 import com.opinta.dao.UserDao;
 import com.opinta.dto.UserDto;
-import com.opinta.entity.Client;
 import com.opinta.entity.Counterparty;
-import com.opinta.entity.DiscountPerCounterparty;
-import com.opinta.entity.Shipment;
-import com.opinta.entity.ShipmentGroup;
 import com.opinta.entity.User;
 import com.opinta.exception.AuthException;
 
@@ -26,19 +21,18 @@ import static com.opinta.util.LogMessageUtil.authenticationOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdLogEndpoint;
 import static com.opinta.util.LogMessageUtil.updateLogEndpoint;
 import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
-import static com.opinta.util.LogMessageUtil.authorizationOnErrorLogEndpoint;
 
 @Service
 @Slf4j
 public class UserServiceImpl implements UserService {
     private final UserDao userDao;
-    private final CounterpartyDao counterpartyDao;
+    private final CounterpartyService counterpartyService;
     private final UserMapper userMapper;
 
     @Autowired
-    public UserServiceImpl(UserDao userDao, CounterpartyDao counterpartyDao, UserMapper userMapper) {
+    public UserServiceImpl(UserDao userDao, CounterpartyService counterpartyService, UserMapper userMapper) {
         this.userDao = userDao;
-        this.counterpartyDao = counterpartyDao;
+        this.counterpartyService = counterpartyService;
         this.userMapper = userMapper;
     }
 
@@ -64,8 +58,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public User saveEntity(User user) throws IncorrectInputDataException {
-        user.setCounterparty(counterpartyDao.getByUuid(user.getCounterparty().getUuid()));
+    public User saveEntity(User user) throws IncorrectInputDataException, AuthException {
+        user.setCounterparty(counterpartyService.getEntityByUuid(user.getCounterparty().getUuid(), user));
         Date date = new Date();
         user.setCreated(date);
         user.setLastModified(date);
@@ -74,7 +68,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserDto save(UserDto userDto) throws IncorrectInputDataException {
+    public UserDto save(UserDto userDto) throws IncorrectInputDataException, AuthException {
         userDto.setToken(UUID.randomUUID());
         return userMapper.toDto(saveEntity(userMapper.toEntity(userDto)));
     }
@@ -105,54 +99,5 @@ public class UserServiceImpl implements UserService {
             throw new AuthException(authenticationOnErrorLogEndpoint(token));
         }
         return user;
-    }
-
-    @Override
-    public void authorizeForAction(Counterparty counterparty, User user) throws AuthException {
-        if (user == null || user.getCounterparty() == null
-                || !user.getCounterparty().getUuid().equals(counterparty.getUuid())) {
-            assert user != null;
-            log.error(authorizationOnErrorLogEndpoint(user.getToken(), counterparty));
-            throw new AuthException(authorizationOnErrorLogEndpoint(user.getToken(), counterparty));
-        }
-    }
-
-    @Override
-    public void authorizeForAction(Client client, User user) throws AuthException {
-        if (user == null || client == null || user.getCounterparty() == null || client.getCounterparty() == null
-                || client.getCounterparty() == null
-                || !client.getCounterparty().getUuid().equals(user.getCounterparty().getUuid())) {
-            assert user != null;
-            log.error(authorizationOnErrorLogEndpoint(user.getToken(), client));
-            throw new AuthException(authorizationOnErrorLogEndpoint(user.getToken(), client));
-        }
-    }
-
-    @Override
-    public void authorizeForAction(Shipment shipment, User user) throws AuthException {
-        if (user == null || user.getCounterparty() == null || shipment == null
-                || shipment.getSender().getCounterparty() == null || shipment.getSender().getCounterparty() == null
-                || !shipment.getSender().getCounterparty().getUuid().equals(user.getCounterparty().getUuid())) {
-            assert user != null;
-            log.error(authorizationOnErrorLogEndpoint(user.getToken(), shipment));
-            throw new AuthException(authorizationOnErrorLogEndpoint(user.getToken(), shipment));
-        }
-    }
-
-    @Override
-    public void authorizeForAction(ShipmentGroup shipmentGroup, User user) throws AuthException {
-        if (user == null || user.getCounterparty() == null
-                || shipmentGroup == null || shipmentGroup.getCounterparty() == null
-                || shipmentGroup.getCounterparty() == null
-                || !shipmentGroup.getCounterparty().getUuid().equals(user.getCounterparty().getUuid())) {
-            assert user != null;
-            log.error(authorizationOnErrorLogEndpoint(user.getToken(), shipmentGroup));
-            throw new AuthException(authorizationOnErrorLogEndpoint(user.getToken(), shipmentGroup));
-        }
-    }
-
-    @Override
-    public void authorizeForAction(DiscountPerCounterparty discountPerCounterparty, User user) throws AuthException {
-        authorizeForAction(discountPerCounterparty.getCounterparty(), user);
     }
 }

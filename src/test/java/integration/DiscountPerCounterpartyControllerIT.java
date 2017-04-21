@@ -206,15 +206,4 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
                 discountPerCounterparty.getDiscount().getUuid().toString(),
                 existedDiscountPerCounterparty.getDiscount().getUuid().toString());
     }
-
-    @Test
-    public void deleteDiscountPerCounterparty() throws Exception {
-        given().
-                queryParam("token", user.getToken()).
-                contentType(APPLICATION_JSON_VALUE).
-        when().
-                delete("/counterparty-discounts/{uuid}", discountPerCounterparty.getUuid()).
-        then().
-                statusCode(SC_OK);
-    }
 }

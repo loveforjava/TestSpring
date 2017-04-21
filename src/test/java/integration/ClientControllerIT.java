@@ -370,26 +370,6 @@ public class ClientControllerIT extends BaseControllerIT {
     }
 
     @Test
-    public void deleteClient() throws Exception {
-        given().
-                queryParam("token", user.getToken()).
-        when().
-                delete("/clients/{uuid}", clientUuid.toString()).
-        then().
-                statusCode(SC_OK);
-    }
-
-    @Test
-    public void deleteClient_notFound() throws Exception {
-        given().
-                queryParam("token", user.getToken()).
-        when().
-                delete("/clients/{uuid}", UUID.randomUUID().toString()).
-        then().
-                statusCode(SC_NOT_FOUND);
-    }
-
-    @Test
     @SuppressWarnings("unchecked")
     public void savingPhoneRemovesAllNonNumericalDigits() throws Exception {
         Address newAddress = testHelper.createAddress();
@@ -432,8 +412,8 @@ public class ClientControllerIT extends BaseControllerIT {
         given().
                 contentType(APPLICATION_JSON_VALUE).
                 queryParam("token", user.getToken()).
-        body(inputJson.toString()).
-                when().
+                body(inputJson.toString()).
+        when().
                 put("/clients/{uuid}", clientUuid.toString()).
         then().
                 body("phoneNumber", equalTo(expectedPhone)).

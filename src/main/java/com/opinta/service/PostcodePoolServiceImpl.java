@@ -4,7 +4,6 @@ import com.opinta.dao.PostcodePoolDao;
 import com.opinta.dto.PostcodePoolDto;
 import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.exception.PerformProcessFailedException;
-import com.opinta.mapper.BarcodeInnerNumberMapper;
 import com.opinta.mapper.PostcodePoolMapper;
 import com.opinta.entity.PostcodePool;
 import java.lang.reflect.InvocationTargetException;
@@ -30,14 +29,11 @@ import static com.opinta.util.LogMessageUtil.updateLogEndpoint;
 public class PostcodePoolServiceImpl implements PostcodePoolService {
     private PostcodePoolDao postcodePoolDao;
     private PostcodePoolMapper postcodePoolMapper;
-    private BarcodeInnerNumberMapper barcodeInnerNumberMapper;
 
     @Autowired
-    public PostcodePoolServiceImpl(PostcodePoolDao postcodePoolDao, PostcodePoolMapper postcodePoolMapper,
-                                   BarcodeInnerNumberMapper barcodeInnerNumberMapper) {
+    public PostcodePoolServiceImpl(PostcodePoolDao postcodePoolDao, PostcodePoolMapper postcodePoolMapper) {
         this.postcodePoolDao = postcodePoolDao;
         this.postcodePoolMapper = postcodePoolMapper;
-        this.barcodeInnerNumberMapper = barcodeInnerNumberMapper;
     }
 
     @Override

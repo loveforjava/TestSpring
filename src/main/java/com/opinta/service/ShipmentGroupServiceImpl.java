@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import static com.opinta.util.AuthorizationUtil.authorizeForAction;
 import static com.opinta.util.EnhancedBeanUtilsBean.copyNotNullProperties;
 import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
@@ -35,15 +36,13 @@ public class ShipmentGroupServiceImpl implements ShipmentGroupService {
     private final ShipmentGroupDao shipmentGroupDao;
     private final CounterpartyService counterpartyService;
     private final ShipmentGroupMapper shipmentGroupMapper;
-    private final UserService userService;
 
     @Autowired
     public ShipmentGroupServiceImpl(ShipmentGroupDao shipmentGroupDao, CounterpartyService counterpartyService,
-                                    ShipmentGroupMapper shipmentGroupMapper, UserService userService) {
+                                    ShipmentGroupMapper shipmentGroupMapper) {
         this.shipmentGroupDao = shipmentGroupDao;
         this.counterpartyService = counterpartyService;
         this.shipmentGroupMapper = shipmentGroupMapper;
-        this.userService = userService;
     }
 
     @Override
@@ -63,7 +62,7 @@ public class ShipmentGroupServiceImpl implements ShipmentGroupService {
             throw new IncorrectInputDataException(getByIdOnErrorLogEndpoint(ShipmentGroup.class, uuid));
         }
 
-        userService.authorizeForAction(shipmentGroup, user);
+        authorizeForAction(shipmentGroup, user);
 
         return shipmentGroup;
     }
@@ -74,7 +73,7 @@ public class ShipmentGroupServiceImpl implements ShipmentGroupService {
             IncorrectInputDataException {
         validateInnerReferenceAndFillObjectFromDB(shipmentGroup, user);
 
-        userService.authorizeForAction(shipmentGroup, user);
+        authorizeForAction(shipmentGroup, user);
         Date date = new Date();
         shipmentGroup.setCreated(date);
         shipmentGroup.setLastModified(date);
