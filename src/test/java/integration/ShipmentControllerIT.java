@@ -307,24 +307,4 @@ public class ShipmentControllerIT extends BaseControllerIT {
 
         testHelper.deleteShipment(shipment);
     }
-
-    @Test
-    public void deleteShipment() throws Exception {
-        given().
-                queryParam("token", user.getToken()).
-        when().
-                delete("/shipments/{uuid}", shipmentUuid.toString()).
-        then().
-                statusCode(SC_OK);
-    }
-
-    @Test
-    public void deleteShipment_notFound() throws Exception {
-        given().
-                queryParam("token", user.getToken()).
-        when().
-                delete("/shipments/{uuid}", UUID.randomUUID().toString()).
-        then().
-                statusCode(SC_NOT_FOUND);
-    }
 }

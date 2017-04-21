@@ -175,24 +175,4 @@ public class ShipmentGroupControllerIT extends BaseControllerIT {
 
         JSONAssert.assertEquals(expectedJson, actualJson, false);
     }
-    
-    @Test
-    public void deleteShipmentGroup() throws Exception {
-        given().
-                queryParam("token", user.getToken()).
-        when().
-                delete("/shipment-groups/{uuid}", shipmentGroupUuid.toString()).
-        then().
-                statusCode(SC_OK);
-    }
-    
-    @Test
-    public void deleteShipmentGroup_notFound() throws Exception {
-        given().
-                queryParam("token", user.getToken()).
-        when().
-                delete("/shipment-groups/{uuid}", UUID.randomUUID().toString()).
-        then().
-                statusCode(SC_NOT_FOUND);
-    }
 }

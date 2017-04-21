@@ -102,17 +102,4 @@ public class DiscountPerCounterpartyController extends BaseController {
                     discountPerCounterpartyDto, e), BAD_REQUEST);
         }
     }
-    
-    @DeleteMapping("{uuid}")
-    public ResponseEntity<?> deleteDiscount(@PathVariable UUID uuid, @RequestParam UUID token) {
-        try {
-            User user = userService.authenticate(token);
-            discountPerCounterpartyService.delete(uuid, user);
-            return new ResponseEntity<>(OK);
-        } catch (AuthException e) {
-            return new ResponseEntity<>(authorizationOnErrorLogEndpoint(token, e), UNAUTHORIZED);
-        } catch (IncorrectInputDataException e) {
-            return new ResponseEntity<>(deleteOnErrorLogEndpoint(DiscountPerCounterparty.class, uuid, e), NOT_FOUND);
-        }
-    }
 }

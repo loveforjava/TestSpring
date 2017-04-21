@@ -66,14 +66,4 @@ public class DiscountController extends BaseController {
             return new ResponseEntity<>(updateOnErrorLogEndpoint(Discount.class, discountDto, e), BAD_REQUEST);
         }
     }
-    
-    @DeleteMapping("{uuid}")
-    public ResponseEntity<?> deleteDiscount(@PathVariable UUID uuid) {
-        try {
-            discountService.delete(uuid);
-            return new ResponseEntity<>(OK);
-        } catch (IncorrectInputDataException e) {
-            return new ResponseEntity<>(deleteOnErrorLogEndpoint(Discount.class, uuid, e), NOT_FOUND);
-        }
-    }
 }

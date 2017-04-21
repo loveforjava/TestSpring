@@ -133,22 +133,4 @@ public class PostcodePoolIT extends BaseControllerIT {
 
         JSONAssert.assertEquals(expectedJson.toJSONString(), actualJson, false);
     }
-
-    @Test
-    public void deletePostcodePool() throws Exception {
-        given().
-                when().
-                delete("/postcodes/{uuid}", postcodePoolUuid.toString()).
-        then().
-                statusCode(SC_OK);
-    }
-
-    @Test
-    public void deletePostcodePool_notFound() throws Exception {
-        given().
-                when().
-                delete("/postcodes/{uuid}", UUID.randomUUID().toString()).
-        then().
-                statusCode(SC_NOT_FOUND);
-    }
 }

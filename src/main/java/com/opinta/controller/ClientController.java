@@ -130,17 +130,4 @@ public class ClientController extends BaseController {
             return new ResponseEntity<>(updateOnErrorLogEndpoint(Client.class, clientTypeDto, e), BAD_REQUEST);
         }
     }
-
-    @DeleteMapping("{uuid}")
-    public ResponseEntity<?> deleteClient(@PathVariable UUID uuid, @RequestParam UUID token) {
-        try {
-            User user = userService.authenticate(token);
-            clientService.delete(uuid, user);
-            return new ResponseEntity<>(OK);
-        } catch (AuthException e) {
-            return new ResponseEntity<>(deleteOnErrorLogEndpoint(Client.class, uuid, e), UNAUTHORIZED);
-        } catch (IncorrectInputDataException e) {
-            return new ResponseEntity<>(deleteOnErrorLogEndpoint(Client.class, uuid, e), NOT_FOUND);
-        }
-    }
 }

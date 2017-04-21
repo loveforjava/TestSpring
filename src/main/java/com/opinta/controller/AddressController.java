@@ -70,14 +70,4 @@ public class AddressController extends BaseController {
             return new ResponseEntity<>(updateOnErrorLogEndpoint(Address.class, addressDto, e), BAD_REQUEST);
         }
     }
-
-    @DeleteMapping("{id}")
-    public ResponseEntity<?> deleteAddress(@PathVariable long id) {
-        try {
-            addressService.delete(id);
-            return new ResponseEntity<>(OK);
-        } catch (IncorrectInputDataException e) {
-            return new ResponseEntity<>(deleteOnErrorLogEndpoint(Address.class, id, e), NOT_FOUND);
-        }
-    }
 }

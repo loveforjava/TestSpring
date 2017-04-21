@@ -70,14 +70,4 @@ public class PostOfficeController extends BaseController {
             return new ResponseEntity<>(updateOnErrorLogEndpoint(PostOffice.class, id, e), BAD_REQUEST);
         }
     }
-
-    @DeleteMapping("{id}")
-    public ResponseEntity<?> deletePostOffice(@PathVariable long id) {
-        try {
-            postOfficeService.delete(id);
-            return new ResponseEntity<>(OK);
-        } catch (IncorrectInputDataException e) {
-            return new ResponseEntity<>(deleteOnErrorLogEndpoint(PostOffice.class, id, e), NOT_FOUND);
-        }
-    }
 }

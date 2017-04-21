@@ -71,15 +71,4 @@ public class ShipmentTrackingDetailController extends BaseController {
                     BAD_REQUEST);
         }
     }
-
-    @DeleteMapping("{id}")
-    public ResponseEntity<?> deleteShipmentTrackingDetail(@PathVariable long id) {
-        try {
-            shipmentTrackingDetailService.delete(id);
-            return new ResponseEntity<>(OK);
-        } catch (IncorrectInputDataException e) {
-            return new ResponseEntity<>(LogMessageUtil.getByIdOnErrorLogEndpoint(ShipmentTrackingDetail.class, id),
-                    NOT_FOUND);
-        }
-    }
 }

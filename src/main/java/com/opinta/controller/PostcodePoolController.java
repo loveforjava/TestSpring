@@ -79,16 +79,6 @@ public class PostcodePoolController extends BaseController {
         }
     }
 
-    @DeleteMapping("{uuid}")
-    public ResponseEntity<?> deletePostcodePool(@PathVariable UUID uuid) {
-        try {
-            postcodePoolService.delete(uuid);
-            return new ResponseEntity<>(OK);
-        } catch (IncorrectInputDataException e) {
-            return new ResponseEntity<>(deleteOnErrorLogEndpoint(PostcodePool.class, uuid, e), NOT_FOUND);
-        }
-    }
-
     @GetMapping("{postcodePoolUuid}/inner-numbers")
     public ResponseEntity<?> getBarcodeInnerNumbers(@PathVariable UUID postcodePoolUuid) {
         try {
@@ -104,16 +94,6 @@ public class PostcodePoolController extends BaseController {
             return new ResponseEntity<>(barcodeInnerNumberService.getById(id), OK);
         } catch (IncorrectInputDataException e) {
             return new ResponseEntity<>(getByIdOnErrorLogEndpoint(BarcodeInnerNumber.class, id, e), NOT_FOUND);
-        }
-    }
-
-    @DeleteMapping("inner-numbers/{id}")
-    public ResponseEntity<?> deleteBarcodeInnerNumber(@PathVariable long id) {
-        try {
-            barcodeInnerNumberService.delete(id);
-            return new ResponseEntity<>(OK);
-        } catch (IncorrectInputDataException e) {
-            return new ResponseEntity<>(deleteOnErrorLogEndpoint(BarcodeInnerNumber.class, id, e), NOT_FOUND);
         }
     }
 }

@@ -166,17 +166,4 @@ public class ShipmentGroupController extends BaseController {
             return new ResponseEntity<>(updateOnErrorLogEndpoint(ShipmentGroup.class, uuid), UNAUTHORIZED);
         }
     }
-
-    @DeleteMapping("{uuid}")
-    public ResponseEntity<?> deleteShipmentGroup(@PathVariable UUID uuid, @RequestParam UUID token) {
-        try {
-            User user = userService.authenticate(token);
-            shipmentGroupService.delete(uuid, user);
-            return new ResponseEntity<>(OK);
-        } catch (IncorrectInputDataException e) {
-            return new ResponseEntity<>(deleteOnErrorLogEndpoint(ShipmentGroup.class, uuid), NOT_FOUND);
-        } catch (AuthException e) {
-            return new ResponseEntity<>(deleteOnErrorLogEndpoint(ShipmentGroup.class, uuid), UNAUTHORIZED);
-        }
-    }
 }
