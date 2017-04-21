@@ -311,7 +311,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         ShipmentDto shipmentDto = shipmentMapper.toDto(updatedShipment);
         long timeModified = updatedShipment.getLastModified().getTime();
 
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished >= timeModified && timeModified >= timeStarted);
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, updatedShipment.getCreator());
         assertThat(WRONG_LAST_MODIFIER_MESSAGE,
                 updatedShipment.getLastModifier().getToken(), equalTo(user.getToken()));
@@ -365,8 +365,8 @@ public class ShipmentControllerIT extends BaseControllerIT {
         long timeCreated = createdShipment.getCreated().getTime();
         long timeModified = createdShipment.getLastModified().getTime();
 
-        assertTrue(WRONG_CREATED_MESSAGE, (timeFinished > timeCreated && timeCreated > timeStarted));
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
+        assertTrue(WRONG_CREATED_MESSAGE, timeFinished >= timeCreated && timeCreated >= timeStarted);
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished >= timeModified && timeModified >= timeStarted);
         assertNotNull(NO_CREATOR_MESSAGE, createdShipment.getCreator());
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, createdShipment.getLastModifier());
         assertThat(WRONG_CREATOR_MESSAGE, createdShipment.getCreator().getToken(), equalTo(user.getToken()));

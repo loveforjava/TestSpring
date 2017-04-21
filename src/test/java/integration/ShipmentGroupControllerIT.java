@@ -153,8 +153,8 @@ public class ShipmentGroupControllerIT extends BaseControllerIT {
         long timeCreated = createdShipmentGroup.getCreated().getTime();
         long timeModified = createdShipmentGroup.getLastModified().getTime();
 
-        assertTrue(WRONG_CREATED_MESSAGE, (timeFinished > timeCreated && timeCreated > timeStarted));
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
+        assertTrue(WRONG_CREATED_MESSAGE, timeFinished >= timeCreated && timeCreated >= timeStarted);
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished >= timeModified && timeModified >= timeStarted);
         assertNotNull(NO_CREATOR_MESSAGE, createdShipmentGroup.getCreator());
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, createdShipmentGroup.getLastModifier());
         assertThat(WRONG_CREATOR_MESSAGE, createdShipmentGroup.getCreator().getToken(), equalTo(user.getToken()));
@@ -193,7 +193,7 @@ public class ShipmentGroupControllerIT extends BaseControllerIT {
         ShipmentGroup updatedShipmentGroup = shipmentGroupService.getEntityById(shipmentGroupUuid, user);
         long timeModified = updatedShipmentGroup.getLastModified().getTime();
 
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished >= timeModified && timeModified >= timeStarted);
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, updatedShipmentGroup.getLastModifier());
         assertThat(WRONG_LAST_MODIFIER_MESSAGE,
                 updatedShipmentGroup.getLastModifier().getToken(), equalTo(user.getToken()));

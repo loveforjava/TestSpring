@@ -111,8 +111,8 @@ public class DiscountControllerIT extends BaseControllerIT {
         long timeCreated = createdDiscount.getCreated().getTime();
         long timeModified = createdDiscount.getLastModified().getTime();
 
-        assertTrue(WRONG_CREATED_MESSAGE, (timeFinished > timeCreated && timeCreated > timeStarted));
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
+        assertTrue(WRONG_CREATED_MESSAGE, timeFinished >= timeCreated && timeCreated >= timeStarted);
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished >= timeModified && timeModified >= timeStarted);
 
         ObjectMapper mapper = new ObjectMapper();
         JSONObject actualJson = (JSONObject) parser.parse(mapper.writeValueAsString(createdDiscount));
@@ -150,7 +150,7 @@ public class DiscountControllerIT extends BaseControllerIT {
         Discount updatedDiscount = discountService.getEntityByUuid(discountUuid);
         long timeModified = updatedDiscount.getLastModified().getTime();
 
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished >= timeModified && timeModified >= timeStarted);
 
         ObjectMapper mapper = new ObjectMapper();
         JSONObject actualJson = (JSONObject) parser.parse(mapper.writeValueAsString(updatedDiscount));

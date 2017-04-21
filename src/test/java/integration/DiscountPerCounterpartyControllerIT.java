@@ -127,8 +127,8 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
         long timeCreated = createdDiscountPerCounterparty.getCreated().getTime();
         long timeModified = createdDiscountPerCounterparty.getLastModified().getTime();
 
-        assertTrue(WRONG_CREATED_MESSAGE, (timeFinished > timeCreated && timeCreated > timeStarted));
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
+        assertTrue(WRONG_CREATED_MESSAGE, timeFinished >= timeCreated && timeCreated >= timeStarted);
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished >= timeModified && timeModified >= timeStarted);
         assertNotNull(NO_CREATOR_MESSAGE, createdDiscountPerCounterparty.getCreator());
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, createdDiscountPerCounterparty.getLastModifier());
         assertThat(WRONG_CREATOR_MESSAGE, createdDiscountPerCounterparty.getCreator().getToken(), equalTo(user.getToken()));
@@ -170,8 +170,7 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
                 .getEntityByUuid(discountPerCounterparty.getUuid(), user);
         long timeModified = updatedDiscountPerCounterparty.getLastModified().getTime();
 
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE,
-                (timeFinished > timeModified && timeModified > timeStarted));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished >= timeModified && timeModified >= timeStarted);
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, updatedDiscountPerCounterparty.getCreator());
         assertThat(WRONG_LAST_MODIFIER_MESSAGE,
                 updatedDiscountPerCounterparty.getLastModifier().getToken(), equalTo(user.getToken()));

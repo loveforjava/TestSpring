@@ -34,11 +34,6 @@ public class BarcodeInnerNumber {
 
     @Temporal(TIMESTAMP)
     private Date created;
-    @Temporal(TIMESTAMP)
-    private Date lastModified;
-    @ManyToOne
-    @JoinColumn(name = "creator_id")
-    private User creator;
 
     public String stringify() {
         return postcodePool.getPostcode() + innerNumber;

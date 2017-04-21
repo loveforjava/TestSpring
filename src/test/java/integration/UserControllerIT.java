@@ -53,8 +53,8 @@ public class UserControllerIT extends BaseControllerIT {
         long timeCreated = createdUser.getCreated().getTime();
         long timeModified = createdUser.getLastModified().getTime();
 
-        assertTrue(WRONG_CREATED_MESSAGE, (timeFinished > timeCreated && timeCreated > timeStarted));
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
+        assertTrue(WRONG_CREATED_MESSAGE, timeFinished >= timeCreated && timeCreated >= timeStarted);
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished >= timeModified && timeModified >= timeStarted);
 
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(userMapper.toDto(createdUser));

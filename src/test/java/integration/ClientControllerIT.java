@@ -142,8 +142,8 @@ public class ClientControllerIT extends BaseControllerIT {
         long timeCreated = createdClient.getCreated().getTime();
         long timeModified = createdClient.getLastModified().getTime();
 
-        assertTrue(WRONG_CREATED_MESSAGE, (timeFinished > timeCreated && timeCreated > timeStarted));
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
+        assertTrue(WRONG_CREATED_MESSAGE, timeFinished >= timeCreated && timeCreated >= timeStarted);
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished >= timeModified && timeModified >= timeStarted);
         assertNotNull(NO_CREATOR_MESSAGE, createdClient.getCreator());
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, createdClient.getLastModifier());
         assertThat(WRONG_CREATOR_MESSAGE, createdClient.getCreator().getToken(), equalTo(user.getToken()));
@@ -206,8 +206,8 @@ public class ClientControllerIT extends BaseControllerIT {
         long timeCreated = createdClient.getCreated().getTime();
         long timeModified = createdClient.getLastModified().getTime();
 
-        assertTrue(WRONG_CREATED_MESSAGE, (timeFinished > timeCreated && timeCreated > timeStarted));
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
+        assertTrue(WRONG_CREATED_MESSAGE, timeFinished >= timeCreated && timeCreated >= timeStarted);
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished >= timeModified && timeModified >= timeStarted);
         assertNotNull(NO_CREATOR_MESSAGE, createdClient.getCreator());
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, createdClient.getLastModifier());
         assertThat(WRONG_CREATOR_MESSAGE, createdClient.getCreator().getToken(), equalTo(user.getToken()));
@@ -262,7 +262,7 @@ public class ClientControllerIT extends BaseControllerIT {
         Client updatedClient = clientService.getEntityByUuid(clientUuid, user);
         long timeModified = updatedClient.getLastModified().getTime();
 
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished >= timeModified && timeModified >= timeStarted);
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, updatedClient.getCreator());
         assertThat(WRONG_LAST_MODIFIER_MESSAGE,
                 updatedClient.getLastModifier().getToken(), equalTo(user.getToken()));
@@ -312,7 +312,7 @@ public class ClientControllerIT extends BaseControllerIT {
         Client updatedClient = clientService.getEntityByUuid(clientUuid, user);
         long timeModified = updatedClient.getLastModified().getTime();
 
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished >= timeModified && timeModified >= timeStarted);
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, updatedClient.getCreator());
         assertThat(WRONG_LAST_MODIFIER_MESSAGE, updatedClient.getLastModifier().getToken(), equalTo(user.getToken()));
 
@@ -357,7 +357,7 @@ public class ClientControllerIT extends BaseControllerIT {
         Client updatedClient = clientService.getEntityByUuid(clientUuid, user);
         long timeModified = updatedClient.getLastModified().getTime();
 
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished >= timeModified && timeModified >= timeStarted);
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, updatedClient.getCreator());
         assertThat(WRONG_LAST_MODIFIER_MESSAGE, updatedClient.getLastModifier().getToken(), equalTo(user.getToken()));
 

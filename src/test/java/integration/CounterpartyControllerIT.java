@@ -129,8 +129,8 @@ public class CounterpartyControllerIT extends BaseControllerIT {
         long timeCreated = createdCounterparty.getCreated().getTime();
         long timeModified = createdCounterparty.getLastModified().getTime();
 
-        assertTrue(WRONG_CREATED_MESSAGE, (timeFinished > timeCreated && timeCreated > timeStarted));
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
+        assertTrue(WRONG_CREATED_MESSAGE, timeFinished >= timeCreated && timeCreated >= timeStarted);
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished >= timeModified && timeModified >= timeStarted);
 
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(counterpartyMapper.toDto(createdCounterparty));
@@ -220,7 +220,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
         CounterpartyDto counterpartyDto = counterpartyMapper.toDto(updatedCounterparty);
         long timeModified = updatedCounterparty.getLastModified().getTime();
 
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished >= timeModified && timeModified >= timeStarted);
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, updatedCounterparty.getLastModifier());
         assertThat(WRONG_LAST_MODIFIER_MESSAGE,
                 updatedCounterparty.getLastModifier().getToken(), equalTo(user.getToken()));

@@ -102,8 +102,8 @@ public class PostcodePoolIT extends BaseControllerIT {
         long timeCreated = createdPostcodePool.getCreated().getTime();
         long timeModified = createdPostcodePool.getLastModified().getTime();
 
-        assertTrue(WRONG_CREATED_MESSAGE, (timeFinished > timeCreated && timeCreated > timeStarted));
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
+        assertTrue(WRONG_CREATED_MESSAGE, timeFinished >= timeCreated && timeCreated >= timeStarted);
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished >= timeModified && timeModified >= timeStarted);
 
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(postcodePoolMapper.toDto(createdPostcodePool));
@@ -144,7 +144,7 @@ public class PostcodePoolIT extends BaseControllerIT {
         PostcodePoolDto postcodePoolDto = postcodePoolMapper.toDto(updatedPostcodePool);
         long timeModified = updatedPostcodePool.getLastModified().getTime();
 
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished >= timeModified && timeModified >= timeStarted);
 
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(postcodePoolDto);

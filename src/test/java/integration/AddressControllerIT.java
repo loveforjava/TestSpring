@@ -102,8 +102,8 @@ public class AddressControllerIT extends BaseControllerIT {
         long timeCreated = createdAddress.getCreated().getTime();
         long timeModified = createdAddress.getLastModified().getTime();
 
-        assertTrue(WRONG_CREATED_MESSAGE, (timeFinished > timeCreated && timeCreated > timeStarted));
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
+        assertTrue(WRONG_CREATED_MESSAGE, timeFinished >= timeCreated && timeCreated >= timeStarted);
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished >= timeModified && timeModified >= timeStarted);
 
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(createdAddress);
@@ -165,7 +165,7 @@ public class AddressControllerIT extends BaseControllerIT {
         Address updatedAddress = addressService.getEntityById(addressId);
         long timeModified = updatedAddress.getLastModified().getTime();
 
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, (timeFinished > timeModified && timeModified > timeStarted));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished >= timeModified && timeModified >= timeStarted);
 
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(updatedAddress);
