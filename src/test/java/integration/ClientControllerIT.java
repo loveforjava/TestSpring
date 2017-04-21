@@ -8,24 +8,27 @@ import com.opinta.entity.Client;
 import com.opinta.entity.User;
 import com.opinta.mapper.ClientMapper;
 import com.opinta.service.ClientService;
-import com.opinta.service.UserService;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import integration.helper.TestHelper;
 
 import static java.lang.String.join;
+import static java.lang.String.valueOf;
 
+import static com.opinta.constraint.RegexPattern.POST_ID_LENGTH;
+import static com.opinta.entity.ClientType.INDIVIDUAL;
+import static com.opinta.util.AlphabetCharactersGenerationUtil.characterOf;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -123,6 +126,8 @@ public class ClientControllerIT extends BaseControllerIT {
         JSONParser parser = new JSONParser();
         JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
         expectedJson.put("name", expectedFullName);
+        expectedJson.put("postId", null);
+        expectedJson.remove("externalId");
 
         UUID newClientUuid = UUID.fromString(newUuid);
 
@@ -176,18 +181,21 @@ public class ClientControllerIT extends BaseControllerIT {
                         path("uuid");
         long timeFinished = System.currentTimeMillis();
 
+
+        inputJson.remove("postId");
         JSONParser parser = new JSONParser();
         JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
         // should use hamcrest to check, cuz oracle returns empty string as null, and other db as ""
         expectedJson.remove("firstName");
         expectedJson.remove("middleName");
         expectedJson.remove("lastName");
+        expectedJson.put("postId", null);
+        expectedJson.remove("externalId");
 
         UUID newClientUuid = UUID.fromString(newUuid);
 
         // check created data
-        Client createdClient = clientService.getEntityByUuid(newClientUuid,
-                user);
+        Client createdClient = clientService.getEntityByUuid(newClientUuid, user);
         long timeCreated = createdClient.getCreated().getTime();
         long timeModified = createdClient.getLastModified().getTime();
 
@@ -200,7 +208,6 @@ public class ClientControllerIT extends BaseControllerIT {
                 createdClient.getCreator().getToken(), equalTo(user.getToken()));
         assertThat("Client was created with wrong modifier!",
                 createdClient.getLastModifier().getToken(), equalTo(user.getToken()));
-
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientMapper.toDto(createdClient));
         assertEquals(expectedJson.toJSONString(), actualJson, false);
@@ -243,6 +250,8 @@ public class ClientControllerIT extends BaseControllerIT {
         String expectedFullName = join(" ", lastName, firstName, middleName);
         expectedJson.put("name", expectedFullName);
         expectedJson.put("middleName", inputJson.get("middleName"));
+        expectedJson.put("postId", null);
+        expectedJson.remove("externalId");
 
         // check updated data
         Client updatedClient = clientService.getEntityByUuid(clientUuid, user);
@@ -253,6 +262,47 @@ public class ClientControllerIT extends BaseControllerIT {
         assertThat("Client was updated with wrong user!",
                 updatedClient.getLastModifier().getToken(), equalTo(user.getToken()));
 
+        ObjectMapper mapper = new ObjectMapper();
+        String actualJson = mapper.writeValueAsString(clientMapper.toDto(updatedClient));
+        assertEquals(expectedJson.toJSONString(), actualJson, false);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void updateClientAsIndividual_postIdNotSaved() throws Exception {
+        // update
+        JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client.json");
+        inputJson.put("addressId", (int) client.getAddress().getId());
+        inputJson.put("middleName", "Jakson [edited]");
+        inputJson.put("phoneNumber", "0934314522");
+        inputJson.put("individual", true);
+        inputJson.put("postId", "P170000001QWE");
+
+        String firstName = (String) inputJson.get("firstName");
+        String middleName = (String) inputJson.get("middleName");
+        String lastName = (String) inputJson.get("lastName");
+
+        given().
+                contentType(APPLICATION_JSON_VALUE).
+                queryParam("token", user.getToken()).
+                body(inputJson.toString()).
+        when().
+                put("/clients/{uuid}", clientUuid.toString()).
+        then().
+                body("counterpartyUuid", equalTo(client.getCounterparty().getUuid().toString())).
+                statusCode(SC_OK);
+
+        inputJson.remove("postId");
+        JSONParser parser = new JSONParser();
+        JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
+        String expectedFullName = join(" ", lastName, firstName, middleName);
+        expectedJson.put("name", expectedFullName);
+        expectedJson.put("middleName", inputJson.get("middleName"));
+        expectedJson.put("postId", null);
+        expectedJson.remove("externalId");
+
+        // check updated data
+        Client updatedClient = clientService.getEntityByUuid(clientUuid, user);
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(clientMapper.toDto(updatedClient));
         assertEquals(expectedJson.toJSONString(), actualJson, false);
@@ -279,6 +329,7 @@ public class ClientControllerIT extends BaseControllerIT {
                 statusCode(SC_OK);
         long timeFinished = System.currentTimeMillis();
 
+        inputJson.remove("postId");
         JSONParser parser = new JSONParser();
         JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
         expectedJson.put("name", inputJson.get("name"));
@@ -286,6 +337,8 @@ public class ClientControllerIT extends BaseControllerIT {
         expectedJson.remove("firstName");
         expectedJson.remove("middleName");
         expectedJson.remove("lastName");
+        expectedJson.put("postId", null);
+        expectedJson.remove("externalId");
 
         // check updated data
         Client updatedClient = clientService.getEntityByUuid(clientUuid, user);
@@ -394,5 +447,29 @@ public class ClientControllerIT extends BaseControllerIT {
                 post("/clients").
         then().
                 statusCode(SC_BAD_REQUEST);
+    }
+
+    @Test
+    public void updateClientPostId() throws Exception {
+        JSONObject inputJson = testHelper.getJsonObjectFromFile("json/client-type.json");
+        inputJson.put("type", INDIVIDUAL.name());
+
+        String postId =
+                given().
+                        contentType(APPLICATION_JSON_VALUE).
+                        queryParam("token", user.getToken()).
+                        body(inputJson.toString()).
+                when().
+                        put("/clients/{uuid}/post-id", client.getUuid().toString()).
+                then().
+                        statusCode(SC_OK).
+                extract().
+                        path("postId");
+
+        Assert.assertEquals(POST_ID_LENGTH, postId.length());
+        Assert.assertEquals(characterOf(INDIVIDUAL), valueOf(postId.charAt(0)));
+
+        Client saved = clientService.getEntityByUuid(client.getUuid(), user);
+        Assert.assertEquals(postId, saved.getPostId());
     }
 }

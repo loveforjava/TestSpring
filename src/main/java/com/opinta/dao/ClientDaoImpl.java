@@ -2,6 +2,9 @@ package com.opinta.dao;
 
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.User;
+
+import java.sql.CallableStatement;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,6 +15,8 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
+import static java.sql.Types.VARCHAR;
 
 @Repository
 public class ClientDaoImpl implements ClientDao {
@@ -47,7 +52,35 @@ public class ClientDaoImpl implements ClientDao {
         Session session = sessionFactory.getCurrentSession();
         return (Client) session.get(Client.class, uuid);
     }
-
+    
+    @Override
+    public Client getByPostId(String postId) {
+        Session session = sessionFactory.getCurrentSession();
+        return (Client) session.createCriteria(Client.class)
+                .add(Restrictions.eq("postId", postId))
+                .setMaxResults(1)
+                .uniqueResult();
+    }
+    
+    @Override
+    public String getNextPostIdInnerNumber() {
+        java.sql.Date date = new java.sql.Date(new java.util.Date().getTime());
+        Session session = sessionFactory.getCurrentSession();
+        return session.doReturningWork(connection -> {
+            try (CallableStatement call = connection.prepareCall(
+                    "BEGIN " +
+                    "   GET_NEXT_CLIENT_POSTID(?, ?); " +
+                    "END;")) {
+                call.setDate(1, date);
+                call.registerOutParameter(2, VARCHAR);
+                call.execute();
+                return call.getString(2);
+            } catch (SQLException e) {
+                throw new RuntimeException("Can't generate next postId inner number from stored procedure: ", e);
+            }
+        });
+    }
+    
     @Override
     public Client save(Client client) {
         Session session = sessionFactory.getCurrentSession();
