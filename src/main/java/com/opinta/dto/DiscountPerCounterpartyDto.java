@@ -1,6 +1,6 @@
 package com.opinta.dto;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,6 +13,6 @@ public class DiscountPerCounterpartyDto {
     private UUID uuid;
     private UUID counterpartyUuid;
     private UUID discountUuid;
-    private Date fromDate;
-    private Date toDate;
+    private LocalDateTime fromDate;
+    private LocalDateTime toDate;
 }

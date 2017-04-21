@@ -1,7 +1,7 @@
 package com.opinta.dto;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.opinta.entity.DeliveryType;
@@ -32,7 +32,7 @@ public class ShipmentDto {
     private BigDecimal price;
     private BigDecimal postPay;
     private DiscountPerCounterpartyDto discountPerCounterparty;
-    private Date lastModified;
+    private LocalDateTime lastModified;
     @Size(max = 255)
     private String description;
 }

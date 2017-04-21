@@ -13,7 +13,7 @@ import com.opinta.mapper.DiscountPerCounterpartyMapper;
 import com.opinta.util.LogMessageUtil;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import javax.transaction.Transactional;
@@ -74,7 +74,7 @@ public class DiscountPerCounterpartyServiceImpl implements DiscountPerCounterpar
 
     @Override
     @Transactional
-    public DiscountPerCounterparty getEntityWithHighestDiscount(User user, Date date) {
+    public DiscountPerCounterparty getEntityWithHighestDiscount(User user, LocalDateTime date) {
         log.info(format("Get the highest value of DiscountPerCounterparty for the %s for user %s", date, user));
         return discountPerCounterpartyDao.getHighestDiscount(user, date);
     }

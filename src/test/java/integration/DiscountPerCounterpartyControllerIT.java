@@ -37,7 +37,6 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
-    private static final TimeZone UTC = getTimeZone("UTC");
 
     @Autowired
     private DiscountPerCounterpartyService discountPerCounterpartyService;
@@ -49,7 +48,6 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
     private Counterparty counterparty;
     private User user;
     private JSONParser jsonParser = new JSONParser();
-    private SimpleDateFormat simpleDateFormat;
     private ObjectMapper jsonMapper = new ObjectMapper();
 
     @Before
@@ -57,10 +55,7 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
         counterparty = testHelper.createCounterparty();
         user = testHelper.createUser(counterparty);
         discountPerCounterparty = testHelper.createDiscountPerCounterparty(testHelper.createDiscount(), counterparty);
-        TimeZone.setDefault(UTC);
-        simpleDateFormat = new SimpleDateFormat(DATE_FORMAT_ISO_8601_24H);
-        simpleDateFormat.setTimeZone(UTC);
-    }
+        }
     
     @After
     public void tearDown() {
@@ -120,8 +115,8 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
         expectedJson.put("uuid", discountPerCounterpartyDto.getUuid());
         
         JSONObject actualJson = (JSONObject) jsonParser.parse(jsonMapper.writeValueAsString(discountPerCounterpartyDto));
-        actualJson.put("fromDate", simpleDateFormat.format(discountPerCounterpartyDto.getFromDate()));
-        actualJson.put("toDate", simpleDateFormat.format(discountPerCounterpartyDto.getToDate()));
+        actualJson.put("fromDate", discountPerCounterpartyDto.getFromDate().toString());
+        actualJson.put("toDate", discountPerCounterpartyDto.getToDate().toString());
         
         assertEquals(expectedJson.toString(), actualJson.toString(), false);
     }

@@ -1,7 +1,8 @@
 package com.opinta.dto;
 
 import com.opinta.entity.ShipmentStatus;
-import java.util.Date;
+
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import lombok.Getter;
@@ -16,5 +17,5 @@ public class ShipmentTrackingDetailDto {
     private UUID shipmentUuid;
     private long postOfficeId;
     private ShipmentStatus shipmentStatus;
-    private Date date;
+    private LocalDateTime date;
 }

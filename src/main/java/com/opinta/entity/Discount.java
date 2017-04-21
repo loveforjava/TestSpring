@@ -1,13 +1,11 @@
 package com.opinta.entity;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.validation.constraints.Size;
 
 import lombok.Data;
@@ -24,13 +22,11 @@ public class Discount {
     private UUID uuid;
     @Size(max = 255)
     private String name;
-    @Temporal(TemporalType.DATE)
-    private Date fromDate;
-    @Temporal(TemporalType.DATE)
-    private Date toDate;
+    private LocalDateTime fromDate;
+    private LocalDateTime toDate;
     private float value;
     
-    public Discount(String name, Date from, Date to, float value) {
+    public Discount(String name, LocalDateTime from, LocalDateTime to, float value) {
         this.name = name;
         this.fromDate = from;
         this.toDate = to;

@@ -5,6 +5,7 @@ import com.opinta.entity.Discount;
 import com.opinta.service.DiscountService;
 import integration.helper.TestHelper;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -20,6 +21,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static com.opinta.util.FormatterUtil.DATE_FORMAT_ISO_8601_24H;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
+
+import static java.time.LocalDateTime.now;
+import static java.time.LocalDateTime.parse;
 import static java.util.TimeZone.getTimeZone;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
@@ -30,22 +34,17 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
 public class DiscountControllerIT extends BaseControllerIT {
-    private static final TimeZone UTC = getTimeZone("UTC");
 
     @Autowired
     private DiscountService discountService;
     @Autowired
     private TestHelper testHelper;
     private List<Discount> discounts;
-    private SimpleDateFormat simpleDateFormat;
 
     @Before
     @SuppressWarnings("unchecked")
     public void setUp() {
         discounts = testHelper.createDiscounts();
-        TimeZone.setDefault(UTC);
-        simpleDateFormat = new SimpleDateFormat(DATE_FORMAT_ISO_8601_24H);
-        simpleDateFormat.setTimeZone(UTC);
     }
     
     @After
@@ -94,6 +93,8 @@ public class DiscountControllerIT extends BaseControllerIT {
                         post("/discounts").
                 then().
                         statusCode(SC_OK).
+                        body("fromDate", equalTo(inputJson.get("fromDate"))).
+                        body("toDate", equalTo(inputJson.get("toDate"))).
                 extract().
                         path("uuid");
 
@@ -106,8 +107,8 @@ public class DiscountControllerIT extends BaseControllerIT {
         Discount discount = discountService.getEntityByUuid(newDiscountUuid);
         ObjectMapper mapper = new ObjectMapper();
         JSONObject actualJson = (JSONObject) parser.parse(mapper.writeValueAsString(discount));
-        actualJson.put("fromDate", simpleDateFormat.format(discount.getFromDate()));
-        actualJson.put("toDate", simpleDateFormat.format(discount.getToDate()));
+        actualJson.put("fromDate", discount.getFromDate().toString());
+        actualJson.put("toDate", discount.getToDate().toString());
 
         JSONAssert.assertEquals(expectedJson.toString(), actualJson.toString(), false);
 
@@ -138,8 +139,8 @@ public class DiscountControllerIT extends BaseControllerIT {
         Discount discount = discountService.getEntityByUuid(discountUuid);
         ObjectMapper mapper = new ObjectMapper();
         JSONObject actualJson = (JSONObject) parser.parse(mapper.writeValueAsString(discount));
-        actualJson.put("fromDate", simpleDateFormat.format(discount.getFromDate()));
-        actualJson.put("toDate", simpleDateFormat.format(discount.getToDate()));
+        actualJson.put("fromDate", discount.getFromDate().toString());
+        actualJson.put("toDate", discount.getToDate().toString());
 
         JSONAssert.assertEquals(expectedJson.toString(), actualJson.toString(), false);
     }

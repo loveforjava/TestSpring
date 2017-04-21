@@ -1,6 +1,6 @@
 package com.opinta.dto;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import javax.validation.constraints.Size;
@@ -16,7 +16,7 @@ public class DiscountDto {
     private UUID uuid;
     @Size(max = 255)
     private String name;
-    private Date fromDate;
-    private Date toDate;
+    private LocalDateTime fromDate;
+    private LocalDateTime toDate;
     private Float value;
 }
