@@ -47,8 +47,8 @@ public class DiscountPerCounterpartyDaoImpl implements DiscountPerCounterpartyDa
                 .createCriteria(DiscountPerCounterparty.class, "discountPerCounterparty")
                 .createCriteria("discountPerCounterparty.discount", "discount")
                 .add(Restrictions.eq("discountPerCounterparty.counterparty", user.getCounterparty()))
-                .add(Restrictions.le("discountPerCounterparty.fromDate", date))
-                .add(Restrictions.ge("discountPerCounterparty.toDate", date))
+                .add(Restrictions.le("discountPerCounterparty.fromDate", date.toLocalDate()))
+                .add(Restrictions.ge("discountPerCounterparty.toDate", date.toLocalDate()))
                 .addOrder(Order.desc("discount.value"))
                 .setMaxResults(1)
                 .uniqueResult();
