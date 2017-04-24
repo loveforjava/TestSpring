@@ -18,13 +18,9 @@ import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static com.opinta.util.FormatterUtil.DATE_FORMAT_ISO_8601_24H;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
 
-import static java.time.LocalDateTime.now;
-import static java.time.LocalDateTime.parse;
-import static java.util.TimeZone.getTimeZone;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -39,6 +35,8 @@ public class DiscountControllerIT extends BaseControllerIT {
     private DiscountService discountService;
     @Autowired
     private TestHelper testHelper;
+    @Autowired
+    private ObjectMapper objectMapper;
     private List<Discount> discounts;
 
     @Before
@@ -105,10 +103,7 @@ public class DiscountControllerIT extends BaseControllerIT {
         JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
 
         Discount discount = discountService.getEntityByUuid(newDiscountUuid);
-        ObjectMapper mapper = new ObjectMapper();
-        JSONObject actualJson = (JSONObject) parser.parse(mapper.writeValueAsString(discount));
-        actualJson.put("fromDate", discount.getFromDate().toString());
-        actualJson.put("toDate", discount.getToDate().toString());
+        JSONObject actualJson = (JSONObject) parser.parse(objectMapper.writeValueAsString(discount));
 
         JSONAssert.assertEquals(expectedJson.toString(), actualJson.toString(), false);
 
@@ -130,17 +125,16 @@ public class DiscountControllerIT extends BaseControllerIT {
         when().
                 put("/discounts/{uuid}", discountUuid).
         then().
-                statusCode(SC_OK);
+                statusCode(SC_OK).
+                body("fromDate", equalTo(inputJson.get("fromDate"))).
+                body("toDate", equalTo(inputJson.get("toDate")));
 
         // check updated data
         JSONParser parser = new JSONParser();
         JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
 
         Discount discount = discountService.getEntityByUuid(discountUuid);
-        ObjectMapper mapper = new ObjectMapper();
-        JSONObject actualJson = (JSONObject) parser.parse(mapper.writeValueAsString(discount));
-        actualJson.put("fromDate", discount.getFromDate().toString());
-        actualJson.put("toDate", discount.getToDate().toString());
+        JSONObject actualJson = (JSONObject) parser.parse(objectMapper.writeValueAsString(discount));
 
         JSONAssert.assertEquals(expectedJson.toString(), actualJson.toString(), false);
     }

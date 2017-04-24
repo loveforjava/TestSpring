@@ -1,6 +1,6 @@
 {
   "name": "Discount 10%",
-  "fromDate": "2017-01-01T00:00",
-  "toDate": "2018-01-01T00:00",
+  "fromDate": "2017-01-01",
+  "toDate": "2018-01-01",
   "value": 10
 }

@@ -1,7 +1,16 @@
 package com.opinta.config;
 
+import java.time.LocalDate;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.opinta.util.serialization.CustomLocalDateDeserializer;
+import com.opinta.util.serialization.CustomLocalDateSerializer;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
@@ -10,4 +19,18 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @EnableTransactionManagement
 @ComponentScan(basePackages = "com.opinta")
 public class ApplicationConfig {
+    
+    @Bean
+    @Primary
+    public ObjectMapper serializingObjectMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        objectMapper.configure(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS, false);
+        JavaTimeModule javaTimeModule = new JavaTimeModule();
+        javaTimeModule.addSerializer(LocalDate.class, new CustomLocalDateSerializer());
+        javaTimeModule.addDeserializer(LocalDate.class, new CustomLocalDateDeserializer());
+        objectMapper.registerModule(javaTimeModule);
+        return objectMapper;
+    }
+    
 }

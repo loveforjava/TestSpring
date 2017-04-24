@@ -3,7 +3,6 @@ package integration.helper;
 import com.opinta.dto.postid.ClientTypeDto;
 import com.opinta.entity.Address;
 import com.opinta.entity.Client;
-import com.opinta.entity.ClientType;
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.Discount;
 import com.opinta.entity.DiscountPerCounterparty;
@@ -19,8 +18,6 @@ import com.opinta.exception.IncorrectInputDataException;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-
-import java.time.ZoneOffset;
 
 import com.opinta.service.AddressService;
 import com.opinta.service.ClientService;
@@ -42,13 +39,12 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
 import static com.opinta.util.LogMessageUtil.updateLogEndpoint;
-import static java.time.LocalDateTime.now;
+import static java.time.LocalDate.now;
 
 import static com.opinta.entity.ClientType.COMPANY;
 import static com.opinta.entity.ClientType.INDIVIDUAL;

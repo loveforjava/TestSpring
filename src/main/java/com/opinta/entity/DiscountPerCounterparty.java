@@ -2,7 +2,7 @@ package com.opinta.entity;
 
 import com.opinta.exception.PerformProcessFailedException;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.UUID;
 
 import javax.persistence.Entity;
@@ -28,11 +28,10 @@ public class DiscountPerCounterparty {
     private Counterparty counterparty;
     @ManyToOne
     private Discount discount;
-    private LocalDateTime fromDate;
-    private LocalDateTime toDate;
+    private LocalDate fromDate;
+    private LocalDate toDate;
 
-    public DiscountPerCounterparty(Counterparty counterparty, Discount discount, LocalDateTime fromDate,
-                                   LocalDateTime toDate) {
+    public DiscountPerCounterparty(Counterparty counterparty, Discount discount, LocalDate fromDate, LocalDate toDate) {
         this.counterparty = counterparty;
         this.discount = discount;
         this.fromDate = fromDate;

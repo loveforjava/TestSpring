@@ -1,13 +1,16 @@
 package com.opinta.dto;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.UUID;
 
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import static com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING;
 
 @Getter
 @Setter
@@ -16,7 +19,9 @@ public class DiscountDto {
     private UUID uuid;
     @Size(max = 255)
     private String name;
-    private LocalDateTime fromDate;
-    private LocalDateTime toDate;
+    @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
+    private LocalDate fromDate;
+    @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
+    private LocalDate toDate;
     private Float value;
 }
