@@ -87,7 +87,7 @@ public class AddressControllerIT extends BaseControllerIT {
     public void createAddress() throws Exception {
         // create
         JSONObject expectedJson = testHelper.getJsonObjectFromFile("json/address.json");
-    
+
         LocalDateTime timeStarted = now();
         int newAddressId =
                 given().

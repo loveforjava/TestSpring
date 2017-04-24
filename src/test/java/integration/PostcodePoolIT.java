@@ -86,7 +86,7 @@ public class PostcodePoolIT extends BaseControllerIT {
         // create
         JSONObject inputJson = testHelper.getJsonObjectFromFile("json/postcode-pool.json");
         String postCode = (String) inputJson.get("postcode");
-    
+
         LocalDateTime timeStarted = now();
         MockMvcResponse response =
                 given().

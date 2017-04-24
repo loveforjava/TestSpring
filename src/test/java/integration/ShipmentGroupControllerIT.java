@@ -134,7 +134,7 @@ public class ShipmentGroupControllerIT extends BaseControllerIT {
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment-group.json");
         jsonObject.put("counterpartyUuid", newCounterparty.getUuid().toString());
         String expectedJson = jsonObject.toString();
-    
+
         LocalDateTime timeStarted = now();
         String newShipmentGroupIdString =
                 given().

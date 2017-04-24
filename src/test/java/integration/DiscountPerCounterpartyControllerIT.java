@@ -102,7 +102,7 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
         JSONObject inputJson = testHelper.getJsonObjectFromFile("json/discount-per-counterparty.json");
         inputJson.put("discountUuid", newDiscount.getUuid().toString());
         inputJson.put("counterpartyUuid", counterparty.getUuid().toString());
-    
+
         LocalDateTime timeStarted = now();
         String newUuid =
                 given().
