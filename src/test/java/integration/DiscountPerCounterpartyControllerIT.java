@@ -1,6 +1,7 @@
 package integration;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.TimeZone;
 import java.util.UUID;
 
@@ -12,18 +13,26 @@ import com.opinta.entity.DiscountPerCounterparty;
 import com.opinta.entity.User;
 import com.opinta.mapper.DiscountPerCounterpartyMapper;
 import com.opinta.service.DiscountPerCounterpartyService;
-import com.opinta.service.UserService;
 import integration.helper.TestHelper;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import static com.opinta.util.FormatterUtil.DATE_FORMAT_ISO_8601_24H;
+import static integration.helper.TestHelper.NO_CREATOR_MESSAGE;
+import static integration.helper.TestHelper.NO_LAST_MODIFIER_MESSAGE;
+import static integration.helper.TestHelper.WRONG_CREATED_MESSAGE;
+import static integration.helper.TestHelper.WRONG_CREATOR_MESSAGE;
+import static integration.helper.TestHelper.WRONG_LAST_MODIFIED_MESSAGE;
+import static integration.helper.TestHelper.WRONG_LAST_MODIFIER_MESSAGE;
+import static java.lang.System.currentTimeMillis;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static java.time.LocalDateTime.now;
 import static java.util.TimeZone.getTimeZone;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
@@ -33,6 +42,8 @@ import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -91,7 +102,8 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
         JSONObject inputJson = testHelper.getJsonObjectFromFile("json/discount-per-counterparty.json");
         inputJson.put("discountUuid", newDiscount.getUuid().toString());
         inputJson.put("counterpartyUuid", counterparty.getUuid().toString());
-
+    
+        LocalDateTime timeStarted = now();
         String newUuid =
                 given().
                         queryParam("token", user.getToken()).
@@ -103,13 +115,23 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
                         statusCode(SC_OK).
                 extract().
                         path("uuid");
-    
+        LocalDateTime timeFinished = now();
         UUID newDiscountUuid = UUID.fromString(newUuid);
 
-        DiscountPerCounterparty discountPerCounterparty = discountPerCounterpartyService.
+        DiscountPerCounterparty createdDiscountPerCounterparty = discountPerCounterpartyService.
                 getEntityByUuid(newDiscountUuid, user);
         DiscountPerCounterpartyDto discountPerCounterpartyDto = discountPerCounterpartyMapper.
-                toDto(discountPerCounterparty);
+                toDto(createdDiscountPerCounterparty);
+        LocalDateTime timeCreated = createdDiscountPerCounterparty.getCreated();
+        LocalDateTime timeModified = createdDiscountPerCounterparty.getLastModified();
+
+        assertTrue(WRONG_CREATED_MESSAGE, timeFinished.isAfter(timeCreated) && timeCreated.isAfter(timeStarted));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished.isAfter(timeModified) && timeModified.isAfter(timeStarted));
+        assertNotNull(NO_CREATOR_MESSAGE, createdDiscountPerCounterparty.getCreator());
+        assertNotNull(NO_LAST_MODIFIER_MESSAGE, createdDiscountPerCounterparty.getLastModifier());
+        assertThat(WRONG_CREATOR_MESSAGE, createdDiscountPerCounterparty.getCreator().getToken(), equalTo(user.getToken()));
+        assertThat(WRONG_LAST_MODIFIER_MESSAGE,
+                createdDiscountPerCounterparty.getLastModifier().getToken(), equalTo(user.getToken()));
 
         JSONObject expectedJson = (JSONObject) jsonParser.parse(inputJson.toJSONString());
         expectedJson.put("uuid", discountPerCounterpartyDto.getUuid());
@@ -129,7 +151,8 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
         JSONObject inputJson = testHelper.getJsonObjectFromFile("json/discount-per-counterparty.json");
         inputJson.put("discountUuid", newDiscount.getUuid().toString());
         inputJson.put("counterpartyUuid", counterparty.getUuid().toString());
-        
+
+        LocalDateTime timeStarted = now();
         given().
                 queryParam("token", user.getToken()).
                 contentType(APPLICATION_JSON_VALUE).
@@ -139,9 +162,16 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
         then().
                 body("discountUuid", equalTo(newDiscount.getUuid().toString())).
                 statusCode(SC_OK);
-    
+        LocalDateTime timeFinished = now();
+
         DiscountPerCounterparty updatedDiscountPerCounterparty = discountPerCounterpartyService
                 .getEntityByUuid(discountPerCounterparty.getUuid(), user);
+        LocalDateTime timeModified = updatedDiscountPerCounterparty.getLastModified();
+
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished.isAfter(timeModified) && timeModified.isAfter(timeStarted));
+        assertNotNull(NO_LAST_MODIFIER_MESSAGE, updatedDiscountPerCounterparty.getCreator());
+        assertThat(WRONG_LAST_MODIFIER_MESSAGE,
+                updatedDiscountPerCounterparty.getLastModifier().getToken(), equalTo(user.getToken()));
 
         assertEquals(updatedDiscountPerCounterparty.getDiscount().getUuid(), newDiscount.getUuid());
     }
@@ -173,16 +203,5 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
         assertEquals(
                 discountPerCounterparty.getDiscount().getUuid().toString(),
                 existedDiscountPerCounterparty.getDiscount().getUuid().toString());
-    }
-
-    @Test
-    public void deleteDiscountPerCounterparty() throws Exception {
-        given().
-                queryParam("token", user.getToken()).
-                contentType(APPLICATION_JSON_VALUE).
-        when().
-                delete("/counterparty-discounts/{uuid}", discountPerCounterparty.getUuid()).
-        then().
-                statusCode(SC_OK);
     }
 }

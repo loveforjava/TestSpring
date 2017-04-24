@@ -97,7 +97,10 @@ public class ShipmentServiceImpl implements ShipmentService {
         shipment.setDiscountPerCounterparty(discountPerCounterpartyService
                 .getEntityWithHighestDiscount(user, shipment.getLastModified()));
         shipment.setPrice(calculatePrice(shipment));
-
+        shipment.setCreated(now());
+        shipment.setLastModified(now());
+        shipment.setCreator(user);
+        shipment.setLastModifier(user);
         log.info(LogMessageUtil.saveLogEndpoint(Shipment.class, shipment));
         return shipmentDao.save(shipment);
     }
@@ -168,6 +171,8 @@ public class ShipmentServiceImpl implements ShipmentService {
         target.setDiscountPerCounterparty(discountPerCounterpartyService
                 .getEntityWithHighestDiscount(user, target.getLastModified()));
         target.setPrice(calculatePrice(target));
+        target.setLastModified(now());
+        target.setLastModifier(user);
         log.info(updateLogEndpoint(Shipment.class, target));
         shipmentDao.update(target);
         return shipmentMapper.toDto(target);

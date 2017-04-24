@@ -16,13 +16,20 @@ import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static integration.helper.TestHelper.WRONG_CREATED_MESSAGE;
+import static integration.helper.TestHelper.WRONG_LAST_MODIFIED_MESSAGE;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
+import static java.lang.System.currentTimeMillis;
+import static java.time.LocalDateTime.now;
+
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 @Slf4j
@@ -79,7 +86,8 @@ public class PostcodePoolIT extends BaseControllerIT {
         // create
         JSONObject inputJson = testHelper.getJsonObjectFromFile("json/postcode-pool.json");
         String postCode = (String) inputJson.get("postcode");
-
+    
+        LocalDateTime timeStarted = now();
         MockMvcResponse response =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
@@ -91,9 +99,16 @@ public class PostcodePoolIT extends BaseControllerIT {
                         body("postcode", equalTo(postCode)).
                 extract().
                         response();
+        LocalDateTime timeFinished = now();
 
         // check created data
         PostcodePool createdPostcodePool = postcodePoolService.getEntityByUuid(UUID.fromString(response.path("uuid")));
+        LocalDateTime timeCreated = createdPostcodePool.getCreated();
+        LocalDateTime timeModified = createdPostcodePool.getLastModified();
+
+        assertTrue(WRONG_CREATED_MESSAGE, timeFinished.isAfter(timeCreated) && timeCreated.isAfter(timeStarted));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished.isAfter(timeModified) && timeModified.isAfter(timeStarted));
+
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(postcodePoolMapper.toDto(createdPostcodePool));
 
@@ -112,6 +127,7 @@ public class PostcodePoolIT extends BaseControllerIT {
 
         String postCode = (String) inputJson.get("postcode");
 
+        LocalDateTime timeStarted = now();
         given().
                 contentType(APPLICATION_JSON_VALUE).
                 body(inputJson).
@@ -120,35 +136,23 @@ public class PostcodePoolIT extends BaseControllerIT {
         then().
                 contentType(APPLICATION_JSON_VALUE).
                 statusCode(SC_OK);
+        LocalDateTime timeFinished = now();
 
         JSONParser parser = new JSONParser();
         JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
         expectedJson.put("postcode", postCode);
 
         // check updated data
-        PostcodePoolDto postcodePoolDto = postcodePoolMapper.toDto(postcodePoolService.getEntityByUuid(
-                postcodePoolUuid));
+        PostcodePool updatedPostcodePool = postcodePoolService.getEntityByUuid(
+                postcodePoolUuid);
+        PostcodePoolDto postcodePoolDto = postcodePoolMapper.toDto(updatedPostcodePool);
+        LocalDateTime timeModified = updatedPostcodePool.getLastModified();
+
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished.isAfter(timeModified) && timeModified.isAfter(timeStarted));
+
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(postcodePoolDto);
 
         JSONAssert.assertEquals(expectedJson.toJSONString(), actualJson, false);
-    }
-
-    @Test
-    public void deletePostcodePool() throws Exception {
-        given().
-                when().
-                delete("/postcodes/{uuid}", postcodePoolUuid.toString()).
-        then().
-                statusCode(SC_OK);
-    }
-
-    @Test
-    public void deletePostcodePool_notFound() throws Exception {
-        given().
-                when().
-                delete("/postcodes/{uuid}", UUID.randomUUID().toString()).
-        then().
-                statusCode(SC_NOT_FOUND);
     }
 }

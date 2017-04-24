@@ -16,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static java.time.LocalDateTime.now;
+
 import static com.opinta.util.LogMessageUtil.authenticationOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdLogEndpoint;
 import static com.opinta.util.LogMessageUtil.updateLogEndpoint;
@@ -59,6 +61,8 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User saveEntity(User user) throws IncorrectInputDataException, AuthException {
         user.setCounterparty(counterpartyService.getEntityByUuid(user.getCounterparty().getUuid(), user));
+        user.setCreated(now());
+        user.setLastModified(now());
         return userDao.save(user);
     }
 
@@ -73,6 +77,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User updateEntity(User user) throws IncorrectInputDataException, AuthException {
         log.info(updateLogEndpoint(User.class, user));
+        user.setLastModified(now());
         userDao.update(user);
         return user;
     }

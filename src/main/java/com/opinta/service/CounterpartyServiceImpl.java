@@ -21,6 +21,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static java.time.LocalDateTime.now;
+
 import static com.opinta.util.AuthorizationUtil.authorizeForAction;
 import static com.opinta.util.EnhancedBeanUtilsBean.copyNotNullProperties;
 import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
@@ -90,6 +92,8 @@ public class CounterpartyServiceImpl implements CounterpartyService {
     @Override
     @Transactional
     public Counterparty saveEntity(Counterparty counterparty) throws IncorrectInputDataException {
+        counterparty.setCreated(now());
+        counterparty.setLastModified(now());
         log.info(saveLogEndpoint(Counterparty.class, counterparty));
         return counterpartyDao.save(counterparty);
     }
@@ -129,6 +133,8 @@ public class CounterpartyServiceImpl implements CounterpartyService {
         }
         target.setUuid(uuid);
         log.info(updateLogEndpoint(Counterparty.class, target));
+        target.setLastModified(now());
+        target.setLastModifier(user);
         counterpartyDao.update(target);
         return counterpartyMapper.toDto(target);
     }

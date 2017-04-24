@@ -1,6 +1,8 @@
 package integration;
 
 import com.opinta.constraint.RegexMatcher;
+
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,10 +23,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import integration.helper.TestHelper;
 
 import static com.opinta.constraint.RegexPattern.BARCODE_REGEX;
+import static integration.helper.TestHelper.NO_CREATOR_MESSAGE;
+import static integration.helper.TestHelper.NO_LAST_MODIFIER_MESSAGE;
+import static integration.helper.TestHelper.WRONG_CREATED_MESSAGE;
+import static integration.helper.TestHelper.WRONG_CREATOR_MESSAGE;
+import static integration.helper.TestHelper.WRONG_LAST_MODIFIED_MESSAGE;
+import static integration.helper.TestHelper.WRONG_LAST_MODIFIER_MESSAGE;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
+import static java.lang.System.currentTimeMillis;
+import static java.time.LocalDateTime.now;
+
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
@@ -111,6 +125,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         jsonObject.put("shipmentGroupUuid", shipmentGroup.getUuid().toString());
         String expectedJson = jsonObject.toString();
 
+        LocalDateTime timeStarted = now();
         String newShipmentUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
@@ -123,9 +138,12 @@ public class ShipmentControllerIT extends BaseControllerIT {
                         body("barcode", RegexMatcher.matches(BARCODE_REGEX)).
                 extract().
                         path("uuid");
+        LocalDateTime timeFinished = now();
 
         // check created data
         Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid), user);
+        checkDatesModifierAndCreator(timeStarted, timeFinished, createdShipment);
+
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(shipmentMapper.toDto(createdShipment));
 
@@ -134,7 +152,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         // delete
         testHelper.deleteShipment(createdShipment);
     }
-    
+
     @Test
     @SuppressWarnings("unchecked")
     public void createShipment_presavedSenderAndRecipient_senderByPostId() throws Exception {
@@ -142,14 +160,15 @@ public class ShipmentControllerIT extends BaseControllerIT {
         testHelper.assignPostIdTo(sender);
         Client recipient = testHelper.createRecipientFor(user);
         ShipmentGroup shipmentGroup = testHelper.createShipmentGroupFor(user);
-        
+
         JSONObject jsonObject = testHelper.getJsonObjectFromFile("json/shipment.json");
         // populate input json with sender and recipient uuid
         jsonObject.put("sender", testHelper.toJsonWithPostId(sender));
         jsonObject.put("recipient", testHelper.toJsonWithUuid(recipient));
         jsonObject.put("shipmentGroupUuid", shipmentGroup.getUuid().toString());
         String expectedJson = jsonObject.toString();
-        
+
+        LocalDateTime timeStarted = now();
         String newShipmentUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
@@ -162,14 +181,17 @@ public class ShipmentControllerIT extends BaseControllerIT {
                         body("barcode", RegexMatcher.matches(BARCODE_REGEX)).
                 extract().
                         path("uuid");
-        
+        LocalDateTime timeFinished = now();
+
         // check created data
         Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid), user);
+        checkDatesModifierAndCreator(timeStarted, timeFinished, createdShipment);
+
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(shipmentMapper.toDto(createdShipment));
-        
+
         assertEquals(expectedJson, actualJson, false);
-        
+
         // delete
         testHelper.deleteShipment(createdShipment);
     }
@@ -188,6 +210,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         testHelper.adjustClientData((JSONObject) jsonObject.get("recipient"), recipientAddress);
         String inputJson = jsonObject.toJSONString();
 
+        LocalDateTime timeStarted = now();
         String newShipmentUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
@@ -200,10 +223,12 @@ public class ShipmentControllerIT extends BaseControllerIT {
                         body("barcode", RegexMatcher.matches(BARCODE_REGEX)).
                 extract().
                         path("uuid");
+        LocalDateTime timeFinished = now();
 
         
         // check created data
         Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid), user);
+        checkDatesModifierAndCreator(timeStarted, timeFinished, createdShipment);
         // adjust jsonObject with actual data, modified in server
         testHelper.mergeClientNames((JSONObject) jsonObject.get("sender"), createdShipment.getSender());
         testHelper.mergeClientNames((JSONObject) jsonObject.get("recipient"), createdShipment.getRecipient());
@@ -230,7 +255,8 @@ public class ShipmentControllerIT extends BaseControllerIT {
         jsonObject.put("sender", testHelper.toJsonWithUuid(sender));
         testHelper.adjustClientData((JSONObject) jsonObject.get("recipient"), recipientAddress);
         String inputJson = jsonObject.toJSONString();
-        
+
+        LocalDateTime timeStarted = now();
         String newShipmentUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
@@ -243,10 +269,12 @@ public class ShipmentControllerIT extends BaseControllerIT {
                         body("barcode", RegexMatcher.matches(BARCODE_REGEX)).
                 extract().
                         path("uuid");
-        
+        LocalDateTime timeFinished = now();
+
         
         // check created data
         Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid), user);
+        checkDatesModifierAndCreator(timeStarted, timeFinished, createdShipment);
         // adjust jsonObject with actual data, modified into
         testHelper.mergeClientNames((JSONObject) jsonObject.get("sender"), createdShipment.getSender());
         testHelper.mergeClientNames((JSONObject) jsonObject.get("recipient"), createdShipment.getRecipient());
@@ -270,7 +298,8 @@ public class ShipmentControllerIT extends BaseControllerIT {
         jsonObject.put("recipient", testHelper.toJsonWithUuid(shipment.getRecipient()));
         String expectedJson = jsonObject.toString();
         ShipmentDto shipmentDtoBeforeUpdate = shipmentMapper.toDto(shipmentService.getEntityByUuid(shipmentUuid, user));
-        
+
+        LocalDateTime timeStarted = now();
         given().
                 contentType(APPLICATION_JSON_VALUE).
                 queryParam("token", user.getToken()).
@@ -280,9 +309,18 @@ public class ShipmentControllerIT extends BaseControllerIT {
         then().
                 body("barcode", equalTo(shipmentDtoBeforeUpdate.getBarcode())).
                 statusCode(SC_OK);
+        LocalDateTime timeFinished = now();
 
         // check updated data
-        ShipmentDto shipmentDto = shipmentMapper.toDto(shipmentService.getEntityByUuid(shipmentUuid, user));
+        Shipment updatedShipment = shipmentService.getEntityByUuid(shipmentUuid, user);
+        ShipmentDto shipmentDto = shipmentMapper.toDto(updatedShipment);
+        LocalDateTime timeModified = updatedShipment.getLastModified();
+
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished.isAfter(timeModified) && timeModified.isAfter(timeStarted));
+        assertNotNull(NO_LAST_MODIFIER_MESSAGE, updatedShipment.getCreator());
+        assertThat(WRONG_LAST_MODIFIER_MESSAGE,
+                updatedShipment.getLastModifier().getToken(), equalTo(user.getToken()));
+
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(shipmentDto);
 
@@ -308,23 +346,15 @@ public class ShipmentControllerIT extends BaseControllerIT {
         testHelper.deleteShipment(shipment);
     }
 
-    @Test
-    public void deleteShipment() throws Exception {
-        given().
-                queryParam("token", user.getToken()).
-        when().
-                delete("/shipments/{uuid}", shipmentUuid.toString()).
-        then().
-                statusCode(SC_OK);
-    }
+    private void checkDatesModifierAndCreator(LocalDateTime timeStarted, LocalDateTime timeFinished, Shipment createdShipment) {
+        LocalDateTime timeCreated = createdShipment.getCreated();
+        LocalDateTime timeModified = createdShipment.getLastModified();
 
-    @Test
-    public void deleteShipment_notFound() throws Exception {
-        given().
-                queryParam("token", user.getToken()).
-        when().
-                delete("/shipments/{uuid}", UUID.randomUUID().toString()).
-        then().
-                statusCode(SC_NOT_FOUND);
+        assertTrue(WRONG_CREATED_MESSAGE, timeFinished.isAfter(timeCreated) && timeCreated.isAfter(timeStarted));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished.isAfter(timeModified) && timeModified.isAfter(timeStarted));
+        assertNotNull(NO_CREATOR_MESSAGE, createdShipment.getCreator());
+        assertNotNull(NO_LAST_MODIFIER_MESSAGE, createdShipment.getLastModifier());
+        assertThat(WRONG_CREATOR_MESSAGE, createdShipment.getCreator().getToken(), equalTo(user.getToken()));
+        assertThat(WRONG_LAST_MODIFIER_MESSAGE, createdShipment.getLastModifier().getToken(), equalTo(user.getToken()));
     }
 }

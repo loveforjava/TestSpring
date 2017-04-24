@@ -17,6 +17,7 @@ import static com.opinta.entity.BarcodeStatus.RESERVED;
 import static java.lang.String.format;
 import static java.sql.Types.INTEGER;
 import static java.sql.Types.VARCHAR;
+import static java.time.LocalDateTime.now;
 
 @Repository
 public class BarcodeInnerNumberDaoImpl implements BarcodeInnerNumberDao {
@@ -60,7 +61,7 @@ public class BarcodeInnerNumberDaoImpl implements BarcodeInnerNumberDao {
         Session session = sessionFactory.getCurrentSession();
         session.delete(barcodeInnerNumber);
     }
-    
+
     @Override
     public BarcodeInnerNumber generateForPostcodePool(PostcodePool postcodePool) {
         Session session = sessionFactory.getCurrentSession();
@@ -83,6 +84,7 @@ public class BarcodeInnerNumberDaoImpl implements BarcodeInnerNumberDao {
         barcodeInnerNumber.setStatus(RESERVED);
         barcodeInnerNumber.setInnerNumber(barcode);
         barcodeInnerNumber.setPostcodePool(postcodePool);
+        barcodeInnerNumber.setCreated(now());
         session.persist(barcodeInnerNumber);
 
         return barcodeInnerNumber;

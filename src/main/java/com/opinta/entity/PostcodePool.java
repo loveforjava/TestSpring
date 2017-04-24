@@ -1,5 +1,6 @@
 package com.opinta.entity;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -29,6 +30,9 @@ public class PostcodePool {
     @Size(min = POSTCODE_LENGTH, max = POSTCODE_LENGTH)
     private String postcode;
     private boolean closed;
+
+    private LocalDateTime created;
+    private LocalDateTime lastModified;
 
     public PostcodePool(String postcode, boolean closed) {
         this.postcode = postcode;

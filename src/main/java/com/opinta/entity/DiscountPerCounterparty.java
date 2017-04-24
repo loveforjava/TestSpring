@@ -3,11 +3,13 @@ package com.opinta.entity;
 import com.opinta.exception.PerformProcessFailedException;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import lombok.Data;
@@ -30,6 +32,15 @@ public class DiscountPerCounterparty {
     private Discount discount;
     private LocalDate fromDate;
     private LocalDate toDate;
+
+    private LocalDateTime created;
+    private LocalDateTime lastModified;
+    @ManyToOne
+    @JoinColumn(name = "creator_id")
+    private User creator;
+    @ManyToOne
+    @JoinColumn(name = "lastModifier_id")
+    private User lastModifier;
 
     public DiscountPerCounterparty(Counterparty counterparty, Discount discount, LocalDate fromDate, LocalDate toDate) {
         this.counterparty = counterparty;

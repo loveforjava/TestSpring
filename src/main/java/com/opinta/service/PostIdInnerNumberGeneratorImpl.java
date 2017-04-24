@@ -9,11 +9,11 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @Profile({"stage", "dev"})
-public class PostIdInnerNumberGeneratorProdDB implements PostIdInnerNumberGenerator {
+public class PostIdInnerNumberGeneratorImpl implements PostIdInnerNumberGenerator {
     private final ClientDao clientDao;
     
     @Autowired
-    public PostIdInnerNumberGeneratorProdDB(ClientDao clientDao) {
+    public PostIdInnerNumberGeneratorImpl(ClientDao clientDao) {
         this.clientDao = clientDao;
     }
     

@@ -1,5 +1,6 @@
 package com.opinta.entity;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
@@ -62,6 +63,15 @@ public class Client {
     private String bankCode;
     @Size(max = BANK_ACCOUNT_LENGTH)
     private String bankAccount;
+
+    private LocalDateTime created;
+    private LocalDateTime lastModified;
+    @ManyToOne
+    @JoinColumn(name = "creator_id")
+    private User creator;
+    @ManyToOne
+    @JoinColumn(name = "lastModifier_id")
+    private User lastModifier;
 
     public Client(String name, String uniqueRegistrationNumber, Address address,
                   Counterparty counterparty) {

@@ -1,5 +1,7 @@
 package integration;
 
+import java.time.LocalDateTime;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opinta.entity.Address;
 import com.opinta.exception.IncorrectInputDataException;
@@ -14,14 +16,20 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static integration.helper.TestHelper.SAME_REGION_COUNTRYSIDE;
+import static integration.helper.TestHelper.WRONG_CREATED_MESSAGE;
+import static integration.helper.TestHelper.WRONG_LAST_MODIFIED_MESSAGE;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
 import static java.lang.Integer.MIN_VALUE;
+
+import static java.lang.System.currentTimeMillis;
+import static java.time.LocalDateTime.now;
 
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
@@ -79,7 +87,8 @@ public class AddressControllerIT extends BaseControllerIT {
     public void createAddress() throws Exception {
         // create
         JSONObject expectedJson = testHelper.getJsonObjectFromFile("json/address.json");
-
+    
+        LocalDateTime timeStarted = now();
         int newAddressId =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
@@ -91,11 +100,18 @@ public class AddressControllerIT extends BaseControllerIT {
                         body("countryside", equalTo(false)).
                 extract().
                         path("id");
+        LocalDateTime timeFinished = now();
 
         // check created data
-        Address address = addressService.getEntityById(newAddressId);
+        Address createdAddress = addressService.getEntityById(newAddressId);
+        LocalDateTime timeCreated = createdAddress.getCreated();
+        LocalDateTime timeModified = createdAddress.getLastModified();
+
+        assertTrue(WRONG_CREATED_MESSAGE, timeFinished.isAfter(timeCreated) && timeCreated.isAfter(timeStarted));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished.isAfter(timeModified) && timeModified.isAfter(timeStarted));
+
         ObjectMapper mapper = new ObjectMapper();
-        String actualJson = mapper.writeValueAsString(address);
+        String actualJson = mapper.writeValueAsString(createdAddress);
         expectedJson.put("countryside", false);
 
         JSONAssert.assertEquals(expectedJson.toString(), actualJson, false);
@@ -140,6 +156,7 @@ public class AddressControllerIT extends BaseControllerIT {
         // update data
         JSONObject expectedJson = testHelper.getJsonObjectFromFile("json/address.json");
 
+        LocalDateTime timeStarted = now();
         given().
                 contentType(APPLICATION_JSON_VALUE).
                 body(expectedJson.toString()).
@@ -147,29 +164,17 @@ public class AddressControllerIT extends BaseControllerIT {
                 put("/addresses/{id}", addressId).
         then().
                 statusCode(SC_OK);
+        LocalDateTime timeFinished = now();
 
         // check if updated
-        Address address = addressService.getEntityById(addressId);
+        Address updatedAddress = addressService.getEntityById(addressId);
+        LocalDateTime timeModified = updatedAddress.getLastModified();
+
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished.isAfter(timeModified) && timeModified.isAfter(timeStarted));
+
         ObjectMapper mapper = new ObjectMapper();
-        String actualJson = mapper.writeValueAsString(address);
+        String actualJson = mapper.writeValueAsString(updatedAddress);
 
         JSONAssert.assertEquals(expectedJson.toString(), actualJson, false);
-    }
-
-    @Test
-    public void deleteAddress() throws Exception {
-        when().
-                delete("/addresses/{id}", addressId).
-        then().
-                statusCode(SC_OK);
-        addressId = -1;
-    }
-
-    @Test
-    public void deleteAddress_notFound() throws Exception {
-        when().
-                delete("/addresses/{id}", addressId + 1).
-        then().
-                statusCode(SC_NOT_FOUND);
     }
 }

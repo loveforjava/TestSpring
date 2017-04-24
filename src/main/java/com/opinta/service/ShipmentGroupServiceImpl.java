@@ -18,6 +18,8 @@ import javax.transaction.Transactional;
 import java.util.List;
 import java.util.UUID;
 
+import static java.time.LocalDateTime.now;
+
 import static com.opinta.util.AuthorizationUtil.authorizeForAction;
 import static com.opinta.util.EnhancedBeanUtilsBean.copyNotNullProperties;
 import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
@@ -73,6 +75,10 @@ public class ShipmentGroupServiceImpl implements ShipmentGroupService {
         validateInnerReferenceAndFillObjectFromDB(shipmentGroup, user);
 
         authorizeForAction(shipmentGroup, user);
+        shipmentGroup.setCreated(now());
+        shipmentGroup.setLastModified(now());
+        shipmentGroup.setCreator(user);
+        shipmentGroup.setLastModifier(user);
         log.info(saveLogEndpoint(ShipmentGroup.class, shipmentGroup));
         return shipmentGroupDao.save(shipmentGroup);
     }
@@ -95,6 +101,8 @@ public class ShipmentGroupServiceImpl implements ShipmentGroupService {
 
         target.setUuid(uuid);
         target.setCounterparty(source.getCounterparty());
+        target.setLastModified(now());
+        target.setLastModifier(user);
 
         log.info(updateOnErrorLogEndpoint(ShipmentGroup.class, target));
         shipmentGroupDao.update(target);

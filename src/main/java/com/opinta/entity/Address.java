@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -26,6 +27,9 @@ public class Address {
     private BigDecimal latitude;
     private BigDecimal longitude;
     private boolean countryside;
+
+    private LocalDateTime created;
+    private LocalDateTime lastModified;
 
     public Address(String postcode, String region, String district, String city, String street, String houseNumber,
                    String apartmentNumber) {

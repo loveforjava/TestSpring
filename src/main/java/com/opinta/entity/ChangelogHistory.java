@@ -11,9 +11,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import java.util.Date;
+
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -24,8 +23,7 @@ public class ChangelogHistory {
     @GeneratedValue
     private long id;
     @Column(nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date changeDate;
+    private LocalDateTime changeDate;
     @Column(length = 36, nullable = false)
     @Enumerated(EnumType.STRING)
     private ChangelogEntity entity;

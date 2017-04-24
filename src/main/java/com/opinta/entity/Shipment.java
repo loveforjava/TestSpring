@@ -48,8 +48,16 @@ public class Shipment {
     @ManyToOne
     @JoinColumn(name = "discount_per_counterparty_uuid")
     private DiscountPerCounterparty discountPerCounterparty;
-    private LocalDateTime lastModified;
     private String description;
+
+    private LocalDateTime created;
+    private LocalDateTime lastModified;
+    @ManyToOne
+    @JoinColumn(name = "creator_id")
+    private User creator;
+    @ManyToOne
+    @JoinColumn(name = "lastModifier_id")
+    private User lastModifier;
 
     public Shipment(Client sender, Client recipient, DeliveryType deliveryType, float weight, float length,
                     BigDecimal declaredPrice, BigDecimal price, BigDecimal postPay) {

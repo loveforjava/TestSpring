@@ -1,6 +1,7 @@
 package com.opinta.entity;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import javax.persistence.Entity;
@@ -25,6 +26,9 @@ public class Discount {
     private LocalDate fromDate;
     private LocalDate toDate;
     private float value;
+
+    private LocalDateTime created;
+    private LocalDateTime lastModified;
     
     public Discount(String name, LocalDate from, LocalDate to, float value) {
         this.name = name;

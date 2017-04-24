@@ -29,6 +29,7 @@ import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.saveLogEndpoint;
 import static com.opinta.util.LogMessageUtil.updateLogEndpoint;
 import static java.lang.String.format;
+import static java.time.LocalDateTime.now;
 
 @Service
 @Slf4j
@@ -90,6 +91,10 @@ public class DiscountPerCounterpartyServiceImpl implements DiscountPerCounterpar
         discountPerCounterparty.setCounterparty(counterparty);
         discountPerCounterparty.setDiscount(discount);
         discountPerCounterparty.validate();
+        discountPerCounterparty.setCreated(now());
+        discountPerCounterparty.setLastModified(now());
+        discountPerCounterparty.setCreator(user);
+        discountPerCounterparty.setLastModifier(user);
         log.info(saveLogEndpoint(DiscountPerCounterparty.class, discountPerCounterparty));
         return discountPerCounterpartyDao.save(discountPerCounterparty);
     }
@@ -110,6 +115,8 @@ public class DiscountPerCounterpartyServiceImpl implements DiscountPerCounterpar
         }
         target.setUuid(uuid);
         log.info(updateLogEndpoint(Discount.class, target));
+        target.setLastModified(now());
+        target.setLastModifier(user);
         discountPerCounterpartyDao.update(target);
         return target;
     }

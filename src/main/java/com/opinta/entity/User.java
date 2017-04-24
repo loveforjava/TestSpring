@@ -1,5 +1,6 @@
 package com.opinta.entity;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -23,6 +24,9 @@ public class User {
     @JoinColumn(name = "counterparty_uuid")
     private Counterparty counterparty;
     private UUID token;
+
+    private LocalDateTime created;
+    private LocalDateTime lastModified;
 
     public User(String username, Counterparty counterparty, UUID token) {
         this.username = username;

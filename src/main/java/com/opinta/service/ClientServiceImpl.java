@@ -9,6 +9,8 @@ import com.opinta.exception.AuthException;
 import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.exception.PerformProcessFailedException;
 import java.lang.reflect.InvocationTargetException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,7 +27,6 @@ import org.springframework.stereotype.Service;
 import static com.opinta.util.AuthorizationUtil.authorizeForAction;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
-import static java.time.LocalDate.now;
 
 import static com.opinta.util.AlphabetCharactersGenerationUtil.characterOf;
 import static com.opinta.util.AlphabetCharactersGenerationUtil.generateRandomChars;
@@ -149,12 +150,16 @@ public class ClientServiceImpl implements ClientService {
         client.setPhone(phoneService.getOrCreateEntityByPhoneNumber(client.getPhone().getPhoneNumber())
                 .removeNonNumericalCharacters());
         authorizeForAction(client, user);
+        client.setCreated(LocalDateTime.now());
+        client.setLastModified(LocalDateTime.now());
+        client.setCreator(user);
+        client.setLastModifier(user);
         log.info(saveLogEndpoint(Client.class, client));
         return clientDao.save(client);
     }
     
     private String generatePostId(ClientType clientType) throws IncorrectInputDataException {
-        String yearString = valueOf(now().getYear());
+        String yearString = valueOf(LocalDate.now().getYear());
         yearString = yearString.substring(yearString.length() - 2);
         return characterOf(clientType) + yearString + postIdInnerNumberGenerator.generate() +
                 generateRandomChars(3, true);
@@ -165,6 +170,8 @@ public class ClientServiceImpl implements ClientService {
     public Client updateEntity(Client client, User user) throws IncorrectInputDataException, AuthException {
         log.info(updateLogEndpoint(Client.class, client));
         authorizeForAction(client, user);
+        client.setLastModified(LocalDateTime.now());
+        client.setLastModifier(user);
         clientDao.update(client);
         return client;
     }

@@ -15,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static java.time.LocalDateTime.now;
+
 import static com.opinta.util.EnhancedBeanUtilsBean.copyNotNullProperties;
 import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
@@ -63,6 +65,8 @@ public class AddressServiceImpl implements AddressService {
     public Address saveEntity(Address address) {
         log.info(saveLogEndpoint(Address.class, address));
         address.setCountryside(countrysidePostcodeService.isPostcodeInCountryside(address.getPostcode()));
+        address.setCreated(now());
+        address.setLastModified(now());
         return addressDao.save(address);
     }
 
@@ -80,6 +84,7 @@ public class AddressServiceImpl implements AddressService {
         target.setId(id);
         target.setCountryside(countrysidePostcodeService.isPostcodeInCountryside(target.getPostcode()));
         log.info(updateLogEndpoint(Address.class, target));
+        target.setLastModified(now());
         addressDao.update(target);
         return target;
     }

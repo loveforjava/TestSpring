@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static java.time.LocalDateTime.now;
+
 import static com.opinta.util.EnhancedBeanUtilsBean.copyNotNullProperties;
 import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.deleteLogEndpoint;
@@ -58,6 +60,8 @@ public class PostcodePoolServiceImpl implements PostcodePoolService {
     @Transactional
     public PostcodePool saveEntity(PostcodePool postcodePool) {
         log.info(saveLogEndpoint(PostcodePool.class, postcodePool));
+        postcodePool.setCreated(now());
+        postcodePool.setLastModified(now());
         return postcodePoolDao.save(postcodePool);
     }
 
@@ -93,6 +97,7 @@ public class PostcodePoolServiceImpl implements PostcodePoolService {
                     PostcodePool.class, source, target, e));
         }
         target.setUuid(uuid);
+        target.setLastModified(now());
         log.info(updateLogEndpoint(PostcodePool.class, target));
         postcodePoolDao.update(target);
         return postcodePoolMapper.toDto(target);
