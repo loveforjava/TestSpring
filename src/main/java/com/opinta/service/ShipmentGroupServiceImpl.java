@@ -77,9 +77,9 @@ public class ShipmentGroupServiceImpl implements ShipmentGroupService {
         validateInnerReferenceAndFillObjectFromDB(shipmentGroup, user);
 
         authorizeForAction(shipmentGroup, user);
-        LocalDateTime now = now();
         shipmentGroup.setCreator(user);
         shipmentGroup.setLastModifier(user);
+        LocalDateTime now = now();
         shipmentGroup.setCreated(now);
         shipmentGroup.setLastModified(now);
         log.info(saveLogEndpoint(ShipmentGroup.class, shipmentGroup));
