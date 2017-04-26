@@ -18,7 +18,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import integration.helper.TestHelper;
 
-import static integration.helper.AssertHelper.assertTimeBetween;
+import static integration.helper.AssertHelper.assertDateTimeBetween;
 import static integration.helper.TestHelper.NO_CREATOR_MESSAGE;
 import static integration.helper.TestHelper.NO_LAST_MODIFIER_MESSAGE;
 import static integration.helper.TestHelper.WRONG_CREATED_MESSAGE;
@@ -41,7 +41,6 @@ import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -146,8 +145,8 @@ public class ClientControllerIT extends BaseControllerIT {
         LocalDateTime timeCreated = createdClient.getCreated();
         LocalDateTime timeModified = createdClient.getLastModified();
 
-        assertTimeBetween(WRONG_CREATED_MESSAGE, timeStarted, timeCreated, timeFinished);
-        assertTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeStarted, timeModified, timeFinished);
+        assertDateTimeBetween(WRONG_CREATED_MESSAGE, timeCreated, timeStarted, timeFinished);
+        assertDateTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeModified, timeStarted, timeFinished);
         assertNotNull(NO_CREATOR_MESSAGE, createdClient.getCreator());
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, createdClient.getLastModifier());
         assertThat(WRONG_CREATOR_MESSAGE, createdClient.getCreator().getToken(), equalTo(user.getToken()));
@@ -210,8 +209,8 @@ public class ClientControllerIT extends BaseControllerIT {
         LocalDateTime timeCreated = createdClient.getCreated();
         LocalDateTime timeModified = createdClient.getLastModified();
 
-        assertTimeBetween(WRONG_CREATED_MESSAGE, timeStarted, timeCreated, timeFinished);
-        assertTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeStarted, timeModified, timeFinished);
+        assertDateTimeBetween(WRONG_CREATED_MESSAGE, timeCreated, timeStarted, timeFinished);
+        assertDateTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeModified, timeStarted, timeFinished);
         assertNotNull(NO_CREATOR_MESSAGE, createdClient.getCreator());
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, createdClient.getLastModifier());
         assertThat(WRONG_CREATOR_MESSAGE, createdClient.getCreator().getToken(), equalTo(user.getToken()));
@@ -266,7 +265,7 @@ public class ClientControllerIT extends BaseControllerIT {
         Client updatedClient = clientService.getEntityByUuid(clientUuid, user);
         LocalDateTime timeModified = updatedClient.getLastModified();
 
-        assertTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeStarted, timeModified, timeFinished);
+        assertDateTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeModified, timeStarted, timeFinished);
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, updatedClient.getCreator());
         assertThat(WRONG_LAST_MODIFIER_MESSAGE,
                 updatedClient.getLastModifier().getToken(), equalTo(user.getToken()));
@@ -316,7 +315,7 @@ public class ClientControllerIT extends BaseControllerIT {
         Client updatedClient = clientService.getEntityByUuid(clientUuid, user);
         LocalDateTime timeModified = updatedClient.getLastModified();
 
-        assertTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeStarted, timeModified, timeFinished);
+        assertDateTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeModified, timeStarted, timeFinished);
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, updatedClient.getCreator());
         assertThat(WRONG_LAST_MODIFIER_MESSAGE, updatedClient.getLastModifier().getToken(), equalTo(user.getToken()));
 
@@ -361,7 +360,7 @@ public class ClientControllerIT extends BaseControllerIT {
         Client updatedClient = clientService.getEntityByUuid(clientUuid, user);
         LocalDateTime timeModified = updatedClient.getLastModified();
 
-        assertTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeStarted, timeModified, timeFinished);
+        assertDateTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeModified, timeStarted, timeFinished);
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, updatedClient.getCreator());
         assertThat(WRONG_LAST_MODIFIER_MESSAGE, updatedClient.getLastModifier().getToken(), equalTo(user.getToken()));
 

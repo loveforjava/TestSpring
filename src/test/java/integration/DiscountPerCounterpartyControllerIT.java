@@ -15,7 +15,7 @@ import integration.helper.TestHelper;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import static integration.helper.AssertHelper.assertTimeBetween;
+import static integration.helper.AssertHelper.assertDateTimeBetween;
 import static integration.helper.TestHelper.NO_CREATOR_MESSAGE;
 import static integration.helper.TestHelper.NO_LAST_MODIFIER_MESSAGE;
 import static integration.helper.TestHelper.WRONG_CREATED_MESSAGE;
@@ -120,8 +120,8 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
         LocalDateTime timeCreated = createdDiscountPerCounterparty.getCreated();
         LocalDateTime timeModified = createdDiscountPerCounterparty.getLastModified();
 
-        assertTimeBetween(WRONG_CREATED_MESSAGE, timeStarted, timeCreated, timeFinished);
-        assertTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeStarted, timeModified, timeFinished);
+        assertDateTimeBetween(WRONG_CREATED_MESSAGE, timeCreated, timeStarted, timeFinished);
+        assertDateTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeModified, timeStarted, timeFinished);
         assertNotNull(NO_CREATOR_MESSAGE, createdDiscountPerCounterparty.getCreator());
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, createdDiscountPerCounterparty.getLastModifier());
         assertThat(WRONG_CREATOR_MESSAGE, createdDiscountPerCounterparty.getCreator().getToken(), equalTo(user.getToken()));
@@ -163,7 +163,7 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
                 .getEntityByUuid(discountPerCounterparty.getUuid(), user);
         LocalDateTime timeModified = updatedDiscountPerCounterparty.getLastModified();
 
-        assertTimeBetween(WRONG_LAST_MODIFIED_MESSAGE,timeStarted, timeModified, timeFinished);
+        assertDateTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeModified, timeStarted, timeFinished);
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, updatedDiscountPerCounterparty.getCreator());
         assertThat(WRONG_LAST_MODIFIER_MESSAGE,
                 updatedDiscountPerCounterparty.getLastModifier().getToken(), equalTo(user.getToken()));

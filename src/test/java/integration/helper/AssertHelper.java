@@ -10,7 +10,8 @@ import static org.junit.Assert.assertThat;
 
 public class AssertHelper {
     
-    public static void assertTimeBetween(String message, LocalDateTime begin, LocalDateTime time, LocalDateTime end) {
+    public static void assertDateTimeBetween(
+            String message, LocalDateTime time, LocalDateTime begin, LocalDateTime end) {
         assertThat(message, time, anyOf(equalTo(begin), greaterThan(begin)));
         assertThat(message, time, anyOf(equalTo(end), lessThan(end)));
     }

@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static integration.helper.AssertHelper.assertTimeBetween;
+import static integration.helper.AssertHelper.assertDateTimeBetween;
 import static integration.helper.TestHelper.NO_CREATOR_MESSAGE;
 import static integration.helper.TestHelper.NO_LAST_MODIFIER_MESSAGE;
 import static integration.helper.TestHelper.WRONG_CREATED_MESSAGE;
@@ -34,7 +34,6 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 
 public class ShipmentGroupControllerIT extends BaseControllerIT {
@@ -156,8 +155,8 @@ public class ShipmentGroupControllerIT extends BaseControllerIT {
         LocalDateTime timeCreated = createdShipmentGroup.getCreated();
         LocalDateTime timeModified = createdShipmentGroup.getLastModified();
 
-        assertTimeBetween(WRONG_CREATED_MESSAGE, timeStarted, timeCreated, timeFinished);
-        assertTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeStarted, timeModified, timeFinished);
+        assertDateTimeBetween(WRONG_CREATED_MESSAGE, timeCreated, timeStarted, timeFinished);
+        assertDateTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeModified, timeStarted, timeFinished);
         assertNotNull(NO_CREATOR_MESSAGE, createdShipmentGroup.getCreator());
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, createdShipmentGroup.getLastModifier());
         assertThat(WRONG_CREATOR_MESSAGE, createdShipmentGroup.getCreator().getToken(), equalTo(user.getToken()));
@@ -196,7 +195,7 @@ public class ShipmentGroupControllerIT extends BaseControllerIT {
         ShipmentGroup updatedShipmentGroup = shipmentGroupService.getEntityById(shipmentGroupUuid, user);
         LocalDateTime timeModified = updatedShipmentGroup.getLastModified();
 
-        assertTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeStarted, timeModified, timeFinished);
+        assertDateTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeModified, timeStarted, timeFinished);
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, updatedShipmentGroup.getLastModifier());
         assertThat(WRONG_LAST_MODIFIER_MESSAGE,
                 updatedShipmentGroup.getLastModifier().getToken(), equalTo(user.getToken()));

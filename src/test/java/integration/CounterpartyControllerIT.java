@@ -24,14 +24,14 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import integration.helper.TestHelper;
 
-import static integration.helper.AssertHelper.assertTimeBetween;
+import static integration.helper.AssertHelper.assertDateTimeBetween;
 import static integration.helper.TestHelper.NO_LAST_MODIFIER_MESSAGE;
 import static integration.helper.TestHelper.WRONG_CREATED_MESSAGE;
 import static integration.helper.TestHelper.WRONG_LAST_MODIFIED_MESSAGE;
 import static integration.helper.TestHelper.WRONG_LAST_MODIFIER_MESSAGE;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.when;
-import static java.lang.System.currentTimeMillis;
+
 import static java.time.LocalDateTime.now;
 
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
@@ -40,7 +40,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 public class CounterpartyControllerIT extends BaseControllerIT {
@@ -134,8 +133,8 @@ public class CounterpartyControllerIT extends BaseControllerIT {
         LocalDateTime timeCreated = createdCounterparty.getCreated();
         LocalDateTime timeModified = createdCounterparty.getLastModified();
 
-        assertTimeBetween(WRONG_CREATED_MESSAGE, timeStarted, timeCreated, timeFinished);
-        assertTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeStarted, timeModified, timeFinished);
+        assertDateTimeBetween(WRONG_CREATED_MESSAGE, timeCreated, timeStarted, timeFinished);
+        assertDateTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeModified, timeStarted, timeFinished);
 
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(counterpartyMapper.toDto(createdCounterparty));
@@ -225,7 +224,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
         CounterpartyDto counterpartyDto = counterpartyMapper.toDto(updatedCounterparty);
         LocalDateTime timeModified = updatedCounterparty.getLastModified();
 
-        assertTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeStarted, timeModified, timeFinished);
+        assertDateTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeModified, timeStarted, timeFinished);
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, updatedCounterparty.getLastModifier());
         assertThat(WRONG_LAST_MODIFIER_MESSAGE,
                 updatedCounterparty.getLastModifier().getToken(), equalTo(user.getToken()));

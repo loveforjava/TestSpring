@@ -16,7 +16,7 @@ import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static integration.helper.AssertHelper.assertTimeBetween;
+import static integration.helper.AssertHelper.assertDateTimeBetween;
 import static integration.helper.TestHelper.WRONG_CREATED_MESSAGE;
 import static integration.helper.TestHelper.WRONG_LAST_MODIFIED_MESSAGE;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
@@ -29,7 +29,6 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
@@ -114,8 +113,8 @@ public class DiscountControllerIT extends BaseControllerIT {
         LocalDateTime timeCreated = createdDiscount.getCreated();
         LocalDateTime timeModified = createdDiscount.getLastModified();
     
-        assertTimeBetween(WRONG_CREATED_MESSAGE, timeStarted, timeCreated, timeFinished);
-        assertTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeStarted, timeModified, timeFinished);
+        assertDateTimeBetween(WRONG_CREATED_MESSAGE, timeCreated, timeStarted, timeFinished);
+        assertDateTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeModified, timeStarted, timeFinished);
     
     
         JSONObject actualJson = (JSONObject) parser.parse(objectMapper.writeValueAsString(createdDiscount));
@@ -153,7 +152,7 @@ public class DiscountControllerIT extends BaseControllerIT {
         Discount updatedDiscount = discountService.getEntityByUuid(discountUuid);
         LocalDateTime timeModified = updatedDiscount.getLastModified();
 
-        assertTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeStarted, timeModified, timeFinished);
+        assertDateTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeModified, timeStarted, timeFinished);
 
         JSONObject actualJson = (JSONObject) parser.parse(objectMapper.writeValueAsString(updatedDiscount));
 
