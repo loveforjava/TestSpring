@@ -66,12 +66,13 @@ public class DiscountControllerIT extends BaseControllerIT {
     public void getDiscount() throws Exception {
         UUID discountUuid = discounts.get(0).getUuid();
         String fromDate = discounts.get(0).getFromDate().format(ISO_LOCAL_DATE);
-        log.info("from date: " + fromDate);
+        String toDate = discounts.get(0).getToDate().format(ISO_LOCAL_DATE);
         when().
                 get("/discounts/{uuid}", discountUuid.toString()).
         then().
                 statusCode(SC_OK).
                 body("fromDate", equalTo(fromDate)).
+                body("toDate", equalTo(toDate)).
                 body("uuid", equalTo(discountUuid.toString()));
     }
 
@@ -98,8 +99,6 @@ public class DiscountControllerIT extends BaseControllerIT {
                         post("/discounts").
                 then().
                         statusCode(SC_OK).
-                        body("fromDate", equalTo(inputJson.get("fromDate"))).
-                        body("toDate", equalTo(inputJson.get("toDate"))).
                 extract().
                         path("uuid");
         LocalDateTime timeFinished = now();
@@ -140,9 +139,7 @@ public class DiscountControllerIT extends BaseControllerIT {
         when().
                 put("/discounts/{uuid}", discountUuid).
         then().
-                statusCode(SC_OK).
-                body("fromDate", equalTo(inputJson.get("fromDate"))).
-                body("toDate", equalTo(inputJson.get("toDate")));
+                statusCode(SC_OK);
         LocalDateTime timeFinished = now();
 
         // check updated data

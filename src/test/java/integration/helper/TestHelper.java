@@ -453,15 +453,9 @@ public class TestHelper {
     public List<Discount> createDiscounts() {
         List<Discount> created = new ArrayList<>();
         
-        Discount discount1 = new Discount("first",
-                now().minusMonths(1),
-                now().plusMonths(3), 10F);
-        Discount discount2 = new Discount("second",
-                now().minusMonths(3),
-                now().plusMonths(1), 10F);
-        Discount discount3 = new Discount("third",
-                now().minusMonths(1),
-                now().plusMonths(6), 10F);
+        Discount discount1 = new Discount("first", now().minusMonths(1), now().plusMonths(3), 10F);
+        Discount discount2 = new Discount("second", now().minusMonths(3), now().plusMonths(1), 10F);
+        Discount discount3 = new Discount("third", now().minusMonths(1), now().plusMonths(6), 10F);
 
         created.add(discountService.saveEntity(discount1));
         created.add(discountService.saveEntity(discount2));
@@ -472,16 +466,14 @@ public class TestHelper {
     
     public Discount createDiscount() {
         Discount discount = new Discount("one more discount",
-                now().minusMonths(2),
-                now().plusMonths(4),
+                now().minusMonths(2), now().plusMonths(4),
                 DISCOUNT);
         return discountService.saveEntity(discount);
     }
     
     public Discount createExpiredDiscount() {
         Discount discount = new Discount("one more discount",
-                now().minusMonths(6),
-                now().minusMonths(2), 5F);
+                now().minusMonths(6), now().minusMonths(2), 5F);
         return discountService.saveEntity(discount);
     }
     

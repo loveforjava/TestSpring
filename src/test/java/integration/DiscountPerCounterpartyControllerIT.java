@@ -30,6 +30,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static java.time.LocalDateTime.now;
+import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
@@ -61,8 +62,8 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
         counterparty = testHelper.createCounterparty();
         user = testHelper.createUser(counterparty);
         discountPerCounterparty = testHelper.createDiscountPerCounterparty(testHelper.createDiscount(), counterparty);
-        }
-    
+    }
+
     @After
     public void tearDown() {
         testHelper.deleteDiscountPerCounterparty(discountPerCounterparty);
@@ -81,12 +82,16 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
 
     @Test
     public void getDiscountPerCounterparty() {
+        String fromDate = discountPerCounterparty.getFromDate().format(ISO_LOCAL_DATE);
+        String toDate = discountPerCounterparty.getToDate().format(ISO_LOCAL_DATE);
         given().
                 queryParam("token", user.getToken()).
         when().
                 get("/counterparty-discounts/{uuid}", discountPerCounterparty.getUuid()).
         then().
                 statusCode(SC_OK).
+                body("fromDate", equalTo(fromDate)).
+                body("toDate", equalTo(toDate)).
                 body("uuid", equalTo(discountPerCounterparty.getUuid().toString()));
     }
     
