@@ -316,7 +316,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         ShipmentDto shipmentDto = shipmentMapper.toDto(updatedShipment);
         LocalDateTime timeModified = updatedShipment.getLastModified();
 
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished.isAfter(timeModified) && timeModified.isAfter(timeStarted));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, testHelper.isTimeBetween(timeStarted, timeModified, timeFinished));
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, updatedShipment.getCreator());
         assertThat(WRONG_LAST_MODIFIER_MESSAGE,
                 updatedShipment.getLastModifier().getToken(), equalTo(user.getToken()));
