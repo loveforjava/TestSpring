@@ -145,7 +145,7 @@ public class ClientControllerIT extends BaseControllerIT {
         Client createdClient = clientService.getEntityByUuid(newClientUuid, user);
         LocalDateTime timeCreated = createdClient.getCreated();
         LocalDateTime timeModified = createdClient.getLastModified();
-    
+
         assertTimeBetween(WRONG_CREATED_MESSAGE, timeStarted, timeCreated, timeFinished);
         assertTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeStarted, timeModified, timeFinished);
         assertNotNull(NO_CREATOR_MESSAGE, createdClient.getCreator());
@@ -209,7 +209,7 @@ public class ClientControllerIT extends BaseControllerIT {
         Client createdClient = clientService.getEntityByUuid(newClientUuid, user);
         LocalDateTime timeCreated = createdClient.getCreated();
         LocalDateTime timeModified = createdClient.getLastModified();
-    
+
         assertTimeBetween(WRONG_CREATED_MESSAGE, timeStarted, timeCreated, timeFinished);
         assertTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeStarted, timeModified, timeFinished);
         assertNotNull(NO_CREATOR_MESSAGE, createdClient.getCreator());

@@ -350,7 +350,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
     private void checkDatesModifierAndCreator(LocalDateTime timeStarted, LocalDateTime timeFinished, Shipment createdShipment) {
         LocalDateTime timeCreated = createdShipment.getCreated();
         LocalDateTime timeModified = createdShipment.getLastModified();
-    
+
         assertTimeBetween(WRONG_CREATED_MESSAGE, timeStarted, timeCreated, timeFinished);
         assertTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeStarted, timeModified, timeFinished);
         assertNotNull(NO_CREATOR_MESSAGE, createdShipment.getCreator());

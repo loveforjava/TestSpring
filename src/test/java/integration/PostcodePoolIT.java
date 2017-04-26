@@ -106,10 +106,10 @@ public class PostcodePoolIT extends BaseControllerIT {
         PostcodePool createdPostcodePool = postcodePoolService.getEntityByUuid(UUID.fromString(response.path("uuid")));
         LocalDateTime timeCreated = createdPostcodePool.getCreated();
         LocalDateTime timeModified = createdPostcodePool.getLastModified();
-    
+
         assertTimeBetween(WRONG_CREATED_MESSAGE, timeStarted, timeCreated, timeFinished);
         assertTimeBetween(WRONG_LAST_MODIFIED_MESSAGE,  timeStarted, timeModified, timeFinished);
-    
+
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(postcodePoolMapper.toDto(createdPostcodePool));
 

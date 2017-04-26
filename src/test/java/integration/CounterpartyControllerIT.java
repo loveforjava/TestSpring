@@ -133,10 +133,10 @@ public class CounterpartyControllerIT extends BaseControllerIT {
                 .getEntityByUuidAnonymous(UUID.fromString(response.path("uuid")));
         LocalDateTime timeCreated = createdCounterparty.getCreated();
         LocalDateTime timeModified = createdCounterparty.getLastModified();
-    
+
         assertTimeBetween(WRONG_CREATED_MESSAGE, timeStarted, timeCreated, timeFinished);
         assertTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeStarted, timeModified, timeFinished);
-    
+
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(counterpartyMapper.toDto(createdCounterparty));
         JSONAssert.assertEquals(expectedJson, actualJson, false);

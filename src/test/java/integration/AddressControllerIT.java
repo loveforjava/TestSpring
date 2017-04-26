@@ -107,7 +107,7 @@ public class AddressControllerIT extends BaseControllerIT {
         Address createdAddress = addressService.getEntityById(newAddressId);
         LocalDateTime timeCreated = createdAddress.getCreated();
         LocalDateTime timeModified = createdAddress.getLastModified();
-    
+
         assertTimeBetween(WRONG_CREATED_MESSAGE, timeStarted, timeCreated, timeFinished);
         assertTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeStarted, timeModified, timeFinished);
 

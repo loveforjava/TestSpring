@@ -39,7 +39,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -120,7 +119,7 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
                 toDto(createdDiscountPerCounterparty);
         LocalDateTime timeCreated = createdDiscountPerCounterparty.getCreated();
         LocalDateTime timeModified = createdDiscountPerCounterparty.getLastModified();
-    
+
         assertTimeBetween(WRONG_CREATED_MESSAGE, timeStarted, timeCreated, timeFinished);
         assertTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeStarted, timeModified, timeFinished);
         assertNotNull(NO_CREATOR_MESSAGE, createdDiscountPerCounterparty.getCreator());
