@@ -38,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -488,8 +489,7 @@ public class TestHelper {
     public DiscountPerCounterparty createDiscountPerCounterparty(Discount discount,
             Counterparty counterparty) throws Exception {
         DiscountPerCounterparty discountPerCounterparty = new DiscountPerCounterparty(counterparty, discount,
-                now().minusDays(20),
-                now().plusDays(20));
+                now().minusDays(20), now().plusDays(20));
         return discountPerCounterpartyService.saveEntity(discountPerCounterparty,
                 userService.getUsersByCounterparty(counterparty).get(0));
     }
@@ -497,8 +497,7 @@ public class TestHelper {
     public DiscountPerCounterparty createDiscountPerCounterparty(Counterparty counterparty, Discount discount)
             throws Exception {
         DiscountPerCounterparty discountPerCounterparty = new DiscountPerCounterparty(counterparty, discount,
-                now().minusDays(15),
-                now().plusDays(25));
+                now().minusDays(15), now().plusDays(25));
         return discountPerCounterpartyService.saveEntity(discountPerCounterparty,
                 userService.getUsersByCounterparty(counterparty).get(0));
     }
@@ -536,5 +535,9 @@ public class TestHelper {
         } catch (IncorrectInputDataException e) {
             log.debug(e.getMessage());
         }
+    }
+    
+    public boolean isTimeBetween(LocalDateTime begin, LocalDateTime time, LocalDateTime end) {
+        return (begin.isBefore(time) || begin.isEqual(time)) && (end.isAfter(time) || end.isEqual(time));
     }
 }

@@ -155,9 +155,9 @@ public class ShipmentGroupControllerIT extends BaseControllerIT {
         ShipmentGroup createdShipmentGroup = shipmentGroupService.getEntityById(newShipmentGroupId, user);
         LocalDateTime timeCreated = createdShipmentGroup.getCreated();
         LocalDateTime timeModified = createdShipmentGroup.getLastModified();
-
-        assertTrue(WRONG_CREATED_MESSAGE, timeFinished.isAfter(timeCreated) && timeCreated.isAfter(timeStarted));
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished.isAfter(timeModified) && timeModified.isAfter(timeStarted));
+    
+        assertTrue(WRONG_CREATED_MESSAGE, testHelper.isTimeBetween(timeStarted, timeCreated, timeFinished));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, testHelper.isTimeBetween(timeStarted, timeModified, timeFinished));
         assertNotNull(NO_CREATOR_MESSAGE, createdShipmentGroup.getCreator());
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, createdShipmentGroup.getLastModifier());
         assertThat(WRONG_CREATOR_MESSAGE, createdShipmentGroup.getCreator().getToken(), equalTo(user.getToken()));
@@ -196,7 +196,7 @@ public class ShipmentGroupControllerIT extends BaseControllerIT {
         ShipmentGroup updatedShipmentGroup = shipmentGroupService.getEntityById(shipmentGroupUuid, user);
         LocalDateTime timeModified = updatedShipmentGroup.getLastModified();
 
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished.isAfter(timeModified) && timeModified.isAfter(timeStarted));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, testHelper.isTimeBetween(timeStarted, timeModified, timeFinished));
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, updatedShipmentGroup.getLastModifier());
         assertThat(WRONG_LAST_MODIFIER_MESSAGE,
                 updatedShipmentGroup.getLastModifier().getToken(), equalTo(user.getToken()));

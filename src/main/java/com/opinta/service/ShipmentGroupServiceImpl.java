@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -75,10 +77,11 @@ public class ShipmentGroupServiceImpl implements ShipmentGroupService {
         validateInnerReferenceAndFillObjectFromDB(shipmentGroup, user);
 
         authorizeForAction(shipmentGroup, user);
-        shipmentGroup.setCreated(now());
-        shipmentGroup.setLastModified(now());
+        LocalDateTime now = now();
         shipmentGroup.setCreator(user);
         shipmentGroup.setLastModifier(user);
+        shipmentGroup.setCreated(now);
+        shipmentGroup.setLastModified(now);
         log.info(saveLogEndpoint(ShipmentGroup.class, shipmentGroup));
         return shipmentGroupDao.save(shipmentGroup);
     }

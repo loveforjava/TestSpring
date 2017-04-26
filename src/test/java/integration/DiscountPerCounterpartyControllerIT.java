@@ -17,14 +17,12 @@ import integration.helper.TestHelper;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import static com.opinta.util.FormatterUtil.DATE_FORMAT_ISO_8601_24H;
 import static integration.helper.TestHelper.NO_CREATOR_MESSAGE;
 import static integration.helper.TestHelper.NO_LAST_MODIFIER_MESSAGE;
 import static integration.helper.TestHelper.WRONG_CREATED_MESSAGE;
 import static integration.helper.TestHelper.WRONG_CREATOR_MESSAGE;
 import static integration.helper.TestHelper.WRONG_LAST_MODIFIED_MESSAGE;
 import static integration.helper.TestHelper.WRONG_LAST_MODIFIER_MESSAGE;
-import static java.lang.System.currentTimeMillis;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import org.junit.After;
@@ -33,7 +31,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static java.time.LocalDateTime.now;
-import static java.util.TimeZone.getTimeZone;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
@@ -124,9 +121,9 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
                 toDto(createdDiscountPerCounterparty);
         LocalDateTime timeCreated = createdDiscountPerCounterparty.getCreated();
         LocalDateTime timeModified = createdDiscountPerCounterparty.getLastModified();
-
-        assertTrue(WRONG_CREATED_MESSAGE, timeFinished.isAfter(timeCreated) && timeCreated.isAfter(timeStarted));
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished.isAfter(timeModified) && timeModified.isAfter(timeStarted));
+    
+        assertTrue(WRONG_CREATED_MESSAGE, testHelper.isTimeBetween(timeStarted, timeCreated, timeFinished));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, testHelper.isTimeBetween(timeStarted, timeModified, timeFinished));
         assertNotNull(NO_CREATOR_MESSAGE, createdDiscountPerCounterparty.getCreator());
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, createdDiscountPerCounterparty.getLastModifier());
         assertThat(WRONG_CREATOR_MESSAGE, createdDiscountPerCounterparty.getCreator().getToken(), equalTo(user.getToken()));
@@ -168,7 +165,7 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
                 .getEntityByUuid(discountPerCounterparty.getUuid(), user);
         LocalDateTime timeModified = updatedDiscountPerCounterparty.getLastModified();
 
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished.isAfter(timeModified) && timeModified.isAfter(timeStarted));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, testHelper.isTimeBetween(timeStarted, timeModified, timeFinished));
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, updatedDiscountPerCounterparty.getCreator());
         assertThat(WRONG_LAST_MODIFIER_MESSAGE,
                 updatedDiscountPerCounterparty.getLastModifier().getToken(), equalTo(user.getToken()));

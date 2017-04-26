@@ -349,9 +349,9 @@ public class ShipmentControllerIT extends BaseControllerIT {
     private void checkDatesModifierAndCreator(LocalDateTime timeStarted, LocalDateTime timeFinished, Shipment createdShipment) {
         LocalDateTime timeCreated = createdShipment.getCreated();
         LocalDateTime timeModified = createdShipment.getLastModified();
-
-        assertTrue(WRONG_CREATED_MESSAGE, timeFinished.isAfter(timeCreated) && timeCreated.isAfter(timeStarted));
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished.isAfter(timeModified) && timeModified.isAfter(timeStarted));
+    
+        assertTrue(WRONG_CREATED_MESSAGE, testHelper.isTimeBetween(timeStarted, timeCreated, timeFinished));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, testHelper.isTimeBetween(timeStarted, timeModified, timeFinished));
         assertNotNull(NO_CREATOR_MESSAGE, createdShipment.getCreator());
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, createdShipment.getLastModifier());
         assertThat(WRONG_CREATOR_MESSAGE, createdShipment.getCreator().getToken(), equalTo(user.getToken()));

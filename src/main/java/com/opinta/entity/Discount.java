@@ -30,10 +30,10 @@ public class Discount {
     private LocalDateTime created;
     private LocalDateTime lastModified;
     
-    public Discount(String name, LocalDate from, LocalDate to, float value) {
+    public Discount(String name, LocalDate fromDate, LocalDate toDate, float value) {
         this.name = name;
-        this.fromDate = from;
-        this.toDate = to;
+        this.fromDate = fromDate;
+        this.toDate = toDate;
         this.value = value;
     }
 }

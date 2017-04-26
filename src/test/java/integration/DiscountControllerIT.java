@@ -112,11 +112,11 @@ public class DiscountControllerIT extends BaseControllerIT {
         Discount createdDiscount = discountService.getEntityByUuid(newDiscountUuid);
         LocalDateTime timeCreated = createdDiscount.getCreated();
         LocalDateTime timeModified = createdDiscount.getLastModified();
-
-        assertTrue(WRONG_CREATED_MESSAGE, timeFinished.isAfter(timeCreated) && timeCreated.isAfter(timeStarted));
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished.isAfter(timeModified) && timeModified.isAfter(timeStarted));
-
-        
+    
+        assertTrue(WRONG_CREATED_MESSAGE, testHelper.isTimeBetween(timeStarted, timeCreated, timeFinished));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, testHelper.isTimeBetween(timeStarted, timeModified, timeFinished));
+    
+    
         JSONObject actualJson = (JSONObject) parser.parse(objectMapper.writeValueAsString(createdDiscount));
 
         JSONAssert.assertEquals(expectedJson.toString(), actualJson.toString(), false);
@@ -152,7 +152,7 @@ public class DiscountControllerIT extends BaseControllerIT {
         Discount updatedDiscount = discountService.getEntityByUuid(discountUuid);
         LocalDateTime timeModified = updatedDiscount.getLastModified();
 
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished.isAfter(timeModified) && timeModified.isAfter(timeStarted));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, testHelper.isTimeBetween(timeStarted, timeModified, timeFinished));
 
         JSONObject actualJson = (JSONObject) parser.parse(objectMapper.writeValueAsString(updatedDiscount));
 

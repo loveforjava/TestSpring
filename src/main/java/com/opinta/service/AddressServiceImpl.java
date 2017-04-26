@@ -3,6 +3,7 @@ package com.opinta.service;
 import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.exception.PerformProcessFailedException;
 import java.lang.reflect.InvocationTargetException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -65,8 +66,9 @@ public class AddressServiceImpl implements AddressService {
     public Address saveEntity(Address address) {
         log.info(saveLogEndpoint(Address.class, address));
         address.setCountryside(countrysidePostcodeService.isPostcodeInCountryside(address.getPostcode()));
-        address.setCreated(now());
-        address.setLastModified(now());
+        LocalDateTime now = now();
+        address.setCreated(now);
+        address.setLastModified(now);
         return addressDao.save(address);
     }
 

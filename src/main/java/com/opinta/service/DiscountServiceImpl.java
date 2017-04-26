@@ -2,6 +2,7 @@ package com.opinta.service;
 
 import com.opinta.exception.PerformProcessFailedException;
 import java.lang.reflect.InvocationTargetException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -56,8 +57,9 @@ public class DiscountServiceImpl implements DiscountService {
     @Override
     @Transactional
     public Discount saveEntity(Discount discount) {
-        discount.setCreated(now());
-        discount.setLastModified(now());
+        LocalDateTime now = now();
+        discount.setCreated(now);
+        discount.setLastModified(now);
         return discountDao.save(discount);
     }
 

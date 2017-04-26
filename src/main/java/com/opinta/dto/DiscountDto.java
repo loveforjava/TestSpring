@@ -11,6 +11,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import static com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING;
+import static com.opinta.constraint.RegexPattern.DATE_PATTERN;
 
 @Getter
 @Setter
@@ -19,9 +20,9 @@ public class DiscountDto {
     private UUID uuid;
     @Size(max = 255)
     private String name;
-    @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = STRING, pattern = DATE_PATTERN)
     private LocalDate fromDate;
-    @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = STRING, pattern = DATE_PATTERN)
     private LocalDate toDate;
     private Float value;
 }

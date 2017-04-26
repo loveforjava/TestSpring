@@ -13,6 +13,7 @@ import com.opinta.util.AddressUtil;
 import com.opinta.util.LogMessageUtil;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -93,14 +94,15 @@ public class ShipmentServiceImpl implements ShipmentService {
         shipment.setRecipient(clientService.saveOrGetEntityAnonymous(shipment.getRecipient(), user));
         PostcodePool postcodePool = shipment.getSender().getCounterparty().getPostcodePool();
         shipment.setBarcodeInnerNumber(barcodeInnerNumberService.generateBarcodeInnerNumber(postcodePool));
-        shipment.setLastModified(now());
+        LocalDateTime now = now();
+        shipment.setLastModified(now);
         shipment.setDiscountPerCounterparty(discountPerCounterpartyService
                 .getEntityWithHighestDiscount(user, shipment.getLastModified()));
         shipment.setPrice(calculatePrice(shipment));
-        shipment.setCreated(now());
-        shipment.setLastModified(now());
         shipment.setCreator(user);
         shipment.setLastModifier(user);
+        shipment.setCreated(now);
+        shipment.setLastModified(now);
         log.info(LogMessageUtil.saveLogEndpoint(Shipment.class, shipment));
         return shipmentDao.save(shipment);
     }
@@ -167,12 +169,13 @@ public class ShipmentServiceImpl implements ShipmentService {
         target.setUuid(uuid);
         target.setSender(clientService.getEntityByUuid(target.getSender().getUuid(), user));
         target.setRecipient(clientService.getEntityByUuidAnonymous(target.getRecipient().getUuid()));
-        target.setLastModified(now());
+        LocalDateTime now = now();
+        target.setLastModified(now);
         target.setDiscountPerCounterparty(discountPerCounterpartyService
                 .getEntityWithHighestDiscount(user, target.getLastModified()));
         target.setPrice(calculatePrice(target));
-        target.setLastModified(now());
         target.setLastModifier(user);
+        target.setLastModified(now);
         log.info(updateLogEndpoint(Shipment.class, target));
         shipmentDao.update(target);
         return shipmentMapper.toDto(target);

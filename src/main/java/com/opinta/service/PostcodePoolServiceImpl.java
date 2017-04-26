@@ -7,6 +7,7 @@ import com.opinta.exception.PerformProcessFailedException;
 import com.opinta.mapper.PostcodePoolMapper;
 import com.opinta.entity.PostcodePool;
 import java.lang.reflect.InvocationTargetException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import javax.transaction.Transactional;
@@ -60,8 +61,9 @@ public class PostcodePoolServiceImpl implements PostcodePoolService {
     @Transactional
     public PostcodePool saveEntity(PostcodePool postcodePool) {
         log.info(saveLogEndpoint(PostcodePool.class, postcodePool));
-        postcodePool.setCreated(now());
-        postcodePool.setLastModified(now());
+        LocalDateTime now = now();
+        postcodePool.setCreated(now);
+        postcodePool.setLastModified(now);
         return postcodePoolDao.save(postcodePool);
     }
 

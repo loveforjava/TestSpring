@@ -150,8 +150,9 @@ public class ClientServiceImpl implements ClientService {
         client.setPhone(phoneService.getOrCreateEntityByPhoneNumber(client.getPhone().getPhoneNumber())
                 .removeNonNumericalCharacters());
         authorizeForAction(client, user);
-        client.setCreated(LocalDateTime.now());
-        client.setLastModified(LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now();
+        client.setCreated(now);
+        client.setLastModified(now);
         client.setCreator(user);
         client.setLastModifier(user);
         log.info(saveLogEndpoint(Client.class, client));

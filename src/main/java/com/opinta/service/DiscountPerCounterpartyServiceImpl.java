@@ -91,8 +91,9 @@ public class DiscountPerCounterpartyServiceImpl implements DiscountPerCounterpar
         discountPerCounterparty.setCounterparty(counterparty);
         discountPerCounterparty.setDiscount(discount);
         discountPerCounterparty.validate();
-        discountPerCounterparty.setCreated(now());
-        discountPerCounterparty.setLastModified(now());
+        LocalDateTime now = now();
+        discountPerCounterparty.setCreated(now);
+        discountPerCounterparty.setLastModified(now);
         discountPerCounterparty.setCreator(user);
         discountPerCounterparty.setLastModifier(user);
         log.info(saveLogEndpoint(DiscountPerCounterparty.class, discountPerCounterparty));

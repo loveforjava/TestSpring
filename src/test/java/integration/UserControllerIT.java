@@ -55,10 +55,10 @@ public class UserControllerIT extends BaseControllerIT {
         User createdUser = userService.getEntityByToken(UUID.fromString(response.path("token")));
         LocalDateTime timeCreated = createdUser.getCreated();
         LocalDateTime timeModified = createdUser.getLastModified();
-
-        assertTrue(WRONG_CREATED_MESSAGE, timeFinished.isAfter(timeCreated) && timeCreated.isAfter(timeStarted));
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished.isAfter(timeModified) && timeModified.isAfter(timeStarted));
-
+    
+        assertTrue(WRONG_CREATED_MESSAGE, testHelper.isTimeBetween(timeStarted, timeCreated, timeFinished));
+        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, testHelper.isTimeBetween(timeStarted, timeModified, timeFinished));
+    
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(userMapper.toDto(createdUser));
         JSONAssert.assertEquals(expectedJson, actualJson, false);
