@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import integration.helper.TestHelper;
 
 import static com.opinta.constraint.RegexPattern.BARCODE_REGEX;
+import static integration.helper.AssertHelper.assertTimeBetween;
 import static integration.helper.TestHelper.NO_CREATOR_MESSAGE;
 import static integration.helper.TestHelper.NO_LAST_MODIFIER_MESSAGE;
 import static integration.helper.TestHelper.WRONG_CREATED_MESSAGE;
@@ -316,7 +317,7 @@ public class ShipmentControllerIT extends BaseControllerIT {
         ShipmentDto shipmentDto = shipmentMapper.toDto(updatedShipment);
         LocalDateTime timeModified = updatedShipment.getLastModified();
 
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, testHelper.isTimeBetween(timeStarted, timeModified, timeFinished));
+        assertTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeStarted, timeModified, timeFinished);
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, updatedShipment.getCreator());
         assertThat(WRONG_LAST_MODIFIER_MESSAGE,
                 updatedShipment.getLastModifier().getToken(), equalTo(user.getToken()));
@@ -350,8 +351,8 @@ public class ShipmentControllerIT extends BaseControllerIT {
         LocalDateTime timeCreated = createdShipment.getCreated();
         LocalDateTime timeModified = createdShipment.getLastModified();
     
-        assertTrue(WRONG_CREATED_MESSAGE, testHelper.isTimeBetween(timeStarted, timeCreated, timeFinished));
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, testHelper.isTimeBetween(timeStarted, timeModified, timeFinished));
+        assertTimeBetween(WRONG_CREATED_MESSAGE, timeStarted, timeCreated, timeFinished);
+        assertTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeStarted, timeModified, timeFinished);
         assertNotNull(NO_CREATOR_MESSAGE, createdShipment.getCreator());
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, createdShipment.getLastModifier());
         assertThat(WRONG_CREATOR_MESSAGE, createdShipment.getCreator().getToken(), equalTo(user.getToken()));

@@ -24,6 +24,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import integration.helper.TestHelper;
 
+import static integration.helper.AssertHelper.assertTimeBetween;
 import static integration.helper.TestHelper.NO_LAST_MODIFIER_MESSAGE;
 import static integration.helper.TestHelper.WRONG_CREATED_MESSAGE;
 import static integration.helper.TestHelper.WRONG_LAST_MODIFIED_MESSAGE;
@@ -133,8 +134,8 @@ public class CounterpartyControllerIT extends BaseControllerIT {
         LocalDateTime timeCreated = createdCounterparty.getCreated();
         LocalDateTime timeModified = createdCounterparty.getLastModified();
     
-        assertTrue(WRONG_CREATED_MESSAGE, testHelper.isTimeBetween(timeStarted, timeCreated, timeFinished));
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, testHelper.isTimeBetween(timeStarted, timeModified, timeFinished));
+        assertTimeBetween(WRONG_CREATED_MESSAGE, timeStarted, timeCreated, timeFinished);
+        assertTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeStarted, timeModified, timeFinished);
     
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(counterpartyMapper.toDto(createdCounterparty));
@@ -224,7 +225,7 @@ public class CounterpartyControllerIT extends BaseControllerIT {
         CounterpartyDto counterpartyDto = counterpartyMapper.toDto(updatedCounterparty);
         LocalDateTime timeModified = updatedCounterparty.getLastModified();
 
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, testHelper.isTimeBetween(timeStarted, timeModified, timeFinished));
+        assertTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeStarted, timeModified, timeFinished);
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, updatedCounterparty.getLastModifier());
         assertThat(WRONG_LAST_MODIFIER_MESSAGE,
                 updatedCounterparty.getLastModifier().getToken(), equalTo(user.getToken()));

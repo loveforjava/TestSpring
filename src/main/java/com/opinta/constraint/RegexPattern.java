@@ -20,5 +20,5 @@ public class RegexPattern {
     public static final String PHONE_NUMBER_REGEX = "^[0-9()+ -]*$";
     
     public static final String DATE_PATTERN = "yyyy-MM-dd";
-    public static final String TIMESTAMP_PATTERN = "yyyy-MM-dd'T'HH:mm:ss";
+    public static final String DATE_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss";
 }

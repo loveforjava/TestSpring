@@ -38,7 +38,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -535,9 +534,5 @@ public class TestHelper {
         } catch (IncorrectInputDataException e) {
             log.debug(e.getMessage());
         }
-    }
-    
-    public boolean isTimeBetween(LocalDateTime begin, LocalDateTime time, LocalDateTime end) {
-        return (begin.isBefore(time) || begin.isEqual(time)) && (end.isAfter(time) || end.isEqual(time));
     }
 }

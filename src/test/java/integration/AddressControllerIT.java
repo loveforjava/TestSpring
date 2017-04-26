@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static integration.helper.AssertHelper.assertTimeBetween;
 import static integration.helper.TestHelper.SAME_REGION_COUNTRYSIDE;
 import static integration.helper.TestHelper.WRONG_CREATED_MESSAGE;
 import static integration.helper.TestHelper.WRONG_LAST_MODIFIED_MESSAGE;
@@ -106,9 +107,9 @@ public class AddressControllerIT extends BaseControllerIT {
         Address createdAddress = addressService.getEntityById(newAddressId);
         LocalDateTime timeCreated = createdAddress.getCreated();
         LocalDateTime timeModified = createdAddress.getLastModified();
-
-        assertTrue(WRONG_CREATED_MESSAGE, testHelper.isTimeBetween(timeStarted, timeCreated, timeFinished));
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, testHelper.isTimeBetween(timeStarted, timeModified, timeFinished));
+    
+        assertTimeBetween(WRONG_CREATED_MESSAGE, timeStarted, timeCreated, timeFinished);
+        assertTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeStarted, timeModified, timeFinished);
 
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(createdAddress);
@@ -170,7 +171,7 @@ public class AddressControllerIT extends BaseControllerIT {
         Address updatedAddress = addressService.getEntityById(addressId);
         LocalDateTime timeModified = updatedAddress.getLastModified();
 
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, testHelper.isTimeBetween(timeStarted, timeModified, timeFinished));
+        assertTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeStarted, timeModified, timeFinished);
 
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(updatedAddress);

@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static integration.helper.AssertHelper.assertTimeBetween;
 import static integration.helper.TestHelper.WRONG_CREATED_MESSAGE;
 import static integration.helper.TestHelper.WRONG_LAST_MODIFIED_MESSAGE;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
@@ -106,8 +107,8 @@ public class PostcodePoolIT extends BaseControllerIT {
         LocalDateTime timeCreated = createdPostcodePool.getCreated();
         LocalDateTime timeModified = createdPostcodePool.getLastModified();
     
-        assertTrue(WRONG_CREATED_MESSAGE, testHelper.isTimeBetween(timeStarted, timeCreated, timeFinished));
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, testHelper.isTimeBetween(timeStarted, timeModified, timeFinished));
+        assertTimeBetween(WRONG_CREATED_MESSAGE, timeStarted, timeCreated, timeFinished);
+        assertTimeBetween(WRONG_LAST_MODIFIED_MESSAGE,  timeStarted, timeModified, timeFinished);
     
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(postcodePoolMapper.toDto(createdPostcodePool));
@@ -148,7 +149,7 @@ public class PostcodePoolIT extends BaseControllerIT {
         PostcodePoolDto postcodePoolDto = postcodePoolMapper.toDto(updatedPostcodePool);
         LocalDateTime timeModified = updatedPostcodePool.getLastModified();
 
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, testHelper.isTimeBetween(timeStarted, timeModified, timeFinished));
+        assertTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeStarted, timeModified, timeFinished);
 
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(postcodePoolDto);

@@ -14,7 +14,7 @@ import lombok.ToString;
 
 import static com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING;
 import static com.opinta.constraint.RegexPattern.BARCODE_LENGTH;
-import static com.opinta.constraint.RegexPattern.TIMESTAMP_PATTERN;
+import static com.opinta.constraint.RegexPattern.DATE_TIME_PATTERN;
 
 @Getter
 @Setter
@@ -35,7 +35,7 @@ public class ShipmentDto {
     private BigDecimal price;
     private BigDecimal postPay;
     private DiscountPerCounterpartyDto discountPerCounterparty;
-    @JsonFormat(shape = STRING, pattern = TIMESTAMP_PATTERN)
+    @JsonFormat(shape = STRING, pattern = DATE_TIME_PATTERN)
     private LocalDateTime lastModified;
     @Size(max = 255)
     private String description;

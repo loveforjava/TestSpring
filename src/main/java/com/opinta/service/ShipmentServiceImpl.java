@@ -95,14 +95,13 @@ public class ShipmentServiceImpl implements ShipmentService {
         PostcodePool postcodePool = shipment.getSender().getCounterparty().getPostcodePool();
         shipment.setBarcodeInnerNumber(barcodeInnerNumberService.generateBarcodeInnerNumber(postcodePool));
         LocalDateTime now = now();
-        shipment.setLastModified(now);
-        shipment.setDiscountPerCounterparty(discountPerCounterpartyService
-                .getEntityWithHighestDiscount(user, shipment.getLastModified()));
-        shipment.setPrice(calculatePrice(shipment));
         shipment.setCreator(user);
         shipment.setLastModifier(user);
         shipment.setCreated(now);
         shipment.setLastModified(now);
+        shipment.setDiscountPerCounterparty(discountPerCounterpartyService
+                .getEntityWithHighestDiscount(user, shipment.getLastModified()));
+        shipment.setPrice(calculatePrice(shipment));
         log.info(LogMessageUtil.saveLogEndpoint(Shipment.class, shipment));
         return shipmentDao.save(shipment);
     }
@@ -170,12 +169,11 @@ public class ShipmentServiceImpl implements ShipmentService {
         target.setSender(clientService.getEntityByUuid(target.getSender().getUuid(), user));
         target.setRecipient(clientService.getEntityByUuidAnonymous(target.getRecipient().getUuid()));
         LocalDateTime now = now();
+        target.setLastModifier(user);
         target.setLastModified(now);
         target.setDiscountPerCounterparty(discountPerCounterpartyService
                 .getEntityWithHighestDiscount(user, target.getLastModified()));
         target.setPrice(calculatePrice(target));
-        target.setLastModifier(user);
-        target.setLastModified(now);
         log.info(updateLogEndpoint(Shipment.class, target));
         shipmentDao.update(target);
         return shipmentMapper.toDto(target);
