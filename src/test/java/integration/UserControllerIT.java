@@ -1,9 +1,9 @@
 package integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.opinta.entity.User;
-import com.opinta.mapper.UserMapper;
-import com.opinta.service.UserService;
+import ua.ukrpost.entity.User;
+import ua.ukrpost.mapper.UserMapper;
+import ua.ukrpost.service.UserService;
 import integration.helper.TestHelper;
 import io.restassured.module.mockmvc.response.MockMvcResponse;
 import org.json.simple.JSONObject;

@@ -3,7 +3,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>ua.test.spring</groupId>
-    <artifactId>TestSpring</artifactId>
+    <artifactId>UkrPostAPI</artifactId>
     <packaging>war</packaging>
     <version>0.0.1-SNAPSHOT</version>
     <name>Test Spring</name>
@@ -274,7 +274,7 @@
                 </executions>
             </plugin>
         </plugins>
-        <finalName>TestSpring</finalName>
+        <finalName>UkrPostAPI</finalName>
         <pluginManagement>
             <plugins>
                 <plugin>

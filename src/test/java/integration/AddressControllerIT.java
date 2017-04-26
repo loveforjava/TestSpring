@@ -3,9 +3,9 @@ package integration;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.opinta.entity.Address;
-import com.opinta.exception.IncorrectInputDataException;
-import com.opinta.service.AddressService;
+import ua.ukrpost.entity.Address;
+import ua.ukrpost.exception.IncorrectInputDataException;
+import ua.ukrpost.service.AddressService;
 import integration.helper.TestHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;

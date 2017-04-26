@@ -1,11 +1,11 @@
 package integration;
 
-import com.opinta.entity.Client;
-import com.opinta.entity.Shipment;
-import com.opinta.entity.ShipmentGroup;
-import com.opinta.entity.User;
-import com.opinta.service.ShipmentService;
-import com.opinta.service.UserService;
+import ua.ukrpost.entity.Client;
+import ua.ukrpost.entity.Shipment;
+import ua.ukrpost.entity.ShipmentGroup;
+import ua.ukrpost.entity.User;
+import ua.ukrpost.service.ShipmentService;
+import ua.ukrpost.service.UserService;
 import integration.helper.TestHelper;
 import java.util.UUID;
 import org.json.simple.JSONObject;

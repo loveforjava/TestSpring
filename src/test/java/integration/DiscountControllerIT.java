@@ -1,8 +1,8 @@
 package integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.opinta.entity.Discount;
-import com.opinta.service.DiscountService;
+import ua.ukrpost.entity.Discount;
+import ua.ukrpost.service.DiscountService;
 import integration.helper.TestHelper;
 import java.time.LocalDateTime;
 import java.util.List;

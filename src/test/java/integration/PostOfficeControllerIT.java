@@ -1,10 +1,10 @@
 package integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.opinta.dto.PostOfficeDto;
-import com.opinta.entity.PostOffice;
-import com.opinta.mapper.PostOfficeMapper;
-import com.opinta.service.PostOfficeService;
+import ua.ukrpost.dto.PostOfficeDto;
+import ua.ukrpost.entity.PostOffice;
+import ua.ukrpost.mapper.PostOfficeMapper;
+import ua.ukrpost.service.PostOfficeService;
 import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
