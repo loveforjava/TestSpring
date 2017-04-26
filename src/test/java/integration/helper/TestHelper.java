@@ -1,35 +1,35 @@
 package integration.helper;
 
-import com.opinta.dto.postid.ClientTypeDto;
-import com.opinta.entity.Address;
-import com.opinta.entity.Client;
-import com.opinta.entity.Counterparty;
-import com.opinta.entity.Discount;
-import com.opinta.entity.DiscountPerCounterparty;
-import com.opinta.entity.Phone;
-import com.opinta.entity.PostOffice;
-import com.opinta.entity.PostcodePool;
-import com.opinta.entity.Shipment;
-import com.opinta.entity.ShipmentGroup;
-import com.opinta.entity.User;
-import com.opinta.exception.AuthException;
-import com.opinta.exception.IncorrectInputDataException;
+import ua.ukrpost.dto.postid.ClientTypeDto;
+import ua.ukrpost.entity.Address;
+import ua.ukrpost.entity.Client;
+import ua.ukrpost.entity.Counterparty;
+import ua.ukrpost.entity.Discount;
+import ua.ukrpost.entity.DiscountPerCounterparty;
+import ua.ukrpost.entity.Phone;
+import ua.ukrpost.entity.PostOffice;
+import ua.ukrpost.entity.PostcodePool;
+import ua.ukrpost.entity.Shipment;
+import ua.ukrpost.entity.ShipmentGroup;
+import ua.ukrpost.entity.User;
+import ua.ukrpost.exception.AuthException;
+import ua.ukrpost.exception.IncorrectInputDataException;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-import com.opinta.service.AddressService;
-import com.opinta.service.ClientService;
-import com.opinta.service.CounterpartyService;
-import com.opinta.service.DiscountPerCounterpartyService;
-import com.opinta.service.DiscountService;
-import com.opinta.service.PhoneService;
-import com.opinta.service.PostOfficeService;
-import com.opinta.service.PostcodePoolService;
-import com.opinta.service.ShipmentGroupService;
-import com.opinta.service.ShipmentService;
-import com.opinta.service.UserService;
+import ua.ukrpost.service.AddressService;
+import ua.ukrpost.service.ClientService;
+import ua.ukrpost.service.CounterpartyService;
+import ua.ukrpost.service.DiscountPerCounterpartyService;
+import ua.ukrpost.service.DiscountService;
+import ua.ukrpost.service.PhoneService;
+import ua.ukrpost.service.PostOfficeService;
+import ua.ukrpost.service.PostcodePoolService;
+import ua.ukrpost.service.ShipmentGroupService;
+import ua.ukrpost.service.ShipmentService;
+import ua.ukrpost.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -43,13 +43,13 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-import static com.opinta.util.LogMessageUtil.updateLogEndpoint;
+import static ua.ukrpost.util.LogMessageUtil.updateLogEndpoint;
 import static java.time.LocalDate.now;
 
-import static com.opinta.entity.ClientType.COMPANY;
-import static com.opinta.entity.ClientType.INDIVIDUAL;
-import static com.opinta.entity.DeliveryType.D2D;
-import static com.opinta.util.LogMessageUtil.deleteOnErrorLogEndpoint;
+import static ua.ukrpost.entity.ClientType.COMPANY;
+import static ua.ukrpost.entity.ClientType.INDIVIDUAL;
+import static ua.ukrpost.entity.DeliveryType.D2D;
+import static ua.ukrpost.util.LogMessageUtil.deleteOnErrorLogEndpoint;
 
 @Component
 @Slf4j

@@ -1,20 +1,20 @@
 package integration;
 
-import com.opinta.constraint.RegexMatcher;
+import ua.ukrpost.constraint.RegexMatcher;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.opinta.dto.ShipmentDto;
-import com.opinta.entity.Address;
-import com.opinta.entity.Client;
-import com.opinta.entity.Counterparty;
-import com.opinta.entity.Shipment;
-import com.opinta.entity.ShipmentGroup;
-import com.opinta.entity.User;
-import com.opinta.mapper.ShipmentMapper;
-import com.opinta.service.ShipmentService;
+import ua.ukrpost.dto.ShipmentDto;
+import ua.ukrpost.entity.Address;
+import ua.ukrpost.entity.Client;
+import ua.ukrpost.entity.Counterparty;
+import ua.ukrpost.entity.Shipment;
+import ua.ukrpost.entity.ShipmentGroup;
+import ua.ukrpost.entity.User;
+import ua.ukrpost.mapper.ShipmentMapper;
+import ua.ukrpost.service.ShipmentService;
 import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -22,7 +22,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import integration.helper.TestHelper;
 
-import static com.opinta.constraint.RegexPattern.BARCODE_REGEX;
+import static ua.ukrpost.constraint.RegexPattern.BARCODE_REGEX;
 import static integration.helper.AssertHelper.assertDateTimeBetween;
 import static integration.helper.TestHelper.NO_CREATOR_MESSAGE;
 import static integration.helper.TestHelper.NO_LAST_MODIFIER_MESSAGE;

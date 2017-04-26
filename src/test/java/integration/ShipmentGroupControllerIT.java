@@ -1,13 +1,13 @@
 package integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.opinta.dto.ShipmentGroupDto;
-import com.opinta.entity.Counterparty;
-import com.opinta.entity.Shipment;
-import com.opinta.entity.ShipmentGroup;
-import com.opinta.entity.User;
-import com.opinta.mapper.ShipmentGroupMapper;
-import com.opinta.service.ShipmentGroupService;
+import ua.ukrpost.dto.ShipmentGroupDto;
+import ua.ukrpost.entity.Counterparty;
+import ua.ukrpost.entity.Shipment;
+import ua.ukrpost.entity.ShipmentGroup;
+import ua.ukrpost.entity.User;
+import ua.ukrpost.mapper.ShipmentGroupMapper;
+import ua.ukrpost.service.ShipmentGroupService;
 import integration.helper.TestHelper;
 import org.json.simple.JSONObject;
 import org.junit.After;

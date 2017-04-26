@@ -4,11 +4,11 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.opinta.entity.Address;
-import com.opinta.entity.Client;
-import com.opinta.entity.User;
-import com.opinta.mapper.ClientMapper;
-import com.opinta.service.ClientService;
+import ua.ukrpost.entity.Address;
+import ua.ukrpost.entity.Client;
+import ua.ukrpost.entity.User;
+import ua.ukrpost.mapper.ClientMapper;
+import ua.ukrpost.service.ClientService;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.After;
@@ -28,9 +28,9 @@ import static integration.helper.TestHelper.WRONG_LAST_MODIFIER_MESSAGE;
 import static java.lang.String.join;
 import static java.lang.String.valueOf;
 
-import static com.opinta.constraint.RegexPattern.POST_ID_LENGTH;
-import static com.opinta.entity.ClientType.INDIVIDUAL;
-import static com.opinta.util.AlphabetCharactersGenerationUtil.characterOf;
+import static ua.ukrpost.constraint.RegexPattern.POST_ID_LENGTH;
+import static ua.ukrpost.entity.ClientType.INDIVIDUAL;
+import static ua.ukrpost.util.AlphabetCharactersGenerationUtil.characterOf;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static java.time.LocalDateTime.now;
 

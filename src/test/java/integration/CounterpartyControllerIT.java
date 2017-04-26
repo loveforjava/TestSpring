@@ -1,8 +1,8 @@
 package integration;
 
-import com.opinta.entity.Client;
-import com.opinta.entity.PostcodePool;
-import com.opinta.service.PostcodePoolService;
+import ua.ukrpost.entity.Client;
+import ua.ukrpost.entity.PostcodePool;
+import ua.ukrpost.service.PostcodePoolService;
 import io.restassured.module.mockmvc.response.MockMvcResponse;
 
 import java.time.LocalDateTime;
@@ -11,11 +11,11 @@ import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.opinta.dto.CounterpartyDto;
-import com.opinta.entity.Counterparty;
-import com.opinta.entity.User;
-import com.opinta.mapper.CounterpartyMapper;
-import com.opinta.service.CounterpartyService;
+import ua.ukrpost.dto.CounterpartyDto;
+import ua.ukrpost.entity.Counterparty;
+import ua.ukrpost.entity.User;
+import ua.ukrpost.mapper.CounterpartyMapper;
+import ua.ukrpost.service.CounterpartyService;
 import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;

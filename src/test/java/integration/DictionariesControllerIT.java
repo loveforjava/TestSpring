@@ -1,7 +1,7 @@
 package integration;
 
-import com.opinta.entity.classifier.TariffGrid;
-import com.opinta.service.TariffGridService;
+import ua.ukrpost.entity.classifier.TariffGrid;
+import ua.ukrpost.service.TariffGridService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 

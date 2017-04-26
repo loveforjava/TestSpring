@@ -1,10 +1,10 @@
 package integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.opinta.dto.PostcodePoolDto;
-import com.opinta.entity.PostcodePool;
-import com.opinta.mapper.PostcodePoolMapper;
-import com.opinta.service.PostcodePoolService;
+import ua.ukrpost.dto.PostcodePoolDto;
+import ua.ukrpost.entity.PostcodePool;
+import ua.ukrpost.mapper.PostcodePoolMapper;
+import ua.ukrpost.service.PostcodePoolService;
 import integration.helper.TestHelper;
 import io.restassured.module.mockmvc.response.MockMvcResponse;
 import lombok.extern.slf4j.Slf4j;
