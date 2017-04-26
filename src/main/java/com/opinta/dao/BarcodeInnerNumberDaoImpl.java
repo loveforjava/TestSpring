@@ -2,7 +2,6 @@ package com.opinta.dao;
 
 import java.sql.CallableStatement;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.List;
 
 import com.opinta.entity.BarcodeInnerNumber;
@@ -18,6 +17,7 @@ import static com.opinta.entity.BarcodeStatus.RESERVED;
 import static java.lang.String.format;
 import static java.sql.Types.INTEGER;
 import static java.sql.Types.VARCHAR;
+import static java.time.LocalDateTime.now;
 
 @Repository
 public class BarcodeInnerNumberDaoImpl implements BarcodeInnerNumberDao {
@@ -84,7 +84,7 @@ public class BarcodeInnerNumberDaoImpl implements BarcodeInnerNumberDao {
         barcodeInnerNumber.setStatus(RESERVED);
         barcodeInnerNumber.setInnerNumber(barcode);
         barcodeInnerNumber.setPostcodePool(postcodePool);
-        barcodeInnerNumber.setCreated(new Date());
+        barcodeInnerNumber.setCreated(now());
         session.persist(barcodeInnerNumber);
 
         return barcodeInnerNumber;

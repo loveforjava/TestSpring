@@ -1,9 +1,10 @@
 package com.opinta.dto;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.opinta.entity.DeliveryType;
 
 import javax.validation.constraints.Size;
@@ -11,7 +12,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import static com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING;
 import static com.opinta.constraint.RegexPattern.BARCODE_LENGTH;
+import static com.opinta.constraint.RegexPattern.DATE_TIME_PATTERN;
 
 @Getter
 @Setter
@@ -32,7 +35,8 @@ public class ShipmentDto {
     private BigDecimal price;
     private BigDecimal postPay;
     private DiscountPerCounterpartyDto discountPerCounterparty;
-    private Date lastModified;
+    @JsonFormat(shape = STRING, pattern = DATE_TIME_PATTERN)
+    private LocalDateTime lastModified;
     @Size(max = 255)
     private String description;
 }

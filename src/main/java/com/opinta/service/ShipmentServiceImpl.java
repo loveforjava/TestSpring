@@ -13,7 +13,7 @@ import com.opinta.util.AddressUtil;
 import com.opinta.util.LogMessageUtil;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static java.lang.String.format;
+import static java.time.LocalDateTime.now;
 
 import static com.opinta.util.AuthorizationUtil.authorizeForAction;
 import static com.opinta.util.EnhancedBeanUtilsBean.copyNotNullProperties;
@@ -93,15 +94,14 @@ public class ShipmentServiceImpl implements ShipmentService {
         shipment.setRecipient(clientService.saveOrGetEntityAnonymous(shipment.getRecipient(), user));
         PostcodePool postcodePool = shipment.getSender().getCounterparty().getPostcodePool();
         shipment.setBarcodeInnerNumber(barcodeInnerNumberService.generateBarcodeInnerNumber(postcodePool));
-        shipment.setLastModified(new Date());
+        LocalDateTime now = now();
+        shipment.setCreator(user);
+        shipment.setLastModifier(user);
+        shipment.setCreated(now);
+        shipment.setLastModified(now);
         shipment.setDiscountPerCounterparty(discountPerCounterpartyService
                 .getEntityWithHighestDiscount(user, shipment.getLastModified()));
         shipment.setPrice(calculatePrice(shipment));
-        Date date = new Date();
-        shipment.setCreated(date);
-        shipment.setLastModified(date);
-        shipment.setCreator(user);
-        shipment.setLastModifier(user);
         log.info(LogMessageUtil.saveLogEndpoint(Shipment.class, shipment));
         return shipmentDao.save(shipment);
     }
@@ -168,12 +168,12 @@ public class ShipmentServiceImpl implements ShipmentService {
         target.setUuid(uuid);
         target.setSender(clientService.getEntityByUuid(target.getSender().getUuid(), user));
         target.setRecipient(clientService.getEntityByUuidAnonymous(target.getRecipient().getUuid()));
-        target.setLastModified(new Date());
+        LocalDateTime now = now();
+        target.setLastModifier(user);
+        target.setLastModified(now);
         target.setDiscountPerCounterparty(discountPerCounterpartyService
                 .getEntityWithHighestDiscount(user, target.getLastModified()));
         target.setPrice(calculatePrice(target));
-        target.setLastModified(new Date());
-        target.setLastModifier(user);
         log.info(updateLogEndpoint(Shipment.class, target));
         shipmentDao.update(target);
         return shipmentMapper.toDto(target);

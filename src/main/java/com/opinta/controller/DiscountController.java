@@ -37,13 +37,13 @@ public class DiscountController extends BaseController {
     
     @GetMapping
     public ResponseEntity<?> getAllDiscounts() {
-        return new ResponseEntity<>(discountService.getAllEntities(), OK);
+        return new ResponseEntity<>(discountService.getAll(), OK);
     }
     
     @GetMapping("{uuid}")
     public ResponseEntity<?> getDiscountByUuid(@PathVariable UUID uuid) {
         try {
-            return new ResponseEntity<>(discountService.getEntityByUuid(uuid), OK);
+            return new ResponseEntity<>(discountService.getByUuid(uuid), OK);
         } catch (IncorrectInputDataException e) {
             return new ResponseEntity<>(getByIdOnErrorLogEndpoint(Discount.class, uuid, e), NOT_FOUND);
         }

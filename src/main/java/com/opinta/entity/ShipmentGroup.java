@@ -4,16 +4,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
-import java.util.Date;
-import java.util.UUID;
-
-import static javax.persistence.TemporalType.TIMESTAMP;
 
 @Entity
 @Data
@@ -28,10 +26,8 @@ public class ShipmentGroup {
     @JoinColumn(name = "counterparty_id")
     private Counterparty counterparty;
 
-    @Temporal(TIMESTAMP)
-    private Date created;
-    @Temporal(TIMESTAMP)
-    private Date lastModified;
+    private LocalDateTime created;
+    private LocalDateTime lastModified;
     @ManyToOne
     @JoinColumn(name = "creator_id")
     private User creator;

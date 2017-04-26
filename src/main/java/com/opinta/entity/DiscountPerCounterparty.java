@@ -1,7 +1,9 @@
 package com.opinta.entity;
 
 import com.opinta.exception.PerformProcessFailedException;
-import java.util.Date;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import javax.persistence.Entity;
@@ -10,14 +12,11 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import static java.lang.String.format;
-import static javax.persistence.TemporalType.TIMESTAMP;
 
 @Entity
 @Data
@@ -31,15 +30,11 @@ public class DiscountPerCounterparty {
     private Counterparty counterparty;
     @ManyToOne
     private Discount discount;
-    @Temporal(TemporalType.DATE)
-    private Date fromDate;
-    @Temporal(TemporalType.DATE)
-    private Date toDate;
+    private LocalDate fromDate;
+    private LocalDate toDate;
 
-    @Temporal(TIMESTAMP)
-    private Date created;
-    @Temporal(TIMESTAMP)
-    private Date lastModified;
+    private LocalDateTime created;
+    private LocalDateTime lastModified;
     @ManyToOne
     @JoinColumn(name = "creator_id")
     private User creator;
@@ -47,7 +42,7 @@ public class DiscountPerCounterparty {
     @JoinColumn(name = "lastModifier_id")
     private User lastModifier;
 
-    public DiscountPerCounterparty(Counterparty counterparty, Discount discount, Date fromDate, Date toDate) {
+    public DiscountPerCounterparty(Counterparty counterparty, Discount discount, LocalDate fromDate, LocalDate toDate) {
         this.counterparty = counterparty;
         this.discount = discount;
         this.fromDate = fromDate;
@@ -55,7 +50,8 @@ public class DiscountPerCounterparty {
     }
 
     public void validate() throws PerformProcessFailedException {
-        if ((discount == null) || (!discount.getFromDate().before(fromDate) && discount.getToDate().after(toDate))) {
+        if ((discount == null) ||
+                (!discount.getFromDate().isBefore(fromDate) && discount.getToDate().isAfter(toDate))) {
             throw new PerformProcessFailedException(
                     format("Discount per counterparty %s is not in the range of the discount %s", this, discount));
         }

@@ -7,13 +7,15 @@ import com.opinta.exception.PerformProcessFailedException;
 import com.opinta.mapper.PostcodePoolMapper;
 import com.opinta.entity.PostcodePool;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import static java.time.LocalDateTime.now;
 
 import static com.opinta.util.EnhancedBeanUtilsBean.copyNotNullProperties;
 import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
@@ -59,9 +61,9 @@ public class PostcodePoolServiceImpl implements PostcodePoolService {
     @Transactional
     public PostcodePool saveEntity(PostcodePool postcodePool) {
         log.info(saveLogEndpoint(PostcodePool.class, postcodePool));
-        Date date = new Date();
-        postcodePool.setCreated(date);
-        postcodePool.setLastModified(date);
+        LocalDateTime now = now();
+        postcodePool.setCreated(now);
+        postcodePool.setLastModified(now);
         return postcodePoolDao.save(postcodePool);
     }
 
@@ -97,7 +99,7 @@ public class PostcodePoolServiceImpl implements PostcodePoolService {
                     PostcodePool.class, source, target, e));
         }
         target.setUuid(uuid);
-        target.setLastModified(new Date());
+        target.setLastModified(now());
         log.info(updateLogEndpoint(PostcodePool.class, target));
         postcodePoolDao.update(target);
         return postcodePoolMapper.toDto(target);

@@ -1,7 +1,8 @@
 package com.opinta.dao;
 
 import com.opinta.entity.User;
-import java.util.Date;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,7 +14,7 @@ public interface DiscountPerCounterpartyDao {
 
     DiscountPerCounterparty getByUuid(UUID uuid);
 
-    DiscountPerCounterparty getHighestDiscount(User user, Date date);
+    DiscountPerCounterparty getHighestDiscount(User user, LocalDateTime date);
 
     DiscountPerCounterparty save(DiscountPerCounterparty discountPerCounterparty);
 

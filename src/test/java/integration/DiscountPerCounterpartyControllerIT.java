@@ -1,7 +1,6 @@
 package integration;
 
-import java.text.SimpleDateFormat;
-import java.util.TimeZone;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,14 +15,13 @@ import integration.helper.TestHelper;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import static com.opinta.util.FormatterUtil.DATE_FORMAT_ISO_8601_24H;
+import static integration.helper.AssertHelper.assertDateTimeBetween;
 import static integration.helper.TestHelper.NO_CREATOR_MESSAGE;
 import static integration.helper.TestHelper.NO_LAST_MODIFIER_MESSAGE;
 import static integration.helper.TestHelper.WRONG_CREATED_MESSAGE;
 import static integration.helper.TestHelper.WRONG_CREATOR_MESSAGE;
 import static integration.helper.TestHelper.WRONG_LAST_MODIFIED_MESSAGE;
 import static integration.helper.TestHelper.WRONG_LAST_MODIFIER_MESSAGE;
-import static java.lang.System.currentTimeMillis;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import org.junit.After;
@@ -31,7 +29,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static java.util.TimeZone.getTimeZone;
+import static java.time.LocalDateTime.now;
+import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
@@ -41,12 +40,10 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
-    private static final TimeZone UTC = getTimeZone("UTC");
 
     @Autowired
     private DiscountPerCounterpartyService discountPerCounterpartyService;
@@ -58,7 +55,6 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
     private Counterparty counterparty;
     private User user;
     private JSONParser jsonParser = new JSONParser();
-    private SimpleDateFormat simpleDateFormat;
     private ObjectMapper jsonMapper = new ObjectMapper();
 
     @Before
@@ -66,11 +62,8 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
         counterparty = testHelper.createCounterparty();
         user = testHelper.createUser(counterparty);
         discountPerCounterparty = testHelper.createDiscountPerCounterparty(testHelper.createDiscount(), counterparty);
-        TimeZone.setDefault(UTC);
-        simpleDateFormat = new SimpleDateFormat(DATE_FORMAT_ISO_8601_24H);
-        simpleDateFormat.setTimeZone(UTC);
     }
-    
+
     @After
     public void tearDown() {
         testHelper.deleteDiscountPerCounterparty(discountPerCounterparty);
@@ -89,12 +82,16 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
 
     @Test
     public void getDiscountPerCounterparty() {
+        String fromDate = discountPerCounterparty.getFromDate().format(ISO_LOCAL_DATE);
+        String toDate = discountPerCounterparty.getToDate().format(ISO_LOCAL_DATE);
         given().
                 queryParam("token", user.getToken()).
         when().
                 get("/counterparty-discounts/{uuid}", discountPerCounterparty.getUuid()).
         then().
                 statusCode(SC_OK).
+                body("fromDate", equalTo(fromDate)).
+                body("toDate", equalTo(toDate)).
                 body("uuid", equalTo(discountPerCounterparty.getUuid().toString()));
     }
     
@@ -106,7 +103,7 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
         inputJson.put("discountUuid", newDiscount.getUuid().toString());
         inputJson.put("counterpartyUuid", counterparty.getUuid().toString());
 
-        long timeStarted = currentTimeMillis();
+        LocalDateTime timeStarted = now();
         String newUuid =
                 given().
                         queryParam("token", user.getToken()).
@@ -118,18 +115,18 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
                         statusCode(SC_OK).
                 extract().
                         path("uuid");
-        long timeFinished = currentTimeMillis();
+        LocalDateTime timeFinished = now();
         UUID newDiscountUuid = UUID.fromString(newUuid);
 
         DiscountPerCounterparty createdDiscountPerCounterparty = discountPerCounterpartyService.
                 getEntityByUuid(newDiscountUuid, user);
         DiscountPerCounterpartyDto discountPerCounterpartyDto = discountPerCounterpartyMapper.
                 toDto(createdDiscountPerCounterparty);
-        long timeCreated = createdDiscountPerCounterparty.getCreated().getTime();
-        long timeModified = createdDiscountPerCounterparty.getLastModified().getTime();
+        LocalDateTime timeCreated = createdDiscountPerCounterparty.getCreated();
+        LocalDateTime timeModified = createdDiscountPerCounterparty.getLastModified();
 
-        assertTrue(WRONG_CREATED_MESSAGE, timeFinished >= timeCreated && timeCreated >= timeStarted);
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished >= timeModified && timeModified >= timeStarted);
+        assertDateTimeBetween(WRONG_CREATED_MESSAGE, timeCreated, timeStarted, timeFinished);
+        assertDateTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeModified, timeStarted, timeFinished);
         assertNotNull(NO_CREATOR_MESSAGE, createdDiscountPerCounterparty.getCreator());
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, createdDiscountPerCounterparty.getLastModifier());
         assertThat(WRONG_CREATOR_MESSAGE, createdDiscountPerCounterparty.getCreator().getToken(), equalTo(user.getToken()));
@@ -140,8 +137,8 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
         expectedJson.put("uuid", discountPerCounterpartyDto.getUuid());
         
         JSONObject actualJson = (JSONObject) jsonParser.parse(jsonMapper.writeValueAsString(discountPerCounterpartyDto));
-        actualJson.put("fromDate", simpleDateFormat.format(discountPerCounterpartyDto.getFromDate()));
-        actualJson.put("toDate", simpleDateFormat.format(discountPerCounterpartyDto.getToDate()));
+        actualJson.put("fromDate", discountPerCounterpartyDto.getFromDate().toString());
+        actualJson.put("toDate", discountPerCounterpartyDto.getToDate().toString());
         
         assertEquals(expectedJson.toString(), actualJson.toString(), false);
     }
@@ -155,7 +152,7 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
         inputJson.put("discountUuid", newDiscount.getUuid().toString());
         inputJson.put("counterpartyUuid", counterparty.getUuid().toString());
 
-        long timeStarted = currentTimeMillis();
+        LocalDateTime timeStarted = now();
         given().
                 queryParam("token", user.getToken()).
                 contentType(APPLICATION_JSON_VALUE).
@@ -165,13 +162,13 @@ public class DiscountPerCounterpartyControllerIT extends BaseControllerIT {
         then().
                 body("discountUuid", equalTo(newDiscount.getUuid().toString())).
                 statusCode(SC_OK);
-        long timeFinished = currentTimeMillis();
+        LocalDateTime timeFinished = now();
 
         DiscountPerCounterparty updatedDiscountPerCounterparty = discountPerCounterpartyService
                 .getEntityByUuid(discountPerCounterparty.getUuid(), user);
-        long timeModified = updatedDiscountPerCounterparty.getLastModified().getTime();
+        LocalDateTime timeModified = updatedDiscountPerCounterparty.getLastModified();
 
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished >= timeModified && timeModified >= timeStarted);
+        assertDateTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeModified, timeStarted, timeFinished);
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, updatedDiscountPerCounterparty.getCreator());
         assertThat(WRONG_LAST_MODIFIER_MESSAGE,
                 updatedDiscountPerCounterparty.getLastModifier().getToken(), equalTo(user.getToken()));

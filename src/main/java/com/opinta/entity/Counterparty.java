@@ -1,21 +1,17 @@
 package com.opinta.entity;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
 import javax.validation.constraints.NotNull;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
-
-import static javax.persistence.TemporalType.TIMESTAMP;
-
 
 /**
  * Counterparty is the group of clients with the same postcode
@@ -34,10 +30,8 @@ public class Counterparty {
     private PostcodePool postcodePool;
     private String description;
 
-    @Temporal(TIMESTAMP)
-    private Date created;
-    @Temporal(TIMESTAMP)
-    private Date lastModified;
+    private LocalDateTime created;
+    private LocalDateTime lastModified;
     @ManyToOne
     @JoinColumn(name = "creator_id")
     private User creator;

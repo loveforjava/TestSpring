@@ -11,14 +11,16 @@ import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static integration.helper.AssertHelper.assertDateTimeBetween;
 import static integration.helper.TestHelper.WRONG_CREATED_MESSAGE;
 import static integration.helper.TestHelper.WRONG_LAST_MODIFIED_MESSAGE;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
-import static java.lang.System.currentTimeMillis;
+import static java.time.LocalDateTime.now;
+
 import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static org.junit.Assert.assertTrue;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 public class UserControllerIT extends BaseControllerIT {
@@ -36,7 +38,7 @@ public class UserControllerIT extends BaseControllerIT {
         jsonObject.put("counterpartyUuid", testHelper.createCounterparty().getUuid().toString());
         String expectedJson = jsonObject.toString();
 
-        long timeStarted = currentTimeMillis();
+        LocalDateTime timeStarted = now();
         MockMvcResponse response =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
@@ -48,14 +50,14 @@ public class UserControllerIT extends BaseControllerIT {
                         statusCode(SC_OK).
                 extract()
                         .response();
-        long timeFinished = currentTimeMillis();
+        LocalDateTime timeFinished = now();
 
         User createdUser = userService.getEntityByToken(UUID.fromString(response.path("token")));
-        long timeCreated = createdUser.getCreated().getTime();
-        long timeModified = createdUser.getLastModified().getTime();
+        LocalDateTime timeCreated = createdUser.getCreated();
+        LocalDateTime timeModified = createdUser.getLastModified();
 
-        assertTrue(WRONG_CREATED_MESSAGE, timeFinished >= timeCreated && timeCreated >= timeStarted);
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished >= timeModified && timeModified >= timeStarted);
+        assertDateTimeBetween(WRONG_CREATED_MESSAGE, timeCreated, timeStarted, timeFinished);
+        assertDateTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeModified, timeStarted, timeFinished);
 
         ObjectMapper mapper = new ObjectMapper();
         String actualJson = mapper.writeValueAsString(userMapper.toDto(createdUser));

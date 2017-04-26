@@ -13,7 +13,7 @@ import com.opinta.mapper.DiscountPerCounterpartyMapper;
 import com.opinta.util.LogMessageUtil;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import javax.transaction.Transactional;
@@ -29,6 +29,7 @@ import static com.opinta.util.LogMessageUtil.getByIdOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.saveLogEndpoint;
 import static com.opinta.util.LogMessageUtil.updateLogEndpoint;
 import static java.lang.String.format;
+import static java.time.LocalDateTime.now;
 
 @Service
 @Slf4j
@@ -74,7 +75,7 @@ public class DiscountPerCounterpartyServiceImpl implements DiscountPerCounterpar
 
     @Override
     @Transactional
-    public DiscountPerCounterparty getEntityWithHighestDiscount(User user, Date date) {
+    public DiscountPerCounterparty getEntityWithHighestDiscount(User user, LocalDateTime date) {
         log.info(format("Get the highest value of DiscountPerCounterparty for the %s for user %s", date, user));
         return discountPerCounterpartyDao.getHighestDiscount(user, date);
     }
@@ -90,9 +91,9 @@ public class DiscountPerCounterpartyServiceImpl implements DiscountPerCounterpar
         discountPerCounterparty.setCounterparty(counterparty);
         discountPerCounterparty.setDiscount(discount);
         discountPerCounterparty.validate();
-        Date date = new Date();
-        discountPerCounterparty.setCreated(date);
-        discountPerCounterparty.setLastModified(date);
+        LocalDateTime now = now();
+        discountPerCounterparty.setCreated(now);
+        discountPerCounterparty.setLastModified(now);
         discountPerCounterparty.setCreator(user);
         discountPerCounterparty.setLastModifier(user);
         log.info(saveLogEndpoint(DiscountPerCounterparty.class, discountPerCounterparty));
@@ -115,7 +116,7 @@ public class DiscountPerCounterpartyServiceImpl implements DiscountPerCounterpar
         }
         target.setUuid(uuid);
         log.info(updateLogEndpoint(Discount.class, target));
-        target.setLastModified(new Date());
+        target.setLastModified(now());
         target.setLastModifier(user);
         discountPerCounterpartyDao.update(target);
         return target;

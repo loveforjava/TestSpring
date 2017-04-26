@@ -6,7 +6,7 @@ import com.opinta.entity.Counterparty;
 import com.opinta.entity.User;
 import com.opinta.exception.AuthException;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import javax.transaction.Transactional;
@@ -16,6 +16,8 @@ import com.opinta.mapper.UserMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import static java.time.LocalDateTime.now;
 
 import static com.opinta.util.LogMessageUtil.authenticationOnErrorLogEndpoint;
 import static com.opinta.util.LogMessageUtil.getByIdLogEndpoint;
@@ -60,9 +62,9 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User saveEntity(User user) throws IncorrectInputDataException, AuthException {
         user.setCounterparty(counterpartyService.getEntityByUuid(user.getCounterparty().getUuid(), user));
-        Date date = new Date();
-        user.setCreated(date);
-        user.setLastModified(date);
+        LocalDateTime now = now();
+        user.setCreated(now);
+        user.setLastModified(now);
         return userDao.save(user);
     }
 
@@ -77,7 +79,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User updateEntity(User user) throws IncorrectInputDataException, AuthException {
         log.info(updateLogEndpoint(User.class, user));
-        user.setLastModified(new Date());
+        user.setLastModified(now());
         userDao.update(user);
         return user;
     }

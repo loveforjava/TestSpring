@@ -3,7 +3,6 @@ package integration.helper;
 import com.opinta.dto.postid.ClientTypeDto;
 import com.opinta.entity.Address;
 import com.opinta.entity.Client;
-import com.opinta.entity.ClientType;
 import com.opinta.entity.Counterparty;
 import com.opinta.entity.Discount;
 import com.opinta.entity.DiscountPerCounterparty;
@@ -19,8 +18,6 @@ import com.opinta.exception.IncorrectInputDataException;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-
-import java.time.ZoneOffset;
 
 import com.opinta.service.AddressService;
 import com.opinta.service.ClientService;
@@ -42,13 +39,12 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
 import static com.opinta.util.LogMessageUtil.updateLogEndpoint;
-import static java.time.LocalDateTime.now;
+import static java.time.LocalDate.now;
 
 import static com.opinta.entity.ClientType.COMPANY;
 import static com.opinta.entity.ClientType.INDIVIDUAL;
@@ -457,15 +453,9 @@ public class TestHelper {
     public List<Discount> createDiscounts() {
         List<Discount> created = new ArrayList<>();
         
-        Discount discount1 = new Discount("first",
-                Date.from(now().minusMonths(1).toInstant(ZoneOffset.UTC)),
-                Date.from(now().plusMonths(3).toInstant(ZoneOffset.UTC)), 10F);
-        Discount discount2 = new Discount("second",
-                Date.from(now().minusMonths(3).toInstant(ZoneOffset.UTC)),
-                Date.from(now().plusMonths(1).toInstant(ZoneOffset.UTC)), 10F);
-        Discount discount3 = new Discount("third",
-                Date.from(now().minusMonths(1).toInstant(ZoneOffset.UTC)),
-                Date.from(now().plusMonths(6).toInstant(ZoneOffset.UTC)), 10F);
+        Discount discount1 = new Discount("first", now().minusMonths(1), now().plusMonths(3), 10F);
+        Discount discount2 = new Discount("second", now().minusMonths(3), now().plusMonths(1), 10F);
+        Discount discount3 = new Discount("third", now().minusMonths(1), now().plusMonths(6), 10F);
 
         created.add(discountService.saveEntity(discount1));
         created.add(discountService.saveEntity(discount2));
@@ -476,24 +466,21 @@ public class TestHelper {
     
     public Discount createDiscount() {
         Discount discount = new Discount("one more discount",
-                Date.from(now().minusMonths(2).toInstant(ZoneOffset.UTC)),
-                Date.from(now().plusMonths(4).toInstant(ZoneOffset.UTC)),
+                now().minusMonths(2), now().plusMonths(4),
                 DISCOUNT);
         return discountService.saveEntity(discount);
     }
     
     public Discount createExpiredDiscount() {
         Discount discount = new Discount("one more discount",
-                Date.from(now().minusMonths(6).toInstant(ZoneOffset.UTC)),
-                Date.from(now().minusMonths(2).toInstant(ZoneOffset.UTC)), 5F);
+                now().minusMonths(6), now().minusMonths(2), 5F);
         return discountService.saveEntity(discount);
     }
     
     public DiscountPerCounterparty createDiscountPerCounterparty(Discount discount,
             Counterparty counterparty) throws Exception {
         DiscountPerCounterparty discountPerCounterparty = new DiscountPerCounterparty(counterparty, discount,
-                Date.from(now().minusDays(20).toInstant(ZoneOffset.UTC)),
-                Date.from(now().plusDays(20).toInstant(ZoneOffset.UTC)));
+                now().minusDays(20), now().plusDays(20));
         return discountPerCounterpartyService.saveEntity(discountPerCounterparty,
                 userService.getUsersByCounterparty(counterparty).get(0));
     }
@@ -501,8 +488,7 @@ public class TestHelper {
     public DiscountPerCounterparty createDiscountPerCounterparty(Counterparty counterparty, Discount discount)
             throws Exception {
         DiscountPerCounterparty discountPerCounterparty = new DiscountPerCounterparty(counterparty, discount,
-                Date.from(now().minusDays(15).toInstant(ZoneOffset.UTC)),
-                Date.from(now().plusDays(25).toInstant(ZoneOffset.UTC)));
+                now().minusDays(15), now().plusDays(25));
         return discountPerCounterpartyService.saveEntity(discountPerCounterparty,
                 userService.getUsersByCounterparty(counterparty).get(0));
     }

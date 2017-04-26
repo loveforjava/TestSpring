@@ -1,18 +1,16 @@
 package com.opinta.entity;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import static javax.persistence.EnumType.STRING;
-import static javax.persistence.TemporalType.TIMESTAMP;
 
 @Entity
 @Data
@@ -29,11 +27,10 @@ public class ShipmentTrackingDetail {
     private PostOffice postOffice;
     @Enumerated(STRING)
     private ShipmentStatus shipmentStatus;
-    @Temporal(TIMESTAMP)
-    private Date statusDate;
+    private LocalDateTime statusDate;
 
     public ShipmentTrackingDetail(Shipment shipment, PostOffice postOffice, ShipmentStatus shipmentStatus,
-                                  Date statusDate) {
+                                  LocalDateTime statusDate) {
         this.shipment = shipment;
         this.postOffice = postOffice;
         this.shipmentStatus = shipmentStatus;

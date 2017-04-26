@@ -1,5 +1,6 @@
 package integration;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,6 +18,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import integration.helper.TestHelper;
 
+import static integration.helper.AssertHelper.assertDateTimeBetween;
 import static integration.helper.TestHelper.NO_CREATOR_MESSAGE;
 import static integration.helper.TestHelper.NO_LAST_MODIFIER_MESSAGE;
 import static integration.helper.TestHelper.WRONG_CREATED_MESSAGE;
@@ -30,7 +32,8 @@ import static com.opinta.constraint.RegexPattern.POST_ID_LENGTH;
 import static com.opinta.entity.ClientType.INDIVIDUAL;
 import static com.opinta.util.AlphabetCharactersGenerationUtil.characterOf;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
-import static java.lang.System.currentTimeMillis;
+import static java.time.LocalDateTime.now;
+
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
@@ -38,7 +41,6 @@ import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -112,7 +114,7 @@ public class ClientControllerIT extends BaseControllerIT {
         String lastName = (String) inputJson.get("lastName");
         String expectedFullName = join(" ", lastName, firstName, middleName);
 
-        long timeStarted = currentTimeMillis();
+        LocalDateTime timeStarted = now();
         String newUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
@@ -128,7 +130,7 @@ public class ClientControllerIT extends BaseControllerIT {
                         body("lastName", equalTo(lastName)).
                 extract().
                         path("uuid");
-        long timeFinished = currentTimeMillis();
+        LocalDateTime timeFinished = now();
 
         JSONParser parser = new JSONParser();
         JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
@@ -140,11 +142,11 @@ public class ClientControllerIT extends BaseControllerIT {
 
         // check created data
         Client createdClient = clientService.getEntityByUuid(newClientUuid, user);
-        long timeCreated = createdClient.getCreated().getTime();
-        long timeModified = createdClient.getLastModified().getTime();
+        LocalDateTime timeCreated = createdClient.getCreated();
+        LocalDateTime timeModified = createdClient.getLastModified();
 
-        assertTrue(WRONG_CREATED_MESSAGE, timeFinished >= timeCreated && timeCreated >= timeStarted);
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished >= timeModified && timeModified >= timeStarted);
+        assertDateTimeBetween(WRONG_CREATED_MESSAGE, timeCreated, timeStarted, timeFinished);
+        assertDateTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeModified, timeStarted, timeFinished);
         assertNotNull(NO_CREATOR_MESSAGE, createdClient.getCreator());
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, createdClient.getLastModifier());
         assertThat(WRONG_CREATOR_MESSAGE, createdClient.getCreator().getToken(), equalTo(user.getToken()));
@@ -171,7 +173,7 @@ public class ClientControllerIT extends BaseControllerIT {
 
         String expectedFullName = (String) inputJson.get("name");
 
-        long timeStarted = currentTimeMillis();
+        LocalDateTime timeStarted = now();
         String newUuid =
                 given().
                         contentType(APPLICATION_JSON_VALUE).
@@ -187,7 +189,7 @@ public class ClientControllerIT extends BaseControllerIT {
                         body("lastName", equalTo("")).
                 extract().
                         path("uuid");
-        long timeFinished = currentTimeMillis();
+        LocalDateTime timeFinished = now();
 
 
         inputJson.remove("postId");
@@ -204,11 +206,11 @@ public class ClientControllerIT extends BaseControllerIT {
 
         // check created data
         Client createdClient = clientService.getEntityByUuid(newClientUuid, user);
-        long timeCreated = createdClient.getCreated().getTime();
-        long timeModified = createdClient.getLastModified().getTime();
+        LocalDateTime timeCreated = createdClient.getCreated();
+        LocalDateTime timeModified = createdClient.getLastModified();
 
-        assertTrue(WRONG_CREATED_MESSAGE, timeFinished >= timeCreated && timeCreated >= timeStarted);
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished >= timeModified && timeModified >= timeStarted);
+        assertDateTimeBetween(WRONG_CREATED_MESSAGE, timeCreated, timeStarted, timeFinished);
+        assertDateTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeModified, timeStarted, timeFinished);
         assertNotNull(NO_CREATOR_MESSAGE, createdClient.getCreator());
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, createdClient.getLastModifier());
         assertThat(WRONG_CREATOR_MESSAGE, createdClient.getCreator().getToken(), equalTo(user.getToken()));
@@ -239,7 +241,7 @@ public class ClientControllerIT extends BaseControllerIT {
         String middleName = (String) inputJson.get("middleName");
         String lastName = (String) inputJson.get("lastName");
 
-        long timeStarted = currentTimeMillis();
+        LocalDateTime timeStarted = now();
         given().
                 contentType(APPLICATION_JSON_VALUE).
                 queryParam("token", user.getToken()).
@@ -249,7 +251,7 @@ public class ClientControllerIT extends BaseControllerIT {
         then().
                 body("counterpartyUuid", equalTo(client.getCounterparty().getUuid().toString())).
                 statusCode(SC_OK);
-        long timeFinished = currentTimeMillis();
+        LocalDateTime timeFinished = now();
 
         JSONParser parser = new JSONParser();
         JSONObject expectedJson = (JSONObject) parser.parse(inputJson.toJSONString());
@@ -261,9 +263,9 @@ public class ClientControllerIT extends BaseControllerIT {
 
         // check updated data
         Client updatedClient = clientService.getEntityByUuid(clientUuid, user);
-        long timeModified = updatedClient.getLastModified().getTime();
+        LocalDateTime timeModified = updatedClient.getLastModified();
 
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished >= timeModified && timeModified >= timeStarted);
+        assertDateTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeModified, timeStarted, timeFinished);
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, updatedClient.getCreator());
         assertThat(WRONG_LAST_MODIFIER_MESSAGE,
                 updatedClient.getLastModifier().getToken(), equalTo(user.getToken()));
@@ -288,7 +290,7 @@ public class ClientControllerIT extends BaseControllerIT {
         String middleName = (String) inputJson.get("middleName");
         String lastName = (String) inputJson.get("lastName");
 
-        long timeStarted = currentTimeMillis();
+        LocalDateTime timeStarted = now();
         given().
                 contentType(APPLICATION_JSON_VALUE).
                 queryParam("token", user.getToken()).
@@ -298,7 +300,7 @@ public class ClientControllerIT extends BaseControllerIT {
         then().
                 body("counterpartyUuid", equalTo(client.getCounterparty().getUuid().toString())).
                 statusCode(SC_OK);
-        long timeFinished = currentTimeMillis();
+        LocalDateTime timeFinished = now();
 
         inputJson.remove("postId");
         JSONParser parser = new JSONParser();
@@ -311,9 +313,9 @@ public class ClientControllerIT extends BaseControllerIT {
 
         // check updated data
         Client updatedClient = clientService.getEntityByUuid(clientUuid, user);
-        long timeModified = updatedClient.getLastModified().getTime();
+        LocalDateTime timeModified = updatedClient.getLastModified();
 
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished >= timeModified && timeModified >= timeStarted);
+        assertDateTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeModified, timeStarted, timeFinished);
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, updatedClient.getCreator());
         assertThat(WRONG_LAST_MODIFIER_MESSAGE, updatedClient.getLastModifier().getToken(), equalTo(user.getToken()));
 
@@ -331,7 +333,7 @@ public class ClientControllerIT extends BaseControllerIT {
         inputJson.put("name", "Rozetka & Roga & Kopyta [edited]");
         inputJson.put("individual", false);
 
-        long timeStarted = currentTimeMillis();
+        LocalDateTime timeStarted = now();
         given().
                 contentType(APPLICATION_JSON_VALUE).
                 queryParam("token", user.getToken()).
@@ -341,7 +343,7 @@ public class ClientControllerIT extends BaseControllerIT {
         then().
                 body("counterpartyUuid", equalTo(client.getCounterparty().getUuid().toString())).
                 statusCode(SC_OK);
-        long timeFinished = currentTimeMillis();
+        LocalDateTime timeFinished = now();
 
         inputJson.remove("postId");
         JSONParser parser = new JSONParser();
@@ -356,9 +358,9 @@ public class ClientControllerIT extends BaseControllerIT {
 
         // check updated data
         Client updatedClient = clientService.getEntityByUuid(clientUuid, user);
-        long timeModified = updatedClient.getLastModified().getTime();
+        LocalDateTime timeModified = updatedClient.getLastModified();
 
-        assertTrue(WRONG_LAST_MODIFIED_MESSAGE, timeFinished >= timeModified && timeModified >= timeStarted);
+        assertDateTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeModified, timeStarted, timeFinished);
         assertNotNull(NO_LAST_MODIFIER_MESSAGE, updatedClient.getCreator());
         assertThat(WRONG_LAST_MODIFIER_MESSAGE, updatedClient.getLastModifier().getToken(), equalTo(user.getToken()));
 

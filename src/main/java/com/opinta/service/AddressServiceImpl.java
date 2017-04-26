@@ -3,7 +3,7 @@ package com.opinta.service;
 import com.opinta.exception.IncorrectInputDataException;
 import com.opinta.exception.PerformProcessFailedException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -15,6 +15,8 @@ import com.opinta.entity.Address;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import static java.time.LocalDateTime.now;
 
 import static com.opinta.util.EnhancedBeanUtilsBean.copyNotNullProperties;
 import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
@@ -64,9 +66,9 @@ public class AddressServiceImpl implements AddressService {
     public Address saveEntity(Address address) {
         log.info(saveLogEndpoint(Address.class, address));
         address.setCountryside(countrysidePostcodeService.isPostcodeInCountryside(address.getPostcode()));
-        Date date = new Date();
-        address.setCreated(date);
-        address.setLastModified(date);
+        LocalDateTime now = now();
+        address.setCreated(now);
+        address.setLastModified(now);
         return addressDao.save(address);
     }
 
@@ -84,7 +86,7 @@ public class AddressServiceImpl implements AddressService {
         target.setId(id);
         target.setCountryside(countrysidePostcodeService.isPostcodeInCountryside(target.getPostcode()));
         log.info(updateLogEndpoint(Address.class, target));
-        target.setLastModified(new Date());
+        target.setLastModified(now());
         addressDao.update(target);
         return target;
     }

@@ -9,7 +9,6 @@ import com.opinta.exception.PerformProcessFailedException;
 import com.opinta.util.LogMessageUtil;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,6 +20,8 @@ import com.opinta.mapper.CounterpartyMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import static java.time.LocalDateTime.now;
 
 import static com.opinta.util.AuthorizationUtil.authorizeForAction;
 import static com.opinta.util.EnhancedBeanUtilsBean.copyNotNullProperties;
@@ -91,9 +92,8 @@ public class CounterpartyServiceImpl implements CounterpartyService {
     @Override
     @Transactional
     public Counterparty saveEntity(Counterparty counterparty) throws IncorrectInputDataException {
-        Date date = new Date();
-        counterparty.setCreated(date);
-        counterparty.setLastModified(date);
+        counterparty.setCreated(now());
+        counterparty.setLastModified(now());
         log.info(saveLogEndpoint(Counterparty.class, counterparty));
         return counterpartyDao.save(counterparty);
     }
@@ -133,7 +133,7 @@ public class CounterpartyServiceImpl implements CounterpartyService {
         }
         target.setUuid(uuid);
         log.info(updateLogEndpoint(Counterparty.class, target));
-        target.setLastModified(new Date());
+        target.setLastModified(now());
         target.setLastModifier(user);
         counterpartyDao.update(target);
         return counterpartyMapper.toDto(target);

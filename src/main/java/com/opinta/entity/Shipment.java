@@ -1,7 +1,7 @@
 package com.opinta.entity;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import javax.persistence.Entity;
@@ -13,12 +13,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
-import javax.persistence.Temporal;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
-
-import static javax.persistence.TemporalType.TIMESTAMP;
 
 @Entity
 @Data
@@ -53,10 +50,8 @@ public class Shipment {
     private DiscountPerCounterparty discountPerCounterparty;
     private String description;
 
-    @Temporal(TIMESTAMP)
-    private Date created;
-    @Temporal(TIMESTAMP)
-    private Date lastModified;
+    private LocalDateTime created;
+    private LocalDateTime lastModified;
     @ManyToOne
     @JoinColumn(name = "creator_id")
     private User creator;

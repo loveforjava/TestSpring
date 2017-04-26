@@ -2,7 +2,7 @@ package com.opinta.service;
 
 import com.opinta.exception.PerformProcessFailedException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,6 +16,8 @@ import com.opinta.mapper.DiscountMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import static java.time.LocalDateTime.now;
 
 import static com.opinta.util.EnhancedBeanUtilsBean.copyNotNullProperties;
 import static com.opinta.util.LogMessageUtil.copyPropertiesOnErrorLogEndpoint;
@@ -55,9 +57,9 @@ public class DiscountServiceImpl implements DiscountService {
     @Override
     @Transactional
     public Discount saveEntity(Discount discount) {
-        Date date = new Date();
-        discount.setCreated(date);
-        discount.setLastModified(date);
+        LocalDateTime now = now();
+        discount.setCreated(now);
+        discount.setLastModified(now);
         return discountDao.save(discount);
     }
 
@@ -75,11 +77,23 @@ public class DiscountServiceImpl implements DiscountService {
         }
         target.setUuid(uuid);
         log.info(updateLogEndpoint(Discount.class, target));
-        target.setLastModified(new Date());
+        target.setLastModified(now());
         discountDao.update(target);
         return target;
     }
-
+    
+    @Override
+    @Transactional
+    public List<DiscountDto> getAll() {
+        return discountMapper.toDto(getAllEntities());
+    }
+    
+    @Override
+    @Transactional
+    public DiscountDto getByUuid(UUID uuid) throws IncorrectInputDataException {
+        return discountMapper.toDto(getEntityByUuid(uuid));
+    }
+    
     @Override
     @Transactional
     public DiscountDto save(DiscountDto dto) {
