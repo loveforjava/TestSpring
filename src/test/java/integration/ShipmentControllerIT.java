@@ -224,7 +224,6 @@ public class ShipmentControllerIT extends BaseControllerIT {
                 extract().
                         path("uuid");
         LocalDateTime timeFinished = now();
-
         
         // check created data
         Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid), user);
@@ -270,7 +269,6 @@ public class ShipmentControllerIT extends BaseControllerIT {
                 extract().
                         path("uuid");
         LocalDateTime timeFinished = now();
-
         
         // check created data
         Shipment createdShipment = shipmentService.getEntityByUuid(UUID.fromString(newShipmentUuid), user);

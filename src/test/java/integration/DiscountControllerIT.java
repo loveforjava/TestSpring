@@ -33,7 +33,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
 public class DiscountControllerIT extends BaseControllerIT {
-
     @Autowired
     private DiscountService discountService;
     @Autowired
@@ -114,8 +113,7 @@ public class DiscountControllerIT extends BaseControllerIT {
     
         assertDateTimeBetween(WRONG_CREATED_MESSAGE, timeCreated, timeStarted, timeFinished);
         assertDateTimeBetween(WRONG_LAST_MODIFIED_MESSAGE, timeModified, timeStarted, timeFinished);
-    
-    
+        
         JSONObject actualJson = (JSONObject) parser.parse(objectMapper.writeValueAsString(createdDiscount));
 
         JSONAssert.assertEquals(expectedJson.toString(), actualJson.toString(), false);
